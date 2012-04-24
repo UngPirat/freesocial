@@ -229,8 +229,7 @@ class BackupAccountForm extends Form
               'format. This is an experimental feature and provides an '.
               'incomplete backup; private account '.
               'information like email and IM addresses is not backed up. '.
-              'Additionally, uploaded files and direct messages are not '.
-              'backed up.');
+              'Additionally, uploaded files are not backed up.');
         $this->out->elementStart('p');
         $this->out->raw($msg);
         $this->out->elementEnd('p');
