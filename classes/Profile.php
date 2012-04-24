@@ -1190,7 +1190,6 @@ class Profile extends Managed_DataObject
                 $result = $this->hasRole(Profile_role::OWNER);
                 break;
             case Right::NEWNOTICE:
-            case Right::NEWMESSAGE:
             case Right::SUBSCRIBE:
             case Right::CREATEGROUP:
                 $result = !$this->isSilenced();

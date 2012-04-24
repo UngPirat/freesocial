@@ -595,61 +595,6 @@ function mail_notify_nudge($from, $to)
 }
 
 /**
- * send a message to notify a user of a direct message (DM)
- *
- * This function checks to see if the recipient wants notification
- * of DMs and has a configured email address.
- *
- * @param Message $message message to notify about
- * @param User    $from    user sending message; default to sender
- * @param User    $to      user receiving message; default to recipient
- *
- * @return boolean success code
- */
-function mail_notify_message($message, $from=null, $to=null)
-{
-    if (is_null($from)) {
-        $from = User::staticGet('id', $message->from_profile);
-    }
-
-    if (is_null($to)) {
-        $to = User::staticGet('id', $message->to_profile);
-    }
-
-    if (is_null($to->email) || !$to->emailnotifymsg) {
-        return true;
-    }
-
-    common_switch_locale($to->language);
-    // TRANS: Subject for direct-message notification email.
-    // TRANS: %s is the sending user's nickname.
-    $subject = sprintf(_('New private message from %s'), $from->nickname);
-
-    $from_profile = $from->getProfile();
-
-    // TRANS: Body for direct-message notification email.
-    // TRANS: %1$s is the sending user's long name, %2$s is the sending user's nickname,
-    // TRANS: %3$s is the message content, %4$s a URL to the message,
-    $body = sprintf(_("%1\$s (%2\$s) sent you a private message:\n\n".
-                      "------------------------------------------------------\n".
-                      "%3\$s\n".
-                      "------------------------------------------------------\n\n".
-                      "You can reply to their message here:\n\n".
-                      "%4\$s\n\n".
-                      "Don't reply to this email; it won't get to them."),
-                    $from_profile->getBestName(),
-                    $from->nickname,
-                    $message->content,
-                    common_local_url('newmessage', array('to' => $from->id))) .
-            mail_footer_block();
-
-    $headers = _mail_prepare_headers('message', $to->nickname, $from->nickname);
-
-    common_switch_locale();
-    return mail_to_user($to, $subject, $body, $headers);
-}
-
-/**
  * Notify a user that one of their notices has been chosen as a 'fave'
  *
  * Doesn't check that the user has an email address nor if they

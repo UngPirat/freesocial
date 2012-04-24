@@ -269,12 +269,6 @@ class Router
                         array('action' => 'conversationreplies'),
                         array('id' => '[0-9]+'));
 
-            $m->connect('message/new', array('action' => 'newmessage'));
-            $m->connect('message/new?to=:to', array('action' => 'newmessage'), array('to' => Nickname::DISPLAY_FMT));
-            $m->connect('message/:message',
-                        array('action' => 'showmessage'),
-                        array('message' => '[0-9]+'));
-
             $m->connect('user/:id',
                         array('action' => 'userbyid'),
                         array('id' => '[0-9]+'));
