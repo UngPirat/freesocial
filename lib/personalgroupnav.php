@@ -104,19 +104,19 @@ class PersonalGroupNav extends Menu
                                          ($user_profile) ? $name : _m('FIXME','User')),
                                  $mine && $action =='showfavorites', 'nav_timeline_favorites');
 
-            $cur = common_current_user();
-
-            if ($cur && $cur->id == $user->id &&
-                !common_config('singleuser', 'enabled')) {
-
-                $this->out->menuItem(common_local_url('inbox', array('nickname' =>
-                                                                     $nickname)),
-                                     // TRANS: Menu item in personal group navigation menu.
-                                     _m('MENU','Messages'),
-                                     // TRANS: Menu item title in personal group navigation menu.
-                                     _('Your incoming messages'),
-                                     $mine && $action =='inbox');
-            }
+//            $cur = common_current_user();
+//
+//            if ($cur && $cur->id == $user->id &&
+//                !common_config('singleuser', 'enabled')) {
+//
+//                $this->out->menuItem(common_local_url('inbox', array('nickname' =>
+//                                                                     $nickname)),
+//                                     // TRANS: Menu item in personal group navigation menu.
+//                                     _m('MENU','Messages'),
+//                                     // TRANS: Menu item title in personal group navigation menu.
+//                                     _('Your incoming messages'),
+//                                     $mine && $action =='inbox');
+//            }
 
             Event::handle('EndPersonalGroupNav', array($this));
         }
