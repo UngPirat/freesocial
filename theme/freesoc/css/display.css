@@ -17,13 +17,13 @@ address {
 
 body {
     background-color: #000000;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
 	font-size: 12px;
     color: #222;
 }
 
 input, textarea, select, option {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font-family: Helvetica, Arial, sans-serif; 
 }
 
 a {color: #007;}
