@@ -62,50 +62,19 @@ class Inbox extends Managed_DataObject
     }
 
     /**
-     * Create a new inbox from existing Notice_inbox stuff
+     * Create a new inbox and save to database
      */
     static function initialize($user_id)
     {
-        $inbox = Inbox::fromNoticeInbox($user_id);
-
-        unset($inbox->fake);
-
+        $inbox = new Inbox();
+		$inbox->user_id = $user_id;
+		$inbox->pack(array());
         $result = $inbox->insert();
 
         if (!$result) {
             common_log_db_error($inbox, 'INSERT', __FILE__);
             return null;
         }
-
-        return $inbox;
-    }
-
-    static function fromNoticeInbox($user_id)
-    {
-        $ids = array();
-
-        $ni = new Notice_inbox();
-
-        $ni->user_id = $user_id;
-        $ni->selectAdd();
-        $ni->selectAdd('notice_id');
-        $ni->orderBy('notice_id DESC');
-        $ni->limit(0, self::MAX_NOTICES);
-
-        if ($ni->find()) {
-            while($ni->fetch()) {
-                $ids[] = $ni->notice_id;
-            }
-        }
-
-        $ni->free();
-        unset($ni);
-
-        $inbox = new Inbox();
-
-        $inbox->user_id = $user_id;
-        $inbox->pack($ids);
-        $inbox->fake = true;
 
         return $inbox;
     }
