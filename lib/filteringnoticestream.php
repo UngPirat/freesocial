@@ -85,7 +85,6 @@ abstract class FilteringNoticeStream extends NoticeStream
             $notices = $raw->fetchAll();
             
             $this->prefill($notices);
-
             foreach ($notices as $notice) {
                 if ($this->filter($notice)) {
                     $filtered[] = $notice;
