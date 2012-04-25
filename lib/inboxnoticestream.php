@@ -101,12 +101,7 @@ class RawInboxNoticeStream extends NoticeStream
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
         if (empty($this->inbox)) {
-            $this->inbox = Inbox::fromNoticeInbox($user_id);
-            if (empty($this->inbox)) {
-                return array();
-            } else {
-                $this->inbox->encache();
-            }
+            return array();
         }
 
         $ids = $this->inbox->unpack();
