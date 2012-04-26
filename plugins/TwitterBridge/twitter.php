@@ -51,11 +51,11 @@ function add_twitter_user($twitter_id, $screen_name)
 
     if (empty($result)) {
         common_log(LOG_WARNING,
-            "TwitterBridge - failed to add new Twitter user: $twitter_id - $screen_name.");
+            "Twitter bridge - failed to add new Twitter user: $twitter_id - $screen_name.");
         common_log_db_error($fuser, 'INSERT', __FILE__);
     } else {
         common_log(LOG_INFO,
-                   "TwitterBridge - Added new Twitter user: $screen_name ($twitter_id).");
+                   "Twitter bridge - Added new Twitter user: $screen_name ($twitter_id).");
     }
 
     return $result;
@@ -74,7 +74,7 @@ function save_twitter_user($twitter_id, $screen_name)
         if ($fuser->nickname != $screen_name) {
             $oldname = $fuser->nickname;
             $fuser->delete();
-            common_log(LOG_INFO, sprintf('TwitterBridge - Updating nickname (and URI) ' .
+            common_log(LOG_INFO, sprintf('Twitter bridge - Updating nickname (and URI) ' .
                                          'for Twitter user %1$d - %2$s, was %3$s.',
                                          $fuser->id,
                                          $screen_name,
@@ -91,7 +91,7 @@ function save_twitter_user($twitter_id, $screen_name)
             common_log(
                 LOG_INFO,
                 sprintf(
-                    'TwitterBridge - detected old record for Twitter ' .
+                    'Twitter bridge - detected old record for Twitter ' .
                     'screen name "%s" belonging to Twitter ID %d.',
                     $screen_name,
                     $fuser->id
@@ -134,8 +134,7 @@ function is_twitter_bound($notice, $flink) {
 
 function is_twitter_notice($notice_id)
 {
-    $result = Foreign_notice_map::is_foreign_notice($notice_id, TWITTER_SERVICE);
-	return $result;
+    return Foreign_notice_map::is_foreign_notice($notice_id, TWITTER_SERVICE);
 }
 
 /**
@@ -167,7 +166,7 @@ function twitter_id($status, $field='id')
 }
 
 /**
- * Check if we need to broadcast a notice over the TwitterBridge, and
+ * Check if we need to broadcast a notice over the Twitter bridge, and
  * do so if necessary. Will determine whether to do a straight post or
  * a repeat/retweet
  *
@@ -179,6 +178,7 @@ function twitter_id($status, $field='id')
 function broadcast_twitter($notice)
 {
     $flink = Foreign_link::getByUserID($notice->profile_id, TWITTER_SERVICE);
+
     // Don't bother with basic auth, since it's no longer allowed
     if (!empty($flink) && TwitterOAuthClient::isPackedToken($flink->credentials)) {
         if (is_twitter_bound($notice, $flink)) {
@@ -242,9 +242,7 @@ function twitter_status_id($notice)
 {
     try {
         $foreign_id = Foreign_notice_map::get_foreign_id($notice->id, TWITTER_SERVICE);
-		common_debug('TwitterBridge Got foreign_id='.$foreign_id.' for notice_id='.$notice->id);
     } catch (Exception $e) {
-		common_debug('TwitterBridge could not find foreign_id for notice_id='.$notice->id);
         return null;
     }
     return $foreign_id;
@@ -293,7 +291,7 @@ function broadcast_oauth($notice, $flink) {
     if (empty($status)) {
         // This could represent a failure posting,
         // or the Twitter API might just be behaving flakey.
-        $errmsg = sprintf('TwitterBridge - No data returned by Twitter API when ' .
+        $errmsg = sprintf('Twitter bridge - No data returned by Twitter API when ' .
                           'trying to post notice %d for User %s (user id %d).',
                           $notice->id,
                           $user->nickname,
@@ -305,7 +303,7 @@ function broadcast_oauth($notice, $flink) {
     }
 
     // Notice crossed the great divide
-    $msg = sprintf('TwitterBridge - posted notice %d to Twitter using ' .
+    $msg = sprintf('Twitter bridge - posted notice %d to Twitter using ' .
                    'OAuth for User %s (user id %d).',
                    $notice->id,
                    $user->nickname,
@@ -321,7 +319,7 @@ function process_error($e, $flink, $notice)
     $user = $flink->getUser();
     $code = $e->getCode();
 
-    $logmsg = sprintf('TwitterBridge - %d posting notice %d for ' .
+    $logmsg = sprintf('Twitter bridge - %d posting notice %d for ' .
                       'User %s (user id: %d): %s.',
                       $code,
                       $notice->id,
@@ -394,18 +392,18 @@ function remove_twitter_link($flink)
 {
     $user = $flink->getUser();
 
-    common_log(LOG_INFO, 'Removing TwitterBridge Foreign link for ' .
+    common_log(LOG_INFO, 'Removing Twitter bridge Foreign link for ' .
                "user $user->nickname (user id: $user->id).");
 
     $result = $flink->safeDelete();
 
     if (empty($result)) {
-        common_log(LOG_ERR, 'Could not remove TwitterBridge ' .
+        common_log(LOG_ERR, 'Could not remove Twitter bridge ' .
                    "Foreign_link for $user->nickname (user id: $user->id)!");
         common_log_db_error($flink, 'DELETE', __FILE__);
     }
 
-    // Notify the user that her TwitterBridge is down
+    // Notify the user that her Twitter bridge is down
 
     if (isset($user->email)) {
         $result = mail_twitter_bridge_removed($user);
@@ -413,7 +411,7 @@ function remove_twitter_link($flink)
         if (!$result) {
             $msg = 'Unable to send email to notify ' .
               "$user->nickname (user id: $user->id) " .
-              'that their TwitterBridge link was ' .
+              'that their Twitter bridge link was ' .
               'removed!';
 
             common_log(LOG_WARNING, $msg);
@@ -422,12 +420,12 @@ function remove_twitter_link($flink)
 }
 
 /**
- * Send a mail message to notify a user that her TwitterBridge link
+ * Send a mail message to notify a user that her Twitter bridge link
  * has stopped working, and therefore has been removed.  This can
  * happen when the user changes her Twitter password, or otherwise
  * revokes access.
  *
- * @param User $user   user whose TwitterBridge link has been removed
+ * @param User $user   user whose Twitter bridge link has been removed
  *
  * @return boolean success flag
  */
@@ -438,7 +436,7 @@ function mail_twitter_bridge_removed($user)
     common_switch_locale($user->language);
 
     // TRANS: Mail subject after forwarding notices to Twitter has stopped working.
-    $subject = sprintf(_m('Your TwitterBridge has been disabled'));
+    $subject = sprintf(_m('Your Twitter bridge has been disabled'));
 
     $site_name = common_config('site', 'name');
 
@@ -449,7 +447,7 @@ function mail_twitter_bridge_removed($user)
         'link to Twitter has been disabled. We no longer seem to have ' .
     'permission to update your Twitter status. Did you maybe revoke ' .
     '%3$s\'s access?' . "\n\n" .
-    'You can re-enable your TwitterBridge by visiting your ' .
+    'You can re-enable your Twitter bridge by visiting your ' .
     "Twitter settings page:\n\n\t%2\$s\n\n" .
         "Regards,\n%3\$s"),
         $profile->getBestName(),
