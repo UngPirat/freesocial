@@ -102,11 +102,8 @@ class TwitterImport
         $statusUri = $this->makeStatusURI($status->user->screen_name, $statusId);
         // check to see if we've already imported the status
         try {
-            if ($notice = $this->checkDupe($profile, $statusUri)
-                    || $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE)) {
-                common_debug('TWITTER DUPE CHECK notice='.print_r($notice,true));
-                return $notice;
-            }
+            $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE);
+            return $notice;
         } catch (Exception $e) {
         }
 
@@ -141,7 +138,7 @@ class TwitterImport
                                             'uri' => $statusUri,
                                             'is_local' => $is_local));
                 } catch (Exception $e) {
-                    common_log(LOG_DEBUG, $this->name() . " could not save {$repeat->id} as a repeat of {$original->id}");
+                    common_log(LOG_DEBUG, $this->name() . " could not save $statusId as a repeat of {$original->id}");
                     return null;
                 }
                 common_log(LOG_INFO, $this->name() . " saved {$repeat->id} as a repeat of {$original->id}");
@@ -250,30 +247,6 @@ class TwitterImport
         return null;
     }
 
-    /**
-     * Check to see if this Twitter status has already been imported
-     *
-     * @param Profile $profile   Twitter user's local profile
-     * @param string  $statusUri URI of the status on Twitter
-     *
-     * @return mixed value a matching Notice or null
-     */
-    function checkDupe($profile, $statusUri)
-    {
-        $notice = new Notice();
-        $notice->uri = $statusUri;
-        $notice->profile_id = $profile->id;
-        $notice->limit(1);
-
-        if ($notice->find()) {
-            $notice->fetch();
-            common_log(LOG_DEBUG, "FNMAP got a dupe of {$statusUri}");
-            return $notice;
-        }
-
-        return null;
-    }
-
     function ensureProfile($user)
     {
         // check to see if there's already a profile for this user
@@ -354,7 +327,7 @@ class TwitterImport
         $newname = 'Twitter_' . $twitter_user->id . '_' . $path_parts['basename'];
 
         $avatar = $profile->getAvatar(48);
-          $oldname = ($avatar === null ? $avatar : $avatar->filename);
+        $oldname = ($avatar === null ? $avatar : $avatar->filename);
 
         if ($newname != $oldname) {
             common_debug($this->name() . ' - Avatar for Twitter user ' .
@@ -383,6 +356,8 @@ class TwitterImport
 
         common_debug('Twitter image_url pathinfo basename: '.$path_parts['basename'].' -> '.substr($path_parts['basename'], 0, -11));
         $img_root = substr($path_parts['basename'], 0, -11);
+        if (!isset($path_parts['extension']))
+            return null;
         $ext = $path_parts['extension'];
         $mediatype = $this->getMediatype($ext);
 
