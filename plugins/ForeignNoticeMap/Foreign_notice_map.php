@@ -69,13 +69,13 @@ class Foreign_notice_map extends Managed_DataObject
         return DB_DataObject::staticGet('Foreign_notice_map',$k,$v);
     }
 
-    function is_foreign_notice($foreign_id, $service_id) {
+    function is_foreign_notice($notice_id, $service_id) {
         try {
-			$result = Foreign_notice_map::get_notice_id($foreign_id, $service_id);
+			Foreign_notice_map::get_foreign_id($notice_id, $service_id);
 		} catch (Exception $e) {
 			return false;
 		}
-        return !empty($result);
+        return true;
     }
     function get_notice_id($foreign_id, $service_id) {
         $fnmap = new Foreign_notice_map();
@@ -195,7 +195,7 @@ class Foreign_notice_map extends Managed_DataObject
             throw new Exception("Unknown service_id $service_id");
         }
 
-        if (Foreign_notice_map::is_foreign_notice($foreign_id, $service_id)) {
+        if (Foreign_notice_map::is_foreign_notice($notice_id, $service_id)) {
             throw new Exception(_('Foreign notice already mapped'));
         }
 
