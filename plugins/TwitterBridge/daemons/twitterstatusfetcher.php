@@ -177,6 +177,9 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         common_debug("Got lastId value '{$lastId}' for foreign id '{$flink->foreign_id}' and timeline 'home_timeline'");
 
         try {
+			if (!is_object($client)) {
+				common_debug('TWITTER BUG on client: '.print_r($client, true));
+			}
             $timeline = $client->statusesHomeTimeline($lastId);
         } catch (Exception $e) {
             common_log(LOG_WARNING, $this->name() .
@@ -190,7 +193,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
             return;
         }
 
-        common_debug(LOG_INFO, $this->name() . ' - Retrieved ' . sizeof($timeline) . ' statuses from Twitter.');
+        common_debug($this->name() . ' - Retrieved ' . sizeof($timeline) . ' statuses from Twitter.');
 
         $importer = new TwitterImport();
 
@@ -199,9 +202,13 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         foreach (array_reverse($timeline) as $status) {
             $notice = $importer->importStatus($status);
 
-            if (!empty($notice)) {
-                Inbox::insertNotice($flink->user_id, $notice->id);
-            }
+			try {
+	            if (!empty($notice)) {
+    	            Inbox::insertNotice($flink->user_id, $notice->id);
+        	    }
+			} catch (Exception $e) {
+            	common_debug($this->name() . " failed to insert Twitter status as Notice:{$notice->id} for user_id {$flink->user_id}");
+			}
         }
 
         if (!empty($timeline)) {

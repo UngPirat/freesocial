@@ -31,19 +31,19 @@ function add_twitter_user($twitter_id, $screen_name)
     $luser = Foreign_user::getForeignUser($twitter_id, TWITTER_SERVICE);
 
     if (!empty($luser)) {
-        $result = $luser->delete();
-        if ($result != false) {
-            common_log(
-                LOG_INFO,
-                "Twitter bridge - removed old Twitter user: $screen_name ($twitter_id)."
-            );
-        }
+		if ($luser->nickname != $screen_name) {
+	        common_log(LOG_INFO, "TwitterBridge - User changed data: $screen_name ($twitter_id).");
+			$luser->delete();
+		} else {
+	        common_log(LOG_INFO, "TwitterBridge - User already existed: $screen_name ($twitter_id).");
+			return false;
+		}
     }
 
     $fuser = new Foreign_user();
 
     $fuser->nickname = $screen_name;
-    $fuser->uri = 'http://twitter.com/' . $screen_name;
+    $fuser->uri = 'https://twitter.com/' . $screen_name;
     $fuser->id = $twitter_id;
     $fuser->service = TWITTER_SERVICE;
     $fuser->created = common_sql_now();
@@ -74,12 +74,14 @@ function save_twitter_user($twitter_id, $screen_name)
         if ($fuser->nickname != $screen_name) {
             $oldname = $fuser->nickname;
             $fuser->delete();
-            common_log(LOG_INFO, sprintf('Twitter bridge - Updated nickname (and URI) ' .
+            common_log(LOG_INFO, sprintf('Twitter bridge - Updating nickname (and URI) ' .
                                          'for Twitter user %1$d - %2$s, was %3$s.',
                                          $fuser->id,
                                          $screen_name,
                                          $oldname));
-        }
+        } else {
+			return true;
+		}
     } else {
         // Kill any old, invalid records for this screen name
         $fuser = Foreign_user::getByNickname($screen_name, TWITTER_SERVICE);
@@ -89,7 +91,7 @@ function save_twitter_user($twitter_id, $screen_name)
             common_log(
                 LOG_INFO,
                 sprintf(
-                    'Twitter bridge - deteted old record for Twitter ' .
+                    'Twitter bridge - detected old record for Twitter ' .
                     'screen name "%s" belonging to Twitter ID %d.',
                     $screen_name,
                     $fuser->id
@@ -120,9 +122,9 @@ function is_twitter_bound($notice, $flink) {
 
         // If it's not a Twitter-style reply, or if the user WANTS to send replies,
         // or if it's in reply to a twitter notice
-        if ( (($flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) == FOREIGN_NOTICE_SEND_REPLY) ||
-             (is_twitter_notice($notice->reply_to) || is_twitter_notice($notice->repeat_of)) ||
-             (empty($notice->reply_to) && !preg_match('/^@[a-zA-Z0-9_]{1,15}\b/u', $notice->content)) ){
+        if (!preg_match('/^@[a-zA-Z0-9_]{1,15}\b/u', $notice->content) ||
+            (($flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) == FOREIGN_NOTICE_SEND_REPLY) ||
+            is_twitter_notice($notice->reply_to)) {
             return true;
         }
     }
@@ -130,11 +132,9 @@ function is_twitter_bound($notice, $flink) {
     return false;
 }
 
-function is_twitter_notice($id)
+function is_twitter_notice($notice_id)
 {
-    $n2s = Notice_to_status::staticGet('notice_id', $id);
-
-    return (!empty($n2s));
+    return Foreign_notice_map::is_foreign_notice($notice_id, TWITTER_SERVICE);
 }
 
 /**
@@ -177,8 +177,7 @@ function twitter_id($status, $field='id')
  */
 function broadcast_twitter($notice)
 {
-    $flink = Foreign_link::getByUserID($notice->profile_id,
-                                       TWITTER_SERVICE);
+    $flink = Foreign_link::getByUserID($notice->profile_id, TWITTER_SERVICE);
 
     // Don't bother with basic auth, since it's no longer allowed
     if (!empty($flink) && TwitterOAuthClient::isPackedToken($flink->credentials)) {
@@ -186,7 +185,7 @@ function broadcast_twitter($notice)
             if (!empty($notice->repeat_of) && is_twitter_notice($notice->repeat_of)) {
                 $retweet = retweet_notice($flink, Notice::staticGet('id', $notice->repeat_of));
                 if (is_object($retweet)) {
-                    Notice_to_status::saveNew($notice->id, twitter_id($retweet));
+                    Foreign_notice_map::saveNew($notice->id, twitter_id($retweet), TWITTER_SERVICE);
                     return true;
                 } else {
                     // Our error processing will have decided if we need to requeue
@@ -225,12 +224,14 @@ function retweet_notice($flink, $notice)
     $id = twitter_status_id($notice);
 
     if (empty($id)) {
-        common_log(LOG_WARNING, "Trying to retweet notice {$notice->id} with no known status id.");
+        common_log(LOG_WARNING, "L2F Trying to retweet notice {$notice->id} with no known status id.");
         return null;
     }
 
     try {
+		common_debug("L2F Retweeting {$notice->id} as Twitter:$id");
         $status = $client->statusesRetweet($id);
+		common_debug("L2F Successfully retweeted {$notice->id} as Twitter:$id");
         return $status;
     } catch (OAuthClientException $e) {
         return process_error($e, $flink, $notice);
@@ -239,12 +240,12 @@ function retweet_notice($flink, $notice)
 
 function twitter_status_id($notice)
 {
-    $n2s = Notice_to_status::staticGet('notice_id', $notice->id);
-    if (empty($n2s)) {
-        return null;
-    } else {
-        return $n2s->status_id;
-    }
+	try {
+    	$foreign_id = Foreign_notice_map::get_foreign_id($notice->id, TWITTER_SERVICE);
+	} catch (Exception $e) {
+		return null;
+	}
+	return $foreign_id;
 }
 
 /**
@@ -281,9 +282,10 @@ function broadcast_oauth($notice, $flink) {
     try {
         $status = $client->statusesUpdate($statustxt, $params);
         if (!empty($status)) {
-            Notice_to_status::saveNew($notice->id, twitter_id($status));
+            Foreign_notice_map::saveNew($notice->id, twitter_id($status), TWITTER_SERVICE);
         }
     } catch (OAuthClientException $e) {
+		common_debug('BROADCAST Twitter failed on statusesUpdate for '.$statustxt);
         return process_error($e, $flink, $notice);
     }
 

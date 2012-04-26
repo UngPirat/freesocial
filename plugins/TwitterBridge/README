@@ -44,11 +44,16 @@ To enable the plugin, add the following to your config.php:
 
 or just:
 
-   addPlugin('TwitterBridge');
+    addPlugin('TwitterBridge');
 
 if you want to set the consumer key and secret from the Twitter bridge
 administration panel.  (The Twitter bridge wont work at all
 unless you configure it with a consumer key and secret.)
+
+* Note: This plugin requires ForeignNoticeMap to be enabled, to enable
+  just make sure it is in the plugin directory and then and this to your
+  config.php (and make sure the database schema check has been run):
+    addPlugin('ForeignNoticeMap');
 
 * Note: The plugin will still push notices to Twitter for users who
   have previously set up the Twitter bridge using their Twitter name and
@@ -65,10 +70,9 @@ unless you configure it with a consumer key and secret.)
 Upgrade
 -------
 
-If you've used the Twitter bridge plugin prior to version 0.9.5,
-you'll need to run the new scripts/initialize_notice_to_status.php
-script to initialize the new notice-to-status mapping file, which
-greatly improves the integration between StatusNet and Twitter.
+This TwitterBridge uses the plugin ForeignNoticeMap which is
+incompatible with previous versions storage. The best way to migrate is
+to manually transfer statuses into the new foreign_notice_map table.
 
 Administration panel
 --------------------

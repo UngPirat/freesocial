@@ -33,6 +33,7 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
 }
 
 require_once INSTALLDIR . '/plugins/TwitterBridge/twitter.php';
+require_once INSTALLDIR . '/extlib/OAuth.php';
 
 /**
  * Class for doing OAuth authentication against Twitter
@@ -406,25 +407,6 @@ class TwitterauthorizationAction extends Action
         $this->elementStart('fieldset');
         $this->element('legend', null,
                        // TRANS: Fieldset legend.
-                       _m('Connect existing account'));
-        $this->element('p', null,
-                       // TRANS: Sub form introduction text.
-                       _m('If you already have an account, login with your username and password to connect it to your Twitter account.'));
-        $this->elementStart('ul', 'form_data');
-        $this->elementStart('li');
-        // TRANS: Field label.
-        $this->input('nickname', _m('Existing nickname'));
-        $this->elementEnd('li');
-        $this->elementStart('li');
-        // TRANS: Field label.
-        $this->password('password', _m('Password'));
-        $this->elementEnd('li');
-        $this->elementEnd('ul');
-        $this->elementEnd('fieldset');
-
-        $this->elementStart('fieldset');
-        $this->element('legend', null,
-                       // TRANS: Fieldset legend.
                        _m('License'));
         $this->elementStart('ul', 'form_data');
         $this->elementStart('li');
@@ -450,6 +432,25 @@ class TwitterauthorizationAction extends Action
         $this->elementEnd('ul');
         $this->elementEnd('fieldset');
         // TRANS: Button text for connecting an existing StatusNet account in the Twitter connect page..
+
+        $this->elementStart('fieldset');
+        $this->element('legend', null,
+                       // TRANS: Fieldset legend.
+                       _m('Connect existing account'));
+        $this->element('p', null,
+                       // TRANS: Sub form introduction text.
+                       _m('If you already have an account, login with your username and password to connect it to your Twitter account.'));
+        $this->elementStart('ul', 'form_data');
+        $this->elementStart('li');
+        // TRANS: Field label.
+        $this->input('nickname', _m('Existing nickname'));
+        $this->elementEnd('li');
+        $this->elementStart('li');
+        // TRANS: Field label.
+        $this->password('password', _m('Password'));
+        $this->elementEnd('li');
+        $this->elementEnd('ul');
+        $this->elementEnd('fieldset');
         $this->submit('connect', _m('BUTTON','Connect'));
         $this->elementEnd('fieldset');
         $this->elementEnd('form');

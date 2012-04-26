@@ -43,6 +43,7 @@ require_once INSTALLDIR . '/plugins/TwitterBridge/twitter.php';
  * @author   Zach Copley <zach@status.net>
  * @author   Julien C <chaumond@gmail.com>
  * @author   Brion Vibber <brion@status.net>
+ * @author   Mikael Nordfeldth <mmn@hethane.se>
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  * @link     http://twitter.com/
@@ -78,7 +79,18 @@ class TwitterImport
 
     function saveStatus($status)
     {
-        $profile = $this->ensureProfile($status->user);
+        $statusId = twitter_id($status);
+		$is_local = Notice::GATEWAY;
+
+		$flink = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
+		if ( !empty($flink) &&
+			($flink->noticesync & Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) == Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT ) {
+				common_debug('TWITTER user has activated IMPORT, meaning I assign tweet for '.$status->user->screen_name.' to '.$flink->user_id);
+				$profile = User::staticGet('id', $flink->user_id);
+				$is_local = Notice::REMOTE;
+		} else {
+	        $profile = $this->ensureProfile($status->user);
+		}
 
         if (empty($profile)) {
             common_log(LOG_ERR, $this->name() .
@@ -86,28 +98,29 @@ class TwitterImport
             return null;
         }
 
-        $statusId = twitter_id($status);
-        $statusUri = $this->makeStatusURI($status->user->screen_name, $statusId);
 
+		$statusUri = $this->makeStatusURI($status->user->screen_name, $statusId);
         // check to see if we've already imported the status
-        $n2s = Notice_to_status::staticGet('status_id', $statusId);
-
-        if (!empty($n2s)) {
-            common_log(
-                LOG_INFO,
-                $this->name() .
-                " - Ignoring duplicate import: {$statusId}"
-            );
-            return Notice::staticGet('id', $n2s->notice_id);
-        }
+		try {
+			if ($notice = $this->checkDupe($profile, $statusUri)
+				    || $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE)) {
+			    common_debug('TWITTER DUPE CHECK notice='.print_r($notice,true));
+			    return $notice;
+			}
+		} catch (Exception $e) {
+		}
 
         // If it's a retweet, save it as a repeat!
         if (!empty($status->retweeted_status)) {
-            common_log(LOG_INFO, "Status {$statusId} is a retweet of " . twitter_id($status->retweeted_status) . ".");
+            common_log(LOG_INFO, "TWITTER REPEAT Status {$statusId} is a retweet of " . twitter_id($status->retweeted_status) . ".");
             $original = $this->saveStatus($status->retweeted_status);
             if (empty($original)) {
                 return null;
             } else {
+				if (!is_object($original)) {
+					common_debug('TWITTER BUG PROFILE for statusId '.$statusId.' original: '.print_r($original, true));
+					return null;
+				}
                 $author = $original->getProfile();
                 // TRANS: Message used to repeat a notice. RT is the abbreviation of 'retweet'.
                 // TRANS: %1$s is the repeated user's name, %2$s is the repeated notice.
@@ -120,14 +133,19 @@ class TwitterImport
                     $content = mb_substr($content, 0, $contentlimit - 4) . ' ...';
                 }
 
-                $repeat = Notice::saveNew($profile->id,
-                                          $content,
-                                          'twitter',
-                                          array('repeat_of' => $original->id,
-                                                'uri' => $statusUri,
-                                                'is_local' => Notice::GATEWAY));
-                common_log(LOG_INFO, "Saved {$repeat->id} as a repeat of {$original->id}");
-                Notice_to_status::saveNew($repeat->id, $statusId);
+				try {
+					$repeat = Notice::saveNew($profile->id,
+                                      $original->content,
+                                      'twitter',
+                                      array('repeat_of' => $original->id,
+                                            'uri' => $statusUri,
+                                            'is_local' => $is_local));
+				} catch (Exception $e) {
+	                common_log(LOG_DEBUG, $this->name() . " could not save {$repeat->id} as a repeat of {$original->id}");
+					return null;
+				}
+	            common_log(LOG_INFO, $this->name() . " saved {$repeat->id} as a repeat of {$original->id}");
+                Foreign_notice_map::saveNew($repeat->id, $statusId, TWITTER_SERVICE);
                 return $repeat;
             }
         }
@@ -136,7 +154,6 @@ class TwitterImport
 
         $notice->profile_id = $profile->id;
         $notice->uri        = $statusUri;
-        $notice->url        = $statusUri;
         $notice->created    = strftime(
             '%Y-%m-%d %H:%M:%S',
             strtotime($status->created_at)
@@ -149,18 +166,13 @@ class TwitterImport
         $replyTo = twitter_id($status, 'in_reply_to_status_id');
         if (!empty($replyTo)) {
             common_log(LOG_INFO, "Status {$statusId} is a reply to status {$replyTo}");
-            $n2s = Notice_to_status::staticGet('status_id', $replyTo);
-            if (empty($n2s)) {
-                common_log(LOG_INFO, "Couldn't find local notice for status {$replyTo}");
-            } else {
-                $reply = Notice::staticGet('id', $n2s->notice_id);
-                if (empty($reply)) {
-                    common_log(LOG_INFO, "Couldn't find local notice for status {$replyTo}");
-                } else {
-                    common_log(LOG_INFO, "Found local notice {$reply->id} for status {$replyTo}");
-                    $notice->reply_to     = $reply->id;
-                    $notice->conversation = $reply->conversation;
-                }
+            try {
+				$reply = Foreign_notice_map::get_foreign_notice($replyTo, TWITTER_SERVICE);
+                common_log(LOG_INFO, "Found local replyTo notice {$reply->id} for replyTo status {$replyTo}. Setting conversation {$reply->conversation}");
+                $notice->reply_to     = $reply->id;
+                $notice->conversation = $reply->conversation;
+			} catch (Exception $e) {
+                common_log(LOG_INFO, "FNMAP Couldn't find mapped local notice for replyTo status {$replyTo}");
             }
         }
 
@@ -170,16 +182,16 @@ class TwitterImport
             common_log(LOG_INFO, "No known conversation for status {$statusId} so making a new one {$conv->id}.");
         }
 
-        $notice->is_local   = Notice::GATEWAY;
+        $notice->is_local = $is_local;
 
         $notice->content  = html_entity_decode($status->text, ENT_QUOTES, 'UTF-8');
         $notice->rendered = $this->linkify($status);
 
         if (Event::handle('StartNoticeSave', array(&$notice))) {
 
-            $id = $notice->insert();
+            $noticeId = $notice->insert();
 
-            if (!$id) {
+            if (!$noticeId) {
                 common_log_db_error($notice, 'INSERT', __FILE__);
                 common_log(LOG_ERR, $this->name() .
                     ' - Problem saving notice.');
@@ -188,7 +200,7 @@ class TwitterImport
             Event::handle('EndNoticeSave', array($notice));
         }
 
-        Notice_to_status::saveNew($notice->id, $statusId);
+        Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
 
         $this->saveStatusMentions($notice, $status);
         $this->saveStatusAttachments($notice, $status);
@@ -207,7 +219,7 @@ class TwitterImport
      */
     function makeStatusURI($username, $id)
     {
-        return 'http://twitter.com/#!/'
+        return 'https://twitter.com/#!/'
           . $username
           . '/status/'
           . $id;
@@ -255,6 +267,7 @@ class TwitterImport
 
         if ($notice->find()) {
             $notice->fetch();
+	        common_log(LOG_DEBUG, "FNMAP got a dupe of {$statusUri}");
             return $notice;
         }
 
@@ -264,21 +277,18 @@ class TwitterImport
     function ensureProfile($user)
     {
         // check to see if there's already a profile for this user
-        $profileurl = 'http://twitter.com/' . $user->screen_name;
+        $profileurl = 'https://twitter.com/' . $user->screen_name;
         $profile = $this->getProfileByUrl($user->screen_name, $profileurl);
 
         if (!empty($profile)) {
-            common_debug($this->name() .
-                         " - Profile for $profile->nickname found.");
+            common_debug($this->name() . " - Profile for $profile->nickname found.");
 
             // Check to see if the user's Avatar has changed
-
             $this->checkAvatar($user, $profile);
             return $profile;
 
         } else {
-            common_debug($this->name() . ' - Adding profile and remote profile ' .
-                         "for Twitter user: $profileurl.");
+            common_debug($this->name() . " - Adding profile and remote profile for Twitter user: $profileurl.");
 
             $profile = new Profile();
             $profile->query("BEGIN");
@@ -341,10 +351,10 @@ class TwitterImport
 
         $path_parts = pathinfo($twitter_user->profile_image_url);
 
-        $newname = 'Twitter_' . $twitter_user->id . '_' .
-            $path_parts['basename'];
+        $newname = 'Twitter_' . $twitter_user->id . '_' . $path_parts['basename'];
 
-        $oldname = $profile->getAvatar(48)->filename;
+        $avatar = $profile->getAvatar(48);
+      	$oldname = ($avatar === null ? $avatar : $avatar->filename);
 
         if ($newname != $oldname) {
             common_debug($this->name() . ' - Avatar for Twitter user ' .
@@ -355,6 +365,7 @@ class TwitterImport
         }
 
         if ($this->missingAvatarFile($profile)) {
+			common_debug('TWITTER AVATAR newname ('.$newname.') vs. oldname ('.$oldname.')');
             common_debug($this->name() . ' - Twitter user ' .
                          $profile->nickname .
                          ' is missing one or more local avatars.');
@@ -370,6 +381,7 @@ class TwitterImport
 
         $path_parts = pathinfo($twitter_user->profile_image_url);
 
+        common_debug('Twitter image_url pathinfo basename: '.$path_parts['basename'].' -> '.substr($path_parts['basename'], 0, -11));
         $img_root = substr($path_parts['basename'], 0, -11);
         $ext = $path_parts['extension'];
         $mediatype = $this->getMediatype($ext);
@@ -387,7 +399,11 @@ class TwitterImport
 
     function missingAvatarFile($profile) {
         foreach (array(24, 48, 73) as $size) {
-            $filename = $profile->getAvatar($size)->filename;
+			$avatar = $profile->getAvatar($size);
+			if ($avatar === null) {
+				return false;
+			}
+            $filename = $avatar->filename;
             $avatarpath = Avatar::path($filename);
             if (file_exists($avatarpath) == FALSE) {
                 return true;
@@ -401,8 +417,9 @@ class TwitterImport
         $mediatype = null;
 
         switch (strtolower($ext)) {
+        case 'jpeg':
         case 'jpg':
-            $mediatype = 'image/jpg';
+            $mediatype = 'image/jpeg';
             break;
         case 'gif':
             $mediatype = 'image/gif';
@@ -433,7 +450,7 @@ class TwitterImport
             if ($this->fetchAvatar($url, $filename)) {
                 $this->newAvatar($id, $size, $mediatype, $filename);
             } else {
-                common_log(LOG_WARNING, $id() .
+                common_log(LOG_WARNING, 'TWITTER AVATAR (' . $id . ')'.
                            " - Problem fetching Avatar: $url");
             }
         }
@@ -502,9 +519,6 @@ class TwitterImport
             return null;
         }
 
-        common_debug($this->name() .
-                     " - Saved new $size avatar for $profile_id.");
-
         return $id;
     }
 
@@ -518,7 +532,7 @@ class TwitterImport
     function fetchAvatar($url, $filename)
     {
         common_debug($this->name() . " - Fetching Twitter avatar: $url");
-
+	try {
         $request = HTTPClient::start();
         $response = $request->get($url);
         if ($response->isOk()) {
@@ -532,7 +546,10 @@ class TwitterImport
         } else {
             return false;
         }
-
+	} catch (Exception $e) {
+		common_debug('TWITTER AVATAR failed due to: '.$e->getMessage());
+		return false;
+	}
         return true;
     }
 
@@ -653,9 +670,9 @@ class TwitterImport
     static function atLink($screenName, $fullName, $orig)
     {
         if (!empty($fullName)) {
-            return "<a href='http://twitter.com/#!/{$screenName}' title='{$fullName}'>{$orig}</a>";
+            return "<a href='https://twitter.com/#!/{$screenName}' title='{$fullName}'>{$orig}</a>";
         } else {
-            return "<a href='http://twitter.com/#!/{$screenName}'>{$orig}</a>";
+            return "<a href='https://twitter.com/#!/{$screenName}'>{$orig}</a>";
         }
     }
 
