@@ -31,13 +31,13 @@ function add_twitter_user($twitter_id, $screen_name)
     $luser = Foreign_user::getForeignUser($twitter_id, TWITTER_SERVICE);
 
     if (!empty($luser)) {
-		if ($luser->nickname != $screen_name) {
-	        common_log(LOG_INFO, "TwitterBridge - User changed data: $screen_name ($twitter_id).");
-			$luser->delete();
-		} else {
-	        common_log(LOG_INFO, "TwitterBridge - User already existed: $screen_name ($twitter_id).");
-			return false;
-		}
+        if ($luser->nickname != $screen_name) {
+            common_log(LOG_INFO, "TwitterBridge - User changed data: $screen_name ($twitter_id).");
+            $luser->delete();
+        } else {
+            common_log(LOG_INFO, "TwitterBridge - User already existed: $screen_name ($twitter_id).");
+            return false;
+        }
     }
 
     $fuser = new Foreign_user();
@@ -80,8 +80,8 @@ function save_twitter_user($twitter_id, $screen_name)
                                          $screen_name,
                                          $oldname));
         } else {
-			return true;
-		}
+            return true;
+        }
     } else {
         // Kill any old, invalid records for this screen name
         $fuser = Foreign_user::getByNickname($screen_name, TWITTER_SERVICE);
@@ -229,9 +229,9 @@ function retweet_notice($flink, $notice)
     }
 
     try {
-		common_debug("L2F Retweeting {$notice->id} as Twitter:$id");
+        common_debug("L2F Retweeting {$notice->id} as Twitter:$id");
         $status = $client->statusesRetweet($id);
-		common_debug("L2F Successfully retweeted {$notice->id} as Twitter:$id");
+        common_debug("L2F Successfully retweeted {$notice->id} as Twitter:$id");
         return $status;
     } catch (OAuthClientException $e) {
         return process_error($e, $flink, $notice);
@@ -240,12 +240,12 @@ function retweet_notice($flink, $notice)
 
 function twitter_status_id($notice)
 {
-	try {
-    	$foreign_id = Foreign_notice_map::get_foreign_id($notice->id, TWITTER_SERVICE);
-	} catch (Exception $e) {
-		return null;
-	}
-	return $foreign_id;
+    try {
+        $foreign_id = Foreign_notice_map::get_foreign_id($notice->id, TWITTER_SERVICE);
+    } catch (Exception $e) {
+        return null;
+    }
+    return $foreign_id;
 }
 
 /**
@@ -285,7 +285,6 @@ function broadcast_oauth($notice, $flink) {
             Foreign_notice_map::saveNew($notice->id, twitter_id($status), TWITTER_SERVICE);
         }
     } catch (OAuthClientException $e) {
-		common_debug('BROADCAST Twitter failed on statusesUpdate for '.$statustxt);
         return process_error($e, $flink, $notice);
     }
 

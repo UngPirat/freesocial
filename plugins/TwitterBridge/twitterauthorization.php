@@ -367,7 +367,7 @@ class TwitterauthorizationAction extends Action
         $this->hidden('token', common_session_token());
 
         // Don't allow new account creation if site is flagged as invite only
-	if (common_config('site', 'inviteonly') == false) {
+    if (common_config('site', 'inviteonly') == false) {
             $this->elementStart('fieldset');
             $this->element('legend', null,
                            // TRANS: Fieldset legend.

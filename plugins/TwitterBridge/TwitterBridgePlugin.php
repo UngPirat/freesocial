@@ -432,12 +432,12 @@ class TwitterBridgePlugin extends Plugin
      */
     function onStartDeleteOwnNotice(User $user, Notice $notice)
     {
-		try {
-	        $foreign_id = twitter_status_id($notice);
-		} catch (Exception $e) {
-			common_debug('TwitterBridge got exception: '.$e->getMessage());
-			$foreign_id = null;
-		}
+        try {
+            $foreign_id = twitter_status_id($notice);
+        } catch (Exception $e) {
+            common_debug('TwitterBridge got exception: '.$e->getMessage());
+            $foreign_id = null;
+        }
 
         if (!empty($foreign_id)) {
 
@@ -462,7 +462,7 @@ class TwitterBridgePlugin extends Plugin
                 common_log(LOG_ERR, "Error attempting to delete bridged notice from Twitter: " . $e->getMessage());
             }
 
-        	Foreign_notice_map::delete_notice_mapping($notice->id, TWITTER_SERVICE);
+            Foreign_notice_map::delete_notice_mapping($notice->id, TWITTER_SERVICE);
         }
 
         return true;
