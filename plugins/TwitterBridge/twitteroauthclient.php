@@ -308,7 +308,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function statusesRetweet($id)
     {
-        $url = "http://api.twitter.com/1/statuses/retweet/$id.json";
+        $url = "https://api.twitter.com/1/statuses/retweet/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -324,7 +324,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function favoritesCreate($id)
     {
-        $url = "http://api.twitter.com/1/favorites/create/$id.json";
+        $url = "https://api.twitter.com/1/favorites/create/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -340,7 +340,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function favoritesDestroy($id)
     {
-        $url = "http://api.twitter.com/1/favorites/destroy/$id.json";
+        $url = "https://api.twitter.com/1/favorites/destroy/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -356,7 +356,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function statusesDestroy($id)
     {
-        $url = "http://api.twitter.com/1/statuses/destroy/$id.json";
+        $url = "https://api.twitter.com/1/statuses/destroy/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;

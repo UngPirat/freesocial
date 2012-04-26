@@ -213,7 +213,6 @@ class TwitterBridgePlugin extends Plugin
         case 'TwitterUserStream':
             include_once $dir . '/twitterstreamreader.php';
             return false;
-        case 'Notice_to_status':
         case 'Twitter_synch_status':
             include_once $dir . '/' . $cls . '.php';
             return false;
@@ -339,7 +338,7 @@ class TwitterBridgePlugin extends Plugin
         $versions[] = array(
             'name' => 'TwitterBridge',
             'version' => self::VERSION,
-            'author' => 'Zach Copley, Julien C, Jean Baptiste Favre',
+            'author' => 'Zach Copley, Julien C',
             'homepage' => 'http://status.net/wiki/Plugin:TwitterBridge',
             // TRANS: Plugin description.
             'rawdescription' => _m('The Twitter "bridge" plugin allows integration ' .
@@ -418,19 +417,12 @@ class TwitterBridgePlugin extends Plugin
 
         // For storing user-submitted flags on profiles
 
-        $schema->ensureTable('notice_to_status',
-                             array(new ColumnDef('notice_id', 'integer', null,
-                                                 false, 'PRI'),
-                                   new ColumnDef('status_id', 'bigint', null, // XXX: check for PostgreSQL
-                                                 false, 'UNI'),
-                                   new ColumnDef('created', 'datetime', null,
-                                                 false)));
 
         return true;
     }
 
     /**
-     * If a notice gets deleted, remove the Notice_to_status mapping and
+     * If a notice gets deleted, remove the Foreign_notice_map mapping and
      * delete the status on Twitter.
      *
      * @param User   $user   The user doing the deleting
@@ -440,9 +432,14 @@ class TwitterBridgePlugin extends Plugin
      */
     function onStartDeleteOwnNotice(User $user, Notice $notice)
     {
-        $n2s = Notice_to_status::staticGet('notice_id', $notice->id);
+		try {
+	        $foreign_id = twitter_status_id($notice);
+		} catch (Exception $e) {
+			common_debug('TwitterBridge got exception: '.$e->getMessage());
+			$foreign_id = null;
+		}
 
-        if (!empty($n2s)) {
+        if (!empty($foreign_id)) {
 
             $flink = Foreign_link::getByUserID($notice->profile_id,
                                                TWITTER_SERVICE); // twitter service
@@ -460,13 +457,14 @@ class TwitterBridgePlugin extends Plugin
                 $token = TwitterOAuthClient::unpackToken($flink->credentials);
                 $client = new TwitterOAuthClient($token->key, $token->secret);
 
-                $client->statusesDestroy($n2s->status_id);
+                $client->statusesDestroy($foreign_id);
             } catch (Exception $e) {
                 common_log(LOG_ERR, "Error attempting to delete bridged notice from Twitter: " . $e->getMessage());
             }
 
-            $n2s->delete();
+        	Foreign_notice_map::delete_notice_mapping($notice->id, TWITTER_SERVICE);
         }
+
         return true;
     }
 

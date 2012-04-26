@@ -157,10 +157,10 @@ class SyncTwitterFriendsDaemon extends ParallelizingDaemon
             return $friends;
         }
 
-        common_debug($this->name() . ' - Twitter\'s API says Twitter user id ' .
+/*        common_debug($this->name() . ' - Twitter\'s API says Twitter user id ' .
                      "$flink->foreign_id has " .
                      count($friends_ids) . ' friends.');
-
+*/
         // Calculate how many pages to get...
         $pages = ceil(count($friends_ids) / 100);
 
@@ -175,8 +175,7 @@ class SyncTwitterFriendsDaemon extends ParallelizingDaemon
         } catch (Exception $e) {
             common_log(LOG_WARNING, $this->name() .
                        ' - cURL error getting Twitter statuses/friends ' .
-                       "page $i - " . $e->getCode() . ' - ' .
-                       $e->getMessage());
+                       "page $i - " . $e->getCode());
         }
 
             if (empty($more_friends)) {
