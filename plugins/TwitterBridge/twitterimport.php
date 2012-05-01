@@ -80,14 +80,21 @@ class TwitterImport
     function saveStatus($status)
     {
         $statusId = twitter_id($status);
-        $is_local = Notice::GATEWAY;
+        $statusUri = $this->makeStatusURI($status->user->screen_name, $statusId);
 
-        $flink = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
-        if ( !empty($flink) &&
-            ($flink->noticesync & Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) == Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT ) {
-                common_debug('TWITTER user has activated IMPORT, meaning I assign tweet for '.$status->user->screen_name.' to '.$flink->user_id);
-                $profile = User::staticGet('id', $flink->user_id);
-                $is_local = Notice::REMOTE;
+        try {
+            $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE);
+            return $notice;
+        } catch (Exception $e) {
+        	$notice = new Notice();
+        }
+
+        $importNotice = false;	// whether to convert it to a local notice
+
+		$flink = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
+        if (!empty($flink) && ($flink->noticesync & Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) == Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) {
+			$importNotice = true;
+            $profile = Profile::staticGet('id', $flink->user_id);
         } else {
             $profile = $this->ensureProfile($status->user);
         }
@@ -95,17 +102,15 @@ class TwitterImport
         if (empty($profile)) {
             common_log(LOG_ERR, $this->name() .
                 ' - Problem saving notice. No associated Profile.');
-            return null;
+			throw new Exception('TWITTER has no associated profile with foreign user id '.$status->user->id);
         }
 
-
-        $statusUri = $this->makeStatusURI($status->user->screen_name, $statusId);
-        // check to see if we've already imported the status
-        try {
-            $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE);
-            return $notice;
-        } catch (Exception $e) {
-        }
+        $notice->source     = 'twitter';
+        $notice->profile_id = $profile->id;
+        $notice->created    = strftime(
+            '%Y-%m-%d %H:%M:%S',
+            strtotime($status->created_at)
+        );
 
         // If it's a retweet, save it as a repeat!
         if (!empty($status->retweeted_status)) {
@@ -136,7 +141,7 @@ class TwitterImport
                                       'twitter',
                                       array('repeat_of' => $original->id,
                                             'uri' => $statusUri,
-                                            'is_local' => $is_local));
+                                            'is_local' => Notice::GATEWAY));
                 } catch (Exception $e) {
                     common_log(LOG_DEBUG, $this->name() . " could not save $statusId as a repeat of {$original->id}");
                     return null;
@@ -147,55 +152,46 @@ class TwitterImport
             }
         }
 
-        $notice = new Notice();
-
-        $notice->profile_id = $profile->id;
-        $notice->uri        = $statusUri;
-        $notice->created    = strftime(
-            '%Y-%m-%d %H:%M:%S',
-            strtotime($status->created_at)
-        );
-
-        $notice->source     = 'twitter';
-
-        $notice->reply_to   = null;
-
-        $replyTo = twitter_id($status, 'in_reply_to_status_id');
-        if (!empty($replyTo)) {
-            common_log(LOG_INFO, "Status {$statusId} is a reply to status {$replyTo}");
+        $replyToId = twitter_id($status, 'in_reply_to_status_id');
+        if (!empty($replyToId)) {
             try {
-                $reply = Foreign_notice_map::get_foreign_notice($replyTo, TWITTER_SERVICE);
-                common_log(LOG_INFO, "Found local replyTo notice {$reply->id} for replyTo status {$replyTo}. Setting conversation {$reply->conversation}");
+                $reply = Foreign_notice_map::get_foreign_notice($replyToId, TWITTER_SERVICE);
                 $notice->reply_to     = $reply->id;
                 $notice->conversation = $reply->conversation;
             } catch (Exception $e) {
-                common_log(LOG_INFO, "FNMAP Couldn't find mapped local notice for replyTo status {$replyTo}");
+                common_log(LOG_INFO, "TWITTER Couldn't find mapped local notice for replyTo status {$replyTo}");
             }
         }
-
-        if (empty($notice->conversation)) {
-            $conv = Conversation::create();
-            $notice->conversation = $conv->id;
-            common_log(LOG_INFO, "No known conversation for status {$statusId} so making a new one {$conv->id}.");
-        }
-
-        $notice->is_local = $is_local;
 
         $notice->content  = html_entity_decode($status->text, ENT_QUOTES, 'UTF-8');
         $notice->rendered = $this->linkify($status);
 
-        if (Event::handle('StartNoticeSave', array(&$notice))) {
+        if ($importNotice) {
+			$noticeOptions = (array)$notice;	// Notice::saveNew should accept a Notice object
+			$notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+		} else {
+        	$notice->is_local	= Notice::GATEWAY;
+			$notice->uri		= $statusUri;
 
-            $noticeId = $notice->insert();
+	        if (empty($notice->conversation)) {
+    	        $conv = Conversation::create();
+        	    $notice->conversation = $conv->id;
+            	common_log(LOG_INFO, "No known conversation for status {$statusId} so made a new one {$conv->id}.");
+	        }
 
-            if (!$noticeId) {
-                common_log_db_error($notice, 'INSERT', __FILE__);
-                common_log(LOG_ERR, $this->name() .
-                    ' - Problem saving notice.');
-            }
-
-            Event::handle('EndNoticeSave', array($notice));
-        }
+	        if (Event::handle('StartNoticeSave', array(&$notice))) {
+	
+	            $id = $notice->insert();
+	
+	            if (!$id) {
+	                common_log_db_error($notice, 'INSERT', __FILE__);
+	                common_log(LOG_ERR, $this->name() .
+	                    ' - Problem saving notice.');
+	            }
+	
+	            Event::handle('EndNoticeSave', array($notice));
+	        }
+		}
 
         Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
 

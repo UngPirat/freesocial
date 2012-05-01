@@ -224,14 +224,11 @@ function retweet_notice($flink, $notice)
     $id = twitter_status_id($notice);
 
     if (empty($id)) {
-        common_log(LOG_WARNING, "L2F Trying to retweet notice {$notice->id} with no known status id.");
         return null;
     }
 
     try {
-        common_debug("L2F Retweeting {$notice->id} as Twitter:$id");
         $status = $client->statusesRetweet($id);
-        common_debug("L2F Successfully retweeted {$notice->id} as Twitter:$id");
         return $status;
     } catch (OAuthClientException $e) {
         return process_error($e, $flink, $notice);
