@@ -109,7 +109,7 @@ class Foreign_notice_map extends Managed_DataObject
         $fnmap->service_id = $service_id;
         $fnmap->find();
         if (!$fnmap->find()) {
-            throw new Exception('No foreign id found for service #'.$service_id.' and notice_id='.$foreign_id);
+            throw new Exception('No foreign id found for service #'.$service_id.' and notice_id='.$notice_id);
         }
         $fnmap->fetch();
         return $fnmap->delete();

@@ -104,6 +104,18 @@ function save_twitter_user($twitter_id, $screen_name)
 }
 
 function is_twitter_bound($notice, $flink) {
+    // Avoid a loop
+    if (mb_strtolower($notice->source) == 'twitter') {
+        common_log(
+            LOG_INFO,
+            sprintf(
+                'Skipping notice %d because its source is '.$this->notice->source,
+                $this->notice->id
+            ),
+            __FILE__
+        );
+        return false;
+    }
 
     // Don't send activity activities (at least for now)
     if ($notice->object_type == ActivityObject::ACTIVITY) {
