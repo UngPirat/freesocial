@@ -346,4 +346,12 @@ class ActivityUtils
 
         return null;
     }
+
+    static function resolveUri($uri)
+    {
+        if (parse_url($uri, PHP_URL_SCHEME) == '') {
+            $uri = 'http://activitystrea.ms/schema/1.0/' . $uri;
+        }
+        return $uri;
+    }
 }
