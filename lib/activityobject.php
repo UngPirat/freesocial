@@ -179,9 +179,9 @@ class ActivityObject
 
     private function _fromAuthor($element)
     {
-        $this->type = $this->_childContent($element,
+        $this->type = ActivityUtils::resolveUri($this->_childContent($element,
                                            Activity::OBJECTTYPE,
-                                           Activity::SPEC);
+                                           Activity::SPEC));
 
         if (empty($this->type)) {
             $this->type = self::PERSON; // XXX: is this fair?
@@ -232,8 +232,8 @@ class ActivityObject
 
     private function _fromAtomEntry($element)
     {
-        $this->type = $this->_childContent($element, Activity::OBJECTTYPE,
-                                           Activity::SPEC);
+        $this->type = ActivityUtils::resolveUri($this->_childContent($element, Activity::OBJECTTYPE,
+                                           Activity::SPEC));
 
         if (empty($this->type)) {
             $this->type = ActivityObject::NOTE;

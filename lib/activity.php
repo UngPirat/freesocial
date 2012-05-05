@@ -165,7 +165,7 @@ class Activity
         $verbEl = $this->_child($entry, self::VERB);
 
         if (!empty($verbEl)) {
-            $this->verb = trim($verbEl->textContent);
+            $this->verb = ActivityUtils::resolveUri(trim($verbEl->textContent));
         } else {
             $this->verb = ActivityVerb::POST;
             // XXX: do other implied stuff here
@@ -272,7 +272,7 @@ class Activity
         $verbEl = $this->_child($item, self::VERB);
 
         if (!empty($verbEl)) {
-            $this->verb = trim($verbEl->textContent);
+            $this->verb = ActivityUtils::resolveUri(trim($verbEl->textContent));
         } else {
             $this->verb = ActivityVerb::POST;
             // XXX: do other implied stuff here
