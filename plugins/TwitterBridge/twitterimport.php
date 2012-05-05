@@ -159,7 +159,7 @@ class TwitterImport
                 $notice->reply_to     = $reply->id;
                 $notice->conversation = $reply->conversation;
             } catch (Exception $e) {
-                common_log(LOG_INFO, "TWITTER Couldn't find mapped local notice for replyTo status {$replyTo}");
+                common_log(LOG_INFO, "TWITTER Couldn't find mapped local notice for replyTo status {$replyToId}");
             }
         }
 
