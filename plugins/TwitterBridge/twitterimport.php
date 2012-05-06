@@ -293,8 +293,13 @@ class TwitterImport
 
         $newname = 'Twitter_' . $user->id . '-original-' . $path_parts['basename'];
 
-        $avatar = Avatar::getOriginal($profile_id);
-        $oldname = ($avatar === null ? $avatar : $avatar->filename);
+        try {
+			$avatar = Avatar::getOriginal($profile_id);
+			$oldname = $avatar->filename;
+			unset($avatar);
+		} catch (Exception $e) {
+			$oldname = null;
+		}
 
         if ($newname != $oldname) {
             common_debug('TWITTER AVATAR newname ('.$newname.') vs. oldname ('.$oldname.')');
