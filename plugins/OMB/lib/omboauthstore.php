@@ -289,8 +289,12 @@ class OMBOAuthDataStore extends OAuthDataStore
                     throw new Exception(_('Error inserting avatar.'));
                 }
             } else {
-                $avatar = $profile->getOriginalAvatar();
-                if($avatar) $avatar->delete();
+                try {
+					$avatar = Avatar::getOriginal($profile->id);
+                	$avatar->delete();
+				} catch (Exception $e) {
+					common_debug($e->getMessage());
+				}
                 $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
                 if($avatar) $avatar->delete();
                 $avatar = $profile->getAvatar(AVATAR_STREAM_SIZE);

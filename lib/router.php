@@ -876,7 +876,7 @@ class Router
                 $m->connect('avatar/:size',
                             array('action' => 'avatarbynickname',
                                   'nickname' => $nickname),
-                            array('size' => '(original|96|48|24)'));
+                            array('size' => '(original|24|48|96)'));
 
                 $m->connect('tag/:tag/rss',
                             array('action' => 'userrss',

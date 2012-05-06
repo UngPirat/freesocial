@@ -452,11 +452,12 @@ class ActivityObject
             $object->title  = $profile->getBestName();
             $object->link   = $profile->profileurl;
 
-            $orig = $profile->getOriginalAvatar();
-
-            if (!empty($orig)) {
-                $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
-            }
+            try {
+				$orig = Avatar::getOriginal($profile->id);
+    	        $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
+			} catch (Exception $e) {
+				common_debug($e->getMessage());
+			}
 
             $sizes = array(
                 AVATAR_PROFILE_SIZE,

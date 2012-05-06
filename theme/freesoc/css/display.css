@@ -473,6 +473,14 @@ h6 {font-size: 1em;}
     border-bottom: 2px dotted #eee;
 }
 
+#content .notice .entry-title {
+	margin: auto;
+}
+#content .notice .author .photo {
+	position: static;
+	float: left;
+}
+
 .notice div.entry-content {
     font-size: 0.88em;
     line-height: 1.2em;
@@ -768,7 +776,7 @@ div.entry-content a.response:after {
 #form_invite textarea {
     clear: left;
     width: 98%;
-    height: 48px;
+    height: 80px;
 }
 
 #form_invite a.add_row, #form_invite a.remove_row {
@@ -1236,7 +1244,6 @@ td.entity_profile {
 
 .profile_list .label {
     display: block;
-    margin-left: 59px !important;
 }
 
 .profile_list .note {

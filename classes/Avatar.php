@@ -73,6 +73,17 @@ class Avatar extends Managed_DataObject
         return Memcached_DataObject::pkeyGet('Avatar', $kv);
     }
 
+    static function getOriginal($profile_id)
+    {
+        $avatar = DB_DataObject::factory('avatar');
+        $avatar->profile_id = $profile_id;
+        $avatar->original = true;
+        if (!$avatar->find(true)) {
+            throw new Exception ('No original avatar filename found for profile_id='.$profile_id);
+        }
+        return $avatar;
+    }
+
     /**
      * Where should the avatar go for this user?
      */
@@ -147,4 +158,28 @@ class Avatar extends Managed_DataObject
                                   AVATAR_MINI_SIZE => 'mini');
         return Theme::path('default-avatar-'.$sizenames[$size].'.png');
     }
+
+	static function newSize($profile_id, $size) {
+		$safesize = floor($size);
+		if ($safesize < 1 || $safesize > 999) {
+			throw new Exception('Bad avatar size: '.$size);
+		}
+
+		$original = Avatar::getOriginal($profile_id);
+
+        $imagefile = new ImageFile($profile_id, $original->filename);
+		$filename = $imagefile->resize($safesize);
+
+		$scaled = clone($original);
+		$scaled->original = false;
+		$scaled->width = $geometry['w'];
+		$scaled->height = $geometry['h'];
+		$scaled->mediatype = image_type_to_mime_type($imagefile->type);
+		$scaled->url = Avatar::url($filename);
+		$scaled->created = DB_DataObject_Cast::dateTime();
+
+        if (!$scaled->insert()) {
+	        throw new Exception('Could not create new avatar from original image for profile_id='.$profile_id);
+        }
+	}
 }

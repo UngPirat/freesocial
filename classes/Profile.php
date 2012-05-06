@@ -114,7 +114,6 @@ class Profile extends Managed_DataObject
         $avatar = $this->_getAvatar($width);
 
         if (empty($avatar)) {
-
             if (Event::handle('StartProfileGetAvatar', array($this, $width, &$avatar))) {
                 $avatar = Avatar::pkeyGet(
                     array(
@@ -123,6 +122,7 @@ class Profile extends Managed_DataObject
                         'height'     => $height
                     )
                 );
+
                 Event::handle('EndProfileGetAvatar', array($this, $width, &$avatar));
             }
 
@@ -158,18 +158,6 @@ class Profile extends Managed_DataObject
 
     }
 
-    function getOriginalAvatar()
-    {
-        $avatar = DB_DataObject::factory('avatar');
-        $avatar->profile_id = $this->id;
-        $avatar->original = true;
-        if ($avatar->find(true)) {
-            return $avatar;
-        } else {
-            return null;
-        }
-    }
-
     function setOriginal($filename)
     {
         $imagefile = new ImageFile($this->id, Avatar::path($filename));
@@ -194,22 +182,11 @@ class Profile extends Managed_DataObject
         foreach (array(AVATAR_PROFILE_SIZE, AVATAR_STREAM_SIZE, AVATAR_MINI_SIZE) as $size) {
             // We don't do a scaled one if original is our scaled size
             if (!($avatar->width == $size && $avatar->height == $size)) {
-                $scaled_filename = $imagefile->resize($size);
-
-                //$scaled = DB_DataObject::factory('avatar');
-                $scaled = new Avatar();
-                $scaled->profile_id = $this->id;
-                $scaled->width = $size;
-                $scaled->height = $size;
-                $scaled->original = false;
-                $scaled->mediatype = image_type_to_mime_type($imagefile->type);
-                $scaled->filename = $scaled_filename;
-                $scaled->url = Avatar::url($scaled_filename);
-                $scaled->created = DB_DataObject_Cast::dateTime(); # current time
-
-                if (!$scaled->insert()) {
-                    return null;
-                }
+				try {
+					Avatar::newSize($avatar, $size);
+				} catch (Exception $e) {
+					common_debug($e->getMessage());
+				}
             }
         }
 

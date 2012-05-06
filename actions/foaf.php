@@ -141,8 +141,8 @@ class FoafAction extends Action
             $this->elementEnd('based_near');
         }
 
-        $avatar = $this->profile->getOriginalAvatar();
-        if ($avatar) {
+        try {
+			$avatar = Avatar::getOriginal($this->profile->id);
             $this->elementStart('img');
             $this->elementStart('Image', array('rdf:about' => $avatar->url));
             foreach (array(AVATAR_PROFILE_SIZE, AVATAR_STREAM_SIZE, AVATAR_MINI_SIZE) as $size) {
@@ -155,7 +155,9 @@ class FoafAction extends Action
             }
             $this->elementEnd('Image');
             $this->elementEnd('img');
-        }
+        } catch (Exception $e) {
+			common_debug($e->getMessage());
+		}
 
         $person = $this->showMicrobloggingAccount($this->profile,
                                      common_root_url(), $this->user->uri,

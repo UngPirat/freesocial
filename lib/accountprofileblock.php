@@ -61,9 +61,6 @@ class AccountProfileBlock extends ProfileBlock
     function avatar()
     {
         $avatar = $this->profile->getAvatar(AVATAR_PROFILE_SIZE);
-        if (empty($avatar)) {
-            $avatar = $this->profile->getAvatar(73);
-        }
         return (!empty($avatar)) ?
             $avatar->displayUrl() :
             Avatar::defaultImage(AVATAR_PROFILE_SIZE);

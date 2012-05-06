@@ -183,6 +183,16 @@ class TwitterBridgePlugin extends Plugin
         return true;
     }
 
+	function onStartProfileGetAvatar($profile, $width, $avatar) {
+        $avatar = Avatar::pkeyGet(
+            array(
+                'profile_id' => $profile->id,
+                'width'      => 73,
+                'height'     => 73
+            )
+        );
+		return empty($avatar);
+	}
     /**
      * Automatically load the actions and libraries used by the Twitter bridge
      *

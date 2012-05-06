@@ -67,7 +67,7 @@ class AvatarbynicknameAction extends Action
             return;
         }
         $size = strtolower($size);
-        if (!in_array($size, array('original', '96', '48', '24'))) {
+        if (!preg_match('/^(original|\d{1,3})$/', $size)) {
             // TRANS: Client error displayed trying to get an avatar providing an invalid avatar size.
             $this->clientError(_('Invalid size.'));
             return;
