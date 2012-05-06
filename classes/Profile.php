@@ -134,7 +134,9 @@ class Profile extends Managed_DataObject
 				}
 			}
 
-            $this->_fillAvatar($width, $avatar);
+			if (!empty($avatar)) {
+	            $this->_fillAvatar($width, $avatar);
+			}
         }
 
         return $avatar;
@@ -191,7 +193,7 @@ class Profile extends Managed_DataObject
             // We don't do a scaled one if original is our scaled size
             if (!($avatar->width == $size && $avatar->height == $size)) {
 				try {
-					Avatar::newSize($avatar, $size);
+					Avatar::newSize($avatar->profile_id, $size);
 				} catch (Exception $e) {
 					common_debug($e->getMessage());
 				}
