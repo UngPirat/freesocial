@@ -75,7 +75,7 @@ class Avatar extends Managed_DataObject
 
     static function getOriginal($profile_id)
     {
-        $avatar = DB_DataObject::factory('avatar');
+        $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
         $avatar->original = true;
         if (!$avatar->find(true)) {
@@ -83,6 +83,20 @@ class Avatar extends Managed_DataObject
         }
         return $avatar;
     }
+
+	static function getProfileAvatars($profile_id) {
+		$avatars = array();
+
+        $avatar = new Avatar();
+        $avatar->profile_id = $profile_id;
+
+        if ($avatar->find()) {
+            while ($avatar->fetch()) {
+                $avatars[] = clone($avatar);
+            }
+        }
+		return $avatars;
+	}
 
     /**
      * Where should the avatar go for this user?
@@ -159,6 +173,14 @@ class Avatar extends Managed_DataObject
         return Theme::path('default-avatar-'.$sizenames[$size].'.png');
     }
 
+    static function deleteFromProfile($profile_id) {
+		$avatars = Avatar::getProfileAvatars($profile_id);
+		foreach ($avatars as $avatar) {
+			$avatar->delete();
+		}
+    }
+
+
 	static function newSize($profile_id, $size) {
 		$safesize = floor($size);
 		if ($safesize < 1 || $safesize > 999) {
@@ -166,7 +188,6 @@ class Avatar extends Managed_DataObject
 		}
 
 		$original = Avatar::getOriginal($profile_id);
-		common_debug(print_r($original,true));
 
         $imagefile = new ImageFile($profile_id, Avatar::path($original->filename));
 		$filename = $imagefile->resize($safesize);
