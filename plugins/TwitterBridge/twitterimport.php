@@ -310,7 +310,7 @@ class TwitterImport
             $this->updateAvatar($user, $profile_id);
         }
 
-        if ($this->missingAvatarFile($profile->id)) {
+        if ($this->missingAvatarFile($profile_id)) {
             common_debug($this->name() . ' - Twitter user ' .
                          $profile_id .
                          ' is missing one or more local avatars.');
