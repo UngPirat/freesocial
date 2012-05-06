@@ -253,7 +253,7 @@ class TwitterImport
             common_debug($this->name() . " - Profile for $profile->nickname found.");
 
             // Check to see if the user's Avatar has changed
-            $this->checkAvatar($user, $profile);
+            $this->checkAvatar($user, $profile->id);
             return $profile;
 
         } else {
@@ -274,36 +274,9 @@ class TwitterImport
                 $id = $profile->insert();
             } catch(Exception $e) {
                 common_log(LOG_WARNING, $this->name() . ' Couldn\'t insert profile - ' . $e->getMessage());
-            }
-
-            if (empty($id)) {
                 common_log_db_error($profile, 'INSERT', __FILE__);
                 $profile->query("ROLLBACK");
                 return false;
-            }
-
-            // check for remote profile
-
-            $remote_pro = Remote_profile::staticGet('uri', $profileurl);
-
-            if (empty($remote_pro)) {
-                $remote_pro = new Remote_profile();
-
-                $remote_pro->id = $id;
-                $remote_pro->uri = $profileurl;
-                $remote_pro->created = common_sql_now();
-
-                try {
-                    $rid = $remote_pro->insert();
-                } catch (Exception $e) {
-                    common_log(LOG_WARNING, $this->name() . ' Couldn\'t save remote profile - ' . $e->getMessage());
-                }
-
-                if (empty($rid)) {
-                    common_log_db_error($profile, 'INSERT', __FILE__);
-                    $profile->query("ROLLBACK");
-                    return false;
-                }
             }
 
             $profile->query("COMMIT");
@@ -314,31 +287,31 @@ class TwitterImport
         }
     }
 
-    function checkAvatar($twitter_user, $profile)
+    function checkAvatar($user, $profile_id)
     {
-        $path_parts = pathinfo($twitter_user->profile_image_url);
+        $path_parts = pathinfo($user->profile_image_url);
 
-        $newname = 'Twitter_' . $twitter_user->id . '_' . $path_parts['basename'];
+        $newname = 'Twitter_' . $user->id . '-original-' . $path_parts['basename'];
 
-        $avatar = $profile->getAvatar(AVATAR_STREAM_SIZE);
+        $avatar = Avatar::getOriginal($profile_id);
         $oldname = ($avatar === null ? $avatar : $avatar->filename);
 
         if ($newname != $oldname) {
             common_debug('TWITTER AVATAR newname ('.$newname.') vs. oldname ('.$oldname.')');
             common_debug($this->name() . ' - Avatar for Twitter user ' .
-                         "$profile->nickname has changed.");
+                         "$profile_id has changed.");
             common_debug($this->name() . " - old: $oldname new: $newname");
 
-            $this->updateAvatar($twitter_user, $profile);
+            $this->updateAvatar($user, $profile_id);
         }
 
         if ($this->missingAvatarFile($profile->id)) {
             common_debug($this->name() . ' - Twitter user ' .
-                         $profile->nickname .
+                         $profile_id .
                          ' is missing one or more local avatars.');
             common_debug($this->name() ." - old: $oldname new: $newname");
 
-            $this->updateAvatar($twitter_user, $profile->id);
+            $this->updateAvatar($user, $profile_id);
         }
     }
 
@@ -358,7 +331,7 @@ class TwitterImport
 				common_debug('no avatars to delete');
 			}
 
-	        $this->newAvatar($profile_id, $mediatype, $filename);
+	        $this->newAvatar($profile_id, $this->getMediatype($ext), $filename);
         }
     }
 
