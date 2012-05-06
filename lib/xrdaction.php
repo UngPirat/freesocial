@@ -104,11 +104,14 @@ class XrdAction extends Action
                 $apiRoot = common_path('index.php/api/', true);
             }
 
-            $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
-                                  'href' => $apiRoot,
-                                  'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
-                                                            'value' => $nick)));
-
+			$flink = Foreign_link::getByUserID($this->user->id, TWITTER_SERVICE);
+			if (!empty($flink) && $foreign_user = Foreign_user::getForeignUser($flink->foreign_id)) {
+	            $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
+    	                              'href' => $apiRoot,
+        	                          'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
+            	                                                'value' => $foreign_user->nickname)));
+				unset($flink);
+			}
             Event::handle('EndXrdActionLinks', array(&$xrd, $this->user));
         }
 
