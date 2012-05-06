@@ -166,15 +166,15 @@ class Avatar extends Managed_DataObject
 		}
 
 		$original = Avatar::getOriginal($profile_id);
+		common_debug(print_r($original,true));
 
-        $imagefile = new ImageFile($profile_id, $original->filename);
+        $imagefile = new ImageFile($profile_id, Avatar::path($original->filename));
 		$filename = $imagefile->resize($safesize);
 
 		$scaled = clone($original);
 		$scaled->original = false;
-		$scaled->width = $geometry['w'];
-		$scaled->height = $geometry['h'];
-		$scaled->mediatype = image_type_to_mime_type($imagefile->type);
+		$scaled->width = $safesize;
+		$scaled->height = $safesize;
 		$scaled->url = Avatar::url($filename);
 		$scaled->created = DB_DataObject_Cast::dateTime();
 

@@ -126,6 +126,14 @@ class Profile extends Managed_DataObject
                 Event::handle('EndProfileGetAvatar', array($this, $width, &$avatar));
             }
 
+			if (empty($avatar)) {
+				try {
+					$avatar = Avatar::newSize($this->id, $width);
+				} catch (Exception $e) {
+					common_debug($e->getMessage());
+				}
+			}
+
             $this->_fillAvatar($width, $avatar);
         }
 

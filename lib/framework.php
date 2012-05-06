@@ -28,7 +28,7 @@ define('LACONICA_VERSION', STATUSNET_VERSION); // compatibility
 define('STATUSNET_CODENAME', 'Fight for Your Right');
 
 define('AVATAR_PROFILE_SIZE', 96);
-define('AVATAR_STREAM_SIZE', 48);
+define('AVATAR_STREAM_SIZE', 80);
 define('AVATAR_MINI_SIZE', 24);
 
 define('NOTICES_PER_PAGE', 20);
