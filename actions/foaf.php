@@ -156,7 +156,7 @@ class FoafAction extends Action
             $this->elementEnd('Image');
             $this->elementEnd('img');
         } catch (Exception $e) {
-			common_debug($e->getMessage());
+		//	common_debug($e->getMessage());
 		}
 
         $person = $this->showMicrobloggingAccount($this->profile,

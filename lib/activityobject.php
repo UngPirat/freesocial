@@ -456,7 +456,7 @@ class ActivityObject
 				$orig = Avatar::getOriginal($profile->id);
     	        $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
 			} catch (Exception $e) {
-				common_debug($e->getMessage());
+				//common_debug($e->getMessage());
 			}
 
             $sizes = array(

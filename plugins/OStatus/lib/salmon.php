@@ -66,6 +66,7 @@ class Salmon
                 $client = new HTTPClient();
                 $client->setBody($envelope);
                 $response = $client->post($endpoint_uri, $headers);
+	common_debug('finished SALMON (for '.$endpoint_uri.' with '.$class.' and response '.$response->getStatus().' data:' .$envelope);
             } catch (HTTP_Request2_Exception $e) {
                 common_log(LOG_ERR, "Salmon ($class) post to $endpoint_uri failed: " . $e->getMessage());
                 continue;

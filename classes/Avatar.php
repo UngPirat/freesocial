@@ -79,23 +79,25 @@ class Avatar extends Managed_DataObject
         $avatar->profile_id = $profile_id;
         $avatar->original = true;
         if (!$avatar->find(true)) {
-            throw new Exception ('No original avatar filename found for profile_id='.$profile_id);
+            throw new Exception (_m('No original avatar filename found for profile'));
         }
         return $avatar;
     }
 
 	static function getProfileAvatars($profile_id) {
-		$avatars = array();
-
         $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
 
-        if ($avatar->find()) {
+		return $avatar->fetchAll();
+	
+/*
+        if (!$avatar->find()) {
+			throw new Exception _m('Found no avatars for profile');
+		}
             while ($avatar->fetch()) {
                 $avatars[] = clone($avatar);
             }
-        }
-		return $avatars;
+        }*/
 	}
 
     /**
@@ -202,5 +204,6 @@ class Avatar extends Managed_DataObject
         if (!$scaled->insert()) {
 	        throw new Exception('Could not create new avatar from original image for profile_id='.$profile_id);
         }
+        return $scaled;
 	}
 }

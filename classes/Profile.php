@@ -163,9 +163,9 @@ class Profile extends Managed_DataObject
 
     function _fillAvatar($width, $avatar)
     {
-      //common_debug("Storing avatar of width: {$avatar->width} and profile_id {$avatar->profile_id} in profile {$this->id}.");
-        $this->_avatars[$width] = $avatar;
-
+        if (is_object($avatar)) {
+            $this->_avatars[$width] = $avatar;
+        }
     }
 
     function setOriginal($filename)

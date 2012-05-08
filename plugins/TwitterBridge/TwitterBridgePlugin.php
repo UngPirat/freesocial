@@ -202,7 +202,7 @@ class TwitterBridgePlugin extends Plugin
         }
 
 		$flink = Foreign_link::getByUserID($user->id, TWITTER_SERVICE);
-		if (!empty($flink) && $foreign_user = Foreign_user::getForeignUser($flink->foreign_id)) {
+		if (!empty($flink) && $foreign_user = Foreign_user::getForeignUser($flink->foreign_id, TWITTER_SERVICE)) {
 	        $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
     	                          'href' => $apiRoot,
                                   'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
