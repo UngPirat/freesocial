@@ -83,6 +83,12 @@ h6 {font-size: 1em;}
 	position: static;
 	overflow: visible;
 }
+#acct {
+	color: white;
+	font-family: "Liberation Serif", serif;
+	font-size: 2em;
+	font-style: normal;
+}
 #content {
 	width: 54%;
 	border-radius: 1ex;
