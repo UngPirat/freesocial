@@ -228,10 +228,9 @@ class TwitterImport
      *
      * @return mixed value the first Profile with that url, or null
      */
-    function getProfileByUrl($nickname, $profileurl)
+    function getProfileByUrl($profileurl)
     {
         $profile = new Profile();
-        $profile->nickname = $nickname;
         $profile->profileurl = $profileurl;
         $profile->limit(1);
 
@@ -247,7 +246,7 @@ class TwitterImport
     {
         // check to see if there's already a profile for this user
         $profileurl = 'https://twitter.com/' . $user->screen_name;
-        $profile = $this->getProfileByUrl($user->screen_name, $profileurl);
+        $profile = $this->getProfileByUrl($profileurl);
 
         if (!empty($profile)) {
             common_debug($this->name() . " - Profile for $profile->nickname found.");
