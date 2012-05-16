@@ -315,11 +315,6 @@ class XmppPlugin extends ImPlugin
         return true;
     }
 
-    function microiduri($screenname)
-    {
-        return 'xmpp:' . $screenname;
-    }
-
     function sendMessage($screenname, $body)
     {
         $this->queuedConnection()->message($screenname, $body, 'chat');

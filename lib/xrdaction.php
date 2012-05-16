@@ -97,6 +97,16 @@ class XrdAction extends Action
                                   'href' => common_local_url('ApiAtomService', array('id' => $nick)),
                                   'property' => array(array('type' => 'http://apinamespace.org/atom/username',
                                                             'value' => $nick)));
+			if (common_config('site', 'fancy')) {
+			    $apiRoot = common_path('api/', true);
+			} else {
+			    $apiRoot = common_path('index.php/api/', true);
+			}
+
+	        $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
+    	                          'href' => $apiRoot,
+                                  'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
+           	                                                'value' => $foreign_user->nickname)));
 
             Event::handle('EndXrdActionLinks', array(&$xrd, $this->user));
         }
