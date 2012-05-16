@@ -101,10 +101,16 @@ class ProfilesettingsAction extends SettingsAction
         if (Event::handle('StartProfileFormData', array($this))) {
             $this->elementStart('li');
             // TRANS: Field label in form for profile settings.
-            $this->input('nickname', _('Nickname'),
+			if (common_config('profile', 'changenick') == true) {
+	            $this->input('nickname', _('Nickname'),
                          ($this->arg('nickname')) ? $this->arg('nickname') : $profile->nickname,
                          // TRANS: Tooltip for field label in form for profile settings.
                          _('1-64 lowercase letters or numbers, no punctuation or spaces.'));
+			} else {
+				$this->elementStart('div');
+				$this->text(sprintf(_m('Editing profile %s'), ($this->arg('nickname') ? $this->arg('nickname') : $profile->nickname)));
+				$this->elementEnd('div');
+			}
             $this->elementEnd('li');
             $this->elementStart('li');
             // TRANS: Field label in form for profile settings.
@@ -336,7 +342,9 @@ class ProfilesettingsAction extends SettingsAction
 
                 $original = clone($user);
 
-                $user->nickname = $nickname;
+				if (common_config('profile', 'changenick') == true) {
+	                $user->nickname = $nickname;
+				}
                 $user->language = $language;
                 $user->timezone = $timezone;
 
