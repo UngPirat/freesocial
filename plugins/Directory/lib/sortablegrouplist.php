@@ -144,7 +144,7 @@ class SortableGroupListItem extends SortableSubscriptionListItem
             $this->out->text(' ');
             $aAttrs = $this->homepageAttributes();
             $this->out->elementStart('a', $aAttrs);
-            $this->out->raw($this->highlight($this->profile->homepage));
+            $this->out->raw($this->highlight($this->profile->homeUrl()));
             $this->out->elementEnd('a');
         }
     }
@@ -202,24 +202,24 @@ class SortableGroupListItem extends SortableSubscriptionListItem
 
     function show()
     {
-        if (Event::handle('StartProfileListItem', array($this))) {
+        if (Event::handle('StartGroupListItem', array($this))) {
             $this->startItem();
-            if (Event::handle('StartProfileListItemProfile', array($this))) {
+            if (Event::handle('StartGroupListItemProfile', array($this))) {
                 $this->showProfile();
-                Event::handle('EndProfileListItemProfile', array($this));
+                Event::handle('EndGroupListItemProfile', array($this));
             }
 
             // XXX Add events?
             $this->showCreatedDate();
             $this->showMemberCount();
 
-            if (Event::handle('StartProfileListItemActions', array($this))) {
+            if (Event::handle('StartGroupListItemActions', array($this))) {
                 $this->showActions();
-                Event::handle('EndProfileListItemActions', array($this));
+                Event::handle('EndGroupListItemActions', array($this));
             }
             $this->endItem();
 
-            Event::handle('EndProfileListItem', array($this));
+            Event::handle('EndGroupListItem', array($this));
         }
     }
 
@@ -239,9 +239,9 @@ class SortableGroupListItem extends SortableSubscriptionListItem
     function showActions()
     {
         $this->startActions();
-        if (Event::handle('StartProfileListItemActionElements', array($this))) {
+        if (Event::handle('StartGroupListItemActionElements', array($this))) {
             $this->showJoinButton();
-            Event::handle('EndProfileListItemActionElements', array($this));
+            Event::handle('EndGroupListItemActionElements', array($this));
         }
         $this->endActions();
     }
