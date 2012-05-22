@@ -535,6 +535,7 @@ class User_group extends Managed_DataObject
             : $this->homepage_logo;
     }
 
+    // Throws an Exception if something is bad
     static function register($fields) {
         if (!empty($fields['userid'])) {
             $profile = Profile::staticGet('id', $fields['userid']);
@@ -546,42 +547,31 @@ class User_group extends Managed_DataObject
             }
         }
 
-        // MAGICALLY put fields into current scope
-        // @fixme kill extract(); it makes debugging absurdly hard
+        $fields['nickname'] = Nickname::normalize($fields['nickname']);
 
-		$defaults = array('nickname' => null,
-						  'fullname' => null,
-						  'homepage' => null,
-						  'description' => null,
-						  'location' => null,
-						  'uri' => null,
-						  'mainpage' => null,
-						  'aliases' => array(),
-						  'userid' => null);
-		
-		$fields = array_merge($defaults, $fields);
-		
-        extract($fields);
+        $default = array('nickname' => null,
+                          'fullname' => null,
+                          'homepage' => null,
+                          'description' => null,
+                          'location' => null,
+                          'uri' => null,
+                          'mainpage' => null);
+
+        // load values into $fields, overwriting as we go
+        $fields = array_merge($default, $fields);
 
         $group = new User_group();
 
         $group->query('BEGIN');
 
-        if (empty($uri)) {
-            // fill in later...
-            $uri = null;
-        }
-        if (empty($mainpage)) {
-            $mainpage = common_local_url('showgroup', array('nickname' => $nickname));
+        if (empty($fields['mainpage'])) {
+            $mainpage = common_local_url('showgroup', array('nickname' => $fields['nickname']));
         }
 
-        $group->nickname    = $nickname;
-        $group->fullname    = $fullname;
-        $group->homepage    = $homepage;
-        $group->description = $description;
-        $group->location    = $location;
-        $group->uri         = $uri;
-        $group->mainpage    = $mainpage;
+        // $default contains the User_group keys-to-be-set, $fields has the submitted values
+        foreach(array_keys($default) as $key) {
+            $group->{$key}    = $fields[$key];
+        }
         $group->created     = common_sql_now();
 
         if (isset($fields['join_policy'])) {
@@ -606,7 +596,7 @@ class User_group extends Managed_DataObject
                 throw new ServerException(_('Could not create group.'));
             }
 
-            if (!isset($uri) || empty($uri)) {
+            if (empty($fields['uri'])) {
                 $orig = clone($group);
                 $group->uri = common_local_url('groupbyid', array('id' => $group->id));
                 $result = $group->update($orig);
@@ -617,7 +607,7 @@ class User_group extends Managed_DataObject
                 }
             }
 
-            $result = $group->setAliases($aliases);
+            $result = $group->setAliases((array)$fields['aliases']);
 
             if (!$result) {
                 // TRANS: Server exception thrown when creating group aliases failed.
@@ -627,7 +617,7 @@ class User_group extends Managed_DataObject
             $member = new Group_member();
 
             $member->group_id   = $group->id;
-            $member->profile_id = $userid;
+            $member->profile_id = $fields['userid'];
             $member->is_admin   = 1;
             $member->created    = $group->created;
 
@@ -639,14 +629,14 @@ class User_group extends Managed_DataObject
                 throw new ServerException(_('Could not set group membership.'));
             }
 
-            self::blow('profile:groups:%d', $userid);
+            self::blow('profile:groups:%d', $fields['userid']);
             
-            if ($local) {
+            if ($fields['local']) {
                 $local_group = new Local_group();
 
                 $local_group->group_id = $group->id;
-                $local_group->nickname = $nickname;
-                $local_group->created  = common_sql_now();
+                $local_group->nickname = $group->nickname;
+                $local_group->created  = $group->created;
 
                 $result = $local_group->insert();
 

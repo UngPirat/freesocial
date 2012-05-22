@@ -218,7 +218,8 @@ class NewgroupAction extends Action
 
             assert(!is_null($cur));
 
-            $group = User_group::register(array('nickname' => $nickname,
+            try {
+                $group = User_group::register(array('nickname' => $nickname,
                                                 'fullname' => $fullname,
                                                 'homepage' => $homepage,
                                                 'description' => $description,
@@ -228,6 +229,10 @@ class NewgroupAction extends Action
                                                 'join_policy' => $join_policy,
                                                 'force_scope' => $force_scope,
                                                 'local'    => true));
+            } catch (Exception $e) {
+                $this->showForm($e->getMessage());
+                return;
+            }
 
             $this->group = $group;
 
