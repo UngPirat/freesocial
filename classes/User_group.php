@@ -558,18 +558,18 @@ class User_group extends Managed_DataObject
                           'mainpage' => null);
 
         // load values into $fields, overwriting as we go
-        $fields = array_merge($default, $fields);
+        $fields = array_merge($defaults, $fields);
 
         $group = new User_group();
 
         $group->query('BEGIN');
 
         if (empty($fields['mainpage'])) {
-            $mainpage = common_local_url('showgroup', array('nickname' => $fields['nickname']));
+            $fields['mainpage'] = common_local_url('showgroup', array('nickname' => $fields['nickname']));
         }
 
         // $default contains the User_group keys-to-be-set, $fields has the submitted values
-        foreach(array_keys($default) as $key) {
+        foreach(array_keys($defaults) as $key) {
             $group->{$key}    = $fields[$key];
         }
         $group->created     = common_sql_now();
