@@ -106,6 +106,7 @@ class PublicSite extends SiteProfileSettings
                     'Event'                   => null,
                     'ExtendedProfile'         => null,
                     'Geonames'                => null,
+                    'Gravatar'                => null,
                     'OpenID'                  => null,
                     'OStatus'                 => null,
                     'Poll'                    => null,

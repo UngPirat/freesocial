@@ -137,7 +137,7 @@ class AvatarsettingsAction extends SettingsAction
                 $this->elementEnd('div');
                 $this->elementEnd('li');
             } catch (Exception $e) {
-				common_debug($e->getMessage());
+				//common_debug($e->getMessage());
 			}
 
             $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
@@ -402,18 +402,7 @@ class AvatarsettingsAction extends SettingsAction
         $user = common_current_user();
         $profile = $user->getProfile();
 
-        try {
-			$avatar = Avatar::getOriginal($profile->id);
-        	$avatar->delete();
-		} catch (Exception $e) {
-			common_debug($e->getMessage());
-		}
-        $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
-        if($avatar) $avatar->delete();
-        $avatar = $profile->getAvatar(AVATAR_STREAM_SIZE);
-        if($avatar) $avatar->delete();
-        $avatar = $profile->getAvatar(AVATAR_MINI_SIZE);
-        if($avatar) $avatar->delete();
+        Avatar::deleteFromProfile($profile->id);
 
         // TRANS: Success message for deleting a user avatar.
         $this->showForm(_('Avatar deleted.'), true);

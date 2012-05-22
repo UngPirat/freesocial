@@ -194,23 +194,6 @@ class TwitterBridgePlugin extends Plugin
 		return empty($avatar);
 	}
 
-	function onEndXrdActionLinks(&$xrd, $user) {
-        if (common_config('site', 'fancy')) {
-            $apiRoot = common_path('api/', true);
-        } else {
-            $apiRoot = common_path('index.php/api/', true);
-        }
-
-		$flink = Foreign_link::getByUserID($user->id, TWITTER_SERVICE);
-		if (!empty($flink) && $foreign_user = Foreign_user::getForeignUser($flink->foreign_id)) {
-	        $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
-    	                          'href' => $apiRoot,
-                                  'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
-           	                                                'value' => $foreign_user->nickname)));
-			unset($flink);
-		}
-	}
-
     /**
      * Automatically load the actions and libraries used by the Twitter bridge
      *

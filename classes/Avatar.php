@@ -75,14 +75,30 @@ class Avatar extends Managed_DataObject
 
     static function getOriginal($profile_id)
     {
-        $avatar = DB_DataObject::factory('avatar');
+        $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
         $avatar->original = true;
         if (!$avatar->find(true)) {
-            throw new Exception ('No original avatar filename found for profile_id='.$profile_id);
+            throw new Exception (_m('No original avatar filename found for profile'));
         }
         return $avatar;
     }
+
+	static function getProfileAvatars($profile_id) {
+        $avatar = new Avatar();
+        $avatar->profile_id = $profile_id;
+
+		return $avatar->fetchAll();
+	
+/*
+        if (!$avatar->find()) {
+			throw new Exception _m('Found no avatars for profile');
+		}
+            while ($avatar->fetch()) {
+                $avatars[] = clone($avatar);
+            }
+        }*/
+	}
 
     /**
      * Where should the avatar go for this user?
@@ -159,6 +175,14 @@ class Avatar extends Managed_DataObject
         return Theme::path('default-avatar-'.$sizenames[$size].'.png');
     }
 
+    static function deleteFromProfile($profile_id) {
+		$avatars = Avatar::getProfileAvatars($profile_id);
+		foreach ($avatars as $avatar) {
+			$avatar->delete();
+		}
+    }
+
+
 	static function newSize($profile_id, $size) {
 		$safesize = floor($size);
 		if ($safesize < 1 || $safesize > 999) {
@@ -166,7 +190,6 @@ class Avatar extends Managed_DataObject
 		}
 
 		$original = Avatar::getOriginal($profile_id);
-		common_debug(print_r($original,true));
 
         $imagefile = new ImageFile($profile_id, Avatar::path($original->filename));
 		$filename = $imagefile->resize($safesize);
@@ -181,5 +204,6 @@ class Avatar extends Managed_DataObject
         if (!$scaled->insert()) {
 	        throw new Exception('Could not create new avatar from original image for profile_id='.$profile_id);
         }
+        return $scaled;
 	}
 }

@@ -689,8 +689,8 @@ class TwitterauthorizationAction extends Action
 
     function bestNewNickname()
     {
-        if (!empty($this->tw_fields['fullname'])) {
-            $nickname = $this->nicknamize($this->tw_fields['fullname']);
+        if (!empty($this->tw_fields['screen_name'])) {
+            $nickname = $this->nicknamize($this->tw_fields['screen_name']);
             if ($this->isNewNickname($nickname)) {
                 return $nickname;
             }

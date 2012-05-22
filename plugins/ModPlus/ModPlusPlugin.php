@@ -29,6 +29,8 @@ if (!defined('STATUSNET')) {
  */
 class ModPlusPlugin extends Plugin
 {
+	var $original_profileurl = null;
+
     function onPluginVersion(&$versions)
     {
         $versions[] = array('name' => 'ModPlus',
@@ -110,9 +112,15 @@ class ModPlusPlugin extends Plugin
      */
     function onStartShowNoticeItem($item)
     {
-        $this->showProfileOptions($item->out, $item->profile);
+		$this->original_profileurl = $item->profile->profileurl;
+		$item->profile->profileurl = common_local_url('remoteprofile', array('id' => $item->profile->id));
+        //$this->showProfileOptions($item->out, $item->profile);
         return true;
     }
+    function onEndShowNoticeItem($item)
+	{
+		$item->profile->profileurl = $this->original_profileurl;
+	}
 
     /**
      * Add per-profile info popup menu on profile lists.

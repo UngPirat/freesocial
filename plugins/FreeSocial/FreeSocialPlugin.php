@@ -82,4 +82,68 @@ class FreeSocialPlugin extends Plugin {
 
         return true;
     }
+
+	function onStartAddressData($out) {
+        if (common_config('singleuser', 'enabled')) {
+            $user = User::singleUser();
+            $url = common_local_url('showstream',
+                                    array('nickname' => $user->nickname));
+        } else if (common_logged_in()) {
+            $user = common_current_user();
+            $url = common_local_url('all', array('nickname' => $user->nickname));
+        } else {
+			$acct = null;
+            $url = common_local_url('public');
+        }
+
+        if (StatusNet::isHTTPS()) {
+            $logoUrl = common_config('site', 'ssllogo');
+            if (empty($logoUrl)) {
+                // if logo is an uploaded file, try to fall back to HTTPS file URL
+                $httpUrl = common_config('site', 'logo');
+                if (!empty($httpUrl)) {
+                    $f = File::staticGet('url', $httpUrl);
+                    if (!empty($f) && !empty($f->filename)) {
+                        // this will handle the HTTPS case
+                        $logoUrl = File::url($f->filename);
+                    }
+                }
+            }
+        } else {
+            $logoUrl = common_config('site', 'logo');
+        }
+
+        if (empty($logoUrl) && file_exists(Theme::file('logo.png'))) {
+            // This should handle the HTTPS case internally
+            $logoUrl = Theme::path('logo.png');
+        }
+
+        if ((common_logged_in() || common_config('singleuser', 'enabled'))
+				&& ($domain = parse_url($url, PHP_URL_HOST))) {
+			$profile = $user->getProfile();
+			$avatar = $profile->getAvatar(48);
+
+			$acct = "{$user->nickname}@{$domain}";
+			$out->elementStart('a', array('href' => "$url"));
+//			$out->element('img', array('class' => 'logo', 'src'=>$avatar->displayUrl()));
+			$out->elementStart('span', array('id' => 'acct', 'class' => 'logo', 'href' => "$url"));
+			$out->text($acct);
+			$out->elementEnd('span');
+			$out->elementEnd('a');
+        } else {
+        	$out->elementStart('a', array('class' => 'url home bookmark',
+                                       'href' => $url));
+
+	        if (!empty($logoUrl)) {
+    	        $out->element('img', array('class' => 'logo photo',
+	                                        'src' => $logoUrl,
+    	                                    'alt' => common_config('site', 'name')));
+        	}
+	        $out->text(' ');
+	        $out->element('span', array('class' => 'fn org'), common_config('site', 'name'));
+        	$out->elementEnd('a');
+		}
+
+		return false;
+	}
 }
