@@ -39,17 +39,18 @@ class MediaFile
 
     var $filename      = null;
     var $fileRecord    = null;
-    var $user          = null;
+    var $profile       = null;
     var $fileurl       = null;
     var $short_fileurl = null;
     var $mimetype      = null;
 
-    function __construct($user = null, $filename = null, $mimetype = null)
+    function __construct($profile = null, $filename = null, $mimetype = null)
     {
-        if ($user == null) {
-            $this->user = common_current_user();
+        if ($profile == null) {
+            $user = common_current_user();
+			$this->profile = $user->getProfile();
         } else {
-            $this->user = $user;
+            $this->profile = $profile;
         }
 
         $this->filename   = $filename;
@@ -124,7 +125,7 @@ class MediaFile
             return null;
         }
 
-        $outname = File::filename($this->user->getProfile(), 'thumb-' . $this->filename, $this->mimetype);
+        $outname = File::filename($this->profile, 'thumb-' . $this->filename, $this->mimetype);
         $outpath = File::path($outname);
 
         $maxWidth = common_config('attachments', 'thumb_width');
@@ -266,7 +267,7 @@ class MediaFile
             return;
         }
 
-        return new MediaFile($user, $filename, $mimetype);
+        return new MediaFile($user->getProfile(), $filename, $mimetype);
     }
 
     static function fromFilehandle($fh, $user) {
@@ -307,7 +308,7 @@ class MediaFile
             return;
         }
 
-        return new MediaFile($user, $filename, $mimetype);
+        return new MediaFile($user->getProfile(), $filename, $mimetype);
     }
 
     /**
