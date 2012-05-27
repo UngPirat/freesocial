@@ -85,9 +85,6 @@ class Foreign_notice_map extends Managed_DataObject
                 'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
                 'foreign_notice_map_service_id_fkey' => array('foreign_service', array('service_id' => 'id')),
             ),
-            'indexes' => array(
-                'foreign_notice_map_service_id' => array('service_id'),
-            ),
         );
     }
 
