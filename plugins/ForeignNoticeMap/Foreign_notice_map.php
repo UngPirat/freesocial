@@ -61,9 +61,38 @@ class Foreign_notice_map extends Managed_DataObject
 
     public $__table = 'foreign_notice_map'; // table name
     public $notice_id;                      // int(4)  not_null
-    public $foreign_id;                      // varchar  primary_key not_null
-    public $service_id;                      // int(4)  not_null
+    public $foreign_id;                     // varchar  primary_key not_null
+    public $service_id;                     // int(4)  not_null
     public $created;                        // datetime
+
+    static function schemaDef()
+    {  
+        return array(
+            'fields' => array(
+                'foreign_id' => array('type' => 'varchar',
+                                      'length' => 255,
+                                      'not null' => true),
+                'notice_id'  => array('type' => 'integer',
+                                      'not null' => true),
+                'service_id' => array('type' => 'integer',
+                                      'not null' => true),
+                'created'    => array('type' => 'datetime',
+                                      'not null' => true),
+            ),
+            'primary key' => array('foreign_id', 'service_id'),
+            'unique keys' => array(
+                'foreign_notice_map_notice_id_idx' => array('notice_id', 'service_id'),
+            ),
+            'foreign keys' => array(
+                // Ok think these examples are correct now:
+                'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
+                'foreign_notice_map_service_id_fkey' => array('foreign_service', array('service_id' => 'id')),
+            ),
+            'indexes' => array(
+                'foreign_notice_map_service_id' => array('service_id'),
+            ),
+        );
+    }
 
     function staticGet($k,$v=null) {
         return DB_DataObject::staticGet('Foreign_notice_map',$k,$v);
@@ -113,53 +142,6 @@ class Foreign_notice_map extends Managed_DataObject
         }
         $fnmap->fetch();
         return $fnmap->delete();
-    }
-
-
-    /**
-     * return table definition for DB_DataObject
-     *
-     * DB_DataObject needs to know something about the table to manipulate
-     * instances. This method provides all the DB_DataObject needs to know.
-     *
-     * @return array array of column definitions
-     */
-    function table()
-    {
-        return array(
-                    'foreign_id' => DB_DATAOBJECT_STR + DB_DATAOBJECT_NOTNULL,
-                    'notice_id'   => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                    'service_id' => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                    'created'    => DB_DATAOBJECT_STR + DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME + DB_DATAOBJECT_NOTNULL);
-    }
-
-    static function schemaDef()
-    {  
-        return array(
-            'fields' => array(
-                'foreign_id' => array('type' => 'varchar',
-                                      'length' => 255,
-                                      'not null' => true),
-                'notice_id'  => array('type' => 'integer',
-                                      'not null' => true),
-                'service_id' => array('type' => 'integer',
-                                      'not null' => true),
-                'created'    => array('type' => 'datetime',
-                                      'not null' => true),
-            ),
-            'primary key' => array('foreign_id', 'service_id'),
-            'unique keys' => array(
-                'foreign_notice_map_notice_id_idx' => array('notice_id', 'service_id'),
-            ),
-            'foreign keys' => array(
-                // Ok think these examples are correct now:
-                'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
-                'foreign_notice_map_service_id_fkey' => array('foreign_service', array('service_id' => 'id')),
-            ),
-            'indexes' => array(
-                'foreign_notice_map_service_id' => array('service_id'),
-            ),
-        );
     }
 
     /**
