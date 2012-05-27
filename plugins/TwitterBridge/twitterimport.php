@@ -289,9 +289,9 @@ class TwitterImport
     function checkAvatar($user, $profile_id)
     {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = $path_parts['extension'];
-        $img_root = basename($path_parts['basename'], "_normal.{$ext}");
-        $newname = "Twitter_{$user->id}-original-{$img_root}.{$ext}";
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
+        $img_root = basename($path_parts['basename'], '_normal'.$ext);	// cut off extension
+        $newname = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         try {
 			$avatar = Avatar::getOriginal($profile_id);
@@ -322,10 +322,10 @@ class TwitterImport
 
     function updateAvatar($user, $profile_id) {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = $path_parts['extension'];
-        $img_root = basename($path_parts['basename'], "_normal.{$ext}");
-        $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small.{$ext}";
-        $filename = "Twitter_{$user->id}-original-{$img_root}.{$ext}";
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
+        $img_root = basename($path_parts['basename'], '_normal' . $ext);
+        $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small" . $ext;
+        $filename = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         if ($this->fetchAvatar($url, $filename)) {
 			try {
@@ -334,7 +334,7 @@ class TwitterImport
 				common_debug('no avatars to delete');
 			}
 
-	        $this->newAvatar($profile_id, $this->getMediatype($ext), $filename);
+	        $this->newAvatar($profile_id, $this->getMediatype(substr($ext, 1)), $filename);
         }
     }
 
