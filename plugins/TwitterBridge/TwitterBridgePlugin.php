@@ -187,8 +187,8 @@ class TwitterBridgePlugin extends Plugin
         $avatar = Avatar::pkeyGet(
             array(
                 'profile_id' => $profile->id,
-                'width'      => 73,
-                'height'     => 73
+                'width'      => 128,
+                'height'     => 128
             )
         );
 		return empty($avatar);

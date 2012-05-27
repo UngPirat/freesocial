@@ -374,8 +374,8 @@ class TwitterImport
         $avatar->mediatype = $mediatype;
         $avatar->filename = $filename;
         $avatar->url = Avatar::url($filename);
-		$avatar->width = 73;
-		$avatar->height = 73;
+		$avatar->width = 128;
+		$avatar->height = 128;
 
         $avatar->created = common_sql_now();
 
