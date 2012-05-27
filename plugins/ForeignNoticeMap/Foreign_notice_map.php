@@ -136,10 +136,29 @@ class Foreign_notice_map extends Managed_DataObject
     static function schemaDef()
     {  
         return array(
-            new ColumnDef('foreign_id', 'varchar', 255, null, 'PRI'),
-            new ColumnDef('notice_id', 'integer', null, false),
-            new ColumnDef('service_id', 'integer', null, false),
-            new ColumnDef('created', 'datetime',  null, false)
+            'fields' => array(
+                'foreign_id' => array('type' => 'varchar',
+                                      'length' => 255,
+                                      'not null' => true),
+                'notice_id'  => array('type' => 'integer',
+                                      'not null' => true),
+                'service_id' => array('type' => 'integer',
+                                      'not null' => true),
+                'created'    => array('type' => 'datetime',
+                                      'not null' => true),
+            ),
+            'primary key' => array('foreign_id', 'service_id'),
+            'unique keys' => array(
+                'foreign_notice_map_notice_id_idx' => array('notice_id', 'service_id'),
+            ),
+            'foreign keys' => array(
+                // Ok think these examples are correct now:
+                'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
+                'foreign_notice_map_service_id_fkey' => array('foreign_service', array('service_id' => 'id')),
+            ),
+            'indexes' => array(
+                'foreign_notice_map_service_id' => array('service_id'),
+            ),
         );
     }
 
