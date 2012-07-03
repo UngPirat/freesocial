@@ -1513,7 +1513,9 @@ class Notice extends Managed_DataObject
 
             if ($this->repeat_of) {
                 $repeated = Notice::staticGet('id', $this->repeat_of);
-                $act->objects[] = $repeated->asActivity($cur);
+                if (!empty($repeated)) {
+                    $act->objects[] = $repeated->asActivity($cur);
+                }
             } else {
                 $act->objects[] = ActivityObject::fromNotice($this);
             }
@@ -2452,7 +2454,11 @@ class Notice extends Managed_DataObject
 
             if ($scope & Notice::FOLLOWER_SCOPE) {
 
-                $author = $this->getProfile();
+                try {
+                    $author = $this->getProfile();
+                } catch (Exception $e) {
+                    return false;
+                }
         
                 if (!Subscription::exists($profile, $author)) {
                     return false;
@@ -2469,10 +2475,16 @@ class Notice extends Managed_DataObject
 
         if (common_config('notice', 'hidespam')) {
 
-            $author = $this->getProfile();
+            try {
+                $author = $this->getProfile();
+            } catch(Exception $e) {
+                // If we can't get an author, keep it hidden.
+                // XXX: technically not spam, but, whatever.
+                return true;
+            }
 
             if ($author->hasRole(Profile_role::SILENCED)) {
-                if (empty($profile) || !$profile->hasRight(Right::REVIEWSPAM)) {
+                if (empty($profile) || (($profile->id !== $author->id) && (!$profile->hasRight(Right::REVIEWSPAM)))) {
                     return true;
                 }
             }

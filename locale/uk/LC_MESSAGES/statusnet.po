@@ -1,4 +1,4 @@
-# Translation of StatusNet - Core to Ukrainian (Українська)
+# Translation of StatusNet - Core to Ukrainian (українська)
 # Exported from translatewiki.net
 #
 # Author: AS
@@ -13,18 +13,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-08 22:26+0000\n"
-"PO-Revision-Date: 2012-04-08 22:28:18+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:08:42+0000\n"
 "Language-Team: Ukrainian <https://translatewiki.net/wiki/Portal:uk>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: MediaWiki 1.20alpha (c953a56); Translate 2012-03-13\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: uk\n"
 "X-Message-Group: #out-statusnet-core\n"
 "Plural-Forms: nplurals=3; plural=(n%10 == 1 && n%100 != 11) ? 0 : ( (n%10 >= "
 "2 && n%10 <= 4 && (n%100 < 10 || n%100 >= 20)) ? 1 : 2 );\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
 
 #. TRANS: Database error message.
 #, php-format
@@ -8776,10 +8776,6 @@ msgstr "у контексті"
 msgid "Repeated by"
 msgstr "Повторено"
 
-#, fuzzy
-msgid " "
-msgstr ", "
-
 #. TRANS: Link title in notice list item to reply to a notice.
 #, fuzzy
 msgid "Reply to this notice."
@@ -9072,6 +9068,9 @@ msgstr "Вийти з сайту."
 #. TRANS: Menu item title in primary navigation panel.
 msgid "Login to the site."
 msgstr "Увійти на сайт."
+
+msgid "This profile has been silenced by site moderators"
+msgstr ""
 
 #. TRANS: H2 text for user subscription statistics.
 msgid "Following"
@@ -9799,3 +9798,7 @@ msgstr "Неправильний XML, корінь XRD відсутній."
 #, php-format
 msgid "Getting backup from file '%s'."
 msgstr "Отримання резервної копії файлу «%s»."
+
+#, fuzzy
+#~ msgid " "
+#~ msgstr ", "

@@ -9,13 +9,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-08 22:26+0000\n"
-"PO-Revision-Date: 2012-04-08 22:27:57+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:08:23+0000\n"
 "Language-Team: Malayalam <https://translatewiki.net/wiki/Portal:ml>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
-"X-Generator: MediaWiki 1.20alpha (c953a56); Translate 2012-03-13\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: ml\n"
 "X-Message-Group: #out-statusnet-core\n"
@@ -8517,9 +8517,6 @@ msgstr ""
 msgid "Repeated by"
 msgstr "ആവർത്തിച്ചത്"
 
-msgid " "
-msgstr ""
-
 #. TRANS: Link title in notice list item to reply to a notice.
 #, fuzzy
 msgid "Reply to this notice."
@@ -8838,6 +8835,9 @@ msgstr "സൈറ്റിൽ നിന്നും പുറത്തുകട�
 #, fuzzy
 msgid "Login to the site."
 msgstr "സൈറ്റിലേക്ക് പ്രവേശിക്കുക"
+
+msgid "This profile has been silenced by site moderators"
+msgstr ""
 
 #. TRANS: H2 text for user subscription statistics.
 #, fuzzy
@@ -9379,7 +9379,7 @@ msgstr "സൈറ്റിൽ തിരയുക"
 
 #. TRANS: Dropdown option for searching in profiles.
 msgid "Everything"
-msgstr ""
+msgstr "എല്ലാം"
 
 #. TRANS: Dropdown option for searching in profiles.
 #, fuzzy
@@ -9419,7 +9419,7 @@ msgstr ""
 #. TRANS: Option in drop-down of potential addressees.
 msgctxt "SENDTO"
 msgid "Everyone"
-msgstr ""
+msgstr "എല്ലാവരും"
 
 #. TRANS: Option in drop-down of potential addressees.
 #. TRANS: %s is a StatusNet sitename.
@@ -9472,10 +9472,9 @@ msgstr ""
 
 #. TRANS: Button text on unsubscribe form.
 #. TRANS: Button text for unsubscribing from a list.
-#, fuzzy
 msgctxt "BUTTON"
 msgid "Unsubscribe"
-msgstr "വരിക്കാരാകുക"
+msgstr "അൺ‌സബ്‌സ്ക്രൈബ്"
 
 #. TRANS: Button title on unsubscribe form.
 #, fuzzy
@@ -9489,9 +9488,8 @@ msgid "User %1$s (%2$d) has no profile record."
 msgstr ""
 
 #. TRANS: Authorisation exception thrown when a user a not allowed to login.
-#, fuzzy
 msgid "Not allowed to log in."
-msgstr "ലോഗിൻ ചെയ്തിട്ടില്ല"
+msgstr "ലോഗിൻ ചെയ്യാൻ അനുവാദമില്ല."
 
 #. TRANS: Used in notices to indicate when the notice was made compared to now.
 msgid "a few seconds ago"
