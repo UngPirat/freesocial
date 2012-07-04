@@ -2,8 +2,8 @@
 README
 ------
 
-StatusNet 1.1.0-alpha1
-3 October 2011
+StatusNet 1.1.0
+2 July 2012
 
 This is the README file for StatusNet, the Open Source social
 networking platform. It includes general information about the
@@ -123,7 +123,7 @@ It includes the following changes:
 - Bug fix for conversation counts in conversation streams.
 - Rights for moderators to manage spam.
 
-A full changelog is available at http://status.net/wiki/StatusNet_1.1.0-alpha1.
+A full changelog is available at http://status.net/wiki/StatusNet_1.1.0.
 
 Troubleshooting
 ===============

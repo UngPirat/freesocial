@@ -1,4 +1,4 @@
-# Translation of StatusNet - Core to Interlingua (Interlingua)
+# Translation of StatusNet - Core to Interlingua (interlingua)
 # Exported from translatewiki.net
 #
 # Author: McDutchie
@@ -9,17 +9,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-08 22:26+0000\n"
-"PO-Revision-Date: 2012-04-08 22:27:44+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:08:11+0000\n"
 "Language-Team: Interlingua <https://translatewiki.net/wiki/Portal:ia>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: MediaWiki 1.20alpha (c953a56); Translate 2012-03-13\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: ia\n"
 "X-Message-Group: #out-statusnet-core\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
 
 #. TRANS: Database error message.
 #, php-format
@@ -8668,9 +8668,6 @@ msgstr "in contexto"
 msgid "Repeated by"
 msgstr "Repetite per"
 
-msgid " "
-msgstr " "
-
 #. TRANS: Link title in notice list item to reply to a notice.
 msgid "Reply to this notice."
 msgstr "Responder a iste nota."
@@ -8960,6 +8957,9 @@ msgstr "Terminar le session del sito."
 #. TRANS: Menu item title in primary navigation panel.
 msgid "Login to the site."
 msgstr "Authenticar te a iste sito."
+
+msgid "This profile has been silenced by site moderators"
+msgstr "Iste profilo ha essite silentiate per le moderatores del sito"
 
 #. TRANS: H2 text for user subscription statistics.
 msgid "Following"
@@ -9339,17 +9339,17 @@ msgstr "Invitar amicos e collegas a accompaniar te in %s."
 
 #. TRANS: Form of form to subscribe to a user.
 msgid "Subscribe to this user"
-msgstr "Subscriber a iste usator"
+msgstr "Subscriber se a iste usator"
 
 #. TRANS: Button text to subscribe to a user.
 #. TRANS: Button text for subscribing to a list.
 msgctxt "BUTTON"
 msgid "Subscribe"
-msgstr "Subscriber"
+msgstr "Sequer"
 
 #. TRANS: Button title to subscribe to a user.
 msgid "Subscribe to this user."
-msgstr "Subscriber a iste usator."
+msgstr "Subscriber se a iste usator."
 
 #. TRANS: Title of personal tag cloud section.
 msgid "People Tagcloud as self-tagged"
@@ -9596,7 +9596,7 @@ msgstr "Cancellar subscription a iste usator"
 #. TRANS: Button text for unsubscribing from a list.
 msgctxt "BUTTON"
 msgid "Unsubscribe"
-msgstr "Cancellar subscription"
+msgstr "Non sequer"
 
 #. TRANS: Button title on unsubscribe form.
 msgid "Unsubscribe from this user."
@@ -9682,3 +9682,7 @@ msgstr "XML invalide, radice XRD mancante."
 #, php-format
 msgid "Getting backup from file '%s'."
 msgstr "Obtene copia de reserva ex file '%s'."
+
+#
+#~ msgid " "
+#~ msgstr " "

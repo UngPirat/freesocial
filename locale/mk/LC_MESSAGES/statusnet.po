@@ -1,4 +1,4 @@
-# Translation of StatusNet - Core to Macedonian (Македонски)
+# Translation of StatusNet - Core to Macedonian (македонски)
 # Exported from translatewiki.net
 #
 # Author: Bjankuloski06
@@ -10,17 +10,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-08 22:26+0000\n"
-"PO-Revision-Date: 2012-04-08 22:27:55+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:08:21+0000\n"
 "Language-Team: Macedonian <https://translatewiki.net/wiki/Portal:mk>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: MediaWiki 1.20alpha (c953a56); Translate 2012-03-13\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: mk\n"
 "X-Message-Group: #out-statusnet-core\n"
 "Plural-Forms: nplurals=2; plural=(n == 1 || n%10 == 1) ? 0 : 1;\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
 
 #. TRANS: Database error message.
 #, php-format
@@ -4182,11 +4182,11 @@ msgstr "Претпочитан јазик"
 
 #. TRANS: Dropdownlist label in form for profile settings.
 msgid "Timezone"
-msgstr "Часовна зона"
+msgstr "Часовен појас"
 
 #. TRANS: Tooltip for dropdown list label in form for profile settings.
 msgid "What timezone are you normally in?"
-msgstr "Во која часовна зона обично се наоѓате?"
+msgstr "Во кој часовен појас обично се наоѓате?"
 
 #. TRANS: Checkbox label in form for profile settings.
 msgid ""
@@ -4230,7 +4230,7 @@ msgstr[1] "Биографијата е предолга (највеќе до %d 
 #. TRANS: Validation error in form for profile settings.
 #. TRANS: Client error displayed trying to save site settings without a timezone.
 msgid "Timezone not selected."
-msgstr "Не е избрана часовна зона."
+msgstr "Не е избран часовен појас."
 
 #. TRANS: Validation error in form for profile settings.
 msgid "Language is too long (maximum 50 characters)."
@@ -4270,7 +4270,7 @@ msgstr "Врати сметка"
 #. TRANS: %s is the page limit.
 #, php-format
 msgid "Beyond the page limit (%s)."
-msgstr "Надминато е ограничувањето на страницата (%s)."
+msgstr "Пречекорено е ограничувањето на страницата (%s)."
 
 #. TRANS: Server error displayed when a public timeline cannot be retrieved.
 msgid "Could not retrieve public timeline."
@@ -5456,11 +5456,11 @@ msgstr "Локални"
 
 #. TRANS: Dropdown label on site settings panel.
 msgid "Default timezone"
-msgstr "Основна часовна зона"
+msgstr "Основен часовен појас"
 
 #. TRANS: Dropdown title on site settings panel.
 msgid "Default timezone for the site; usually UTC."
-msgstr "Матична часовна зона за мрежното место; обично UTC."
+msgstr "Матичен часовен појас за мрежното место; обично UTC."
 
 #. TRANS: Dropdown label on site settings panel.
 msgid "Default language"
@@ -7296,8 +7296,8 @@ msgstr "Грешка при означувањето на %1$s: %2$s"
 #, php-format
 msgid "%1$s was tagged %2$s"
 msgid_plural "%1$s was tagged %2$s"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s беше означен(а) со %2$s"
+msgstr[1] "%1$s беше означен(а) со %2$s"
 
 #. TRANS: Separator for list of tags.
 #. TRANS: Separator in list of user names like "Jim, Bob, Mary".
@@ -8702,9 +8702,6 @@ msgstr "во контекст"
 msgid "Repeated by"
 msgstr "Повторено од"
 
-msgid " "
-msgstr " "
-
 #. TRANS: Link title in notice list item to reply to a notice.
 msgid "Reply to this notice."
 msgstr "Одговори на забелешкава."
@@ -8995,6 +8992,9 @@ msgstr "Одјава од мрежното место."
 msgid "Login to the site."
 msgstr "Најава на мрежното место."
 
+msgid "This profile has been silenced by site moderators"
+msgstr "Овој корисник е замолчен од модераторите"
+
 #. TRANS: H2 text for user subscription statistics.
 msgid "Following"
 msgstr "Следи"
@@ -9009,7 +9009,7 @@ msgstr "Статистики"
 
 #. TRANS: Label for user statistics.
 msgid "User ID"
-msgstr "Кориснички ID"
+msgstr "Корисничка назнака"
 
 #. TRANS: Label for user statistics.
 msgid "Member since"
@@ -9048,7 +9048,7 @@ msgstr "Скорешни ознаки"
 #. TRANS: Menu item in search group navigation panel.
 msgctxt "MENU"
 msgid "Featured"
-msgstr "Избрани"
+msgstr "Истакнати"
 
 #. TRANS: Menu item in search group navigation panel.
 msgctxt "MENU"
@@ -9708,3 +9708,7 @@ msgstr "Неважечки XML. Нема XRD-корен."
 #, php-format
 msgid "Getting backup from file '%s'."
 msgstr "Земам резерва на податотеката „%s“."
+
+#
+#~ msgid " "
+#~ msgstr " "

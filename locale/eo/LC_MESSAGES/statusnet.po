@@ -4,6 +4,7 @@
 # Author: AVRS
 # Author: Brion
 # Author: Eliovir
+# Author: Happy5214
 # Author: Ianmcorvidae
 # Author: Kris10
 # Author: LyzTyphone
@@ -17,17 +18,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-15 12:10+0000\n"
-"PO-Revision-Date: 2012-04-15 12:10:46+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:07:50+0000\n"
 "Language-Team: Esperanto <https://translatewiki.net/wiki/Portal:eo>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: MediaWiki 1.20alpha (27b39a6); Translate 2012-04-11\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: eo\n"
 "X-Message-Group: #out-statusnet-core\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
 
 #. TRANS: Database error message.
 #, php-format
@@ -2024,7 +2025,7 @@ msgid "FAQ"
 msgstr "Oftaj demandoj"
 
 msgid "Frequently asked questions"
-msgstr ""
+msgstr "Oftaj demandoj"
 
 #. TRANS: Secondary navigation menu item leading to e-mail contact information on the
 #. TRANS: StatusNet site, where to report bugs, ...
@@ -8848,9 +8849,6 @@ msgstr "kuntekste"
 msgid "Repeated by"
 msgstr "Ripetita de"
 
-msgid " "
-msgstr ""
-
 #. TRANS: Link title in notice list item to reply to a notice.
 #, fuzzy
 msgid "Reply to this notice."
@@ -9174,6 +9172,9 @@ msgstr "Elsaluti el la retpaĝaro"
 #, fuzzy
 msgid "Login to the site."
 msgstr "Ensaluti al la retpaĝaro"
+
+msgid "This profile has been silenced by site moderators"
+msgstr ""
 
 #. TRANS: H2 text for user subscription statistics.
 #, fuzzy

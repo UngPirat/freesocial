@@ -65,6 +65,11 @@ class ActivitySpamPlugin extends Plugin
 
         $this->hideSpam = common_config('activityspam', 'hidespam');
 
+        // Let DB_DataObject find Spam_score
+
+        common_config_set('db', 'class_location', 
+                          common_config('db', 'class_location') .':'.dirname(__FILE__));
+
         return true;
     }
 
@@ -180,11 +185,12 @@ class ActivitySpamPlugin extends Plugin
 
             if (!empty($notice)) {
 
-                $score = $this->getScore($notice);
+                $score = Spam_score::staticGet('notice_id', $notice->id);
 
                 if (empty($score)) {
-                    $this->debug("No score for notice " . $notice->id);
-                    // XXX: show a question-mark or something
+                    // If it's empty, we can train it.
+                    $form = new TrainSpamForm($out, $notice);
+                    $form->show();
                 } else if ($score->is_spam) {
                     $form = new TrainHamForm($out, $notice);
                     $form->show();
@@ -251,37 +257,6 @@ class ActivitySpamPlugin extends Plugin
                             _m('Test notices against the Activity Spam service.'));
         return true;
     }
-
-    function getScore($notice)
-    {
-        $score = Spam_score::staticGet('notice_id', $notice->id);
-        
-        if (!empty($score)) {
-            return $score;
-        }
-
-        try {
-
-            $result = $this->filter->test($notice);
-
-            $score = Spam_score::saveNew($notice, $result);
-
-            $this->log(LOG_INFO, "Notice " . $notice->id . " has spam score " . $score->score);
-
-        } catch (Exception $e) {
-            // Log but continue 
-            $this->log(LOG_ERR, $e->getMessage());
-            $score = null;
-        }
-
-        return $score;
-    }
-
-    function onStartReadWriteTables(&$alwaysRW, &$rwdb) {
-        $alwaysRW[] = 'spam_score';
-        return true;
-    }
-
 
     function onEndNoticeInScope($notice, $profile, &$bResult)
     {

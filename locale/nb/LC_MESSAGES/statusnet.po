@@ -1,4 +1,4 @@
-# Translation of StatusNet - Core to Norwegian Bokmål (‪Norsk (bokmål)‬)
+# Translation of StatusNet - Core to Norwegian Bokmål (‪norsk (bokmål)‬)
 # Exported from translatewiki.net
 #
 # Author: EivindJ
@@ -14,17 +14,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: StatusNet - Core\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-08 22:26+0000\n"
-"PO-Revision-Date: 2012-04-08 22:27:59+0000\n"
+"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"PO-Revision-Date: 2012-06-30 11:08:25+0000\n"
 "Language-Team: Norwegian Bokmål <https://translatewiki.net/wiki/Portal:nb>\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: MediaWiki 1.20alpha (c953a56); Translate 2012-03-13\n"
+"X-Generator: MediaWiki 1.20alpha (233fc08); Translate 2012-06-21\n"
 "X-Translation-Project: translatewiki.net <https://translatewiki.net>\n"
 "X-Language-Code: nb\n"
 "X-Message-Group: #out-statusnet-core\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-POT-Import-Date: 2012-03-11 21:26:16+0000\n"
+"X-POT-Import-Date: 2012-04-22 22:02:21+0000\n"
 
 #. TRANS: Database error message.
 #, php-format
@@ -8856,10 +8856,6 @@ msgstr "Inget innhold."
 msgid "Repeated by"
 msgstr "Repetert av"
 
-#, fuzzy
-msgid " "
-msgstr ", "
-
 #. TRANS: Link title in notice list item to reply to a notice.
 #, fuzzy
 msgid "Reply to this notice."
@@ -9183,6 +9179,9 @@ msgstr "Logg ut fra nettstedet"
 #, fuzzy
 msgid "Login to the site."
 msgstr "Log inn på nettstedet"
+
+msgid "This profile has been silenced by site moderators"
+msgstr ""
 
 #. TRANS: H2 text for user subscription statistics.
 #, fuzzy
@@ -9938,3 +9937,7 @@ msgstr "Ugyldig XML, mangler XRD-rot."
 #, php-format
 msgid "Getting backup from file '%s'."
 msgstr ""
+
+#, fuzzy
+#~ msgid " "
+#~ msgstr ", "
