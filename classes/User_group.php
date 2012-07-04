@@ -156,7 +156,7 @@ class User_group extends Managed_DataObject
             $gm->limit($offset, $limit);
         }
 
-        $ids = [];
+        $ids = array();
 
         if ($gm->find()) {
             $ids = $gm->fetchAll();
