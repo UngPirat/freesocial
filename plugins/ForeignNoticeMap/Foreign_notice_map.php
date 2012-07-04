@@ -79,7 +79,7 @@ class Foreign_notice_map extends Managed_DataObject
             ),
             'primary key' => array('foreign_id', 'service_id'),
             'unique keys' => array(
-                'foreign_notice_map_notice_id_idx' => array('notice_id', 'service_id'),
+                'foreign_notice_map_notice_id_idx' => array('foreign_id', 'service_id'),
             ),
             'foreign keys' => array(
                 'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),

@@ -426,6 +426,8 @@ class TwitterImport
     {
         $text = $status->text;
 
+		file_put_contents('/tmp/twitter_post.txt', print_r($status, true));
+
         if (empty($status->entities)) {
             $statusId = twitter_id($status);
             common_log(LOG_WARNING, "No entities data for {$statusId}; trying to fake up links ourselves.");
@@ -514,7 +516,7 @@ class TwitterImport
 
     function makeUrlLink($object, $orig)
     {
-        return "<a href='{$object->url}' class='extlink'>{$orig}</a>";
+        return '<a href="'.htmlspecialchars($object->expanded_url).'" class="extlink">'.htmlspecialchars($object->display_url).'</a>';
     }
 
     function makeHashtagLink($object, $orig)

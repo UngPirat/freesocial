@@ -7,6 +7,7 @@ class User_group extends Managed_DataObject
 {
     const JOIN_POLICY_OPEN = 0;
     const JOIN_POLICY_MODERATE = 1;
+    const CACHE_WINDOW = 201;
 
     ###START_AUTOCODE
     /* the code below is auto generated do not remove the above tag */
@@ -141,7 +142,26 @@ class User_group extends Managed_DataObject
         return !in_array($nickname, $blacklist);
     }
 
-    function getMembers($offset=0, $limit=null)
+    function getMembers($offset=0, $limit=null) {
+        if (is_null($limit) || $offset + $limit > User_group::CACHE_WINDOW) {
+            return $this->realGetMembers($offset,
+                                         $limit);
+        } else {
+            $key = sprintf('group:members:%d', $this->id);
+            $window = self::cacheGet($key);
+            if ($window === false) {
+                $members = $this->realGetMembers(0,
+                                                 User_group::CACHE_WINDOW);
+                $window = $members->fetchAll();
+                self::cacheSet($key, $window);
+            }
+            return new ArrayWrapper(array_slice($window,
+                                                $offset,
+                                                $limit));
+        }
+    }
+
+    function realGetMembers($offset=0, $limit=null)
     {
         $gm = new Group_member();
 
@@ -150,7 +170,7 @@ class User_group extends Managed_DataObject
 
         $gm->group_id = $this->id;
 
-        $gm->order_by('created DESC');
+        $gm->orderBy('created DESC');
 
         if (!is_null($limit)) {
             $gm->limit($offset, $limit);
@@ -159,7 +179,9 @@ class User_group extends Managed_DataObject
         $ids = array();
 
         if ($gm->find()) {
-            $ids = $gm->fetchAll();
+            while ($gm->fetch()) {
+                $ids[] = $gm->profile_id;
+            }
         }
 
         $members = Profile::multiGet('id', $ids);
@@ -199,17 +221,24 @@ class User_group extends Managed_DataObject
 
     function getMemberCount()
     {
-        // XXX: WORM cache this
+        $key = sprintf("group:member_count:%d", $this->id);
 
-        $members = $this->getMembers();
-        $member_count = 0;
+        $cnt = self::cacheGet($key);
 
-        /** $member->count() doesn't work. */
-        while ($members->fetch()) {
-            $member_count++;
+        if (is_integer($cnt)) {
+            return (int) $cnt;
         }
 
-        return $member_count;
+        $mem = new Group_member();
+        $mem->group_id = $this->id;
+
+        // XXX: why 'distinct'?
+
+        $cnt = (int) $mem->count('distinct profile_id');
+
+        self::cacheSet($key, $cnt);
+
+        return $cnt;
     }
 
     function getBlockedCount()
