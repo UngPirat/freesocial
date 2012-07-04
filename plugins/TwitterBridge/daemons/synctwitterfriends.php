@@ -207,7 +207,7 @@ class SyncTwitterFriendsDaemon extends ParallelizingDaemon
         foreach ($friends as $friend) {
 
             $friend_name = $friend->screen_name;
-            $friend_id = (int) $friend->id;
+            $friend_id = $friend->id_str;
 
             // Update or create the Foreign_user record for each
             // Twitter friend
@@ -268,5 +268,5 @@ if (have_option('d') || have_option('debug')) {
     $debug = true;
 }
 
-$syncer = new SyncTwitterFriendsDaemon($id, 60, 2, $debug);
+$syncer = new SyncTwitterFriendsDaemon($id, 120, 1, $debug);
 $syncer->runOnce();

@@ -204,7 +204,7 @@ function broadcast_twitter($notice)
                     // this or can discard safely.
                     return $retweet;
                 }
-            } else {
+            } elseif (empty($notice->reply_to) || is_twitter_notice($notice->reply_to)) {
                 return broadcast_oauth($notice, $flink);
             }
         }

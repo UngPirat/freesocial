@@ -549,7 +549,7 @@ class User_group extends Managed_DataObject
 
         $fields['nickname'] = Nickname::normalize($fields['nickname']);
 
-        $default = array('nickname' => null,
+        $defaults = array('nickname' => null,
                           'fullname' => null,
                           'homepage' => null,
                           'description' => null,
