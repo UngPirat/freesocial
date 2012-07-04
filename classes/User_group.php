@@ -143,24 +143,27 @@ class User_group extends Managed_DataObject
 
     function getMembers($offset=0, $limit=null)
     {
-        $qry =
-          'SELECT profile.* ' .
-          'FROM profile JOIN group_member '.
-          'ON profile.id = group_member.profile_id ' .
-          'WHERE group_member.group_id = %d ' .
-          'ORDER BY group_member.created DESC ';
+        $gm = new Group_member();
 
-        if ($limit != null) {
-            if (common_config('db','type') == 'pgsql') {
-                $qry .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-            } else {
-                $qry .= ' LIMIT ' . $offset . ', ' . $limit;
-            }
+        $gm->selectAdd();
+        $gm->selectAdd('profile_id');
+
+        $gm->group_id = $this->id;
+
+        $gm->order_by('created DESC');
+
+        if (!is_null($limit)) {
+            $gm->limit($offset, $limit);
         }
 
-        $members = new Profile();
+        $ids = [];
 
-        $members->query(sprintf($qry, $this->id));
+        if ($gm->find()) {
+            $ids = $gm->fetchAll();
+        }
+
+        $members = Profile::multiGet('id', $ids);
+
         return $members;
     }
 
