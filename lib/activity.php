@@ -57,7 +57,6 @@ class Activity
     const VERB       = 'verb';
     const OBJECT     = 'object';
     const ACTOR      = 'actor';
-    const SUBJECT    = 'subject';
     const OBJECTTYPE = 'object-type';
     const CONTEXT    = 'context';
     const TARGET     = 'target';
@@ -215,13 +214,6 @@ class Activity
             // An <atom:author> in the entry overrides any author info on
             // the surrounding feed.
             $this->actor = new ActivityObject($authorEl);
-
-        } else if (!empty($feed) &&
-                   $subjectEl = $this->_child($feed, self::SUBJECT)) {
-
-            // Feed subject is used for things like groups.
-            // Should actually possibly not be interpreted as an actor...?
-            $this->actor = new ActivityObject($subjectEl);
 
         } else if (!empty($feed) && $authorEl = $this->_child($feed, self::AUTHOR,
                                                               self::ATOM)) {
@@ -386,12 +378,6 @@ class Activity
                     $loc = $this->context->location;
 
                     // GeoJSON
-
-                    $activity['geopoint'] = array(
-                        'type'        => 'Point',
-                        'coordinates' => array($loc->lat, $loc->lon),
-                        'deprecated'  => true,
-                    );
 
                     $activity['location'] = array(
                         'objectType' => 'place',
