@@ -474,21 +474,6 @@ class Router
                               'screen_name' => Nickname::DISPLAY_FMT,
                               'format' => '(xml|json)'));
 
-            // direct messages
-
-            $m->connect('api/direct_messages.:format',
-                        array('action' => 'ApiDirectMessage',
-                              'format' => '(xml|json|rss|atom)'));
-
-            $m->connect('api/direct_messages/sent.:format',
-                        array('action' => 'ApiDirectMessage',
-                              'format' => '(xml|json|rss|atom)',
-                              'sent' => true));
-
-            $m->connect('api/direct_messages/new.:format',
-                        array('action' => 'ApiDirectMessageNew',
-                              'format' => '(xml|json)'));
-
             // friendships
 
             $m->connect('api/friendships/show.:format',
