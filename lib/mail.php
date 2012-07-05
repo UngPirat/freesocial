@@ -726,6 +726,9 @@ function mail_notify_attn($user, $notice)
                                      array('nickname' => $user->nickname))) . //%7
                 mail_footer_block();
     $headers = _mail_prepare_headers('mention', $user->nickname, $sender->nickname);
+	if (!empty($user->incomingemail)) {
+	    $headers['Reply-To'] = $user->incomingemail;
+	}
 
     common_switch_locale();
     mail_to_user($user, $subject, $body, $headers);

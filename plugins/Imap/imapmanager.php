@@ -71,7 +71,7 @@ class ImapManager extends IoManager
      */
     public static function multiSite()
     {
-        return IoManager::GLOBAL_SINGLE_ONLY;
+        return IoManager::SINGLE_ONLY;
     }
 
     /**

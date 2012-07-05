@@ -67,7 +67,11 @@ class TwitterImport
             return null;
         }
 
-        $notice = $this->saveStatus($status);
+        try {
+			$notice = $this->saveStatus($status);
+		} catch (Exception $e) {
+			return null;	// import failed, maybe because the user was silenced
+		}
 
         return $notice;
     }
@@ -425,8 +429,6 @@ class TwitterImport
     function linkify($status)
     {
         $text = $status->text;
-
-		file_put_contents('/tmp/twitter_post.txt', print_r($status, true));
 
         if (empty($status->entities)) {
             $statusId = twitter_id($status);
