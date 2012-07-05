@@ -73,15 +73,6 @@ class AtomUserNoticeFeed extends AtomNoticeFeed
             // removed in future versions of StatusNet.
 
             $this->addAuthorRaw($ao->asString('author'));
-
-            $depMsg = 'Deprecation warning: activity:subject is present '
-                . 'only for backward compatibility. It will be '
-                . 'removed in the next version of StatusNet.';
-
-            $this->addAuthorRaw(
-                "<!--$depMsg-->\n"
-                . $ao->asString('activity:subject')
-            );
         }
 
         // TRANS: Title in atom user notice feed. %s is a user name.
