@@ -113,6 +113,7 @@ class FacebookBridgePlugin extends Plugin
         case 'FacebookfinishloginAction':
         case 'FacebookadminpanelAction':
         case 'FacebooksettingsAction':
+        case 'FacebookcallbackAction':
         case 'FacebookdeauthorizeAction':
             include_once $dir . '/actions/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
             return false;
@@ -120,7 +121,8 @@ class FacebookBridgePlugin extends Plugin
         case 'FacebookQueueHandler':
             include_once $dir . '/lib/' . strtolower($cls) . '.php';
             return false;
-        case 'Notice_to_item':
+        case 'FacebookRealtime':
+        case 'FacebookImport':
             include_once $dir . '/classes/' . $cls . '.php';
             return false;
         default:
@@ -141,7 +143,7 @@ class FacebookBridgePlugin extends Plugin
     function onCheckSchema()
     {
         $schema = Schema::get();
-        $schema->ensureTable('notice_to_item', Notice_to_item::schemaDef());
+        $schema->ensureTable('facebook_realtime', FacebookRealtime::schemaDef());
         return true;
     }
 
@@ -189,9 +191,33 @@ class FacebookBridgePlugin extends Plugin
             array('action' => 'facebooksettings')
         );
         $m->connect(
+            'facebook/callback',
+            array('action' => 'facebookcallback')
+        );
+        $m->connect(
             'facebook/deauthorize',
             array('action' => 'facebookdeauthorize')
         );
+
+        return true;
+    }
+
+    /**
+     * Add FacebookBridge daemons to the list of daemons to start
+     *
+     * @param array $daemons the list fo daemons to run
+     *
+     * @return boolean hook return
+     */
+    function onGetValidDaemons($daemons)
+    {
+        if (common_config('facebookimport', 'enabled')) {
+            array_push(
+                $daemons,
+                INSTALLDIR
+                . '/plugins/FacebookBridge/daemons/facebookrealtimefetcher.php'
+                );
+        }
 
         return true;
     }
@@ -371,7 +397,7 @@ $('#facebook_button').bind('click', function(event) {
         } else {
             // NOP (user cancelled login)
         }
-    }, {scope:'read_stream,publish_stream,offline_access,user_status,user_location,user_website,email'});
+    }, {scope:'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages'});
 });
 ENDOFSCRIPT;
 
@@ -416,14 +442,7 @@ ENDOFSCRIPT;
                     array('next' => $destination)
                 );
 
-                common_log(
-                    LOG_INFO,
-                    sprintf(
-                        "Logging user out of Facebook (fbuid = %s)",
-                        $fbuid
-                    ),
-                    __FILE__
-                );
+                common_log(LOG_INFO, "Logging user out of Facebook ({$cur->id})");
 
                 $action->logout();
 
