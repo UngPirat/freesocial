@@ -66,12 +66,6 @@ class AtomUserNoticeFeed extends AtomNoticeFeed
 
             array_push($ao->extra, $profile->profileInfo($cur));
 
-            // XXX: For users, we generate an author _AND_ an <activity:subject>
-            // This is for backward compatibility with clients (especially
-            // StatusNet's clients) that assume the Atom will conform to an
-            // older version of the Activity Streams API. Subject should be
-            // removed in future versions of StatusNet.
-
             $this->addAuthorRaw($ao->asString('author'));
         }
 
