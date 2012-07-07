@@ -7,6 +7,7 @@ class User_group extends Managed_DataObject
 {
     const JOIN_POLICY_OPEN = 0;
     const JOIN_POLICY_MODERATE = 1;
+    const CACHE_WINDOW = 201;
 
     ###START_AUTOCODE
     /* the code below is auto generated do not remove the above tag */
@@ -141,26 +142,50 @@ class User_group extends Managed_DataObject
         return !in_array($nickname, $blacklist);
     }
 
-    function getMembers($offset=0, $limit=null)
-    {
-        $qry =
-          'SELECT profile.* ' .
-          'FROM profile JOIN group_member '.
-          'ON profile.id = group_member.profile_id ' .
-          'WHERE group_member.group_id = %d ' .
-          'ORDER BY group_member.created DESC ';
+    function getMembers($offset=0, $limit=null) {
+        if (is_null($limit) || $offset + $limit > User_group::CACHE_WINDOW) {
+            return $this->realGetMembers($offset,
+                                         $limit);
+        } else {
+            $key = sprintf('group:members:%d', $this->id);
+            $window = self::cacheGet($key);
+            if ($window === false) {
+                $members = $this->realGetMembers(0,
+                                                 User_group::CACHE_WINDOW);
+                $window = $members->fetchAll();
+                self::cacheSet($key, $window);
+            }
+            return new ArrayWrapper(array_slice($window,
+                                                $offset,
+                                                $limit));
+        }
+    }
 
-        if ($limit != null) {
-            if (common_config('db','type') == 'pgsql') {
-                $qry .= ' LIMIT ' . $limit . ' OFFSET ' . $offset;
-            } else {
-                $qry .= ' LIMIT ' . $offset . ', ' . $limit;
+    function realGetMembers($offset=0, $limit=null)
+    {
+        $gm = new Group_member();
+
+        $gm->selectAdd();
+        $gm->selectAdd('profile_id');
+
+        $gm->group_id = $this->id;
+
+        $gm->orderBy('created DESC');
+
+        if (!is_null($limit)) {
+            $gm->limit($offset, $limit);
+        }
+
+        $ids = array();
+
+        if ($gm->find()) {
+            while ($gm->fetch()) {
+                $ids[] = $gm->profile_id;
             }
         }
 
-        $members = new Profile();
+        $members = Profile::multiGet('id', $ids);
 
-        $members->query(sprintf($qry, $this->id));
         return $members;
     }
 
@@ -196,17 +221,24 @@ class User_group extends Managed_DataObject
 
     function getMemberCount()
     {
-        // XXX: WORM cache this
+        $key = sprintf("group:member_count:%d", $this->id);
 
-        $members = $this->getMembers();
-        $member_count = 0;
+        $cnt = self::cacheGet($key);
 
-        /** $member->count() doesn't work. */
-        while ($members->fetch()) {
-            $member_count++;
+        if (is_integer($cnt)) {
+            return (int) $cnt;
         }
 
-        return $member_count;
+        $mem = new Group_member();
+        $mem->group_id = $this->id;
+
+        // XXX: why 'distinct'?
+
+        $cnt = (int) $mem->count('distinct profile_id');
+
+        self::cacheSet($key, $cnt);
+
+        return $cnt;
     }
 
     function getBlockedCount()
@@ -535,6 +567,7 @@ class User_group extends Managed_DataObject
             : $this->homepage_logo;
     }
 
+    // Throws an Exception if something is bad
     static function register($fields) {
         if (!empty($fields['userid'])) {
             $profile = Profile::staticGet('id', $fields['userid']);
@@ -546,42 +579,31 @@ class User_group extends Managed_DataObject
             }
         }
 
-        // MAGICALLY put fields into current scope
-        // @fixme kill extract(); it makes debugging absurdly hard
+        $fields['nickname'] = Nickname::normalize($fields['nickname']);
 
-		$defaults = array('nickname' => null,
-						  'fullname' => null,
-						  'homepage' => null,
-						  'description' => null,
-						  'location' => null,
-						  'uri' => null,
-						  'mainpage' => null,
-						  'aliases' => array(),
-						  'userid' => null);
-		
-		$fields = array_merge($defaults, $fields);
-		
-        extract($fields);
+        $defaults = array('nickname' => null,
+                          'fullname' => null,
+                          'homepage' => null,
+                          'description' => null,
+                          'location' => null,
+                          'uri' => null,
+                          'mainpage' => null);
+
+        // load values into $fields, overwriting as we go
+        $fields = array_merge($defaults, $fields);
 
         $group = new User_group();
 
         $group->query('BEGIN');
 
-        if (empty($uri)) {
-            // fill in later...
-            $uri = null;
-        }
-        if (empty($mainpage)) {
-            $mainpage = common_local_url('showgroup', array('nickname' => $nickname));
+        if (empty($fields['mainpage'])) {
+            $fields['mainpage'] = common_local_url('showgroup', array('nickname' => $fields['nickname']));
         }
 
-        $group->nickname    = $nickname;
-        $group->fullname    = $fullname;
-        $group->homepage    = $homepage;
-        $group->description = $description;
-        $group->location    = $location;
-        $group->uri         = $uri;
-        $group->mainpage    = $mainpage;
+        // $default contains the User_group keys-to-be-set, $fields has the submitted values
+        foreach(array_keys($defaults) as $key) {
+            $group->{$key}    = $fields[$key];
+        }
         $group->created     = common_sql_now();
 
         if (isset($fields['join_policy'])) {
@@ -606,7 +628,7 @@ class User_group extends Managed_DataObject
                 throw new ServerException(_('Could not create group.'));
             }
 
-            if (!isset($uri) || empty($uri)) {
+            if (empty($fields['uri'])) {
                 $orig = clone($group);
                 $group->uri = common_local_url('groupbyid', array('id' => $group->id));
                 $result = $group->update($orig);
@@ -617,7 +639,7 @@ class User_group extends Managed_DataObject
                 }
             }
 
-            $result = $group->setAliases($aliases);
+            $result = $group->setAliases((array)$fields['aliases']);
 
             if (!$result) {
                 // TRANS: Server exception thrown when creating group aliases failed.
@@ -627,7 +649,7 @@ class User_group extends Managed_DataObject
             $member = new Group_member();
 
             $member->group_id   = $group->id;
-            $member->profile_id = $userid;
+            $member->profile_id = $fields['userid'];
             $member->is_admin   = 1;
             $member->created    = $group->created;
 
@@ -639,14 +661,14 @@ class User_group extends Managed_DataObject
                 throw new ServerException(_('Could not set group membership.'));
             }
 
-            self::blow('profile:groups:%d', $userid);
+            self::blow('profile:groups:%d', $fields['userid']);
             
-            if ($local) {
+            if ($fields['local']) {
                 $local_group = new Local_group();
 
                 $local_group->group_id = $group->id;
-                $local_group->nickname = $nickname;
-                $local_group->created  = common_sql_now();
+                $local_group->nickname = $group->nickname;
+                $local_group->created  = $group->created;
 
                 $result = $local_group->insert();
 

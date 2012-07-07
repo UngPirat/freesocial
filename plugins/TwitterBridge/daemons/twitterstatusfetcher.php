@@ -22,7 +22,7 @@ define('INSTALLDIR', realpath(dirname(__FILE__) . '/../../..'));
 
 // Tune number of processes and how often to poll Twitter
 // XXX: Should these things be in config.php?
-define('MAXCHILDREN', 2);
+define('MAXCHILDREN', 1);
 define('POLL_INTERVAL', 60); // in seconds
 
 $shortoptions = 'di::';
@@ -136,13 +136,21 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         // a new connection if there isn't one already
         $conn = &$flink->getDatabaseConnection();
 
-        $this->getTimeline($flink);
+        $profile = new Profile();
+        $profile->profileurl = $profileurl;
+        $profile->limit(1);
 
-        $flink->last_friendsync = common_sql_now();
-        $flink->update();
+        if ($profile->find() && $profile->fetch() && !$profile->isSilenced()) {
+	        $this->getTimeline($flink);
+
+	        $flink->last_friendsync = common_sql_now();
+	        $flink->update();
+		} else {
+			common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
+		}
 
         $conn->disconnect();
-
+			
         // XXX: Couldn't find a less brutal way to blow
         // away a cached connection
         global $_DB_DATAOBJECT;

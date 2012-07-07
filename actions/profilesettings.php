@@ -245,12 +245,14 @@ class ProfilesettingsAction extends SettingsAction
 
         if (Event::handle('StartProfileSaveForm', array($this))) {
 
-            try {
-                $nickname = Nickname::normalize($this->trimmed('nickname'));
-            } catch (NicknameException $e) {
-                $this->showForm($e->getMessage());
-                return;
-            }
+			if (common_config('profile', 'changenick') == true) {
+    	        try {
+	                $nickname = Nickname::normalize($this->trimmed('nickname'));
+        	    } catch (NicknameException $e) {
+            	    $this->showForm($e->getMessage());
+	                return;
+    	        }
+			}
 
             $fullname = $this->trimmed('fullname');
             $homepage = $this->trimmed('homepage');
@@ -264,7 +266,7 @@ class ProfilesettingsAction extends SettingsAction
             $tagstring = $this->trimmed('tags');
 
             // Some validation
-            if (!User::allowed_nickname($nickname)) {
+            if (common_config('profile', 'changenick') == true && !User::allowed_nickname($nickname)) {
                 // TRANS: Validation error in form for profile settings.
                 $this->showForm(_('Not a valid nickname.'));
                 return;

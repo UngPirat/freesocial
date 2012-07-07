@@ -120,6 +120,7 @@ class MailHandler
     {
         $incoming = $user->incomingemail;
         $tos = mailparse_rfc822_parse_addresses($to_hdr);
+		file_put_contents('/tmp/mail_rfc822-to.txt', print_r($tos, true));
         foreach ($tos as $to) {
             if (strcasecmp($incoming, $to['address']) == 0) {
                 return true;
@@ -207,7 +208,7 @@ class MailHandler
         } else if ($parsed->ctype_primary == 'text'
             && $parsed->ctype_secondary=='plain') {
             $msg = $parsed->body;
-            if(strtolower($parsed->ctype_parameters['charset']) != "utf-8"){
+            if(isset($parsed->ctype_parameters['charset']) && strtolower($parsed->ctype_parameters['charset']) != "utf-8"){
                 $msg = utf8_encode($msg);
             }
         }else if(!empty($parsed->body)){

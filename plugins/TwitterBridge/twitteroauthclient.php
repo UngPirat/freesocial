@@ -261,6 +261,65 @@ class TwitterOAuthClient extends OAuthClient
     }
 
     /**
+     * Subscribes to a user on Twitter
+     *
+     * @param int $id          id of the user whom you wish to see friends of
+     * @param int $user_id     numerical user id
+     * @param int $screen_name screen name
+     *
+     * @return friend object
+     */
+    function createFriendship($friend)
+    {
+        $url = 'https://api.twitter.com/1/friendships/create.json';
+
+        $params = array('follow'=>'true');
+
+        // primarily use user_id, but if we only have screen_name to go by...
+        foreach(array('user_id', 'screen_name') as $field) {
+            if (isset($friend[$field])) {
+                $params[$field] = $friend[$field];
+				break;
+            }
+        }
+
+common_debug('TWITTER subscription calling oAuthPost');
+
+        $response = $this->oAuthPost($url, $params);
+        $status   = json_decode($response);
+common_debug('TWITTER subscription status: '.$status);
+        return $status;
+    }
+
+    /**
+     * Unsubscribes a user on Twitter
+     *
+     * @param int   $id          id of the user whom you wish to see friends of
+     * @param array $friend      array with either 'user_id' or 'screen_name' defined
+     * @param int $screen_name screen name
+     *
+     * @return friend object
+     */
+    function destroyFriendship($friend)
+    {
+        $url = 'https://api.twitter.com/1/friendships/destroy.json';
+
+        $params = array();
+
+        // primarily use user_id, but if we only have screen_name to go by...
+        foreach(array('user_id', 'screen_name') as $field) {
+            if (isset($friend[$field])) {
+                $params[$field] = $friend[$field];
+				break;
+            }
+        }
+
+        $response = $this->oAuthPost($url, $params);
+        $status   = json_decode($response);
+        return $status;
+    }
+
+    /**
      * Calls Twitter's /statuses/friends/ids API method
      *
      * @param int $id          id of the user whom you wish to see friends of

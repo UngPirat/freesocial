@@ -149,20 +149,30 @@ class Facebookclient
         }
 
         // Avoid a loop
-        if ($this->notice->source == 'Facebook') {
+        if (mb_strtolower($this->notice->source) == 'facebook') {
             common_log(
                 LOG_INFO,
                 sprintf(
-                    'Skipping notice %d because its source is Facebook.',
+                    'Skipping notice %d because its source is '.$this->notice->source,
                     $this->notice->id
                 ),
                 __FILE__
             );
             return false;
         }
+    
+        // Don't send activity activities (at least for now)
+        if ($this->notice->object_type == ActivityObject::ACTIVITY) {
+            return false;
+        }
+        $allowedVerbs = array(ActivityVerb::POST, ActivityVerb::SHARE);
+        // Don't send things that aren't posts or repeats (at least for now)
+        if (!in_array($this->notice->verb, $allowedVerbs)) {
+            return false;
+        }
 
         // If the user does not want to broadcast to Facebook, move along
-        if (!($this->flink->noticesync & FOREIGN_NOTICE_SEND == FOREIGN_NOTICE_SEND)) {
+        if (!(($this->flink->noticesync & FOREIGN_NOTICE_SEND) == FOREIGN_NOTICE_SEND)) {
             common_log(
                 LOG_INFO,
                 sprintf(
@@ -175,15 +185,31 @@ class Facebookclient
         }
 
         // If it's not a reply, or if the user WANTS to send @-replies,
+		// or if it's a reply to a Facebook post,
         // then, yeah, it can go to Facebook.
-
-        if (empty($this->notice->reply_to) ||
-            ($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY)) {
+        if (($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) == FOREIGN_NOTICE_SEND_REPLY ||
+			$this->isForeignNotice($this->notice->reply_to)) {
             return true;
         }
 
         return false;
     }
+
+	function isForeignNotice($notice_id) {
+		return Foreign_notice_map::is_foreign_notice($notice_id, FACEBOOK_SERVICE);
+	}
+	function getForeignId($notice_id) {
+		try {
+			$foreign_id = Foreign_notice_map::get_foreign_id($notice_id, FACEBOOK_SERVICE);
+		} catch (Exception $e) {
+			return null;
+		}
+		return $foreign_id;
+	}
+	function deleteNoticeMapping($notice_id) {
+		return Foreign_notice_map::delete_notice_mapping($notice_id, FACEBOOK_SERVICE);
+	}
+
 
     /*
      * Determine whether we should send this notice using the Graph API or the
@@ -191,13 +217,11 @@ class Facebookclient
      */
     function sendNotice()
     {
-        // If there's nothing in the credentials field try to send via
-        // the Old Rest API
-
         if ($this->isFacebookBound()) {
-            common_debug("notice is facebook bound", __FILE__);
+            common_debug("notice {$this->notice->id} is facebook bound", __FILE__);
             if (empty($this->flink->credentials)) {
-                return $this->sendOldRest();
+                throw new Exception('REST interface no longer supported');
+				//return $this->sendOldRest();
             } else {
 
                 // Otherwise we most likely have an access token
@@ -235,32 +259,39 @@ class Facebookclient
                 'message'      => $this->notice->content
             );
 
-            $attachments = $this->notice->attachments();
+			if (!empty($this->notice->reply_to) && $fb_id = FacebookImport::getOriginalId($this->getForeignId($this->notice->reply_to))) {
+				common_debug("attempting to comment with {$this->notice->id} on FACEBOOK post: $fb_id which is parent of ".$this->getForeignId($this->notice->reply_to));
+				$result = $this->facebook->api(sprintf('/%s/comments', $fb_id), 'post', $params);
+				// attachments not supported for comments in Facebook.;
+			} else {
 
-            if (!empty($attachments)) {
+	            $attachments = $this->notice->attachments();
+	
+    	        if (!empty($attachments)) {
 
-                // We can only send one attachment with the Graph API :(
+        	        // We can only send one attachment with the Graph API :(
+	
+    	            $first = array_shift($attachments);
+	
+    	            if (substr($first->mimetype, 0, 6) == 'image/'
+        	            || in_array(
+            	            $first->mimetype,
+                	        array('application/x-shockwave-flash', 'audio/mpeg' ))) {
 
-                $first = array_shift($attachments);
+	                   $params['picture'] = $first->url;
+    	               $params['caption'] = 'Click for full size';
+        	           $params['source']  = $first->url;
+                	}
 
-                if (substr($first->mimetype, 0, 6) == 'image/'
-                    || in_array(
-                        $first->mimetype,
-                        array('application/x-shockwave-flash', 'audio/mpeg' ))) {
+            	}
 
-                   $params['picture'] = $first->url;
-                   $params['caption'] = 'Click for full size';
-                   $params['source']  = $first->url;
-                }
-
-            }
-
-            $result = $this->facebook->api(
-                sprintf('/%s/feed', $fbuid), 'post', $params
-            );
+	            $result = $this->facebook->api(
+   		            sprintf('/%s/feed', $fbuid), 'post', $params
+       		    );
+			}
 
             // Save a mapping
-            Notice_to_item::saveNew($this->notice->id, $result['id']);
+            Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
 
             common_log(
                 LOG_INFO,
@@ -281,126 +312,31 @@ class Facebookclient
         return true;
     }
 
-    /*
-     * Send a notice to Facebook using the deprecated Old REST API. We need this
-     * for backwards compatibility. Users who signed up for Facebook bridging
-     * using the old Facebook Canvas application do not have an OAuth 2.0
-     * access token.
-     */
-    function sendOldRest()
-    {
-        try {
+// this must be run to get a subscription. not necessary per user!
+//		Facebookclient::subscribeToRealtime($this->fbuid);
+	static function subscribeToRealtime($userid) {
+		if ( !$flink=Foreign_link::getByForeignID($userid, FACEBOOK_SERVICE) ) {
+			common_debug('FACEBOOK failed subscription due to lack of link: '.print_r($userid,true));
+			throw new Exception(_m('No such user'));
+		}
 
-            $canPublish = $this->checkPermission('publish_stream');
-            $canUpdate  = $this->checkPermission('status_update');
-
-            // We prefer to use stream.publish, because it can handle
-            // attachments and returns the ID of the published item
-
-            if ($canPublish == 1) {
-                $this->restPublishStream();
-            } else if ($canUpdate == 1) {
-                // as a last resort we can just update the user's "status"
-                $this->restStatusUpdate();
-            } else {
-
-                $msg = 'Not sending notice %d to Facebook because user %s '
-                     . '(%d), fbuid %d,  does not have \'status_update\' '
-                     . 'or \'publish_stream\' permission.';
-
-                common_log(
-                    LOG_WARNING,
-                    sprintf(
-                        $msg,
-                        $this->notice->id,
-                        $this->user->nickname,
-                        $this->user->id,
-                        $this->flink->foreign_id
-                    ),
-                    __FILE__
-                );
-            }
-
-        } catch (FacebookApiException $e) {
-            return $this->handleFacebookError($e);
+        $appsecret = common_config('facebook', 'appsecret');
+        if (empty($appsecret)) {
+			throw new Exception('You have to set the Facebook appsecret in config');
         }
-
-        return true;
-    }
-
-    /*
-     * Query Facebook to to see if a user has permission
-     *
-     *
-     *
-     * @param $permission the permission to check for - must be either
-     *                    public_stream or status_update
-     *
-     * @return boolean result
-     */
-    function checkPermission($permission)
-    {
-        if (!in_array($permission, array('publish_stream', 'status_update'))) {
-             // TRANS: Server exception thrown when permission check fails.
-             throw new ServerException(_('No such permission!'));
-        }
-
-        $fbuid = $this->flink->foreign_id;
-
-        common_debug(
-            sprintf(
-                'Checking for %s permission for user %s (%d), fbuid %d',
-                $permission,
-                $this->user->nickname,
-                $this->user->id,
-                $fbuid
-            ),
-            __FILE__
-        );
-
-        $hasPermission = $this->facebook->api(
-            array(
-                'method'   => 'users.hasAppPermission',
-                'ext_perm' => $permission,
-                'uid'      => $fbuid
-            )
-        );
-
-        if ($hasPermission == 1) {
-
-            common_debug(
-                sprintf(
-                    '%s (%d), fbuid %d has %s permission',
-                    $permission,
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
-
-            return true;
-
-        } else {
-
-            $logMsg = '%s (%d), fbuid $fbuid does NOT have %s permission.'
-                    . 'Facebook returned: %s';
-
-            common_debug(
-                sprintf(
-                    $logMsg,
-                    $this->user->nickname,
-                    $this->user->id,
-                    $permission,
-                    $fbuid,
-                    var_export($result, true)
-                ),
-                __FILE__
-            );
-
-            return false;
-        }
-    }
+		$facebook = Facebookclient::getFacebook();
+		$params = array(
+			'access_token' => $appsecret,
+			'object' => 'user',
+			//'callback_url' => common_local_url('facebookcallback'),
+			'callback_url' => 'http://callback.freesocial.org/facebook',
+			'fields' => 'feed,likes',
+			'verify_token' => "$userid",
+			);
+		$result = $facebook->api(sprintf('/%s/subscriptions'), 'post', $params);
+		common_debug('FACEBOOK subscription result: '.print_r($result,true));
+		return $result;
+	}
 
     /*
      * Handle a Facebook API Exception
@@ -486,131 +422,6 @@ class Facebookclient
             );
             return true; // dequeue
             break;
-        }
-    }
-
-    /*
-     * Publish a notice to Facebook as a status update
-     *
-     * This is the least preferable way to send a notice to Facebook because
-     * it doesn't support attachments and the API method doesn't return
-     * the ID of the post on Facebook.
-     *
-     */
-    function restStatusUpdate()
-    {
-        $fbuid = $this->flink->foreign_id;
-
-        common_debug(
-            sprintf(
-                "Attempting to post notice %d as a status update for %s (%d), fbuid %d",
-                $this->notice->id,
-                $this->user->nickname,
-                $this->user->id,
-                $fbuid
-            ),
-            __FILE__
-        );
-
-        $result = $this->facebook->api(
-            array(
-                'method'               => 'users.setStatus',
-                'status'               => $this->formatMessage(),
-                'status_includes_verb' => true,
-                'uid'                  => $fbuid
-            )
-        );
-
-        if ($result == 1) { // 1 is success
-
-            common_log(
-                LOG_INFO,
-                sprintf(
-                    "Posted notice %s as a status update for %s (%d), fbuid %d",
-                    $this->notice->id,
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
-
-            // There is no item ID returned for status update so we can't
-            // save a Notice_to_item mapping
-
-        } else {
-
-            $msg = sprintf(
-                "Error posting notice %s as a status update for %s (%d), fbuid %d - error code: %s",
-                $this->notice->id,
-                $this->user->nickname,
-                $this->user->id,
-                $fbuid,
-                $result // will contain 0, or an error
-            );
-
-            throw new FacebookApiException($msg, $result);
-        }
-    }
-
-    /*
-     * Publish a notice to a Facebook user's stream using the old REST API
-     */
-    function restPublishStream()
-    {
-        $fbuid = $this->flink->foreign_id;
-
-        common_debug(
-            sprintf(
-                'Attempting to post notice %d as stream item for %s (%d) fbuid %d',
-                $this->notice->id,
-                $this->user->nickname,
-                $this->user->id,
-                $fbuid
-            ),
-            __FILE__
-        );
-
-        $fbattachment = $this->formatAttachments();
-
-        $result = $this->facebook->api(
-            array(
-                'method'     => 'stream.publish',
-                'message'    => $this->formatMessage(),
-                'attachment' => $fbattachment,
-                'uid'        => $fbuid
-            )
-        );
-
-        if (!empty($result)) { // result will contain the item ID
-            // Save a mapping
-            Notice_to_item::saveNew($this->notice->id, $result);
-
-            common_log(
-                LOG_INFO,
-                sprintf(
-                    'Posted notice %d as a %s for %s (%d), fbuid %d',
-                    $this->notice->id,
-                    empty($fbattachment) ? 'stream item' : 'stream item with attachment',
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
-        } else {
-
-            $msg = sprintf(
-                'Could not post notice %d as a %s for %s (%d), fbuid %d - error code: %s',
-                $this->notice->id,
-                empty($fbattachment) ? 'stream item' : 'stream item with attachment',
-                $this->user->nickname,
-                $this->user->id,
-                $result, // result will contain an error code
-                $fbuid
-            );
-
-            throw new FacebookApiException($msg, $result);
         }
     }
 
@@ -897,13 +708,7 @@ class Facebookclient
      */
     static function facebookStatusId($notice)
     {
-        $n2i = Notice_to_item::staticGet('notice_id', $notice->id);
-
-        if (empty($n2i)) {
-            return null;
-        } else {
-            return $n2i->item_id;
-        }
+        return $this->getForeignId($notice->id);
     }
 
     /*
@@ -930,8 +735,7 @@ class Facebookclient
                         'Removed old Facebook user: %s, fbuid %d',
                         $fbuid->name,
                         $fbuid->id
-                    ),
-                    __FILE__
+                    )
                 );
             }
         }
@@ -965,8 +769,7 @@ class Facebookclient
                     'Added new Facebook user: %s, fbuid %d',
                     $fbuser->name,
                     $fbuser->id
-                ),
-                __FILE__
+                )
             );
         }
 
@@ -979,14 +782,15 @@ class Facebookclient
      */
     function streamRemove()
     {
-        $n2i = Notice_to_item::staticGet('notice_id', $this->notice->id);
+        $foreign_id = $this->getForeignId($this->notice->id);
 
-        if (!empty($this->flink) && !empty($n2i)) {
+        if (!empty($this->flink) && !empty($foreign_id)) {
             try {
                 $result = $this->facebook->api(
                     array(
+                		'access_token' => $this->flink->credentials,
                         'method'  => 'stream.remove',
-                        'post_id' => $n2i->item_id,
+                        'post_id' => $foreign_id,
                         'uid'     => $this->flink->foreign_id
                     )
                 );
@@ -996,7 +800,7 @@ class Facebookclient
                       LOG_INFO,
                         sprintf(
                             'Deleted Facebook item: %s for %s (%d), fbuid %d',
-                            $n2i->item_id,
+                            $foreign_id,
                             $this->user->nickname,
                             $this->user->id,
                             $this->flink->foreign_id
@@ -1004,7 +808,7 @@ class Facebookclient
                         __FILE__
                     );
 
-                    $n2i->delete();
+                    $foreign_id->delete();
 
                 } else {
                     throw new FaceboookApiException(var_export($result, true));
@@ -1016,7 +820,7 @@ class Facebookclient
                         'Could not deleted Facebook item: %s for %s (%d), '
                             . 'fbuid %d - (API error: %s) item already deleted '
                             . 'on Facebook? ',
-                        $n2i->item_id,
+                        $foreign_id,
                         $this->user->nickname,
                         $this->user->id,
                         $this->flink->foreign_id,
@@ -1025,6 +829,9 @@ class Facebookclient
                     __FILE__
                 );
             }
+
+        $this->deleteNoticeMapping($this->notice->id);
+
         }
     }
 
@@ -1034,24 +841,21 @@ class Facebookclient
      */
     function like()
     {
-        $n2i = Notice_to_item::staticGet('notice_id', $this->notice->id);
+        $foreign_id = $this->getForeignId($this->notice->id);
 
-        if (!empty($this->flink) && !empty($n2i)) {
+        if (!empty($this->flink) && !empty($foreign_id)) {
             try {
-                $result = $this->facebook->api(
-                    array(
-                        'method'  => 'stream.addlike',
-                        'post_id' => $n2i->item_id,
-                        'uid'     => $this->flink->foreign_id
-                    )
-                );
+	            $params = array(
+    	            'access_token' => $this->flink->credentials,
+	            );
+				$result = $this->facebook->api(sprintf('/%s/likes', $foreign_id), 'post', $params);
 
-                if (!empty($result) && result == true) {
+                if (!empty($result) && $result == true) {
                     common_log(
                       LOG_INFO,
                         sprintf(
                             'Added like for item: %s for %s (%d), fbuid %d',
-                            $n2i->item_id,
+                            $foreign_id,
                             $this->user->nickname,
                             $this->user->id,
                             $this->flink->foreign_id
@@ -1067,7 +871,7 @@ class Facebookclient
                     sprintf(
                         'Could not like Facebook item: %s for %s (%d), '
                             . 'fbuid %d (API error: %s)',
-                        $n2i->item_id,
+                        $foreign_id,
                         $this->user->nickname,
                         $this->user->id,
                         $this->flink->foreign_id,
@@ -1085,24 +889,21 @@ class Facebookclient
      */
     function unLike()
     {
-        $n2i = Notice_to_item::staticGet('notice_id', $this->notice->id);
+        $foreign_id = $this->getForeignId($this->notice->id);
 
-        if (!empty($this->flink) && !empty($n2i)) {
+        if (!empty($this->flink) && !empty($foreign_id)) {
             try {
-                $result = $this->facebook->api(
-                    array(
-                        'method'  => 'stream.removeLike',
-                        'post_id' => $n2i->item_id,
-                        'uid'     => $this->flink->foreign_id
-                    )
-                );
+	            $params = array(
+    	            'access_token' => $this->flink->credentials,
+	            );
+				$result = $this->facebook->api(sprintf('/%s/likes', $foreign_id), 'delete', $params);
 
-                if (!empty($result) && result == true) {
+                if (!empty($result) && $result == true) {
                     common_log(
                       LOG_INFO,
                         sprintf(
                             'Removed like for item: %s for %s (%d), fbuid %d',
-                            $n2i->item_id,
+                            $foreign_id,
                             $this->user->nickname,
                             $this->user->id,
                             $this->flink->foreign_id
@@ -1119,7 +920,7 @@ class Facebookclient
                     sprintf(
                         'Could not remove like for Facebook item: %s for %s '
                           . '(%d), fbuid %d (API error: %s)',
-                        $n2i->item_id,
+                        $foreign_id,
                         $this->user->nickname,
                         $this->user->id,
                         $this->flink->foreign_id,

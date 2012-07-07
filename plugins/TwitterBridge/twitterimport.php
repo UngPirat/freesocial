@@ -67,7 +67,11 @@ class TwitterImport
             return null;
         }
 
-        $notice = $this->saveStatus($status);
+        try {
+			$notice = $this->saveStatus($status);
+		} catch (Exception $e) {
+			return null;	// import failed, maybe because the user was silenced
+		}
 
         return $notice;
     }
@@ -102,8 +106,10 @@ class TwitterImport
         if (empty($profile)) {
             common_log(LOG_ERR, $this->name() .
                 ' - Problem saving notice. No associated Profile.');
-			throw new Exception('TWITTER has no associated profile with foreign user id '.$status->user->id);
-        }
+			throw new Exception('No associated profile with foreign user id '.$status->user->id);
+        } elseif ($profile->isSilenced()) {
+			throw new Exception('Foreign profile is silenced');
+		}
 
         $notice->source     = 'twitter';
         $notice->profile_id = $profile->id;
@@ -116,17 +122,13 @@ class TwitterImport
         if (!empty($status->retweeted_status)) {
             common_log(LOG_INFO, "TWITTER REPEAT Status {$statusId} is a retweet of " . twitter_id($status->retweeted_status) . ".");
             $original = $this->saveStatus($status->retweeted_status);
-            if (empty($original)) {
+            if (!is_object($original)) {
                 return null;
             } else {
-                if (!is_object($original)) {
-                    common_debug('TWITTER BUG PROFILE for statusId '.$statusId.' original: '.print_r($original, true));
-                    return null;
-                }
                 $author = $original->getProfile();
                 // TRANS: Message used to repeat a notice. RT is the abbreviation of 'retweet'.
                 // TRANS: %1$s is the repeated user's name, %2$s is the repeated notice.
-                $content = sprintf(_m('RT @%1$s %2$s'),
+                $content = sprintf(_m('♲  @%1$s %2$s'),
                                    $author->nickname,
                                    $original->content);
 
@@ -142,12 +144,12 @@ class TwitterImport
                                       array('repeat_of' => $original->id,
                                             'uri' => $statusUri,
                                             'is_local' => Notice::GATEWAY));
+                    Foreign_notice_map::saveNew($repeat->id, $statusId, TWITTER_SERVICE);
                 } catch (Exception $e) {
                     common_log(LOG_DEBUG, $this->name() . " could not save $statusId as a repeat of {$original->id}");
                     return null;
                 }
                 common_log(LOG_INFO, $this->name() . " saved {$repeat->id} as a repeat of {$original->id}");
-                Foreign_notice_map::saveNew($repeat->id, $statusId, TWITTER_SERVICE);
                 return $repeat;
             }
         }
@@ -169,6 +171,7 @@ class TwitterImport
         if ($importNotice) {
 			$noticeOptions = (array)$notice;	// Notice::saveNew should accept a Notice object
 			$notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+            Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
 		} else {
         	$notice->is_local	= Notice::GATEWAY;
 			$notice->uri		= $statusUri;
@@ -176,7 +179,6 @@ class TwitterImport
 	        if (empty($notice->conversation)) {
     	        $conv = Conversation::create();
         	    $notice->conversation = $conv->id;
-            	common_log(LOG_INFO, "No known conversation for status {$statusId} so made a new one {$conv->id}.");
 	        }
 
 	        if (Event::handle('StartNoticeSave', array(&$notice))) {
@@ -187,13 +189,12 @@ class TwitterImport
 	                common_log_db_error($notice, 'INSERT', __FILE__);
 	                common_log(LOG_ERR, $this->name() .
 	                    ' - Problem saving notice.');
+	            } else {
+                    Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
 	            }
-	
 	            Event::handle('EndNoticeSave', array($notice));
 	        }
 		}
-
-        Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
 
         $this->saveStatusMentions($notice, $status);
         $this->saveStatusAttachments($notice, $status);
@@ -289,9 +290,9 @@ class TwitterImport
     function checkAvatar($user, $profile_id)
     {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = $path_parts['extension'];
-        $img_root = basename($path_parts['basename'], "_normal.{$ext}");
-        $newname = "Twitter_{$user->id}-original-{$img_root}.{$ext}";
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
+        $img_root = basename($path_parts['basename'], '_normal'.$ext);	// cut off extension
+        $newname = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         try {
 			$avatar = Avatar::getOriginal($profile_id);
@@ -322,10 +323,10 @@ class TwitterImport
 
     function updateAvatar($user, $profile_id) {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = $path_parts['extension'];
-        $img_root = basename($path_parts['basename'], "_normal.{$ext}");
-        $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small.{$ext}";
-        $filename = "Twitter_{$user->id}-original-{$img_root}.{$ext}";
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
+        $img_root = basename($path_parts['basename'], '_normal' . $ext);
+        $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small" . $ext;
+        $filename = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         if ($this->fetchAvatar($url, $filename)) {
 			try {
@@ -334,7 +335,7 @@ class TwitterImport
 				common_debug('no avatars to delete');
 			}
 
-	        $this->newAvatar($profile_id, $this->getMediatype($ext), $filename);
+	        $this->newAvatar($profile_id, $this->getMediatype(substr($ext, 1)), $filename);
         }
     }
 
@@ -374,8 +375,8 @@ class TwitterImport
         $avatar->mediatype = $mediatype;
         $avatar->filename = $filename;
         $avatar->url = Avatar::url($filename);
-		$avatar->width = 73;
-		$avatar->height = 73;
+		$avatar->width = 128;
+		$avatar->height = 128;
 
         $avatar->created = common_sql_now();
 
@@ -517,7 +518,7 @@ class TwitterImport
 
     function makeUrlLink($object, $orig)
     {
-        return "<a href='{$object->url}' class='extlink'>{$orig}</a>";
+        return '<a href="'.htmlspecialchars($object->expanded_url).'" class="extlink">'.htmlspecialchars($object->display_url).'</a>';
     }
 
     function makeHashtagLink($object, $orig)

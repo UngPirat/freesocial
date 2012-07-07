@@ -112,14 +112,18 @@ class ModPlusPlugin extends Plugin
      */
     function onStartShowNoticeItem($item)
     {
-		$this->original_profileurl = $item->profile->profileurl;
-		$item->profile->profileurl = common_local_url('remoteprofile', array('id' => $item->profile->id));
-        //$this->showProfileOptions($item->out, $item->profile);
+		unset($this->original_profileurl);
+        if (!(User::staticGet('id', $item->profile->id))) {
+			$this->original_profileurl = $item->profile->profileurl;
+			$item->profile->profileurl = common_local_url('remoteprofile', array('id' => $item->profile->id));
+		}
         return true;
     }
     function onEndShowNoticeItem($item)
 	{
-		$item->profile->profileurl = $this->original_profileurl;
+		if (isset($this->original_profileurl)) {
+			$item->profile->profileurl = $this->original_profileurl;
+		}
 	}
 
     /**

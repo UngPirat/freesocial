@@ -12,7 +12,7 @@
  * @link     http://status.net/
  *
  * StatusNet - the distributed open-source microblogging tool
- * Copyright (C) 2010, StatusNet, Inc.
+ * Copyright (C) 2010-2012, StatusNet, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -32,20 +32,18 @@ if (!defined('STATUSNET')) {
     exit(1);
 }
 
-require_once INSTALLDIR . '/classes/Managed_DataObject.php';
-
 /**
  * Data class for mapping local notices to foreign ids
  *
  * Notices flow back and forth between StatusNet and other services. We
- * use this table to remember which StatusNet notice corresponds to which
- * foreign status.
+ * use this table to remember which local notice corresponds to which
+ * foreign status at each respective service (like Facebook or Twitter).
  *
  * Note that notice_id is unique only within your own database; if you
  * want to share this data for some reason, get the notice's URI and use
  * that instead, since it's universally unique.
  *
- * @category Action
+ * @category Plugin
  * @package  StatusNet
  * @author   Evan Prodromou <evan@status.net>
  * @author   Mikael Nordfeldth <mmn@hethane.se>
@@ -57,122 +55,87 @@ require_once INSTALLDIR . '/classes/Managed_DataObject.php';
 
 class Foreign_notice_map extends Managed_DataObject
 {
-	const FOREIGN_NOTICE_RECV_IMPORT = 8;
+    const FOREIGN_NOTICE_RECV_IMPORT = 8;
 
     public $__table = 'foreign_notice_map'; // table name
     public $notice_id;                      // int(4)  not_null
-    public $foreign_id;                      // varchar  primary_key not_null
-    public $service_id;                      // int(4)  not_null
+    public $foreign_id;                     // varchar  primary_key not_null
+    public $service_id;                     // int(4)  not_null
     public $created;                        // datetime
-
-    function staticGet($k,$v=null) {
-        return DB_DataObject::staticGet('Foreign_notice_map',$k,$v);
-    }
-
-    function is_foreign_notice($notice_id, $service_id) {
-        try {
-			Foreign_notice_map::get_foreign_id($notice_id, $service_id);
-		} catch (Exception $e) {
-			return false;
-		}
-        return true;
-    }
-    function get_notice_id($foreign_id, $service_id) {
-        $fnmap = new Foreign_notice_map();
-        $fnmap->foreign_id = $foreign_id;
-        $fnmap->service_id = $service_id;
-        if (!$fnmap->find()) {
-            throw new Exception('No notice found for service #'.$service_id.' and foreign_id='.$foreign_id);
-        }
-        $fnmap->fetch();
-        return $fnmap->notice_id;
-    }
-    function get_foreign_id($notice_id, $service_id) {
-        $fnmap = new Foreign_notice_map();
-        $fnmap->notice_id = $notice_id;
-        $fnmap->service_id = $service_id;
-        if (!$fnmap->find()) {
-            throw new Exception('No foreign notice found for service #'.$service_id.' and notice_id='.$notice_id);
-        }
-        $fnmap->fetch();
-        return $fnmap->foreign_id;
-    }
-    function get_foreign_notice($foreign_id, $service_id) {
-        $notice_id = Foreign_notice_map::get_notice_id($foreign_id, $service_id);	// throws exception on failure
-
-        $result = Notice::staticGet('id', $notice_id);
-        return $result;
-    }
-    function delete_notice_mapping($notice_id, $service_id) {
-        $fnmap = new Foreign_notice_map();
-        $fnmap->notice_id = $notice_id;
-        $fnmap->service_id = $service_id;
-        $fnmap->find();
-        if (!$fnmap->find()) {
-            throw new Exception('No foreign id found for service #'.$service_id.' and notice_id='.$notice_id);
-        }
-        $fnmap->fetch();
-        return $fnmap->delete();
-    }
-
-
-    /**
-     * return table definition for DB_DataObject
-     *
-     * DB_DataObject needs to know something about the table to manipulate
-     * instances. This method provides all the DB_DataObject needs to know.
-     *
-     * @return array array of column definitions
-     */
-    function table()
-    {
-        return array(
-                    'foreign_id' => DB_DATAOBJECT_STR + DB_DATAOBJECT_NOTNULL,
-                    'notice_id'   => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                    'service_id' => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                    'created'    => DB_DATAOBJECT_STR + DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME + DB_DATAOBJECT_NOTNULL);
-    }
 
     static function schemaDef()
     {  
         return array(
-            new ColumnDef('foreign_id', 'varchar', 255, null, 'PRI'),
-            new ColumnDef('notice_id', 'integer', null, false),
-            new ColumnDef('service_id', 'integer', null, false),
-            new ColumnDef('created', 'datetime',  null, false)
+            'fields' => array(
+                'foreign_id' => array('type' => 'varchar',
+                                      'length' => 255,
+                                      'not null' => true),
+                'notice_id'  => array('type' => 'integer',
+                                      'not null' => true),
+                'service_id' => array('type' => 'integer',
+                                      'not null' => true),
+                'created'    => array('type' => 'datetime',
+                                      'not null' => true),
+            ),
+            'primary key' => array('foreign_id', 'service_id'),
+            'unique keys' => array(
+                'foreign_notice_map_notice_id_idx' => array('notice_id', 'service_id'),
+            ),
+            'foreign keys' => array(
+                'foreign_notice_map_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
+                'foreign_notice_map_service_id_fkey' => array('foreign_service', array('service_id' => 'id')),
+            ),
         );
     }
 
-    /**
-     * return key definitions for Managed_DataObject
-     *
-     * Our caching system uses the same key definitions, but uses a different
-     * method to get them. This key information is used to store and clear
-     * cached data, so be sure to list any key that will be used for static
-     * lookups.
-     *
-     * @return array associative array of key definitions, field name to type:
-     *         'K' for primary key: for compound keys, add an entry for each component;
-     *         'U' for unique keys: compound keys are not well supported here.
-     */
-    function keyTypes()
-    {
-        return array('foreign_id' => 'K');
+    function staticGet($k,$v=null) {
+        return parent::staticGet('Foreign_notice_map',$k,$v);
     }
 
-    /**
-     * Magic formula for non-autoincrementing integer primary keys
-     *
-     * If a table has a single integer column as its primary key, DB_DataObject
-     * assumes that the column is auto-incrementing and makes a sequence table
-     * to do this incrementation. Since we don't need this for our class, we
-     * overload this method and return the magic formula that DB_DataObject needs.
-     *
-     * @return array magic three-false array that stops auto-incrementing.
-     */
-    function sequenceKey()
-    {
-        return array(false, false, false);
+    static function is_foreign_notice($notice_id, $service_id) {
+        try {
+            Foreign_notice_map::get_foreign_id($notice_id, $service_id);
+        } catch (Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    static function get_notice_id($foreign_id, $service_id) {
+        $fnmap = new Foreign_notice_map();
+        $fnmap->foreign_id = $foreign_id;
+        $fnmap->service_id = $service_id;
+        if (!$fnmap->find()) {
+            throw new Exception('No notice found');
+        }
+        $fnmap->fetch();
+        return $fnmap->notice_id;
+    }
+
+    static function get_foreign_id($notice_id, $service_id) {
+        $fnmap = new Foreign_notice_map();
+        $fnmap->notice_id = $notice_id;
+        $fnmap->service_id = $service_id;
+        if (!$fnmap->find()) {
+            throw new Exception('No foreign notice found');
+        }
+        $fnmap->fetch();
+        return $fnmap->foreign_id;
+    }
+    static function get_foreign_notice($foreign_id, $service_id) {
+        $notice_id = Foreign_notice_map::get_notice_id($foreign_id, $service_id);    // throws exception on failure
+        $result = Notice::staticGet('id', $notice_id);
+        return $result;
+    }
+    static function delete_notice_mapping($notice_id, $service_id) {
+        $fnmap = new Foreign_notice_map();
+        $fnmap->notice_id = $notice_id;
+        $fnmap->service_id = $service_id;
+        if (!$fnmap->find()) {
+            throw new Exception('No foreign notice to delete');
+        }
+        $fnmap->fetch();
+        return $fnmap->delete();
     }
 
     /**
@@ -188,15 +151,15 @@ class Foreign_notice_map extends Managed_DataObject
     static function saveNew($notice_id, $foreign_id, $service_id)
     {
         if (empty($notice_id) || empty($foreign_id) || empty($service_id)) {
-            throw new Exception("saveNew invalid parameters ($notice_id, $foreign_id, $service_id)");
+            throw new Exception('Invalid parameters');
         }
         $service = Foreign_service::staticGet('id', $service_id);
         if (empty($service)) {
-            throw new Exception("Unknown service_id $service_id");
+            throw new Exception('Unknown service_id');
         }
 
         if (Foreign_notice_map::is_foreign_notice($notice_id, $service_id)) {
-            throw new Exception(_('Foreign notice already mapped'));
+            throw new Exception('Foreign notice already mapped');
         }
 
         $fnmap = new Foreign_notice_map();

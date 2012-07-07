@@ -302,14 +302,6 @@ class ActivityUtils
 
     static function getFeedAuthor($feedEl)
     {
-        // Try old and deprecated activity:subject
-
-        $subject = ActivityUtils::child($feedEl, Activity::SUBJECT, Activity::SPEC);
-
-        if (!empty($subject)) {
-            return new ActivityObject($subject);
-        }
-
         // Try the feed author
 
         $author = ActivityUtils::child($feedEl, Activity::AUTHOR, Activity::ATOM);
@@ -326,14 +318,6 @@ class ActivityUtils
         if (!empty($entries) && $entries->length > 0) {
 
             $entry = $entries->item(0);
-
-            // Try the (deprecated) activity:actor
-
-            $actor = ActivityUtils::child($entry, Activity::ACTOR, Activity::SPEC);
-
-            if (!empty($actor)) {
-                return new ActivityObject($actor);
-            }
 
             // Try the author
 

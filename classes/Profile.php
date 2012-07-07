@@ -582,6 +582,8 @@ class Profile extends Managed_DataObject
             if (Event::handle('StartJoinGroup', array($group, $this))) {
                 $join = Group_member::join($group->id, $this->id);
                 self::blow('profile:groups:%d', $this->id);
+                self::blow('group:members:%d', $group->id);
+                self::blow('group:member_count:%d', $group->id);
                 Event::handle('EndJoinGroup', array($group, $this));
             }
         }
@@ -602,6 +604,8 @@ class Profile extends Managed_DataObject
         if (Event::handle('StartLeaveGroup', array($group, $this))) {
             Group_member::leave($group->id, $this->id);
             self::blow('profile:groups:%d', $this->id);
+            self::blow('group:members:%d', $group->id);
+            self::blow('group:member_count:%d', $group->id);
             Event::handle('EndLeaveGroup', array($group, $this));
         }
     }

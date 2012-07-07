@@ -55,6 +55,7 @@ class TweetInQueueHandler extends QueueHandler
             if ($flink) {
                 // @fixme this should go through more regular channels?
                 Inbox::insertNotice($flink->user_id, $notice->id);
+// maybe?				Subscription::start($flink->user_id, $notice->profile_id);
             }
         }
 

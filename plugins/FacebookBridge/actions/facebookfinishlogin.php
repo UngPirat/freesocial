@@ -435,7 +435,7 @@ class FacebookfinishloginAction extends Action
     {
          try {
             $picUrl = sprintf(
-                'http://graph.facebook.com/%d/picture?type=large',
+                'http://graph.facebook.com/%d/picture?type=square',
                 $this->fbuser->id
             );
 
@@ -535,6 +535,22 @@ class FacebookfinishloginAction extends Action
             $this->serverError(_m('Error connecting user to Facebook.'));
             return;
         }
+
+        $takeover = new Profile();
+        $takeover->profileurl = 'https://facebook.com/'.urlencode($this->fbuid);
+        $takeover->find();
+
+        while ($takeover->fetch()) {
+	        $switch = new Notice();
+			$switch->profile_id = $takeover->id;
+			$switch->find();
+			while ($switch->fetch()) {
+				$original = clone($switch);
+				$switch->profile_id = $user->id;
+				$switch->update($original);
+			}
+			$takeover->delete();
+        }
     }
 
     function tryLogin()
@@ -545,11 +561,12 @@ class FacebookfinishloginAction extends Action
             $user = $flink->getUser();
 
             if (!empty($user)) {
+				$this->updateAccessToken($flink);
 
                 common_log(
                     LOG_INFO,
                     sprintf(
-                        'Logged in Facebook user %s as user %d (%s)',
+                        'Logged in Facebook user %s as user %s (%d)',
                         $this->fbuid,
                         $user->nickname,
                         $user->id
@@ -569,6 +586,16 @@ class FacebookfinishloginAction extends Action
         } else {
             $this->showForm(null, $this->bestNewNickname());
         }
+    }
+
+    function updateAccessToken($flink) {
+		if (empty($this->accessToken)) {
+			common_debug('FACEBOOK accessToken empty!');
+			return null;
+		}
+        $original = clone($flink);
+        $flink->credentials = $this->accessToken;
+        return $flink->update($original);
     }
 
     function goHome($nickname)

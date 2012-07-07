@@ -77,7 +77,7 @@ class FacebooksettingsAction extends SettingsAction {
     /*
      * Check the sessions token and dispatch
      */
-    function handlePost($args) {
+    function handlePost() {
         // CSRF protection
 
         $token = $this->trimmed('token');
@@ -182,6 +182,14 @@ class FacebooksettingsAction extends SettingsAction {
 
             $this->elementEnd('li');
 
+                $this->elementStart('li');
+                $this->checkbox('noticerecv',
+                    // TRANS: Checkbox label.
+                    _m('Import status updates and comments.'),
+                    ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_RECV) : false
+				);
+                $this->elementEnd('li');
+
             $this->elementStart('li');
 
             // TRANS: Submit button to save synchronisation settings.
@@ -235,9 +243,10 @@ class FacebooksettingsAction extends SettingsAction {
     function saveSettings() {
         $noticesync = $this->boolean('noticesync');
         $replysync  = $this->boolean('replysync');
+        $noticerecv = $this->boolean('noticerecv');
 
         $original = clone($this->flink);
-        $this->flink->set_flags($noticesync, false, $replysync, false);
+        $this->flink->set_flags($noticesync, $noticerecv, $replysync, false);
         $result = $this->flink->update($original);
 
         if ($result === false) {
