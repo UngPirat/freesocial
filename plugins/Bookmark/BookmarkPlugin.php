@@ -390,6 +390,7 @@ class BookmarkPlugin extends MicroAppPlugin
 
         $relLinkEls = ActivityUtils::getLinks($bookmark->element, 'related');
 
+file_put_contents(tempnam('/tmp','as-'), print_r($activity,true)."\n\n================\n\n".print_r($relLinkEls,true));
         if (count($relLinkEls) < 1) {
             // TRANS: Client exception thrown when a bookmark is formatted incorrectly.
             throw new ClientException(_m('Expected exactly 1 link '.

@@ -208,7 +208,7 @@ class TwitterSiteStream extends TwitterStreamReader
 {
     protected $userIds;
 
-    public function __construct(TwitterOAuthClient $auth, $baseUrl='http://betastream.twitter.com')
+    public function __construct(TwitterOAuthClient $auth, $baseUrl='http://sitestream.twitter.com')
     {
         parent::__construct($auth, $baseUrl);
     }

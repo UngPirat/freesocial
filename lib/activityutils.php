@@ -158,6 +158,7 @@ class ActivityUtils
     static function children(DOMNode $element, $tag, $namespace=self::ATOM)
     {
         $results = array();
+file_put_contents(tempnam('/tmp', 'as-element'), $element->nodeValue);
 
         $els = $element->childNodes;
 
@@ -334,7 +335,7 @@ class ActivityUtils
     static function resolveUri($uri)
     {
         if (parse_url($uri, PHP_URL_SCHEME) == '') {
-            $uri = 'http://activitystrea.ms/schema/1.0/' . $uri;
+            $uri = Activity::SCHEMA . $uri;
         }
         return $uri;
     }

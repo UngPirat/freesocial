@@ -467,6 +467,8 @@ class Ostatus_profile extends Managed_DataObject
      */
     public function processEntry($entry, $feed, $source)
     {
+file_put_contents(tempnam('/tmp', 'push-entry-beforeactivity'), $entry->nodeValue);
+file_put_contents(tempnam('/tmp', 'push-feed-beforeactivity'), $feed->nodeValue);
         $activity = new Activity($entry, $feed);
         return $this->processActivity($activity, $source);
     }

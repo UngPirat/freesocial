@@ -57,11 +57,14 @@ if ($xml === false) {
     exit(1);
 }
 
+file_put_contents(tempnam('/tmp', 'fetch-xml'), var_export($xml,true));
+
 $feed = new DOMDocument();
 if (!$feed->loadXML($xml)) {
     print "Bad XML.\n";
     exit(1);
 }
+file_put_contents(tempnam('/tmp', 'fetch-feed'), $feed->saveXML());
 
 if ($skip || $count) {
     $entries = $feed->getElementsByTagNameNS(ActivityUtils::ATOM, 'entry');
