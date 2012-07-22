@@ -171,7 +171,6 @@ h6 {font-size: 1em;}
     margin-right: 10px;
     padding: 2px 22px 2px 6px;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     border: none;
     font-size: 0.88em;
@@ -192,7 +191,6 @@ h6 {font-size: 1em;}
 
 #site_notice {
     -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 	background-color: red;
 	float: none;
@@ -224,7 +222,6 @@ h6 {font-size: 1em;}
     float: left;
     padding: 0px 10px 1px 10px;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     border: 1px solid #ECECF2;
     font-weight: bold;
@@ -261,7 +258,6 @@ h6 {font-size: 1em;}
 .form_notice .success,
 .form_notice .notice-status {
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
 }
 
@@ -271,7 +267,6 @@ h6 {font-size: 1em;}
 .input_form .form_settings li textarea,
 .threaded-replies .placeholder { /* TODO combine all these declarations */
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
     -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -304,7 +299,6 @@ h6 {font-size: 1em;}
     display: block;
     padding: 0px 10px 1px 10px;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
 	margin-right: 1ex;
     text-transform: uppercase;
@@ -382,7 +376,6 @@ h6 {font-size: 1em;}
     display: block;
     padding: 0px 0px 1px 10px;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     text-transform: uppercase;
     text-shadow: 0px 1px 1px rgba(255, 255, 255, 0.5);
@@ -438,7 +431,6 @@ h6 {font-size: 1em;}
     text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
     border: 1px solid #d7621c;
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     background: #FB6104;
     background: -moz-linear-gradient(top, #ff9d63 0%, #fb6104 100%);
@@ -550,7 +542,6 @@ div.entry-content a.response:after {
     margin-right: 0px;
     border: 1px solid #aaa;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
@@ -571,7 +562,7 @@ div.entry-content a.response:after {
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
-.avatar.photo .ur_face{
+.avatar.photo, .ur_face {
 	border-radius: 4px;
 }
 
@@ -617,7 +608,6 @@ div.entry-content a.response:after {
 .entity_actions a, .entity_actions p, .entity_actions .entity_subscribe input, .entity_actions .entity_block input, .entity_actions .entity_moderation input, .entity_actions .entity_role input, .entity_actions .entity_nudge input, .entity_actions .entity_delete input, .entity_actions input.submit {
    	text-shadow:0 1px 0 rgba(255,255,255,0.4);
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     background-color: #CDD1DD !important;
 }
@@ -625,7 +615,6 @@ div.entry-content a.response:after {
 .entity_moderation:hover ul,
 .entity_role:hover ul {
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
 }
 
@@ -645,7 +634,6 @@ div.entry-content a.response:after {
 .entity_subscribe .dialogbox, .entity_tag .dialogbox {
     border: 1px solid #aaa;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.4);
@@ -665,7 +653,6 @@ div.entry-content a.response:after {
     height: 1.2em;
     padding-bottom: 12px;
     -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -681,7 +668,6 @@ div.entry-content a.response:after {
 
 .error, .success, .notice-status {
     -webkit-border-radius: 6px;
-    -moz-border-radius: 6px;
     border-radius: 6px;
 }
 
@@ -776,7 +762,6 @@ div.entry-content a.response:after {
     padding: 5px;
     border: 1px solid #a6a6a6;
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
     -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -940,7 +925,6 @@ h4.blog-entry-title {
 
 .bookmark-notice-count {
     border-radius: 4px;
-	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
     padding: 1px 6px;
     font-size: 1.2em;
@@ -979,7 +963,6 @@ h4.blog-entry-title {
 
 ul.bookmark-tags a {
     border-radius: 4px;
-	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
     padding: 1px 6px;
     background: #f2f2f2;
@@ -1106,7 +1089,6 @@ ul.bookmark-tags a:hover {
     width: 196px;
     padding: 10px;
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     border: 1px solid #516499;
     background: #fafafa;
@@ -1114,10 +1096,8 @@ ul.bookmark-tags a:hover {
 
 #onboard_section H2 {
     -webkit-border-top-left-radius: 4px;
-    -moz-border-radius-topleft: 4px;
     border-top-left-radius: 4px;
     -webkit-border-top-right-radius: 4px;
-    -moz-border-radius-topright: 4px;
     border-top-right-radius: 4px;
     position: relative;
     top: -11px;
@@ -1351,7 +1331,6 @@ td.entity_profile {
     text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
     border: 1px solid #d7621c;
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     background: #FB6104;
     background: -moz-linear-gradient(top, #ff9d63 0%, #fb6104 100%);
@@ -1424,7 +1403,6 @@ label[for=event-starttime], label[for=event-endtime] {
 
 .qna-dummy-placeholder input, .question #qna-answer, .qna-full-question #qna-answer {
     -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
     border-radius: 4px;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
     -moz-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.2);
@@ -1442,7 +1420,6 @@ label[for=event-starttime], label[for=event-endtime] {
     text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
     border: 1px solid #d7621c;
     border-radius: 4px;
-    -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
     background: #FB6104;
     background: -moz-linear-gradient(top, #ff9d63 0%, #fb6104 100%);
