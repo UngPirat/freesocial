@@ -253,6 +253,7 @@ class TwitterImport
             common_debug($this->name() . " - Profile for $profile->nickname found.");
 
             // Check to see if the user's Avatar has changed
+            $this->checkProfile($user, $profile);
             $this->checkAvatar($user, $profile->id);
             return $profile;
 
@@ -287,6 +288,16 @@ class TwitterImport
         }
     }
 
+    function checkProfile($user, $profile) {
+        $original = clone($profile);
+        $checks = array('screen_name'=>'nickname', 'name'=>'fullname', 'url'=>'homepage', 'description'=>'bio', 'location'=>'location');
+        foreach ( $checks as $tw=>$sn ) {
+            if ( $user->{$tw} != $profile->{$sn} ) {
+                $profile->{$sn} = $user->{$tw};
+            }
+        }
+        $profile->update($original);
+    }
     function checkAvatar($user, $profile_id)
     {
         $path_parts = pathinfo($user->profile_image_url);

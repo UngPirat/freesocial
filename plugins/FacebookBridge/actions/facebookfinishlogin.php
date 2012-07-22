@@ -403,7 +403,7 @@ class FacebookfinishloginAction extends Action
         }
 
         // Add a Foreign_user record
-        Facebookclient::addFacebookUser($this->fbuser);
+        Facebookclient::addForeignUser($this->fbuser);
 
         $this->setAvatar($user);
 

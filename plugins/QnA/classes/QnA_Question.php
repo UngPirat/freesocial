@@ -44,7 +44,7 @@ if (!defined('STATUSNET')) {
  */
 class QnA_Question extends Managed_DataObject
 {
-    const OBJECT_TYPE = 'http://activityschema.org/object/question';
+    const OBJECT_TYPE = 'http://activitystrea.ms/schema/1.0/question';
 
     public $__table = 'qna_question'; // table name
     public $id;          // char(36) primary key not null -> UUID

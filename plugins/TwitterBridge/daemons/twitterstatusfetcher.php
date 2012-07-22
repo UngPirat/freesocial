@@ -136,17 +136,16 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         // a new connection if there isn't one already
         $conn = &$flink->getDatabaseConnection();
 
-        $profile = new Profile();
-        $profile->profileurl = $profileurl;
-        $profile->limit(1);
-
-        if ($profile->find() && $profile->fetch() && !$profile->isSilenced()) {
+        $profile = Profile::staticGet('id', $flink->user_id);
+		if (empty($profile)) {
+			common_debug('TWITTER user does not have a profile: '.$flink->user_id);
+		} elseif ($profile->isSilenced()) {
+			common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
+		} else {
 	        $this->getTimeline($flink);
 
-	        $flink->last_friendsync = common_sql_now();
+	        $flink->last_noticesync = common_sql_now();
 	        $flink->update();
-		} else {
-			common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
 		}
 
         $conn->disconnect();

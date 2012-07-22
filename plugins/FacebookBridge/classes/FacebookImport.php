@@ -40,7 +40,7 @@ define('FACEBOOK__TO_CUSTOM', 'CUSTOM');    //sets 'friends' => 'SOME_FRIENDS' f
 
 /**
  * Encapsulation of the Facebook update -> notice incoming bridge import.
- * Is used by both the polling facebookrealtimefetcher.php daemon, and the
+ * Is used by both the polling facebookstatusfetcher.php daemon, and the
  * in-progress streaming import.
  *
  * @category Plugin
@@ -51,7 +51,6 @@ define('FACEBOOK__TO_CUSTOM', 'CUSTOM');    //sets 'friends' => 'SOME_FRIENDS' f
  * @author   Brion Vibber <brion@status.net>
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
- * @link     http://twitter.com/
  */
 class FacebookImport
 {
@@ -75,16 +74,18 @@ class FacebookImport
     }
 
     function importUpdates($field, $args=array()) {
-        $args['access_token'] = $this->flink->credentials;
         $loops = 0;
         $this->flink->last_noticesync = common_sql_now();
 
         // I think it's ok to go backwards since oldest threads end up first anyway if newly commented
         do {
+            if (!isset($args['access_token'])) {
+                $args['access_token'] = $this->flink->credentials;
+            }
             try {
                 $result = $this->facebook->api(sprintf('/%s/', $this->flink->foreign_id).urlencode($field), 'get', $args);
             } catch (Exception $e) {
-                common_debug('FACEBOOK returned: '.$e->getMessage().' when fetching '.$this->flink->foreign_id.'/'.$field);
+                common_debug('FACEBOOK returned error for https://graph.facebook.com/'.$this->flink->foreign_id.'/'.$field.'?'.http_build_query($args).': '.$e->getMessage());
                 return 0;
             }
 
@@ -133,9 +134,9 @@ class FacebookImport
                 if ( !isset($update['application']) || !preg_match("/$source/", mb_strtolower($update['application']['name'])) ) {
                     $notice = $this->saveUpdate($update, $scope);
                 }
-                if (!empty($notice) && $update['comments']['count']>0) {
+                if ($update['comments']['count']>0) {	// TODO: Check if notice has data?
                     if (isset($update['comments']['data'])) {
-                        common_debug('FACEBOOK importing '.$update['comments']['count'].' comments for '.$update['id'].' which is notice '.$notice->id);
+                        common_debug('FACEBOOK importing '.$update['comments']['count'].' comments for '.$update['id']);
                         foreach ($update['comments']['data'] as $comment) :
                             common_debug($this->name()." - Importing comment {$comment['id']} from {$comment['from']['id']}");
                             $notice = $this->saveUpdate($comment, $scope);
@@ -293,98 +294,18 @@ class FacebookImport
         }
     }
 
-    static function addForeignUser($foreign_id, $nickname, $profileurl, $service)
-    {
-        // Clear out any bad old foreign_users with the new user's legit URL
-        // This can happen when users move around or fakester accounts get
-        // repoed, and things like that.
-        $luser = Foreign_user::getForeignUser($foreign_id, $service);
-    
-        if (!empty($luser)) {
-            if ($luser->nickname != $nickname) {
-                common_log(LOG_INFO, "FacebookBridge - User changed data: $nickname ($foreign_id).");
-                $luser->delete();
-            } else {
-                common_log(LOG_INFO, "FacebookBridge - User already existed: $nickname ($foreign_id).");
-                return false;
-            }
-        }
-    
-        $fuser = new Foreign_user();
-    
-        $fuser->nickname = $nickname;
-        $fuser->uri = $profileurl;
-        $fuser->id = $foreign_id;
-        $fuser->service = $service;
-        $fuser->created = common_sql_now();
-        $result = $fuser->insert();
-    
-        if (empty($result)) {
-            common_log(LOG_WARNING,
-                "FacebookImport::addForeignUser - failed to add new foreign user: $foreign_id - $nickname.");
-            common_log_db_error($fuser, 'INSERT', __FILE__);
-        } else {
-            common_log(LOG_INFO,
-                       "FacebookImport::addForeignUser - Added new foreign user: $nickname ($foreign_id).");
-        }
-    
-        return $result;
-    }
-    // Creates or Updates a Twitter user
-    static function updateForeignUser($foreign_id, $nickname, $profileurl, $service)
-    {
-        // Check to see whether the Twitter user is already in the system,
-        // and update its screen name and uri if so.
-        $fuser = Foreign_user::getForeignUser($foreign_id, $service);
-
-        if (!empty($fuser)) {
-        // Delete old record if Twitter user changed screen name
-
-            if ($fuser->nickname != $nickname) {
-                $oldname = $fuser->nickname;
-                $fuser->delete();
-                common_log(LOG_INFO, sprintf('FacebookBridge - Updating nickname (and URI) ' .
-                                             'for Facebook user %1$d - %2$s, was %3$s.',
-                                             $fuser->id,
-                                             $nickname,
-                                             $oldname));
-            } else {
-                return true;
-            }
-        } else {
-        // Kill any old, invalid records for this screen name
-        $fuser = Foreign_user::getByNickname($nickname, $service);
-
-            if (!empty($fuser)) {
-                $fuser->delete();
-                common_log(
-                    LOG_INFO,
-                    sprintf(
-                        'FacebookBridge - detected old record for Facebook ' .
-                        'screen name "%s" belonging to Facebook ID %d.',
-                        $nickname,
-                        $fuser->id
-                    )
-                );
-            }
-        }
-
-        return FacebookImport::addForeignUser($foreign_id, $nickname, $profileurl, $service);
-    }
-
-
     function saveUpdateMentions($notice, $update)
     {
         $users = array();
 
         if (isset($update['message_tags'])) {
             foreach ($update['message_tags'] as $tag) {
-                switch ($tag['type']) {
+				switch ($tag['type']) {
                 case 'user':
                     $users[$tag['id']] = $tag;
                     break;
                 default:
-                    common_debug(__METHOD__.' has not implemented message_tags type '.$tag->type);
+                    common_debug(__METHOD__.' has not implemented message_tags type '.$tag['type'].': '.print_r($tag,true));
                 }
             }
         }
@@ -458,10 +379,15 @@ class FacebookImport
      *
      * @return mixed value the first Profile with that url, or null
      */
-    function getProfileByUrl($profileurl)
+    function getProfileByForeignId($foreign_id)
     {
+		$fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$foreign_id, 'service'=>FACEBOOK_SERVICE));
+		if (empty($fuser)) {
+			throw new Exception('No foreign user found');
+		}
+
         $profile = new Profile();
-        $profile->profileurl = $profileurl;
+        $profile->profileurl = $fuser->uri;
         $profile->limit(1);
 
         if ($profile->find()) {
@@ -469,62 +395,60 @@ class FacebookImport
             return $profile;
         }
 
-        return null;
+		// backup profileurl
+        $profile->profileurl = 'https://facebook.com/'.$foreign_id;
+        if ($profile->find()) {
+            $profile->fetch();
+				// update to new profile link
+			common_debug('FACEBOOK updating profile for foreign_id='.$foreign_id.' to profileurl: '.$fuser->uri.' for new user nick '.$fuser->nickname);
+			$original = clone($profile);
+			$profile->profileurl = $fuser->uri;
+			$profile->nickname = $fuser->nickname;
+			$profile->update($original);
+            return $profile;
+        }
+
+        throw new Exception('No profile found');
     }
 
     function ensureProfile($foreign_id)
     {
+
         // check to see if there's already a profile for this user
-        $profileurl = 'https://facebook.com/' . $foreign_id;
-        $profile = $this->getProfileByUrl($profileurl);
-
-        if (!empty($profile)) {
-            common_debug($this->name() .
-                         " - Profile for $profile->nickname found.");
-
-/*            $foreign_user = FacebookImport::fetchUserObject($foreign_id);
-            if ($profile->nickname != $foreign_user->username) {
-                common_debug('FACEBOOK updating nickname from '.$profile->nickname.' to '.$foreign_user->username);
-                $original = clone($profile);
-                $profile->nickname = $foreign_user->username;
-                $profile->update($original);
-            }
-                common_debug('FACEBOOK updating nickname etc. for '.$foreign_user->username);
-            FacebookImport::updateForeignUser($foreign_user->id, $foreign_user->username, $profileurl, FACEBOOK_SERVICE);
-*/
-            // Check to see if the user's Avatar has changed
-            try {
-                FacebookImport::checkAvatar($profile->id, $foreign_id);
-            } catch (Exception $e) {
-                common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
-            }
-            return $profile;
+        try {
+			$profile = $this->getProfileByForeignId($foreign_id);
+            common_debug($this->name() . " - Profile for $profile->nickname found.");
+		} catch (Exception $e) {	// no profile found, let's create one!
+            common_debug($this->name() . " - Adding profile for Facebook user: ".$foreign_id);
+            $foreign_user = Facebookclient::saveForeignUser($foreign_id, $this->flink);
+            $profile = $this->createForeignUserProfile($foreign_user);
         }
-
-        $foreign_user = FacebookImport::fetchUserObject($foreign_id);
-        FacebookImport::updateForeignUser($foreign_user->id, $foreign_user->username, $profileurl, FACEBOOK_SERVICE);
-
-        common_debug($this->name() . ' - Adding profile and remote profile ' .
-                     "for Facebook user: ".$foreign_user->id);
-
-        $profile = new Profile();
-        $profile->query("BEGIN");
-
-        $profile->nickname = $foreign_user->username;
-        $profile->fullname = $foreign_user->name;
-        $profile->profileurl = $profileurl;
-        $profile->created = common_sql_now();
 
         try {
-            $id = $profile->insert();
-        } catch(Exception $e) {
-            common_log(LOG_WARNING, $this->name() . ' FACEBOOK couldn\'t insert profile - ' . $e->getMessage());
+            FacebookImport::checkAvatar($profile->id, $foreign_id);
+        } catch (Exception $e) {
+            common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
         }
+        return $profile;
+    }
+
+    function createForeignUserProfile($foreign_user) {
+        $user = $this->facebook->api(sprintf('/%s', $foreign_user->id), 'get');
+
+		$profile = new Profile();
+        $profile->query("BEGIN");
+
+        $profile->nickname = $foreign_user->nickname;
+   	    $profile->fullname = $user['name'];
+        $profile->profileurl = $foreign_user->uri;
+        $profile->created = common_sql_now();
+
+        $id = $profile->insert();
 
         if (empty($id)) {
             common_log_db_error($profile, 'INSERT', __FILE__);
             $profile->query("ROLLBACK");
-            return false;
+            throw new Exception('FACEBOOK foreign user profile already exists? See log_db_error');
         }
 
         $profile->query("COMMIT");
@@ -533,11 +457,6 @@ class FacebookImport
             throw new Exception('FACEBOOK profile transaction failed');
         }
 
-        try {
-            FacebookImport::checkAvatar($id, $foreign_id);
-        } catch (Exception $e) {
-            common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
-        }
         return $profile;
     }
 
@@ -549,14 +468,16 @@ class FacebookImport
         return (isset($headers['Location']) ? $headers['Location'] : $url);
     }
 
-    static function checkAvatar($profile_id, $foreign_id)
+    static function checkAvatar($profile_id, $foreign_id, $url='')
     {
-        $url = FacebookImport::getAvatarUrl($foreign_id);
+        if (empty($url)) {
+            $url = FacebookImport::getAvatarUrl($foreign_id);
+        }
 
         $path_parts = pathinfo($url);
-        $ext = $path_parts['extension'];
-        $img_root = basename($path_parts['basename'], "_q.{$ext}");    // q stands for square
-        $filename = "Facebook_{$foreign_id}-original-{$img_root}.{$ext}";
+        $ext = isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '';
+        $img_root = basename($path_parts['basename'], "_q{$ext}");    // q stands for square
+        $filename = "Facebook_{$foreign_id}-original-{$img_root}{$ext}";
 
         try {
             $avatar = Avatar::getOriginal($profile_id);
@@ -616,26 +537,6 @@ class FacebookImport
         return $id;
     }
 
-    static function fetchUserObject($foreign_id)
-    {
-           $request = HTTPClient::start();
-        $response = $request->get('https://graph.facebook.com/'.urlencode($foreign_id));
-           if ($response->isOk()) {
-            $user = json_decode($response->getBody());
-               if (!$user) {
-                throw new Exception('FacebookImport::fetchUserObject failed to json_decode: '.$response->getBody());
-            }
-            if (!isset($user->username)) {
-                $user->username = $user->id;
-            } else {
-                $user->username = strtolower($user->username);    //normalized, facebook doesn't care
-            }
-           } else {
-               throw new Exception('FacebookImport::fetchUserObject HTTPClient got bad response for '.$url);
-        }
-           return $user;
-    }
-
     /**
      * Fetch a remote avatar image and save to local storage.
      *
@@ -646,16 +547,16 @@ class FacebookImport
     static function fetchRemoteUrl($url, $filename)
     {
         common_debug("FacebookImport::fetchRemoteUrl - Fetching FACEBOOK avatar: $url");
-           $request = HTTPClient::start();
+        $request = HTTPClient::start();
         $response = $request->get($url);
-           if ($response->isOk()) {
+        if ($response->isOk()) {
             $ok = file_put_contents($filename, $response->getBody());
-               if (!$ok) {
+            if (!$ok) {
                 throw new Exception('FacebookImport::fetchRemoteUrl file_put_contents failed for filename '.$filename);
             }
-           } else {
-               throw new Exception('FacebookImport::fetchRemoteUrl HTTPClient got bad response for '.$url);
+        } else {
+            throw new Exception('FacebookImport::fetchRemoteUrl HTTPClient got bad response for '.$url);
         }
-           return true;
+        return true;
     }
 }

@@ -39,7 +39,7 @@ class Foreign_link extends Managed_DataObject
                 'credentials' => array('type' => 'varchar', 'length' => 255, 'description' => 'authc credentials, typically a password'),
                 'noticesync' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'default' => 1, 'description' => 'notice synchronization, bit 1 = sync outgoing, bit 2 = sync incoming, bit 3 = filter local replies'),
                 'friendsync' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'default' => 2, 'description' => 'friend synchronization, bit 1 = sync outgoing, bit 2 = sync incoming'),
-                'profilesync' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'default' => 1, 'description' => 'profile synchronization, bit 1 = sync outgoing, bit 2 = sync incoming'),
+                'profilesync' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'default' => 0, 'description' => 'profile synchronization, bit 1 = sync profile data'),
                 'last_noticesync' => array('type' => 'datetime', 'description' => 'last time notices were imported'),
                 'last_friendsync' => array('type' => 'datetime', 'description' => 'last time friends were imported'),
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
@@ -90,7 +90,7 @@ class Foreign_link extends Managed_DataObject
         }
     }
 
-    function set_flags($noticesend, $noticerecv, $replysync, $friendsync)
+    function set_flags($noticesend, $noticerecv, $replysync, $friendsync, $profilesync=0)
     {
         if ($noticesend) {
             $this->noticesync |= FOREIGN_NOTICE_SEND;
@@ -116,7 +116,11 @@ class Foreign_link extends Managed_DataObject
             $this->friendsync &= ~FOREIGN_FRIEND_RECV;
         }
 
-        $this->profilesync = 0;
+        if ($profilesync) {
+            $this->profilesync |= FOREIGN_PROFILE_SYNC;
+        } else {
+            $this->profilesync &= ~FOREIGN_PROFILE_SYNC;
+        }
     }
 
     // Convenience methods

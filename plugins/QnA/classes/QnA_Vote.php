@@ -45,7 +45,7 @@ if (!defined('STATUSNET')) {
 class QnA_Vote extends Managed_DataObject
 {
     const UP   = 'http://activitystrea.ms/schema/1.0/like';
-    const DOWN = 'http://activityschema.org/object/dislike'; // Gar!
+    const DOWN = 'http://activitystrea.ms/schema/1.0/dislike';
 
     public $__table = 'qna_vote'; // table name
     public $id;          // char(36) primary key not null -> UUID

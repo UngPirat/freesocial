@@ -240,7 +240,7 @@ class ResultItem
         } else {
             $this->iso_language_code = $user->language;
         }
-
+        
         $this->source = $this->getSourceLink($this->notice->source);
 
         $avatar = $this->profile->getAvatar(AVATAR_STREAM_SIZE);

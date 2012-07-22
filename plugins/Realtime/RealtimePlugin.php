@@ -253,6 +253,9 @@ class RealtimePlugin extends Plugin
                 list($action, $arg1, $arg2) = $path;
 
                 $channels = Realtime_channel::getAllChannels($action, $arg1, $arg2);
+                $this->log(LOG_INFO, sprintf(_("%d candidate channels for notice %d"),
+                                             count($channels), 
+                                             $notice->id));
 
                 foreach ($channels as $channel) {
 
@@ -265,6 +268,13 @@ class RealtimePlugin extends Plugin
                         $profile = Profile::staticGet('id', $channel->user_id);
                     }
                     if ($notice->inScope($profile)) {
+                        $this->log(LOG_INFO, 
+                                   sprintf(_("Delivering notice %d to channel (%s, %s, %s) for user '%s'"),
+                                           $notice->id,
+                                           $channel->action,
+                                           $channel->arg1,
+                                           $channel->arg2,
+                                           ($profile) ? ($profile->nickname) : "<public>"));
                         $timeline = $this->_pathToChannel(array($channel->channel_key));
                         $this->_publish($timeline, $json);
                     }

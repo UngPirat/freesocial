@@ -122,117 +122,145 @@ class FacebooksettingsAction extends SettingsAction {
      * @return void
      */
     function showContent() {
-        if (!empty($this->flink)) {
-
+        if (empty($this->flink)) {
+            $params = array(
+              'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
+              'redirect_uri' => common_local_url('facebookfinishlogin')
+            );
+    
+            // Degrade to plain link if JavaScript is not available
             $this->elementStart(
-                'form',
+                'a',
                 array(
-                    'method' => 'post',
-                    'id' => 'form_settings_facebook',
-                    'class' => 'form_settings',
-                    'action' => common_local_url('facebooksettings')
+                    'href' => $this->facebook->getLoginUrl($params),
+                    'id'    => 'facebook_button'
                 )
             );
-
-            $this->hidden('token', common_session_token());
-
-            // TRANS: Form note. User is connected to facebook.
-            $this->element('p', 'form_note', _m('Connected Facebook user'));
-
-            $this->elementStart('p', array('class' => 'facebook-user-display'));
-
-            $this->element(
-                'fb:profile-pic',
-                array(
-                    'uid' => $this->flink->foreign_id,
-                    'size' => 'small',
-                    'linked' => 'true',
-                    'facebook-logo' => 'true'
-                )
+    
+            $attrs = array(
+                'src' => Plugin::staticPath('FacebookBridge', 'images/login-button.png'),
+                // TRANS: Alt text for "Login with Facebook" image.
+                'alt'   => _m('Login with Facebook'),
+                // TRANS: Title for "Login with Facebook" image.
+                'title' => _m('Login with Facebook.')
             );
+    
+            $this->element('img', $attrs);
+            return;
+        }
 
-            $this->element(
-                'fb:name',
-                array('uid' => $this->flink->foreign_id, 'useyou' => 'false')
-            );
+        $this->elementStart(
+            'form',
+            array(
+                'method' => 'post',
+                'id' => 'form_settings_facebook',
+                'class' => 'form_settings',
+                'action' => common_local_url('facebooksettings')
+            )
+        );
+        $this->hidden('token', common_session_token());
 
-            $this->elementEnd('p');
 
-            $this->elementStart('ul', 'form_data');
+        // TRANS: Form note. User is connected to facebook.
+        $this->element('p', 'form_note', _m('Connected Facebook user'));
 
-            $this->elementStart('li');
+        $this->elementStart('p', array('class' => 'facebook-user-display'));
 
-            $this->checkbox(
-                'noticesync',
+        $this->element(
+            'fb:profile-pic',
+            array(
+                'uid' => $this->flink->foreign_id,
+                'size' => 'small',
+                'linked' => 'true',
+                'facebook-logo' => 'true'
+            )
+        );
+
+        $this->element(
+            'fb:name',
+            array('uid' => $this->flink->foreign_id, 'useyou' => 'false')
+        );
+
+        $this->elementEnd('p');
+
+        $this->elementStart('ul', 'form_data');
+
+        $this->elementStart('li');
+        $this->checkbox(
+            'noticesync',
+            // TRANS: Checkbox label in Facebook settings.
+            _m('Publish my notices to Facebook.'),
+            ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_SEND) : true
+        );
+        $this->elementEnd('li');
+
+        $this->elementStart('li');
+        $this->checkbox(
+                'replysync',
                 // TRANS: Checkbox label in Facebook settings.
-                _m('Publish my notices to Facebook.'),
-                ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_SEND) : true
+                _m('Send "@" replies to Facebook.'),
+                ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) : true
+        );
+
+        $this->elementEnd('li');
+
+        $this->elementStart('li');
+        $this->checkbox('friendsync',
+                        // TRANS: Checkbox label.
+                _m('Subscribe to my Facebook friends here.'),
+                ($this->flink) ?
+                    ($this->flink->friendsync & FOREIGN_FRIEND_RECV) :
+                    false);
+        $this->elementEnd('li');
+
+        $this->elementStart('li');
+        $this->checkbox('noticerecv',
+            // TRANS: Checkbox label.
+            _m('Import status updates and comments.'),
+            ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_RECV) : false
+        );
+        $this->elementEnd('li');
+
+        $this->elementStart('li');
+        // TRANS: Submit button to save synchronisation settings.
+        $this->submit('save', _m('BUTTON', 'Save'));
+        $this->elementEnd('li');
+
+        $this->elementEnd('ul');
+
+        $this->elementStart('fieldset');
+
+        // TRANS: Fieldset legend for form to disconnect from Facebook.
+        $this->element('legend', null, _m('Disconnect my account from Facebook'));
+
+        if (empty($this->user->password)) {
+            $this->elementStart('p', array('class' => 'form_guide'));
+
+            $msg = sprintf(
+                // TRANS: Notice in disconnect from Facebook form if user has no local StatusNet password.
+                _m('Disconnecting your Faceboook would make it impossible to '.
+                   'log in! Please [set a password](%s) first.'),
+                common_local_url('passwordsettings')
             );
 
-            $this->elementEnd('li');
-
-            $this->elementStart('li');
-
-            $this->checkbox(
-                    'replysync',
-                    // TRANS: Checkbox label in Facebook settings.
-                    _m('Send "@" replies to Facebook.'),
-                    ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) : true
+            $this->raw(common_markup_to_html($msg));
+            $this->elementEnd('p');
+        } else {
+            // @todo FIXME: i18n: This message is not being used.
+            // TRANS: Message displayed when initiating disconnect of a StatusNet user
+            // TRANS: from a Facebook account. %1$s is the StatusNet site name.
+            $msg = sprintf(_m('Keep your %1$s account but disconnect from Facebook. ' .
+                              'You\'ll use your %1$s password to log in.'),
+                           common_config('site', 'name')
             );
 
-            $this->elementEnd('li');
+            // TRANS: Submit button.
+            $this->submit('disconnect', _m('BUTTON', 'Disconnect'));
+        }
 
-                $this->elementStart('li');
-                $this->checkbox('noticerecv',
-                    // TRANS: Checkbox label.
-                    _m('Import status updates and comments.'),
-                    ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_RECV) : false
-				);
-                $this->elementEnd('li');
+        $this->elementEnd('fieldset');
 
-            $this->elementStart('li');
-
-            // TRANS: Submit button to save synchronisation settings.
-            $this->submit('save', _m('BUTTON', 'Save'));
-
-            $this->elementEnd('li');
-
-            $this->elementEnd('ul');
-
-            $this->elementStart('fieldset');
-
-            // TRANS: Fieldset legend for form to disconnect from Facebook.
-            $this->element('legend', null, _m('Disconnect my account from Facebook'));
-
-            if (empty($this->user->password)) {
-                $this->elementStart('p', array('class' => 'form_guide'));
-
-                $msg = sprintf(
-                    // TRANS: Notice in disconnect from Facebook form if user has no local StatusNet password.
-                    _m('Disconnecting your Faceboook would make it impossible to '.
-                       'log in! Please [set a password](%s) first.'),
-                    common_local_url('passwordsettings')
-                );
-
-                $this->raw(common_markup_to_html($msg));
-                $this->elementEnd('p');
-            } else {
-                // @todo FIXME: i18n: This message is not being used.
-                // TRANS: Message displayed when initiating disconnect of a StatusNet user
-                // TRANS: from a Facebook account. %1$s is the StatusNet site name.
-                $msg = sprintf(_m('Keep your %1$s account but disconnect from Facebook. ' .
-                                  'You\'ll use your %1$s password to log in.'),
-                               common_config('site', 'name')
-                );
-
-                // TRANS: Submit button.
-                $this->submit('disconnect', _m('BUTTON', 'Disconnect'));
-            }
-
-            $this->elementEnd('fieldset');
-
-            $this->elementEnd('form');
-         }
+        $this->elementEnd('form');
     }
 
     /*
@@ -243,10 +271,11 @@ class FacebooksettingsAction extends SettingsAction {
     function saveSettings() {
         $noticesync = $this->boolean('noticesync');
         $replysync  = $this->boolean('replysync');
+        $friendsync = $this->boolean('friendsync');
         $noticerecv = $this->boolean('noticerecv');
 
         $original = clone($this->flink);
-        $this->flink->set_flags($noticesync, $noticerecv, $replysync, false);
+        $this->flink->set_flags($noticesync, $noticerecv, $replysync, $friendsync);
         $result = $this->flink->update($original);
 
         if ($result === false) {

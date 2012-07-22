@@ -51,7 +51,7 @@ class User_location_prefs extends Managed_DataObject
         return array(
             'fields' => array(
                 'user_id' => array('type' => 'int', 'not null' => true, 'description' => 'user who has the preference'),
-                'share_location' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Whether to share location data'),
+                'share_location' => array('type' => 'int', 'size' => 'tiny', 'default' => 0, 'description' => 'Whether to share location data'),
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
             ),

@@ -571,7 +571,7 @@ div.entry-content a.response:after {
     -webkit-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
-.avatar.photo {
+.avatar.photo .ur_face{
 	border-radius: 4px;
 }
 

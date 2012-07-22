@@ -224,7 +224,7 @@ class QnAPlugin extends MicroAppPlugin
                 $options
             );
             break;
-        case Answer::ObjectType:
+        case QnA_Answer::OBJECT_TYPE:
             $question = QnA_Question::staticGet('uri', $questionObj->id);
             if (empty($question)) {
                 // FIXME: save the question

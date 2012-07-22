@@ -115,7 +115,7 @@ class QnashowquestionAction extends ShownoticeAction
         }
 
         if (count($answerIds) > 0) {
-			$notice = Notice::multiGet('id', $answerIds);
+            $notice = Notice::multiGet('id', $answerIds);
 
             $nli = new NoticeList($notice, $this);
             $nli->show();

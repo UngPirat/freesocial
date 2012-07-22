@@ -121,30 +121,12 @@ class FacebookBridgePlugin extends Plugin
         case 'FacebookQueueHandler':
             include_once $dir . '/lib/' . strtolower($cls) . '.php';
             return false;
-        case 'FacebookRealtime':
         case 'FacebookImport':
             include_once $dir . '/classes/' . $cls . '.php';
             return false;
         default:
             return true;
         }
-    }
-
-    /**
-     * Database schema setup
-     *
-     * We maintain a table mapping StatusNet notices to Facebook items
-     *
-     * @see Schema
-     * @see ColumnDef
-     *
-     * @return boolean hook value; true means continue processing, false means stop.
-     */
-    function onCheckSchema()
-    {
-        $schema = Schema::get();
-        $schema->ensureTable('facebook_realtime', FacebookRealtime::schemaDef());
-        return true;
     }
 
     /*
@@ -215,9 +197,19 @@ class FacebookBridgePlugin extends Plugin
             array_push(
                 $daemons,
                 INSTALLDIR
-                . '/plugins/FacebookBridge/daemons/facebookrealtimefetcher.php'
+                . '/plugins/FacebookBridge/daemons/facebookstatusfetcher.php'
                 );
         }
+        array_push(
+            $daemons,
+            INSTALLDIR
+            . '/plugins/FacebookBridge/daemons/syncfacebookfriends.php'
+            );
+        array_push(
+            $daemons,
+            INSTALLDIR
+            . '/plugins/FacebookBridge/daemons/syncfacebookprofile.php'
+            );
 
         return true;
     }
@@ -313,17 +305,14 @@ class FacebookBridgePlugin extends Plugin
                 );
             }
 
-            if (!empty($flink)) {
-
-                $action->menuItem(
-                    common_local_url('facebooksettings'),
-                    // TRANS: Menu item for "Facebook" in user settings.
-                    _m('MENU','Facebook'),
-                    // TRANS: Menu title for "Facebook" in user settings.
-                    _m('Facebook settings.'),
-                    $action_name === 'facebooksettings'
-                );
-            }
+            $action->menuItem(
+                common_local_url('facebooksettings'),
+                // TRANS: Menu item for "Facebook" in user settings.
+                _m('MENU','Facebook'),
+                // TRANS: Menu title for "Facebook" in user settings.
+                _m('Facebook settings.'),
+                $action_name === 'facebooksettings'
+            );
         }
     }
 
@@ -578,6 +567,35 @@ ENDOFSCRIPT;
         return true;
     }
 
+    /**
+     * Add links in the user's profile block to their Facebook profile URL.
+     *
+     * @param Profile $profile The profile being shown
+     * @param Array   &$links  Writeable array of arrays (href, text, image).
+     *
+     * @return boolean hook value (true)
+     */
+
+    function onOtherAccountProfiles($profile, &$links)
+    {
+        $fuser = null;
+
+        $flink = Foreign_link::getByUserID($profile->id, FACEBOOK_SERVICE);
+
+        if (!empty($flink)) {
+
+            $fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$flink->foreign_id, 'service'=>$flink->service));
+
+            if (!empty($fuser)) {
+                $links[] = array("href" => $fuser->uri,
+                                 "text" => sprintf(_("%s on Facebook"), $fuser->nickname),
+                                 "image" => $this->path("images/f_logo.png"));
+            }
+        }
+
+        return true;
+    }
+
     /*
      * Add version info for this plugin
      *
@@ -588,7 +606,7 @@ ENDOFSCRIPT;
         $versions[] = array(
             'name' => 'Facebook Bridge',
             'version' => STATUSNET_VERSION,
-            'author' => 'Craig Andrews, Zach Copley',
+            'author' => 'Craig Andrews, Zach Copley, Mikael Nordfeldth',
             'homepage' => 'http://status.net/wiki/Plugin:FacebookBridge',
             'rawdescription' =>
              // TRANS: Plugin description.

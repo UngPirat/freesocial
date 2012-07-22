@@ -53,9 +53,8 @@ class FacebookcallbackAction extends Action
 			}
 			break;
 		case 'POST':
-			// Sample: {"object":"user","entry":[{"uid":"100002540381705","id":"100002540381705","time":1326414487,"changed_fields":["feed"]}]}
-			$data = json_decode(file_get_contents('php://input'));
-/*			$headers = getallheaders(); //http_get_request_headers();
+/*			$data = json_decode(file_get_contents('php://input'));
+			$headers = getallheaders();	// Requires PHP 5.4.0!
 			if ($_SERVER['CONTENT_TYPE'] != 'application/json' &&
 					isset($headers['X-Hub-Signature']) &&
 					$data = http_get_request_body()) {
@@ -70,7 +69,17 @@ class FacebookcallbackAction extends Action
 				foreach((array)$data->entry as $entry) {
 					$flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
 					if (($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
-						FacebookRealtime::newRealtimeUpdate($entry);
+						$importer = new FacebookImport($flink);
+				        common_debug("FACEBOOK User '{$entry->uid}' has a realtime update, handling it");
+
+						foreach ( $entry->changed_fields as $field ) {
+							$args = array('until'=>$entry->time+1);
+				            try {
+								$importer->importUpdates($field, $args);
+				            } catch (Exception $e) {
+				                common_debug('FACEBOOK realtime importUpdates for '.$flink->foreign_id.' returned error: '.$e->getMessage());
+				            }
+						}
 					}
 				}
 			}
@@ -82,15 +91,12 @@ class FacebookcallbackAction extends Action
 		die;
     }
 
-	// should be connected Facebook user id number
 	private function verifyToken($token) {
-		// enable to accept new subscriptions
-		//$user = Foreign_user::getForeignUser($token, FACEBOOK_SERVICE);
-		if (empty($user)) {
+		if (empty($token) || $token != common_config('facebook', 'callback_token')) {
 			common_debug('FACEBOOK got bad verify_token: '.print_r($token,true));
 			throw new Exception('Bad token');
 		}
-		return !empty($user) ? $user->user_id : false;
+		return true;
 	}
 	private function challengeResponse($challenge) {
 		common_debug('FACEBOOK received challenge: '.print_r($data,true));

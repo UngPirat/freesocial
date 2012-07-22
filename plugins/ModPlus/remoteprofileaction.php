@@ -80,7 +80,22 @@ class RemoteProfileAction extends ShowstreamAction
 			$this->raw(common_markup_to_html($markdown));
 		}
 
-		parent::showNotices();
+        $pnl = null;
+        if (Event::handle('ShowStreamNoticeList', array($this->notice, $this, &$pnl))) {
+            $pnl = new ProfileNoticeList($this->notice, $this);
+        }
+        $cnt = $pnl->show();
+        if (0 == $cnt) {
+            $this->showEmptyListMessage();
+        }
+
+        $args = array('id' => $this->profile->id);
+        if (!empty($this->tag))
+        {
+            $args['tag'] = $this->tag;
+        }
+        $this->pagination($this->page>1, $cnt>NOTICES_PER_PAGE, $this->page,
+                          'remoteprofile', $args);
 	}
 
 	function getFeeds()
@@ -99,18 +114,19 @@ class RemoteProfileAction extends ShowstreamAction
 
 	function showLocalNav()
 	{
-		$nav = new PublicGroupNav($this);
-		$nav->show();
+		ProfileAction::showLocalNav();
+		/*$nav = new PublicGroupNav($this);
+		$nav->show();*/
 	}
 
 	function showSections()
 	{
 		ProfileAction::showSections();
-		// skip tag cloud
 	}
 
 	function showStatistics()
 	{
+		ProfileAction::showStatistics();
 		// skip
 	}
 }
