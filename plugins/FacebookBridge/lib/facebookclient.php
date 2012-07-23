@@ -665,7 +665,6 @@ class Facebookclient
 
         common_switch_locale();
 
-        mail('mmn@hethane.se', $subject, $body);
         if (mail_to_user($user, $subject, $body)) {
             common_log(
                 LOG_INFO,
