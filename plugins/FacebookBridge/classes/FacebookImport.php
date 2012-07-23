@@ -379,13 +379,8 @@ class FacebookImport
      *
      * @return mixed value the first Profile with that url, or null
      */
-    function getProfileByForeignId($foreign_id)
+    function getProfileByForeignUser($fuser)
     {
-		$fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$foreign_id, 'service'=>FACEBOOK_SERVICE));
-		if (empty($fuser)) {
-			throw new Exception('No foreign user found');
-		}
-
         $profile = new Profile();
         $profile->profileurl = $fuser->uri;
         $profile->limit(1);
@@ -396,11 +391,11 @@ class FacebookImport
         }
 
 		// backup profileurl
-        $profile->profileurl = 'https://facebook.com/'.$foreign_id;
+        $profile->profileurl = 'https://facebook.com/'.$fuser->id;
         if ($profile->find()) {
             $profile->fetch();
 				// update to new profile link
-			common_debug('FACEBOOK updating profile for foreign_id='.$foreign_id.' to profileurl: '.$fuser->uri.' for new user nick '.$fuser->nickname);
+			common_debug('FACEBOOK updating profile for foreign_id='.$fuser->id.' to profileurl: '.$fuser->uri.' for new user nick '.$fuser->nickname);
 			$original = clone($profile);
 			$profile->profileurl = $fuser->uri;
 			$profile->nickname = $fuser->nickname;
@@ -414,13 +409,10 @@ class FacebookImport
     function ensureProfile($foreign_id)
     {
 
-        // check to see if there's already a profile for this user
+        $foreign_user = Facebookclient::saveForeignUser($foreign_id, $this->flink);
         try {
-			$profile = $this->getProfileByForeignId($foreign_id);
-            common_debug($this->name() . " - Profile for $profile->nickname found.");
+			$profile = $this->getProfileByForeignUser($foreign_user);
 		} catch (Exception $e) {	// no profile found, let's create one!
-            common_debug($this->name() . " - Adding profile for Facebook user: ".$foreign_id);
-            $foreign_user = Facebookclient::saveForeignUser($foreign_id, $this->flink);
             $profile = $this->createForeignUserProfile($foreign_user);
         }
 

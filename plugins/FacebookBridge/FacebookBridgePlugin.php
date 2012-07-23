@@ -583,8 +583,7 @@ ENDOFSCRIPT;
         $flink = Foreign_link::getByUserID($profile->id, FACEBOOK_SERVICE);
 
         if (!empty($flink)) {
-
-            $fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$flink->foreign_id, 'service'=>$flink->service));
+            $fuser = Facebookclient::getForeignUser($flink->foreign_id);
 
             if (!empty($fuser)) {
                 $links[] = array("href" => $fuser->uri,

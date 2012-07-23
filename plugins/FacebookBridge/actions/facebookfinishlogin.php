@@ -51,8 +51,7 @@ class FacebookfinishloginAction extends Action
             return false;
         }
 
-        $graphUrl = 'https://graph.facebook.com/me?access_token=' . urlencode($this->accessToken);
-        $this->fbuser = json_decode(file_get_contents($graphUrl));
+        $this->fbuser = Facebookclient::fetchUserObject('me', $this->accessToken, 'name,username,website,link,location,email');
 
         if (!empty($this->fbuser)) {
             $this->fbuid  = $this->fbuser->id;
@@ -92,17 +91,17 @@ class FacebookfinishloginAction extends Action
             // This will throw a client exception if the user already
             // has some sort of foreign_link to Facebook.
 
-            $this->checkForExistingLink();
-
-            // Possibly reconnect an existing account
-
-            $this->connectUser();
-
+            try {
+                $this->checkForExistingLink();
+                // Possibly reconnect an existing account
+                $this->connectUser();
+            } catch (Exception $e) {
+            }
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->handlePost();
-        } else {
-            $this->tryLogin();
         }
+
+        $this->tryLogin();
     }
 
     function checkForExistingLink() {
@@ -134,7 +133,7 @@ class FacebookfinishloginAction extends Action
             $this->clientError(
                 // TRANS: Client error displayed when trying to connect to a Facebook account that is already linked
                 // TRANS: in the same StatusNet site.
-                _m('There is already a local account linked with that Facebook account.')
+                _m('There is already a local user linked to this Facebook account.')
             );
 
             return;
@@ -394,16 +393,16 @@ class FacebookfinishloginAction extends Action
         }
 
         $user   = User::register($args);
-        $result = $this->flinkUser($user->id, $this->fbuid);
+        $flink = $this->flinkUser($user->id, $this->fbuid);
 
-        if (!$result) {
+        if (!$flink) {
             // TRANS: Server error displayed when connecting to Facebook fails.
             $this->serverError(_m('Error connecting user to Facebook.'));
             return;
         }
 
         // Add a Foreign_user record
-        Facebookclient::addForeignUser($this->fbuser);
+        Facebookclient::saveForeignUser($this->fbuser, $flink, true);
 
         $this->setAvatar($user);
 
@@ -504,52 +503,41 @@ class FacebookfinishloginAction extends Action
         }
 
         $user = User::staticGet('nickname', $nickname);
-
         $this->tryLinkUser($user);
-
-        common_set_user($user);
-        common_real_login(true);
-
-        // clear out the stupid cookie
-        setcookie('fb_access_token', '', time() - 3600); // one hour ago
-
-        $this->goHome($user->nickname);
     }
 
     function connectUser()
     {
         $user = common_current_user();
         $this->tryLinkUser($user);
-
-        // clear out the stupid cookie
-        setcookie('fb_access_token', '', time() - 3600); // one hour ago
-        common_redirect(common_local_url('facebookfinishlogin'), 303);
     }
 
     function tryLinkUser($user)
     {
-        $result = $this->flinkUser($user->id, $this->fbuid);
+        $flink = $this->flinkUser($user->id, $this->fbuid);
 
-        if (empty($result)) {
+        if (empty($flink)) {
             // TRANS: Server error displayed when connecting to Facebook fails.
             $this->serverError(_m('Error connecting user to Facebook.'));
             return;
         }
 
+        $fuser = Facebookclient::getForeignUser($this->fbuid);
+        
         $takeover = new Profile();
-        $takeover->profileurl = 'https://facebook.com/'.urlencode($this->fbuid);
+        $takeover->profileurl = $fuser->uri;
         $takeover->find();
 
         while ($takeover->fetch()) {
-	        $switch = new Notice();
-			$switch->profile_id = $takeover->id;
-			$switch->find();
-			while ($switch->fetch()) {
-				$original = clone($switch);
-				$switch->profile_id = $user->id;
-				$switch->update($original);
-			}
-			$takeover->delete();
+            $switch = new Notice();
+            $switch->profile_id = $takeover->id;
+            $switch->find();
+            while ($switch->fetch()) {
+                $original = clone($switch);
+                $switch->profile_id = $user->id;
+                $switch->update($original);
+            }
+            $takeover->delete();
         }
     }
 
@@ -561,7 +549,7 @@ class FacebookfinishloginAction extends Action
             $user = $flink->getUser();
 
             if (!empty($user)) {
-				$this->updateAccessToken($flink);
+                $this->updateAccessToken($flink);
 
                 common_log(
                     LOG_INFO,
@@ -589,10 +577,10 @@ class FacebookfinishloginAction extends Action
     }
 
     function updateAccessToken($flink) {
-		if (empty($this->accessToken)) {
-			common_debug('FACEBOOK accessToken empty!');
-			return null;
-		}
+        if (empty($this->accessToken)) {
+            common_debug('FACEBOOK accessToken empty!');
+            return null;
+        }
         $original = clone($flink);
         $flink->credentials = $this->accessToken;
         return $flink->update($original);
@@ -624,8 +612,13 @@ class FacebookfinishloginAction extends Action
         $flink->created     = common_sql_now();
 
         $flink_id = $flink->insert();
+        if (empty($flink_id)) {
+            return null;
+        }
 
-        return $flink_id;
+        $fuser = Facebookclient::saveForeignUser($fbuid, $flink, true);
+
+        return $flink;
     }
 
     function bestNewNickname()

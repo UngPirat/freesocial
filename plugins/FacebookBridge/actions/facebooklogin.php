@@ -39,8 +39,18 @@ class FacebookloginAction extends Action
         parent::handle($args);
 
         if (common_is_real_login()) {
-            // TRANS: Client error displayed when trying to login while already logged in.
-            $this->clientError(_m('Already logged in.'));
+            $facebook = Facebookclient::getFacebook();
+            $user = common_current_user();
+            $flink = Foreign_link::getByUserID($user->id, FACEBOOK_SERVICE);
+            setcookie('fb_access_token', $flink->credentials, time()+300);
+
+            $params = array(
+                'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
+                'redirect_uri' => common_local_url('facebookfinishlogin')
+            );
+
+            common_redirect($facebook->getLoginUrl($params), 303);
+            die;
         } else {
             $this->showPage();
         }

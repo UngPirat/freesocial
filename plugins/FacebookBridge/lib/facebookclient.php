@@ -628,6 +628,67 @@ class Facebookclient
         return $result;
     }
 
+    static function emailExpiredCredentials($user, $reason='unknown') {
+        $profile = $user->getProfile();
+
+        $siteName  = common_config('site', 'name');
+        $siteEmail = common_config('site', 'email');
+
+        if (empty($siteEmail)) {
+            common_log(
+                LOG_WARNING,
+                    "No site email address configured. Please set one."
+            );
+        }
+
+        common_switch_locale($user->language);
+
+        // TRANS: E-mail subject. %s is the StatusNet sitename.
+        $subject = sprintf(_m('%1$s Facebook session token expired'), $siteName);
+
+        // TRANS: E-mail body. %1$s is a username,
+        // TRANS: %2$s is the StatusNet sitename, %3$s is the site contact e-mail address.
+        $msg = _m("Hi %1\$s,\n\n".
+                  "We have received information that your Facebook session for %2\$s has become invalid: '%3\$s'\n\n".
+                  "This means that if you want to keep your account connected you must login with Facebook again to establish a new session. You can do this by going to:\n".
+                  "%4\$s\n\n".
+                  "Sincerely,\n".
+                  "%2\$s\n");
+
+        $body = sprintf(
+            $msg,
+            $user->nickname,
+            $siteName,
+            $reason,
+            common_local_url('facebooklogin')
+        );
+
+        common_switch_locale();
+
+        mail('mmn@hethane.se', $subject, $body);
+        if (mail_to_user($user, $subject, $body)) {
+            common_log(
+                LOG_INFO,
+                sprintf(
+                    'Sent Facebook expiration information to %s (%d)',
+                    $user->nickname,
+                    $user->id
+                ),
+                __FILE__
+            );
+        } else {
+            common_log(
+                LOG_WARNING,
+                sprintf(
+                    'Unable to send Facebook expiration information to %s (%d)',
+                    $user->nickname,
+                    $user->id
+                ),
+                __FILE__
+            );
+        }
+    }
+    
     /*
      * Send the user an email warning that their account has been
      * disconnected and he/she has no way to login and must contact
@@ -736,21 +797,37 @@ class Facebookclient
     }
 
     /*
+     * Get the Foreign_user object for a facebook uid
+     * 
+     * @param string $fb_id Facebook user id
+     *
+     * @return Foreign_user object
+     */
+    static function getForeignUser($foreign_id) {
+        $fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$foreign_id, 'service'=>FACEBOOK_SERVICE));
+        if (empty($fuser)) {
+            throw new Exception('No such foreign user found: '.$foreign_id);
+        }
+        return $fuser;
+    }
+
+    /*
      * See if Facebook user exists, if not call addForeignUser
      *
      * @param string $fb_id  Facebook user id
      * @param boolean $update Whether to update data despite existing entry
      *
      * @return mixed $result Id or key
-     *
      */
     static function saveForeignUser($fb_id, $flink, $update=false) {
-        $fuser = Foreign_user::getForeignUser($fb_id, FACEBOOK_SERVICE);
-
-		// create a Foreign_user object in the database
-		if (!empty($fuser) && !$update) {
-			return $fuser;
-		}
+        try {
+            $fuser = Facebookclient::getForeignUser($fb_id);
+            if (!$update) {
+               return $fuser;
+            }
+        } catch (Exception $e) {
+            common_debug($e->getMessage());
+        }
 
         // throws exception on failure
 	    $fb_user = Facebookclient::fetchUserObject($fb_id, $flink->credentials, 'username,link,id');
@@ -759,9 +836,9 @@ class Facebookclient
 			$fuser = Facebookclient::addForeignUser($fb_user);
 		} else {	// updating foreign_user table data
             $original = clone($fuser);
-	        $fuser->nickname = $fb_user->username;
-            $fuser->uri      = $fb_user->link;
-            $fuser->id       = $fb_user->id;
+	        $fuser->nickname = !empty($fb_user->username) ? $fb_user->username : $fuser->nickname;
+            $fuser->uri      = !empty($fb_user->link) ? $fb_user->link : $fuser->uri;
+            $fuser->id       = !empty($fb_user->id) ? $fb_user->id : $fuser->id;
             $fuser->update($original);
         }
 
@@ -778,10 +855,8 @@ class Facebookclient
      */
     static function addForeignUser($fbuser)
     {
-        $luser = Foreign_user::getForeignUser($fbuser->id, FACEBOOK_SERVICE);
-
-        if (!empty($luser)) {
-            return $luser;
+        if (empty($fbuser->username) || empty($fbuser->link) || empty($fbuser->id)) {
+            throw new Exception('FACEBOOK incomplete Foreign_user data for '.$fbuser->id.'/'.$fbuser->username);
         }
 
         $fuser = new Foreign_user();
@@ -812,13 +887,13 @@ class Facebookclient
                 LOG_INFO,
                 sprintf(
                     'Added new Facebook user: %s, fbuid %d',
-                    $fbuser->name,
+                    $fbuser->username,
                     $fbuser->id
                 )
             );
         }
 
-        return $result;
+        return $fuser;
     }
 
     /*
