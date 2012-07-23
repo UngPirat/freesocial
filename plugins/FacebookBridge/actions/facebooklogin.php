@@ -40,16 +40,17 @@ class FacebookloginAction extends Action
 
         if (common_is_real_login()) {
             $facebook = Facebookclient::getFacebook();
-            $user = common_current_user();
-            $flink = Foreign_link::getByUserID($user->id, FACEBOOK_SERVICE);
-            setcookie('fb_access_token', $flink->credentials, time()+300);
-
             $params = array(
                 'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
                 'redirect_uri' => common_local_url('facebookfinishlogin')
             );
+            $loginUrl = $facebook->getLoginUrl($params);
 
-            common_redirect($facebook->getLoginUrl($params), 303);
+            $user = common_current_user();
+            $flink = Foreign_link::getByUserID($user->id, FACEBOOK_SERVICE);
+            setcookie('fb_access_token', $flink->credentials, time()+300);
+            
+            common_redirect($loginUrl, 303);
             die;
         } else {
             $this->showPage();

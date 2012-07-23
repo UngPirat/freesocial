@@ -44,6 +44,7 @@ class FacebookfinishloginAction extends Action
 
         if (isset($_COOKIE['fb_access_token'])) {
             $this->accessToken = $_COOKIE['fb_access_token'];
+        } elseif ( isset($_SESSION['fb_state']) && $_SESSION['fb_state'] === $this->arg('state') ) {
         }
 
         if (empty($this->accessToken)) {

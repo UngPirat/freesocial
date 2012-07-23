@@ -53,9 +53,8 @@ class FacebookcallbackAction extends Action
 			}
 			break;
 		case 'POST':
-/*			$data = json_decode(file_get_contents('php://input'));
 			$headers = getallheaders();	// Requires PHP 5.4.0!
-			if ($_SERVER['CONTENT_TYPE'] != 'application/json' &&
+			if ($_SERVER['CONTENT_TYPE'] == 'application/json' &&
 					isset($headers['X-Hub-Signature']) &&
 					$data = http_get_request_body()) {
 				if ( 'sha1='.hash_hmac('sha1', $data, $this->fb->secret) !== $headers['X-Hub-Signature']) {
@@ -63,8 +62,11 @@ class FacebookcallbackAction extends Action
 					common_debug('FACEBOOK got bad signature for body: '.print_r($data,true));
 					throw new Exception(_m('Bad signature'));
 				}
-			}
-*/
+			} else {
+               throw new Exception('Bad Facebook callback POST');
+            }
+
+            $data = json_decode($data);
 			if ($data->object == 'user') {
 				foreach((array)$data->entry as $entry) {
 					$flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
@@ -99,7 +101,6 @@ class FacebookcallbackAction extends Action
 		return true;
 	}
 	private function challengeResponse($challenge) {
-		common_debug('FACEBOOK received challenge: '.print_r($data,true));
 		echo $challenge;
 		die;
 	}

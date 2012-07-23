@@ -247,5 +247,5 @@ if (have_option('d') || have_option('debug')) {
     $debug = true;
 }
 
-$fetcher = new TwitterStatusFetcher($id, 60, 2, $debug);
+$fetcher = new TwitterStatusFetcher($id, POLL_INTERVAL, MAXCHILDREN, $debug);
 $fetcher->runOnce();

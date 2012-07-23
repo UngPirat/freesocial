@@ -58,9 +58,10 @@ class FreeSocialPlugin extends Plugin {
                 _m('Login or register using Twitter.'),
                'twitterlogin' === $action->trimmed('action')
             );
+
             $action->menuItem(
                 // TRANS: Menu item for "Facebook" login.
-				common_local_url('facebooklogin'),
+                common_local_url('facebooklogin', null, array('signin' => true)),
                 _m('Login with Facebook'),
                 // TRANS: Menu title for "Facebook" login.
                 _m('Login or register using Facebook.'),
