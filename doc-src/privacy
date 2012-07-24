@@ -5,6 +5,13 @@
 This document outlines this service's respect for your personal
 privacy as a user of the service.
 
+- The website uses cookies to remember logged in users. In accordance to
+  Swedish law, we must inform you about this and offer a way not to use 
+  cookies. That way is to leave the website, as barely any website with 
+  account functionality would ever work without cookies. However, we do 
+  promise that your visit is entirely private and only actions taken by 
+  you personally to publish information are relayed - and then only to 
+  your desired recipients.
 - Almost all the text and files that users upload to this site is
   available under the site license (see the license block at the bottom
   of this page). Users agree to the license when they register to use
@@ -16,10 +23,9 @@ privacy as a user of the service.
   shared with other users, business partners, or the public at large:
   * your password
   * your email address
-  * your IM address (AIM, Jabber, or other instant messaging address)
+  * your IM address (i.e. non site-related Xmpp account)
   * your phone number
-  * your "private messages"
-  * your login credentials (username and password) for other services (Twitter, Facebook, etc.)
+  * your login credentials (oauth tokens etc.) for connected services.
 - Some private data may be published in aggregate, e.g. "30% of our
   users are registered with Hotmail addresses."
 - Your notices (including files) can be downloaded and re-used by
@@ -40,9 +46,11 @@ privacy as a user of the service.
   receive it.
 - In urgent situations, administrators may send you email directly to
   your registered email address, even if you've requested no notices
-  or newsletter. *Administrators will use digitally-signed email.*
+  or newsletter.
 - This service will comply with court orders to turn over your private
-  information.
+  information, if our option is to do so or be shut down. But remember
+  that *we can only give them what you submit yourself*. So if you want 
+  to be anonymous, simply don't connect your real identity to us.
   
   
   
