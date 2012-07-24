@@ -106,7 +106,7 @@ class XrdAction extends Action
 	        $xrd->links[] = array('rel' => 'http://apinamespace.org/twitter',
     	                          'href' => $apiRoot,
                                   'property' => array(array('type' => 'http://apinamespace.org/twitter/username',
-           	                                                'value' => $foreign_user->nickname)));
+           	                                                'value' => $nick)));
 
             Event::handle('EndXrdActionLinks', array(&$xrd, $this->user));
         }
