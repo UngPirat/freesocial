@@ -149,7 +149,7 @@ class FacebookImport
                 }
             //} elseif (isset($update['story'])) {
             else :
-                common_debug('FACEBOOK update '.$update['id'].' with scope '.$scope.' does not have a message set: '.print_r($update,true));
+                common_debug('FACEBOOK update '.$update['id'].' with scope '.$scope.' does not have a message set');
             endif;
             break;
         default:

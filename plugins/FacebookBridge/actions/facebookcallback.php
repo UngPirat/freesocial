@@ -34,74 +34,74 @@ if (!defined('STATUSNET')) {
 
 class FacebookcallbackAction extends Action
 {
-	private $fb = null;
+    private $fb = null;
 
     function handle($args)
     {
         parent::handle($args);
 
-		if ( !$this->fb = Facebookclient::getFacebook() ) {
-			throw new Exception(_m('Facebook application not configured'));
-		}
-		$data = null;
-		switch ($_SERVER['REQUEST_METHOD']) {
-		case 'GET':
-			if ($_GET['hub_mode'] == 'subscribe') {
-				$this->verifyToken($_GET['hub_verify_token']);
-				$this->challengeResponse($_GET['hub_challenge']);
-				die;
-			}
-			break;
-		case 'POST':
-			$headers = getallheaders();	// Requires PHP 5.4.0!
-			if ($_SERVER['CONTENT_TYPE'] == 'application/json' &&
-					isset($headers['X-Hub-Signature']) &&
-					$data = http_get_request_body()) {
-				if ( 'sha1='.hash_hmac('sha1', $data, $this->fb->secret) !== $headers['X-Hub-Signature']) {
-					common_debug('FACEBOOK headers: '.print_r($headers,true));
-					common_debug('FACEBOOK got bad signature for body: '.print_r($data,true));
-					throw new Exception(_m('Bad signature'));
-				}
-			} else {
+        if ( !$this->fb = Facebookclient::getFacebook() ) {
+            throw new Exception(_m('Facebook application not configured'));
+        }
+        $data = null;
+        switch ($_SERVER['REQUEST_METHOD']) {
+        case 'GET':
+            if ($_GET['hub_mode'] == 'subscribe') {
+                $this->verifyToken($_GET['hub_verify_token']);
+                $this->challengeResponse($_GET['hub_challenge']);
+                die;
+            }
+            break;
+        case 'POST':
+            $headers = getallheaders();    // Requires PHP 5.4.0!
+            if ($_SERVER['CONTENT_TYPE'] == 'application/json' &&
+                    isset($headers['X-Hub-Signature']) &&
+                    $data = http_get_request_body()) {
+                if ( 'sha1='.hash_hmac('sha1', $data, $this->fb->secret) !== $headers['X-Hub-Signature']) {
+                    common_debug('FACEBOOK headers: '.print_r($headers,true));
+                    common_debug('FACEBOOK got bad signature for body: '.print_r($data,true));
+                    throw new Exception(_m('Bad signature'));
+                }
+            } else {
                throw new Exception('Bad Facebook callback POST');
             }
 
             $data = json_decode($data);
-			if ($data->object == 'user') {
-				foreach((array)$data->entry as $entry) {
-					$flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
-					if (($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
-						$importer = new FacebookImport($flink);
-				        common_debug("FACEBOOK User '{$entry->uid}' has a realtime update, handling it");
+            if ($data->object == 'user') {
+                foreach((array)$data->entry as $entry) {
+                    $flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
+                    if (($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
+                        $importer = new FacebookImport($flink);
+                        common_debug("FACEBOOK User '{$entry->uid}' has a realtime update, handling it");
 
-						foreach ( $entry->changed_fields as $field ) {
-							$args = array('until'=>$entry->time+1);
-				            try {
-								$importer->importUpdates($field, $args);
-				            } catch (Exception $e) {
-				                common_debug('FACEBOOK realtime importUpdates for '.$flink->foreign_id.' returned error: '.$e->getMessage());
-				            }
-						}
-					}
-				}
-			}
-			break;
-		default:
-			throw new Exception(_m('Unhandled request method'));
-		}
+                        foreach ( $entry->changed_fields as $field ) {
+                            $args = array('until'=>$entry->time+1);
+                            try {
+                                $importer->importUpdates($field, $args);
+                            } catch (Exception $e) {
+                                common_debug('FACEBOOK realtime importUpdates for '.$flink->foreign_id.' returned error: '.$e->getMessage());
+                            }
+                        }
+                    }
+                }
+            }
+            break;
+        default:
+            throw new Exception(_m('Unhandled request method'));
+        }
 
-		die;
+        die;
     }
 
-	private function verifyToken($token) {
-		if (empty($token) || $token != common_config('facebook', 'callback_token')) {
-			common_debug('FACEBOOK got bad verify_token: '.print_r($token,true));
-			throw new Exception('Bad token');
-		}
-		return true;
-	}
-	private function challengeResponse($challenge) {
-		echo $challenge;
-		die;
-	}
+    private function verifyToken($token) {
+        if (empty($token) || $token != common_config('facebook', 'callback_token')) {
+            common_debug('FACEBOOK got bad verify_token: '.print_r($token,true));
+            throw new Exception('Bad token');
+        }
+        return true;
+    }
+    private function challengeResponse($challenge) {
+        echo $challenge;
+        die;
+    }
 }

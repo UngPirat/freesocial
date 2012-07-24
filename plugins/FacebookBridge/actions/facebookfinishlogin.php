@@ -34,7 +34,7 @@ if (!defined('STATUSNET')) {
 class FacebookfinishloginAction extends Action
 {
     private $fbuid       = null; // Facebook user ID
-    private $fbuser      = null; // Facebook user object (JSON)
+    private $fbuser      = null; // Facebook user array (JSON)
     private $accessToken = null; // Access token provided by Facebook JS API
 
     function prepare($args) {
@@ -55,7 +55,7 @@ class FacebookfinishloginAction extends Action
         $this->fbuser = Facebookclient::fetchUserObject('me', $this->accessToken, 'name,username,website,link,location,email');
 
         if (!empty($this->fbuser)) {
-            $this->fbuid  = $this->fbuser->id;
+            $this->fbuid  = $this->fbuser['id'];
             // OKAY, all is well... proceed to register
             return true;
         } else {
@@ -97,12 +97,13 @@ class FacebookfinishloginAction extends Action
                 // Possibly reconnect an existing account
                 $this->connectUser();
             } catch (Exception $e) {
+                $this->tryLogin();
             }
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->handlePost();
+        } else {
+            $this->tryLogin();
         }
-
-        $this->tryLogin();
     }
 
     function checkForExistingLink() {
@@ -375,15 +376,15 @@ class FacebookfinishloginAction extends Action
 
         $args = array(
             'nickname' => $nickname,
-            'fullname' => $this->fbuser->name,
-            'homepage' => $this->fbuser->website,
-            'location' => $this->fbuser->location->name
+            'fullname' => $this->fbuser['name'],
+            'homepage' => $this->fbuser['website'],
+            'location' => $this->fbuser['location']['name']
         );
 
         // It's possible that the email address is already in our
         // DB. It's a unique key, so we need to check
-        if ($this->isNewEmail($this->fbuser->email)) {
-            $args['email']           = $this->fbuser->email;
+        if ($this->isNewEmail($this->fbuser['email'])) {
+            $args['email']           = $this->fbuser['email'];
             if (isset($this->fuser->verified) && $this->fuser->verified == true) {
                 $args['email_confirmed'] = true;
             }
@@ -403,7 +404,7 @@ class FacebookfinishloginAction extends Action
         }
 
         // Add a Foreign_user record
-        Facebookclient::saveForeignUser($this->fbuser, $flink, true);
+        Facebookclient::saveForeignUser($this->fbuid, $flink, true);
 
         $this->setAvatar($user);
 
@@ -416,7 +417,7 @@ class FacebookfinishloginAction extends Action
                 'Registered new user %s (%d) from Facebook user %s, (fbuid %d)',
                 $user->nickname,
                 $user->id,
-                $this->fbuser->name,
+                $this->fbuser['name'],
                 $this->fbuid
             ),
             __FILE__
@@ -436,7 +437,7 @@ class FacebookfinishloginAction extends Action
          try {
             $picUrl = sprintf(
                 'http://graph.facebook.com/%d/picture?type=square',
-                $this->fbuser->id
+                $this->fbuser['id']
             );
 
             // fetch the picture from Facebook
@@ -473,7 +474,7 @@ class FacebookfinishloginAction extends Action
                                     . '%s (fbuid %d), filename = %s',
                                  $user->nickname,
                                  $user->id,
-                                 $this->fbuser->name,
+                                 $this->fbuser['name'],
                                  $this->fbuid,
                                  $filename
                              ),
@@ -520,7 +521,7 @@ class FacebookfinishloginAction extends Action
         if (empty($flink)) {
             // TRANS: Server error displayed when connecting to Facebook fails.
             $this->serverError(_m('Error connecting user to Facebook.'));
-            return;
+            return null;
         }
 
         $fuser = Facebookclient::getForeignUser($this->fbuid);
@@ -540,6 +541,8 @@ class FacebookfinishloginAction extends Action
             }
             $takeover->delete();
         }
+
+        return $this->tryLogin();
     }
 
     function tryLogin()
@@ -624,8 +627,8 @@ class FacebookfinishloginAction extends Action
 
     function bestNewNickname()
     {
-        if (!empty($this->fbuser->username)) {
-            $nickname = $this->nicknamize($this->fbuser->username);
+        if (!empty($this->fbuser['username'])) {
+            $nickname = $this->nicknamize($this->fbuser['username']);
             if ($this->isNewNickname($nickname)) {
                 return $nickname;
             }
@@ -633,7 +636,7 @@ class FacebookfinishloginAction extends Action
 
         // Try the full name
 
-        $fullname = $this->fbuser->name;
+        $fullname = $this->fbuser['name'];
 
         if (!empty($fullname)) {
             $fullname = $this->nicknamize($fullname);
