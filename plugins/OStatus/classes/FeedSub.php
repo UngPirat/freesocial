@@ -455,13 +455,11 @@ class FeedSub extends Memcached_DataObject
         }
 
         $feed = new DOMDocument();
-file_put_contents(tempnam('/tmp', 'push-post'), var_export($post,true));
         if (!$feed->loadXML($post)) {
             // @fixme might help to include the err message
             common_log(LOG_ERR, __METHOD__ . ": ignoring invalid XML");
             return;
         }
-file_put_contents(tempnam('/tmp', 'push-feed'), $feed->saveXML());
 
         $orig = clone($this);
         $this->last_update = common_sql_now();
