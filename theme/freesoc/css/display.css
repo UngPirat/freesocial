@@ -1470,6 +1470,11 @@ label[for=event-starttime], label[for=event-endtime] {
     min-width: 100px;
 }
 
+#avatar_preview_view {
+	height: auto;
+	width: auto;
+}
+
 /* SNOD CompanyLogo styling */
 /* TODO move to plugin */
 
