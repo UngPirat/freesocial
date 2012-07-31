@@ -190,7 +190,7 @@ class TwittersettingsAction extends ProfileSettingsAction
                 $this->elementStart('li');
                 $this->checkbox('noticerecv',
                                 // TRANS: Checkbox label.
-                                _m('Import my friends timeline.'),
+                                _m('Import tweets from Twitter timeline.'),
                                 ($flink) ?
                                 ($flink->noticesync & FOREIGN_NOTICE_RECV) :
                                 false);

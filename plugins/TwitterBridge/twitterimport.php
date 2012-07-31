@@ -68,10 +68,10 @@ class TwitterImport
         }
 
         try {
-			$notice = $this->saveStatus($status);
-		} catch (Exception $e) {
-			return null;	// import failed, maybe because the user was silenced
-		}
+            $notice = $this->saveStatus($status);
+        } catch (Exception $e) {
+            return null;    // import failed, maybe because the user was silenced
+        }
 
         return $notice;
     }
@@ -90,14 +90,14 @@ class TwitterImport
             $notice = Foreign_notice_map::get_foreign_notice($statusId, TWITTER_SERVICE);
             return $notice;
         } catch (Exception $e) {
-        	$notice = new Notice();
+            $notice = new Notice();
         }
 
-        $importNotice = false;	// whether to convert it to a local notice
+        $importNotice = false;    // whether to convert it to a local notice
 
-		$flink = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
-        if (!empty($flink) && ($flink->noticesync & Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) == Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT) {
-			$importNotice = true;
+        $flink = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
+        if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
+            $importNotice = true;
             $profile = Profile::staticGet('id', $flink->user_id);
         } else {
             $profile = $this->ensureProfile($status->user);
@@ -106,10 +106,10 @@ class TwitterImport
         if (empty($profile)) {
             common_log(LOG_ERR, $this->name() .
                 ' - Problem saving notice. No associated Profile.');
-			throw new Exception('No associated profile with foreign user id '.$status->user->id);
+            throw new Exception('No associated profile with foreign user id '.$status->user->id);
         } elseif ($profile->isSilenced()) {
-			throw new Exception('Foreign profile is silenced');
-		}
+            throw new Exception('Foreign profile is silenced');
+        }
 
         $notice->source     = 'twitter';
         $notice->profile_id = $profile->id;
@@ -169,32 +169,32 @@ class TwitterImport
         $notice->rendered = $this->linkify($status);
 
         if ($importNotice) {
-			$noticeOptions = (array)$notice;	// Notice::saveNew should accept a Notice object
-			$notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+            $noticeOptions = (array)$notice;    // Notice::saveNew should accept a Notice object
+            $notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
             Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
-		} else {
-        	$notice->is_local	= Notice::GATEWAY;
-			$notice->uri		= $statusUri;
+        } else {
+            $notice->is_local    = Notice::GATEWAY;
+            $notice->uri        = $statusUri;
 
-	        if (empty($notice->conversation)) {
-    	        $conv = Conversation::create();
-        	    $notice->conversation = $conv->id;
-	        }
+            if (empty($notice->conversation)) {
+                $conv = Conversation::create();
+                $notice->conversation = $conv->id;
+            }
 
-	        if (Event::handle('StartNoticeSave', array(&$notice))) {
-	
-	            $id = $notice->insert();
-	
-	            if (!$id) {
-	                common_log_db_error($notice, 'INSERT', __FILE__);
-	                common_log(LOG_ERR, $this->name() .
-	                    ' - Problem saving notice.');
-	            } else {
+            if (Event::handle('StartNoticeSave', array(&$notice))) {
+    
+                $id = $notice->insert();
+    
+                if (!$id) {
+                    common_log_db_error($notice, 'INSERT', __FILE__);
+                    common_log(LOG_ERR, $this->name() .
+                        ' - Problem saving notice.');
+                } else {
                     Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
-	            }
-	            Event::handle('EndNoticeSave', array($notice));
-	        }
-		}
+                }
+                Event::handle('EndNoticeSave', array($notice));
+            }
+        }
 
         $this->saveStatusMentions($notice, $status);
         $this->saveStatusAttachments($notice, $status);
@@ -301,17 +301,17 @@ class TwitterImport
     function checkAvatar($user, $profile_id)
     {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
-        $img_root = basename($path_parts['basename'], '_normal'.$ext);	// cut off extension
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');    // some lack extension
+        $img_root = basename($path_parts['basename'], '_normal'.$ext);    // cut off extension
         $newname = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         try {
-			$avatar = Avatar::getOriginal($profile_id);
-			$oldname = $avatar->filename;
-			unset($avatar);
-		} catch (Exception $e) {
-			$oldname = null;
-		}
+            $avatar = Avatar::getOriginal($profile_id);
+            $oldname = $avatar->filename;
+            unset($avatar);
+        } catch (Exception $e) {
+            $oldname = null;
+        }
 
         if ($newname != $oldname) {
             common_debug('TWITTER AVATAR newname ('.$newname.') vs. oldname ('.$oldname.')');
@@ -334,27 +334,27 @@ class TwitterImport
 
     function updateAvatar($user, $profile_id) {
         $path_parts = pathinfo($user->profile_image_url);
-        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');	// some lack extension
+        $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');    // some lack extension
         $img_root = basename($path_parts['basename'], '_normal' . $ext);
         $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small" . $ext;
         $filename = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         if ($this->fetchAvatar($url, $filename)) {
-			try {
-				Avatar::deleteFromProfile($profile_id);
-			} catch (Exception $e) {
-				common_debug('no avatars to delete');
-			}
+            try {
+                Avatar::deleteFromProfile($profile_id);
+            } catch (Exception $e) {
+                common_debug('no avatars to delete');
+            }
 
-	        $this->newAvatar($profile_id, $this->getMediatype(substr($ext, 1)), $filename);
+            $this->newAvatar($profile_id, $this->getMediatype(substr($ext, 1)), $filename);
         }
     }
 
     function missingAvatarFile($profile_id) {
         try {
-			$avatar = Avatar::getOriginal($profile_id);
-		} catch (Exception $e) {
-        	return false;
+            $avatar = Avatar::getOriginal($profile_id);
+        } catch (Exception $e) {
+            return false;
         }
         return !file_exists(Avatar::path($avatar->filename));
     }
@@ -386,8 +386,8 @@ class TwitterImport
         $avatar->mediatype = $mediatype;
         $avatar->filename = $filename;
         $avatar->url = Avatar::url($filename);
-		$avatar->width = 128;
-		$avatar->height = 128;
+        $avatar->width = 128;
+        $avatar->height = 128;
 
         $avatar->created = common_sql_now();
 
@@ -396,7 +396,7 @@ class TwitterImport
         } catch (Exception $e) {
             common_log(LOG_WARNING, $this->name() . ' Couldn\'t insert avatar - ' . $e->getMessage());
             common_log_db_error($avatar, 'INSERT', __FILE__);
-			return false;
+            return false;
         }
 
         return true;
@@ -412,24 +412,40 @@ class TwitterImport
     function fetchAvatar($url, $filename)
     {
         common_debug($this->name() . " - Fetching Twitter avatar: $url");
-	    try {
-    	    $request = HTTPClient::start();
-	        $response = $request->get($url);
-	        if ($response->isOk()) {
-	            $avatarfile = Avatar::path($filename);
-	            $ok = file_put_contents($avatarfile, $response->getBody());
-	            if (!$ok) {
-	                common_log(LOG_WARNING, $this->name() .
-            	               " - Couldn't open file $filename");
-        	        return false;
-    	        }
-	        } else {
-            	return false;
-        	}
-		} catch (Exception $e) {
-	        common_debug('TWITTER AVATAR failed due to: '.$e->getMessage());
-	        return false;
-	    }
+        try {
+            $request = HTTPClient::start();
+            $response = $request->get($url);
+            if ($response->isOk()) {
+                $avatarfile = Avatar::path($filename);
+                $ok = file_put_contents($avatarfile, $response->getBody());
+                if (!$ok) {
+                    common_log(LOG_WARNING, $this->name() .
+                               " - Couldn't open file $filename");
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } catch (Exception $e) {
+            common_debug('TWITTER AVATAR failed due to: '.$e->getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    function fetchRemoteUrl($url, $filename)
+    {
+        common_debug("Twitter fetchRemoteUrl - Fetching Twitter url: $url");
+        $request = HTTPClient::start();
+        $response = $request->get($url);
+        if ($response->isOk()) {
+            $ok = file_put_contents($filename, $response->getBody());
+            if (!$ok) {
+                throw new Exception('Failed fetching to filename '.$filename);
+            }
+        } else {
+            throw new Exception('HTTPClient bad response for '.$url);
+        }
         return true;
     }
 
@@ -596,5 +612,17 @@ class TwitterImport
                 }
             }
         }
+        if (isset($status->entities->media)) : foreach ($status->entities->media as $media) {
+file_put_contents('/tmp/tweet-media', print_r($media,true));
+            $url = $media->media_url_https;
+            $filename = 'Twitter_'.urlencode($media->id_str).'-original-'.urlencode(basename($url));
+
+            $this->fetchRemoteUrl($url, File::path($filename));
+//            $attachment = File::processNew(File::url($filename), $notice->id);
+            $mediafile = new MediaFile($notice->getProfile(), $filename, MediaFile::getUploadedFileType(File::path($filename)));
+            $mediafile->attachToNotice($notice);
+    
+            common_debug('TWITTER imported File '.$mediafile->fileRecord->id.' by URL to notice '.$notice->id);
+        } endif;
     }
 }
