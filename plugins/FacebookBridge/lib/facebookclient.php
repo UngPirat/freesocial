@@ -48,13 +48,7 @@ class Facebookclient
     protected $notice        = null; // The user's notice
     protected $user          = null; // Sender of the notice
 
-    /**
-     *
-     * @param Notice $notice the notice to manipulate
-     * @param Profile $profile local user to act as; if left empty, the notice's poster will be used.
-     */
-    function __construct($notice, $profile=null)
-    {
+    function __construct($notice, $profile=null) {
         $this->facebook = self::getFacebook();
 
         if (empty($this->facebook)) {
@@ -337,6 +331,7 @@ class Facebookclient
 		common_debug('FACEBOOK subscription result: '.print_r($result,true));
 		return $result;
 	}
+
 
     /*
      * Handle a Facebook API Exception
@@ -771,21 +766,6 @@ class Facebookclient
         return $this->getForeignId($notice->id);
     }
 
-    /*
-     * Fetch a Facebook user object using the Graph API
-     * 
-     * @param $foreign_id The user's foreign id ('me', user id or username)
-     * @param $credentials (optional) The access_token for the Graph API
-     * @param $fields (optional) Fields to request from Facebook. Comma separated.
-     */
-    static function fetchUserObject($foreign_id, $credentials='', $fields='')
-    {
-        $params = array('access_token' => $credentials, 'fields' => $fields);
-        $facebook = Facebookclient::getFacebook();
-        // will throw exception on error
-        $result = $facebook->api(sprintf('/%s', $foreign_id, $credentials, $fields), 'get', $params);
-        return $result;
-    }
 
     /*
      * Get the Foreign_user object for a facebook uid
@@ -794,7 +774,7 @@ class Facebookclient
      *
      * @return Foreign_user object
      */
-    static function getForeignUser($foreign_id) {
+    static function getFacebookUser($foreign_id) {
         $fuser = Foreign_user::pkeyGet('Foreign_user', array('id'=>$foreign_id, 'service'=>FACEBOOK_SERVICE));
         if (empty($fuser)) {
             throw new Exception('No such foreign user found: '.$foreign_id);
@@ -802,105 +782,6 @@ class Facebookclient
         return $fuser;
     }
 
-    /*
-     * See if Facebook user exists, if not call addForeignUser
-     *
-     * @param string $fb_id  Facebook user id
-     * @param boolean $update Whether to update data despite existing entry
-     *
-     * @return mixed $result foreign user
-     */
-    static function saveForeignUser($fb_id, $flink, $update=false) {
-        try {
-            $fuser = Facebookclient::getForeignUser($fb_id);
-            if (!$update) {
-               return $fuser;
-            }
-        } catch (Exception $e) {
-            common_debug($e->getMessage());
-        }
-
-	    try {
-           $fb_user = Facebookclient::fetchUserObject($fb_id, $flink->credentials, 'username,link,id');
-	    } catch (FacebookApiException $e) {
-            $r = $e->getResult();
-            if ($r['error']['code']==190) {
-                switch($r['error']['error_subcode']) {
-                case 458:	//User %i has not authorized application %i.
-                case 460:	//The session has been invalidated because the user has changed the password.
-                case 463:	//Session has expired at unix time %i. The current unix time is %i.
-                    Facebookclient::emailExpiredCredentials($flink->getUser(), $e->getMessage());
-                    $flink->credentials = '';
-                    $flink->update();
-                    break;
-                default:
-                    common_debug('Unhandled error: ['.$r['error']['code'].'/'.$r['error']['error_subcode'].'] '.$e->getMessage());
-                }
-            } else {
-                common_log(LOG_WARNING, $this->name() .
-                   ' - error getting FACEBOOK user object ['.$r['error']['code'].'/'.$r['error']['error_subcode'].'] ' . 
-	                  $e->getMessage());
-            }
-            $fb_user = null;
-        }
-        if (empty($fb_user)) {
-            throw new Exception('Could not fetch user object');
-        }
-
-        if (empty($fuser)) {	// no pre-existing user
-			$fuser = Facebookclient::addForeignUser($fb_user);
-		} else {	// updating foreign_user table data
-            $original = clone($fuser);
-	        $fuser->nickname = !empty($fb_user['username']) ? $fb_user['username'] : $fuser->nickname;
-            $fuser->uri      = !empty($fb_user['link']) ? $fb_user['link'] : $fuser->uri;
-            $fuser->id       = !empty($fb_user['id']) ? $fb_user['id'] : $fuser->id;
-            $fuser->update($original);
-        }
-
-		return $fuser;	// give back the Foreign_user object
-    }
-
-    /*
-     * Save a Foreign_user record of a Facebook user
-     *
-     * @param object $fbuser a Facebook Graph API user obj
-     *                       See: http://developers.facebook.com/docs/reference/api/user
-     * @return mixed $result Id or key
-     *
-     */
-    static function addForeignUser($fbuser)
-    {
-        if (empty($fbuser['username']) || empty($fbuser['link']) || empty($fbuser['id'])) {
-            throw new Exception('FACEBOOK incomplete Foreign_user data for '.$fbuser['id'].'/'.$fbuser['username']);
-        }
-
-        $fuser = new Foreign_user();
-
-        $fuser->nickname = $fbuser['username'];
-        $fuser->uri      = $fbuser['link'];
-        $fuser->id       = $fbuser['id'];
-        $fuser->service  = FACEBOOK_SERVICE;
-        $fuser->created  = common_sql_now();
-
-        $result = $fuser->insert();
-
-        if (empty($result)) {
-            common_log(
-                LOG_WARNING,
-                    sprintf(
-                        'Failed to add new Facebook user: %s, fbuid %d',
-                        $fbuser['username'],
-                        $fbuser['id']
-                    ),
-                    __FILE__
-            );
-
-            common_log_db_error($fuser, 'INSERT', __FILE__);
-			throw new Exception('FACEBOOK foreign user add failed: '.$fbuser->username);
-        }
-
-        return $fuser;
-    }
 
     /*
      * Remove an item from a Facebook user's feed if we have a mapping

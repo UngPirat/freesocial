@@ -124,7 +124,7 @@ class FacebooksettingsAction extends SettingsAction {
     function showContent() {
         if (empty($this->flink)) {
             $params = array(
-              'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
+              'scope' => 'read_stream,publish_stream,user_status,user_groups,user_location,user_website,email,manage_pages',
               'redirect_uri' => common_local_url('facebookfinishlogin')
             );
     

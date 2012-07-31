@@ -83,9 +83,9 @@ class FacebookImport
                 $args['access_token'] = $this->flink->credentials;
             }
             try {
-                $result = $this->facebook->api(sprintf('/%s/', $this->flink->foreign_id).urlencode($field), 'get', $args);
+                $result = $this->facebook->api('/me/'.urlencode($field), 'get', $args);
             } catch (Exception $e) {
-                common_debug('FACEBOOK returned error for https://graph.facebook.com/'.$this->flink->foreign_id.'/'.$field.'?'.http_build_query($args).': '.$e->getMessage());
+                common_debug('FACEBOOK returned error for https://graph.facebook.com/me/'.$field.'?'.http_build_query($args).' - '.$e->getMessage());
                 return 0;
             }
 
@@ -189,7 +189,7 @@ class FacebookImport
 
         common_debug('FACEBOOK importing ('.$update['id'].'): '.$update['message']);
         $flink = Foreign_link::getByForeignID($update['from']['id'], FACEBOOK_SERVICE);
-        if (!empty($flink) && ($flink->noticesync & Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT == Foreign_notice_map::FOREIGN_NOTICE_RECV_IMPORT)) {
+        if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
             $doNoticeImport = true;
             $profile = Profile::staticGet('id', $flink->user_id);
             unset($flink);
@@ -225,13 +225,21 @@ class FacebookImport
         $notice->content  = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
         if ($doNoticeImport) {
-            $noticeOptions = (array)$notice;    // Notice::saveNew should accept a Notice object
             $notice->is_local   = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
-            $notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+            $noticeOptions = (array)$notice;    // Notice::saveNew should accept a Notice object :(
+            unset($noticeOptions['uri']);
+
+            switch ($update['type']) {
+            case 'link':
+                $notice = Bookmark::saveNew($profile, $message, $update['link'], '', $update['description'], $noticeOptions);
+                break;
+            default:
+                $notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+            }
         } else {
             $notice->is_local   = Notice::GATEWAY;
             $notice->uri        = $notice->url;
-               $notice->rendered = common_render_content($message, $notice);
+            $notice->rendered = common_render_content($message, $notice);
     
             if (empty($notice->conversation)) {
                 $conv = Conversation::create();
@@ -277,6 +285,11 @@ class FacebookImport
             return false;
         }
         switch ($update['type']) {
+        case 'link':
+            // continue to photo if there's a picture involved
+            if (!isset($update['picture'])) {
+                break;
+            }
         case 'photo':
             $url = preg_replace('/\_s\.jpg$/', '_n.jpg', $update['picture']);    // _n is a bigger version
             $filename = 'Facebook_'.urlencode($update['id']).'-original-'.urlencode(basename($url));
@@ -408,8 +421,8 @@ class FacebookImport
 
     function ensureProfile($foreign_id)
     {
-
-        $foreign_user = Facebookclient::saveForeignUser($foreign_id, $this->flink);
+        $fsrv = new FacebookService();
+        $foreign_user = $fsrv->addForeignUser($foreign_id, $this->flink->credentials);
         try {
 			$profile = $this->getProfileByForeignUser($foreign_user);
 		} catch (Exception $e) {	// no profile found, let's create one!
@@ -482,7 +495,6 @@ class FacebookImport
             return $avatar;
         }
 
-        /* make this several sizes */
         if (FacebookImport::fetchRemoteUrl($url, Avatar::path($filename))) {
             try {
                 Avatar::deleteFromProfile($profile_id);

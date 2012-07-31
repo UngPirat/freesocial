@@ -33,7 +33,7 @@ if (!defined('STATUSNET')) {
     exit(1);
 }
 
-define("FACEBOOK_SERVICE", 2);
+if (!defined('FACEBOOK_SERVICE')) define("FACEBOOK_SERVICE", 2);
 
 /**
  * Main class for Facebook Bridge plugin
@@ -50,6 +50,7 @@ class FacebookBridgePlugin extends Plugin
     public $appId;  // Facebook application ID
     public $secret; // Facebook application secret
 
+    public $fsrv     = null; // ForeignServiceClient
     public $facebook = null; // Facebook application instance
     public $dir      = null; // Facebook plugin dir
 
@@ -84,10 +85,13 @@ class FacebookBridgePlugin extends Plugin
             }
         }
 
+        $this->fsrv = new FacebookService();
+
         $this->facebook = Facebookclient::getFacebook(
             $this->appId,
             $this->secret
         );
+
 
         return true;
     }
@@ -386,7 +390,7 @@ $('#facebook_button').bind('click', function(event) {
         } else {
             // NOP (user cancelled login)
         }
-    }, {scope:'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages'});
+    }, {scope:'read_stream,publish_stream,user_status,user_groups,user_location,user_website,email,manage_pages'});
 });
 ENDOFSCRIPT;
 
@@ -583,7 +587,7 @@ ENDOFSCRIPT;
         $flink = Foreign_link::getByUserID($profile->id, FACEBOOK_SERVICE);
 
         if (!empty($flink)) {
-            $fuser = Facebookclient::getForeignUser($flink->foreign_id);
+            $fuser = $this->fsrv->getForeignUser($flink->foreign_id);
 
             if (!empty($fuser)) {
                 $links[] = array("href" => $fuser->uri,

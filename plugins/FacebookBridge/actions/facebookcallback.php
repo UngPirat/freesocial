@@ -53,7 +53,8 @@ class FacebookcallbackAction extends Action
             }
             break;
         case 'POST':
-            $headers = getallheaders();    // Requires PHP 5.4.0!
+            $data = file_get_contents('php://input');
+/*            $headers = getallheaders();    // Requires PHP 5.4.0!
             if ($_SERVER['CONTENT_TYPE'] == 'application/json' &&
                     isset($headers['X-Hub-Signature']) &&
                     $data = http_get_request_body()) {
@@ -65,12 +66,14 @@ class FacebookcallbackAction extends Action
             } else {
                throw new Exception('Bad Facebook callback POST');
             }
-
+*/
+file_put_contents('/tmp/realtime.txt', $data);
+file_put_contents('/tmp/realtime-headers.txt', print_r($data,true));
             $data = json_decode($data);
             if ($data->object == 'user') {
                 foreach((array)$data->entry as $entry) {
                     $flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
-                    if (($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
+                    if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
                         $importer = new FacebookImport($flink);
                         common_debug("FACEBOOK User '{$entry->uid}' has a realtime update, handling it");
 

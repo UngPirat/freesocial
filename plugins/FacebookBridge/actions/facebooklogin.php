@@ -41,7 +41,7 @@ class FacebookloginAction extends Action
         if (common_is_real_login()) {
             $facebook = Facebookclient::getFacebook();
             $params = array(
-                'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
+                'scope' => 'read_stream,publish_stream,user_status,user_groups,user_location,user_website,email,manage_pages',
                 'redirect_uri' => common_local_url('facebookfinishlogin')
             );
             $loginUrl = $facebook->getLoginUrl($params);
@@ -84,7 +84,7 @@ class FacebookloginAction extends Action
         $facebook = Facebookclient::getFacebook();
 
         $params = array(
-          'scope' => 'read_stream,publish_stream,user_status,user_location,user_website,email,manage_pages',
+          'scope' => 'read_stream,publish_stream,user_status,user_groups,user_location,user_website,email,manage_pages',
           'redirect_uri' => common_local_url('facebookfinishlogin')
         );
 

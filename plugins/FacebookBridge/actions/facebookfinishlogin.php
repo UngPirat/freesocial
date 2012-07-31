@@ -37,6 +37,8 @@ class FacebookfinishloginAction extends Action
     private $fbuser      = null; // Facebook user array (JSON)
     private $accessToken = null; // Access token provided by Facebook JS API
 
+    private $fsrv        = null;
+
     function prepare($args) {
         parent::prepare($args);
 
@@ -44,7 +46,6 @@ class FacebookfinishloginAction extends Action
 
         if (isset($_COOKIE['fb_access_token'])) {
             $this->accessToken = $_COOKIE['fb_access_token'];
-        } elseif ( isset($_SESSION['fb_state']) && $_SESSION['fb_state'] === $this->arg('state') ) {
         }
 
         if (empty($this->accessToken)) {
@@ -52,28 +53,14 @@ class FacebookfinishloginAction extends Action
             return false;
         }
 
-        $this->fbuser = Facebookclient::fetchUserObject('me', $this->accessToken, 'name,username,website,link,location,email');
+        $this->fsrv = new FacebookService();
+        $this->fbuser = $this->fsrv->fetchUserData('me', $this->accessToken, array('name','username','website','link','location','email'));
 
         if (!empty($this->fbuser)) {
             $this->fbuid  = $this->fbuser['id'];
             // OKAY, all is well... proceed to register
             return true;
         } else {
-
-            // log badness
-
-            list($proxy, $ip) = common_client_ip();
-
-            common_log(
-                LOG_WARNING,
-                    sprintf(
-                        'Failed Facebook authentication attempt, proxy = %s, ip = %s.',
-                         $proxy,
-                         $ip
-                    ),
-                    __FILE__
-            );
-
             $this->clientError(
                 // TRANS: Client error displayed when trying to connect to Facebook while not logged in.
                 _m('You must be logged into Facebook to register a local account using Facebook.')
@@ -88,16 +75,20 @@ class FacebookfinishloginAction extends Action
         parent::handle($args);
 
         if (common_is_real_login()) {
-
-            // This will throw a client exception if the user already
-            // has some sort of foreign_link to Facebook.
-
             try {
+                // This will throw a client exception if the user already
+                // has some sort of foreign_link to Facebook.
                 $this->checkForExistingLink();
                 // Possibly reconnect an existing account
                 $this->connectUser();
             } catch (Exception $e) {
-                $this->tryLogin();
+                // if the currently logged in user has a foreign_link to Facebook,
+                // update its credentials and go to settings
+
+                $flink = Foreign_link::getByForeignID($this->fbuid, FACEBOOK_SERVICE);
+                $this->updateAccessToken($flink);
+                setcookie('fb_access_token', '', time() - 3600); // one hour ago
+                common_redirect(common_local_url('facebooksettings'), 303);
             }
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->handlePost();
@@ -107,37 +98,28 @@ class FacebookfinishloginAction extends Action
     }
 
     function checkForExistingLink() {
-
         // User is already logged in, are her accounts already linked?
 
         $flink = Foreign_link::getByForeignID($this->fbuid, FACEBOOK_SERVICE);
-
         if (!empty($flink)) {
-
             // User already has a linked Facebook account and shouldn't be here!
-
             $this->clientError(
                 // TRANS: Client error displayed when trying to connect to a Facebook account that is already linked
                 // TRANS: in the same StatusNet site.
                 _m('There is already a local account linked with that Facebook account.')
             );
-
             return;
        }
 
        $cur = common_current_user();
        $flink = Foreign_link::getByUserID($cur->id, FACEBOOK_SERVICE);
-
        if (!empty($flink)) {
-
             // There's already a local user linked to this Facebook account.
-
             $this->clientError(
                 // TRANS: Client error displayed when trying to connect to a Facebook account that is already linked
                 // TRANS: in the same StatusNet site.
                 _m('There is already a local user linked to this Facebook account.')
             );
-
             return;
         }
     }
@@ -404,7 +386,7 @@ class FacebookfinishloginAction extends Action
         }
 
         // Add a Foreign_user record
-        Facebookclient::saveForeignUser($this->fbuid, $flink, true);
+        $this->fsrv->addForeignUser($this->fbuid, $flink->credentials, true);
 
         $this->setAvatar($user);
 
@@ -524,24 +506,12 @@ class FacebookfinishloginAction extends Action
             return null;
         }
 
-        $fuser = Facebookclient::getForeignUser($this->fbuid);
-        
-        $takeover = new Profile();
-        $takeover->profileurl = $fuser->uri;
-        $takeover->find();
-
-        while ($takeover->fetch()) {
-            $switch = new Notice();
-            $switch->profile_id = $takeover->id;
-            $switch->find();
-            while ($switch->fetch()) {
-                $original = clone($switch);
-                $switch->profile_id = $user->id;
-                $switch->update($original);
-            }
-            $takeover->delete();
+        try {
+            $this->fsrv->profileTakeover($user->id, $this->fbuid);
+        } catch (Exception $e) {
+            common_debug('FACEBOOK profileTakeover failed: '.$e->getMessage());
         }
-
+        
         return $this->tryLogin();
     }
 
@@ -620,7 +590,7 @@ class FacebookfinishloginAction extends Action
             return null;
         }
 
-        $fuser = Facebookclient::saveForeignUser($fbuid, $flink, true);
+        $fuser = $this->fsrv->addForeignUser($fbuid, $flink->credentials, true);
 
         return $flink;
     }
