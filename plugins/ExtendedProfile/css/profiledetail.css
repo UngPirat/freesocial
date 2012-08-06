@@ -106,7 +106,7 @@
     max-width: 100%;
     float: none;
     display: inline;
-    left: -20px;
+    left: 0px;
 }
 
 .extended-profile select {
