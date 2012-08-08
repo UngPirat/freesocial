@@ -48,7 +48,7 @@ class FacebookloginAction extends Action
 
             $user = common_current_user();
             $flink = Foreign_link::getByUserID($user->id, FACEBOOK_SERVICE);
-            setcookie('fb_access_token', $flink->credentials, time()+300);
+//            setcookie('fb_access_token', $flink->credentials, time()+300);
             
             common_redirect($loginUrl, 303);
             die;

@@ -78,14 +78,19 @@ class FacebookService extends ForeignServiceClient {
     }
     function prepare(array $params=array())
     {
-        $required = array('appid', 'secret');
+        $required = array('appId', 'secret');
         foreach($required as $param) {
             ${$param} = !empty($params[$param]) ? $params[$param] : common_config('facebook', $param);
             if (empty(${$param})) {
             }
         }
+        $cookie = isset($cookie) ? $cookie : true;
 
-        $this->client = new Facebook($appid, $secret, true);
+        $this->client = new Facebook(array(
+                                      'appId' => $appId,
+                                      'secret' => $secret,
+                                      'cookie' => $cookie,
+                                    ));
     }
 
     function addForeignUser($foreign_id, $credentials='', $update=false)
@@ -135,6 +140,12 @@ class FacebookService extends ForeignServiceClient {
         return $result;
     }
 
+    function getAccessToken()
+    {
+common_debug('FBDBG '.$this->client->getAppId());
+        return $this->client->getAccessToken();
+    }
+
     static function handleForeignError($e, $flink) {
         $r = $e->getResult();
         if ($r['error']['code']==190) {
@@ -145,6 +156,9 @@ class FacebookService extends ForeignServiceClient {
                 self::emailExpiredCredentials($flink->getUser(), $e->getMessage());
                 $flink->credentials = '';
                 $flink->update();
+                break;
+            case 2500:
+                common_debug('OAuthException: '.$e->getMessage());
                 break;
             default:
                 common_debug('Unhandled error: ['.$r['error']['code'].'/'.$r['error']['error_subcode'].'] '.$e->getMessage());

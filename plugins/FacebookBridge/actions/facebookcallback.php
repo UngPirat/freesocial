@@ -67,7 +67,7 @@ class FacebookcallbackAction extends Action
                throw new Exception('Bad Facebook callback POST');
             }
 */
-file_put_contents('/tmp/realtime.txt', $data);
+file_put_contents('/tmp/realtime.txt', date('r').': '.$data);
 file_put_contents('/tmp/realtime-headers.txt', print_r($data,true));
             $data = json_decode($data);
             if ($data->object == 'user') {

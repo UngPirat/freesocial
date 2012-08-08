@@ -42,18 +42,13 @@ class FacebookfinishloginAction extends Action
     function prepare($args) {
         parent::prepare($args);
 
-        // Check cookie for a valid access_token
+        $this->fsrv = new FacebookService();
 
-        if (isset($_COOKIE['fb_access_token'])) {
-            $this->accessToken = $_COOKIE['fb_access_token'];
-        }
-
+        $this->accessToken = $this->fsrv->getAccessToken();
         if (empty($this->accessToken)) {
             $this->clientError(_m("Unable to authenticate you with Facebook."));
-            return false;
         }
 
-        $this->fsrv = new FacebookService();
         $this->fbuser = $this->fsrv->fetchUserData('me', $this->accessToken, array('name','username','website','link','location','email'));
 
         if (!empty($this->fbuser)) {
@@ -87,7 +82,7 @@ class FacebookfinishloginAction extends Action
 
                 $flink = Foreign_link::getByForeignID($this->fbuid, FACEBOOK_SERVICE);
                 $this->updateAccessToken($flink);
-                setcookie('fb_access_token', '', time() - 3600); // one hour ago
+                //setcookie('fb_access_token', '', time() - 3600); // one hour ago
                 common_redirect(common_local_url('facebooksettings'), 303);
             }
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
