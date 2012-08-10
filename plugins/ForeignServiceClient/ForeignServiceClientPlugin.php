@@ -46,6 +46,46 @@ if (!defined('STATUSNET')) {
 class ForeignServiceClientPlugin extends Plugin
 {
     const VERSION = STATUSNET_VERSION;
+
+    /**
+     * Automatically load the PHP file for our class
+     *
+     * @param Class $cls the class
+     *
+     * @return boolean hook return
+     *
+     */
+    function onAutoload($cls)
+    {
+        $dir = dirname(__FILE__);
+
+        switch ($cls) {
+        case 'Foreign_group':
+        case 'Foreign_notice_map':
+            require_once $dir . '/classes/' . $cls . '.php';
+            return false;
+        default:
+            return true;
+        }
+    }
+
+    /**
+     * Database schema setup
+     *
+     * We maintain a table mapping StatusNet notices to foreign notice ids and services
+     *
+     * @see Schema
+     * @see ColumnDef
+     *
+     * @return boolean hook value; true means continue processing, false means stop.
+     */
+    function onCheckSchema()
+    {  
+        $schema = Schema::get();
+        $schema->ensureTable('foreign_group', Foreign_group::schemaDef());
+        $schema->ensureTable('foreign_notice_map', Foreign_notice_map::schemaDef());
+        return true;
+    }
 }
 
 abstract class ForeignServiceClient
