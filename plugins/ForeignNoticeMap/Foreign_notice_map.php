@@ -146,7 +146,7 @@ class Foreign_notice_map extends Managed_DataObject
      * @param integer $foreign_id ID of the status in your foreign service
      * @param integer $service_id ID of the foreign service in foreign_service
      *
-     * @return ForeignNotice new object for this value
+     * @return Foreign_notice_map new object for this value
      */
     static function saveNew($notice_id, $foreign_id, $service_id)
     {
