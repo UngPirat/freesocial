@@ -103,15 +103,17 @@ class File_oembed extends Managed_DataObject
         $file_oembed->file_id = $file_id;
         $file_oembed->version = $data->version;
         $file_oembed->type = $data->type;
-        if (!empty($data->provider_name)) $file_oembed->provider = $data->provider_name;
-        if (!empty($data->provider)) $file_oembed->provider = $data->provider;
-        if (!empty($data->provide_url)) $file_oembed->provider_url = $data->provider_url;
-        if (!empty($data->width)) $file_oembed->width = intval($data->width);
-        if (!empty($data->height)) $file_oembed->height = intval($data->height);
-        if (!empty($data->html)) $file_oembed->html = $data->html;
-        if (!empty($data->title)) $file_oembed->title = $data->title;
-        if (!empty($data->author_name)) $file_oembed->author_name = $data->author_name;
-        if (!empty($data->author_url)) $file_oembed->author_url = $data->author_url;
+
+        if (!empty($data->provider_name)) {
+            $file_oembed->provider = $data->provider_name;	// in case $data->provider is empty
+        }
+        $fields = array('provider', 'provider_url', 'width', 'height', 'html', 'title', 'author_name', 'author_url');
+        foreach ($fields as $field) :
+            if (!empty($data->$field)) {
+                $file_oembed->$field = $data->$field;
+            }
+        endforeach;
+
         if (!empty($data->url)){
             $file_oembed->url = $data->url;
             $given_url = File_redirection::_canonUrl($file_oembed->url);
