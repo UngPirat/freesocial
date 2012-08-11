@@ -8,13 +8,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. TRANS: Title of blacklist plugin administration panel.
+#: blacklistadminpanel.php:53
+msgctxt "TITLE"
+msgid "Blacklist"
+msgstr ""
+
+#. TRANS: Instructions for blacklist plugin administration panel.
+#: blacklistadminpanel.php:64
+msgid "Blacklisted URLs and nicknames"
+msgstr ""
+
+#. TRANS: Field label in blacklist plugin administration panel.
+#: blacklistadminpanel.php:177
+msgid "Nicknames"
+msgstr ""
+
+#. TRANS: Field title in blacklist plugin administration panel.
+#: blacklistadminpanel.php:180
+msgid "Patterns of nicknames to block, one per line."
+msgstr ""
+
+#. TRANS: Field label in blacklist plugin administration panel.
+#: blacklistadminpanel.php:187
+msgid "URLs"
+msgstr ""
+
+#. TRANS: Field title in blacklist plugin administration panel.
+#: blacklistadminpanel.php:190
+msgid "Patterns of URLs to block, one per line."
+msgstr ""
+
+#. TRANS: Button text in blacklist plugin administration panel to save settings.
+#: blacklistadminpanel.php:205
+msgctxt "BUTTON"
+msgid "Save"
+msgstr ""
+
+#. TRANS: Button title in blacklist plugin administration panel to save settings.
+#: blacklistadminpanel.php:209
+msgid "Save site settings."
+msgstr ""
 
 #. TRANS: Exception thrown if the Blacklist plugin configuration is incorrect.
 #. TRANS: %1$s is a configuration section, %2$s is a configuration setting.
@@ -97,46 +140,4 @@ msgstr ""
 #: BlacklistPlugin.php:550
 #, php-format
 msgid "Cannot subscribe to nickname \"%s\"."
-msgstr ""
-
-#. TRANS: Title of blacklist plugin administration panel.
-#: blacklistadminpanel.php:53
-msgctxt "TITLE"
-msgid "Blacklist"
-msgstr ""
-
-#. TRANS: Instructions for blacklist plugin administration panel.
-#: blacklistadminpanel.php:64
-msgid "Blacklisted URLs and nicknames"
-msgstr ""
-
-#. TRANS: Field label in blacklist plugin administration panel.
-#: blacklistadminpanel.php:177
-msgid "Nicknames"
-msgstr ""
-
-#. TRANS: Field title in blacklist plugin administration panel.
-#: blacklistadminpanel.php:180
-msgid "Patterns of nicknames to block, one per line."
-msgstr ""
-
-#. TRANS: Field label in blacklist plugin administration panel.
-#: blacklistadminpanel.php:187
-msgid "URLs"
-msgstr ""
-
-#. TRANS: Field title in blacklist plugin administration panel.
-#: blacklistadminpanel.php:190
-msgid "Patterns of URLs to block, one per line."
-msgstr ""
-
-#. TRANS: Button text in blacklist plugin administration panel to save settings.
-#: blacklistadminpanel.php:205
-msgctxt "BUTTON"
-msgid "Save"
-msgstr ""
-
-#. TRANS: Button title in blacklist plugin administration panel to save settings.
-#: blacklistadminpanel.php:209
-msgid "Save site settings."
 msgstr ""

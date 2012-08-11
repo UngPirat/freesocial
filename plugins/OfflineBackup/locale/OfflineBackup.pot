@@ -8,13 +8,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. TRANS: Plugin description.
+#: OfflineBackupPlugin.php:98
+msgid "Backup user data in offline queue and email when ready."
+msgstr ""
 
 #: offlinebackupqueuehandler.php:105
 #, php-format
@@ -24,9 +30,4 @@ msgctxt ""
 "%s\n"
 "Thanks for your time,\n"
 msgid "%s\n"
-msgstr ""
-
-#. TRANS: Plugin description.
-#: OfflineBackupPlugin.php:98
-msgid "Backup user data in offline queue and email when ready."
 msgstr ""

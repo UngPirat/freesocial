@@ -8,84 +8,54 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. TRANS: Page title for user directory. %d is a page number.
-#: actions/userdirectory.php:95
-#, php-format
-msgid "User Directory, page %d"
+#. TRANS: Menu item text for user directory.
+#: DirectoryPlugin.php:241
+msgctxt "MENU"
+msgid "Directory"
 msgstr ""
 
-#. TRANS: Page title for user directory.
-#: actions/userdirectory.php:98
-msgid "User directory"
+#. TRANS: Menu item title for user directory.
+#: DirectoryPlugin.php:243
+msgid "User Directory."
 msgstr ""
 
-#. TRANS: Page title for user directory. %s is the applied filter.
-#: actions/userdirectory.php:102
-#, php-format
-msgid "User directory - %s"
+#. TRANS: Plugin description.
+#: DirectoryPlugin.php:262
+msgid "Add a user directory."
 msgstr ""
 
-#. TRANS: Page title for user directory.
-#. TRANS: %1$s is the applied filter, %2$d is a page number.
-#: actions/userdirectory.php:109
-#, php-format
-msgid "User directory - %1$s, page %2$d"
+#. TRANS: Column header in table for user nickname.
+#: lib/sortablesubscriptionlist.php:65 lib/sortablegrouplist.php:65
+msgid "Nickname"
 msgstr ""
 
-#. TRANS: %%site.name%% is the name of the StatusNet site.
-#: actions/userdirectory.php:124
-#, php-format
-msgid ""
-"Search for people on %%site.name%% by their name, location, or interests. "
-"Separate the terms by spaces;  they must be 3 characters or more."
+#. TRANS: Column header in table for timestamp when user was created.
+#: lib/sortablesubscriptionlist.php:67 lib/sortablegrouplist.php:67
+msgid "Created"
 msgstr ""
 
-#. TRANS: Fieldset legend.
-#: actions/userdirectory.php:264
-msgid "Search site"
+#. TRANS: Column header for number of subscriptions.
+#: lib/sortablesubscriptionlist.php:114
+msgid "Subscriptions"
 msgstr ""
 
-#. TRANS: Field label for user directory filter.
-#. TRANS: Field label for input of one or more keywords.
-#: actions/userdirectory.php:269 actions/groupdirectory.php:288
-msgid "Keyword(s)"
+#. TRANS: Column header for number of notices.
+#: lib/sortablesubscriptionlist.php:116
+msgid "Notices"
 msgstr ""
 
-#. TRANS: Button text.
-#. TRANS: Button text for searching group directory.
-#: actions/userdirectory.php:272 actions/groupdirectory.php:291
-msgctxt "BUTTON"
-msgid "Search"
-msgstr ""
-
-#. TRANS: Empty list message for user directory.
-#: actions/userdirectory.php:378
-#, php-format
-msgid "No users starting with %s"
-msgstr ""
-
-#. TRANS: Empty list message for user directory.
-#. TRANS: Empty list message for searching group directory.
-#: actions/userdirectory.php:384 actions/groupdirectory.php:414
-msgid "No results."
-msgstr ""
-
-#. TRANS: Standard search suggestions shown when a search does not give any results.
-#. TRANS: Help text for searching group directory.
-#: actions/userdirectory.php:386 actions/groupdirectory.php:416
-msgid ""
-"* Make sure all words are spelled correctly.\n"
-"* Try different keywords.\n"
-"* Try more general keywords.\n"
-"* Try fewer keywords."
+#. TRANS: Column header in table for members of a group.
+#: lib/sortablegrouplist.php:113
+msgid "Members"
 msgstr ""
 
 #. TRANS: Title for group directory page. %d is a page number.
@@ -133,6 +103,19 @@ msgstr ""
 msgid "Search groups"
 msgstr ""
 
+#. TRANS: Field label for input of one or more keywords.
+#. TRANS: Field label for user directory filter.
+#: actions/groupdirectory.php:288 actions/userdirectory.php:269
+msgid "Keyword(s)"
+msgstr ""
+
+#. TRANS: Button text for searching group directory.
+#. TRANS: Button text.
+#: actions/groupdirectory.php:291 actions/userdirectory.php:272
+msgctxt "BUTTON"
+msgid "Search"
+msgstr ""
+
 #. TRANS: Empty list message for searching group directory.
 #. TRANS: %s is the search string.
 #: actions/groupdirectory.php:408
@@ -140,43 +123,61 @@ msgstr ""
 msgid "No groups starting with %s."
 msgstr ""
 
-#. TRANS: Menu item text for user directory.
-#: DirectoryPlugin.php:241
-msgctxt "MENU"
-msgid "Directory"
+#. TRANS: Empty list message for searching group directory.
+#. TRANS: Empty list message for user directory.
+#: actions/groupdirectory.php:414 actions/userdirectory.php:384
+msgid "No results."
 msgstr ""
 
-#. TRANS: Menu item title for user directory.
-#: DirectoryPlugin.php:243
-msgid "User Directory."
+#. TRANS: Help text for searching group directory.
+#. TRANS: Standard search suggestions shown when a search does not give any results.
+#: actions/groupdirectory.php:416 actions/userdirectory.php:386
+msgid ""
+"* Make sure all words are spelled correctly.\n"
+"* Try different keywords.\n"
+"* Try more general keywords.\n"
+"* Try fewer keywords."
 msgstr ""
 
-#. TRANS: Plugin description.
-#: DirectoryPlugin.php:262
-msgid "Add a user directory."
+#. TRANS: Page title for user directory. %d is a page number.
+#: actions/userdirectory.php:95
+#, php-format
+msgid "User Directory, page %d"
 msgstr ""
 
-#. TRANS: Column header in table for user nickname.
-#: lib/sortablesubscriptionlist.php:65 lib/sortablegrouplist.php:65
-msgid "Nickname"
+#. TRANS: Page title for user directory.
+#: actions/userdirectory.php:98
+msgid "User directory"
 msgstr ""
 
-#. TRANS: Column header in table for timestamp when user was created.
-#: lib/sortablesubscriptionlist.php:67 lib/sortablegrouplist.php:67
-msgid "Created"
+#. TRANS: Page title for user directory. %s is the applied filter.
+#: actions/userdirectory.php:102
+#, php-format
+msgid "User directory - %s"
 msgstr ""
 
-#. TRANS: Column header for number of subscriptions.
-#: lib/sortablesubscriptionlist.php:114
-msgid "Subscriptions"
+#. TRANS: Page title for user directory.
+#. TRANS: %1$s is the applied filter, %2$d is a page number.
+#: actions/userdirectory.php:109
+#, php-format
+msgid "User directory - %1$s, page %2$d"
 msgstr ""
 
-#. TRANS: Column header for number of notices.
-#: lib/sortablesubscriptionlist.php:116
-msgid "Notices"
+#. TRANS: %%site.name%% is the name of the StatusNet site.
+#: actions/userdirectory.php:124
+#, php-format
+msgid ""
+"Search for people on %%site.name%% by their name, location, or interests. "
+"Separate the terms by spaces;  they must be 3 characters or more."
 msgstr ""
 
-#. TRANS: Column header in table for members of a group.
-#: lib/sortablegrouplist.php:113
-msgid "Members"
+#. TRANS: Fieldset legend.
+#: actions/userdirectory.php:264
+msgid "Search site"
+msgstr ""
+
+#. TRANS: Empty list message for user directory.
+#: actions/userdirectory.php:378
+#, php-format
+msgid "No users starting with %s"
 msgstr ""

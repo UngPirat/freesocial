@@ -8,29 +8,28 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#. TRANS: Client exception thrown trying to view a non-existing poll.
-#: showpoll.php:59
-msgid "No such poll."
+#. TRANS: Client exception thrown when responding to a poll with an invalid option.
+#. TRANS: Client exception thrown responding to a poll with an invalid answer.
+#: Poll_response.php:167 respondpoll.php:102
+msgid "Invalid poll selection."
 msgstr ""
 
-#. TRANS: Client exception thrown trying to view a non-existing poll notice.
-#: showpoll.php:67
-msgid "No such poll notice."
-msgstr ""
-
-#. TRANS: Page title for a poll.
-#. TRANS: %1$s is the nickname of the user that created the poll, %2$s is the poll question.
-#: showpoll.php:84
+#. TRANS: Notice content voting for a poll.
+#. TRANS: %s is the chosen option in the poll.
+#. TRANS: Rendered version of the notice content voting for a poll.
+#. TRANS: %s a link to the poll with the chosen option as link description.
+#: Poll_response.php:196 Poll_response.php:201
 #, php-format
-msgid "%1$s's poll: %2$s"
+msgid "voted for \"%s\""
 msgstr ""
 
 #. TRANS: Field label on the page to create a poll.
@@ -89,25 +88,24 @@ msgctxt "APPTITLE"
 msgid "Poll"
 msgstr ""
 
-#. TRANS: Client exception thrown when responding to a poll with an invalid option.
-#. TRANS: Client exception thrown responding to a poll with an invalid answer.
-#: Poll_response.php:167 respondpoll.php:102
-msgid "Invalid poll selection."
+#. TRANS: Page title for poll response.
+#: respondpoll.php:63
+msgid "Poll response"
 msgstr ""
 
-#. TRANS: Notice content voting for a poll.
-#. TRANS: %s is the chosen option in the poll.
-#. TRANS: Rendered version of the notice content voting for a poll.
-#. TRANS: %s a link to the poll with the chosen option as link description.
-#: Poll_response.php:196 Poll_response.php:201
-#, php-format
-msgid "voted for \"%s\""
+#. TRANS: Client exception thrown trying to respond to a poll while not logged in.
+#: respondpoll.php:84
+msgid "You must be logged in to respond to a poll."
 msgstr ""
 
-#. TRANS: Button text for submitting a poll response.
-#: pollresponseform.php:127
-msgctxt "BUTTON"
-msgid "Submit"
+#. TRANS: Client exception thrown trying to respond to a non-existing poll.
+#: respondpoll.php:96
+msgid "Invalid or missing poll."
+msgstr ""
+
+#. TRANS: Page title after sending a poll response.
+#: respondpoll.php:152
+msgid "Poll results"
 msgstr ""
 
 #. TRANS: Notice content creating a poll.
@@ -122,6 +120,29 @@ msgstr ""
 #: Poll.php:240
 #, php-format
 msgid "Poll: %s"
+msgstr ""
+
+#. TRANS: Client exception thrown trying to view a non-existing poll.
+#: showpoll.php:59
+msgid "No such poll."
+msgstr ""
+
+#. TRANS: Client exception thrown trying to view a non-existing poll notice.
+#: showpoll.php:67
+msgid "No such poll notice."
+msgstr ""
+
+#. TRANS: Page title for a poll.
+#. TRANS: %1$s is the nickname of the user that created the poll, %2$s is the poll question.
+#: showpoll.php:84
+#, php-format
+msgid "%1$s's poll: %2$s"
+msgstr ""
+
+#. TRANS: Button text for submitting a poll response.
+#: pollresponseform.php:127
+msgctxt "BUTTON"
+msgid "Submit"
 msgstr ""
 
 #. TRANS: Title for poll page.
@@ -147,24 +168,4 @@ msgstr ""
 #. TRANS: Page title after sending a notice.
 #: newpoll.php:166
 msgid "Notice posted"
-msgstr ""
-
-#. TRANS: Page title for poll response.
-#: respondpoll.php:63
-msgid "Poll response"
-msgstr ""
-
-#. TRANS: Client exception thrown trying to respond to a poll while not logged in.
-#: respondpoll.php:84
-msgid "You must be logged in to respond to a poll."
-msgstr ""
-
-#. TRANS: Client exception thrown trying to respond to a non-existing poll.
-#: respondpoll.php:96
-msgid "Invalid or missing poll."
-msgstr ""
-
-#. TRANS: Page title after sending a poll response.
-#: respondpoll.php:152
-msgid "Poll results"
 msgstr ""

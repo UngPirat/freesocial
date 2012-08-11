@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -70,33 +71,33 @@ msgstr ""
 
 #. TRANS: Link description to notice in conversation.
 #. TRANS: %s is a notice ID.
-#: XmppPlugin.php:368
+#: XmppPlugin.php:363
 #, php-format
 msgid "[%s]"
 msgstr ""
 
 #. TRANS: Exception thrown when the plugin configuration is incorrect.
-#: XmppPlugin.php:406
+#: XmppPlugin.php:401
 msgid "You must specify a server in the configuration."
 msgstr ""
 
 #. TRANS: Exception thrown when the plugin configuration is incorrect.
-#: XmppPlugin.php:410
+#: XmppPlugin.php:405
 msgid "You must specify a port in the configuration."
 msgstr ""
 
 #. TRANS: Exception thrown when the plugin configuration is incorrect.
-#: XmppPlugin.php:414
+#: XmppPlugin.php:409
 msgid "You must specify a user in the configuration."
 msgstr ""
 
 #. TRANS: Exception thrown when the plugin configuration is incorrect.
-#: XmppPlugin.php:418
+#: XmppPlugin.php:413
 msgid "You must specify a password in the configuration."
 msgstr ""
 
 #. TRANS: Plugin description.
-#: XmppPlugin.php:444
+#: XmppPlugin.php:439
 msgid ""
 "The XMPP plugin allows users to send and receive notices over the XMPP/"
 "Jabber network."

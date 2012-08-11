@@ -8,19 +8,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#. TRANS: Page title for sample plugin.
 #. TRANS: Menu item in sample plugin.
-#: hello.php:112 SamplePlugin.php:270
+#. TRANS: Page title for sample plugin.
+#: SamplePlugin.php:270 hello.php:112
 msgid "Hello"
+msgstr ""
+
+#. TRANS: Menu item title in sample plugin.
+#: SamplePlugin.php:272
+msgid "A warm greeting"
+msgstr ""
+
+#. TRANS: Plugin description.
+#: SamplePlugin.php:284
+msgid "A sample plugin to show basics of development for new hackers."
+msgstr ""
+
+#. TRANS: Exception thrown when the user greeting count could not be saved in the database.
+#. TRANS: %d is a user ID (number).
+#: User_greeting_count.php:161
+#, php-format
+msgid "Could not save new greeting count for %d."
+msgstr ""
+
+#. TRANS: Exception thrown when the user greeting count could not be saved in the database.
+#. TRANS: %d is a user ID (number).
+#: User_greeting_count.php:174
+#, php-format
+msgid "Could not increment greeting count for %d."
 msgstr ""
 
 #. TRANS: Page title for sample plugin. %s is a user nickname.
@@ -48,27 +73,3 @@ msgid "I have greeted you %d time."
 msgid_plural "I have greeted you %d times."
 msgstr[0] ""
 msgstr[1] ""
-
-#. TRANS: Menu item title in sample plugin.
-#: SamplePlugin.php:272
-msgid "A warm greeting"
-msgstr ""
-
-#. TRANS: Plugin description.
-#: SamplePlugin.php:284
-msgid "A sample plugin to show basics of development for new hackers."
-msgstr ""
-
-#. TRANS: Exception thrown when the user greeting count could not be saved in the database.
-#. TRANS: %d is a user ID (number).
-#: User_greeting_count.php:161
-#, php-format
-msgid "Could not save new greeting count for %d."
-msgstr ""
-
-#. TRANS: Exception thrown when the user greeting count could not be saved in the database.
-#. TRANS: %d is a user ID (number).
-#: User_greeting_count.php:174
-#, php-format
-msgid "Could not increment greeting count for %d."
-msgstr ""

@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -112,22 +113,30 @@ msgid ""
 "If it was not you, you can safely ignore this message."
 msgstr ""
 
-#. TRANS: Form instructions.
-#: emailregistrationform.php:61
-msgid "Enter your email address to register for an account."
+#. TRANS: Error text when trying to register with an already registered e-mail address.
+#. TRANS: %s is the URL to recover password at.
+#: EmailRegistrationPlugin.php:110
+#, php-format
+msgid ""
+"A user with that email address already exists. You can use the <a href=\"%s"
+"\">password recovery</a> tool to recover a missing password."
 msgstr ""
 
-#. TRANS: Field label on form for registering an account.
-#: emailregistrationform.php:69
-msgctxt "LABEL"
-msgid "E-mail address"
+#. TRANS: Error text when trying to register with an invalid e-mail address.
+#: EmailRegistrationPlugin.php:124
+msgid "Not a valid email address."
 msgstr ""
 
-#. TRANS: Button text for registering an account.
-#. TRANS: Button text for action to register.
-#: emailregistrationform.php:93 confirmregistrationform.php:152
-msgctxt "BUTTON"
-msgid "Register"
+#. TRANS: Subject for confirmation e-mail.
+#. TRANS: %s is the StatusNet sitename.
+#: EmailRegistrationPlugin.php:168
+#, php-format
+msgid "Welcome to %s"
+msgstr ""
+
+#. TRANS: Plugin description.
+#: EmailRegistrationPlugin.php:201
+msgid "Use email only for registration."
 msgstr ""
 
 #. TRANS: Form instructions.
@@ -175,28 +184,20 @@ msgid ""
 "\">Privacy policy</a> of this site."
 msgstr ""
 
-#. TRANS: Error text when trying to register with an already registered e-mail address.
-#. TRANS: %s is the URL to recover password at.
-#: EmailRegistrationPlugin.php:110
-#, php-format
-msgid ""
-"A user with that email address already exists. You can use the <a href=\"%s"
-"\">password recovery</a> tool to recover a missing password."
+#. TRANS: Button text for action to register.
+#. TRANS: Button text for registering an account.
+#: confirmregistrationform.php:152 emailregistrationform.php:93
+msgctxt "BUTTON"
+msgid "Register"
 msgstr ""
 
-#. TRANS: Error text when trying to register with an invalid e-mail address.
-#: EmailRegistrationPlugin.php:124
-msgid "Not a valid email address."
+#. TRANS: Form instructions.
+#: emailregistrationform.php:61
+msgid "Enter your email address to register for an account."
 msgstr ""
 
-#. TRANS: Subject for confirmation e-mail.
-#. TRANS: %s is the StatusNet sitename.
-#: EmailRegistrationPlugin.php:168
-#, php-format
-msgid "Welcome to %s"
-msgstr ""
-
-#. TRANS: Plugin description.
-#: EmailRegistrationPlugin.php:201
-msgid "Use email only for registration."
+#. TRANS: Field label on form for registering an account.
+#: emailregistrationform.php:69
+msgctxt "LABEL"
+msgid "E-mail address"
 msgstr ""

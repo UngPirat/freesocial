@@ -8,13 +8,94 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-30 11:07+0000\n"
+"POT-Creation-Date: 2012-08-10 23:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#. TRANS: Title for new event form.
+#: newevent.php:66
+msgctxt "TITLE"
+msgid "New event"
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event while not logged in.
+#: newevent.php:84
+msgid "Must be logged in to post a event."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing a title.
+#: newevent.php:98
+msgid "Title required."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing a start date.
+#: newevent.php:110
+msgid "Start date required."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing an end date.
+#: newevent.php:123
+msgid "End date required."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event with a date that cannot be processed.
+#. TRANS: %s is the data that could not be processed.
+#: newevent.php:141 newevent.php:148
+#, php-format
+msgid "Could not parse date \"%s\"."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing a title.
+#: newevent.php:196
+msgid "Event must have a title."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing a start time.
+#: newevent.php:201
+msgid "Event must have a start time."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event without providing an end time.
+#: newevent.php:206
+msgid "Event must have an end time."
+msgstr ""
+
+#. TRANS: Client exception thrown when trying to post an event with an invalid URL.
+#: newevent.php:211
+msgid "URL must be valid."
+msgstr ""
+
+#. TRANS: Page title after sending a notice.
+#. TRANS: Page title after creating an event.
+#: newevent.php:252 cancelrsvp.php:158 newrsvp.php:163
+msgid "Event saved"
+msgstr ""
+
+#. TRANS: Possible status for RSVP ("please respond") item.
+#: cancelrsvpform.php:101
+msgid "You will attend this event."
+msgstr ""
+
+#. TRANS: Possible status for RSVP ("please respond") item.
+#: cancelrsvpform.php:105
+msgid "You will not attend this event."
+msgstr ""
+
+#. TRANS: Possible status for RSVP ("please respond") item.
+#: cancelrsvpform.php:109
+msgid "You might attend this event."
+msgstr ""
+
+#. TRANS: Button text to cancel responding to an RSVP ("please respond") item.
+#: cancelrsvpform.php:124
+msgctxt "BUTTON"
+msgid "Cancel"
+msgstr ""
 
 #. TRANS: 0 minutes abbreviated. Used in a list.
 #: eventtimelist.php:85
@@ -41,107 +122,10 @@ msgstr ""
 msgid "(%d hours)"
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to create an event that already exists.
-#: Happening.php:125
-msgid "Event already exists."
-msgstr ""
-
-#. TRANS: Event description. %1$s is a title, %2$s is start time, %3$s is end time,
-#. TRANS: %4$s is location, %5$s is a description.
-#: Happening.php:159
-#, php-format
-msgid "\"%1$s\" %2$s - %3$s (%4$s): %5$s"
-msgstr ""
-
-#. TRANS: Rendered event description. %1$s is a title, %2$s is start time, %3$s is start time,
-#. TRANS: %4$s is end time, %5$s is end time, %6$s is location, %7$s is description.
-#. TRANS: Class names should not be translated.
-#: Happening.php:169
-#, php-format
-msgid ""
-"<span class=\"vevent\"><span class=\"summary\">%1$s</span> <abbr class="
-"\"dtstart\" title=\"%2$s\">%3$s</a> - <abbr class=\"dtend\" title=\"%4$s\">%5"
-"$s</a> (<span class=\"location\">%6$s</span>): <span class=\"description\">%7"
-"$s</span> </span>"
-msgstr ""
-
-#. TRANS: Error message displayed when trying to perform an action that requires a logged in user.
-#: timelist.php:65
-msgid "Not logged in."
-msgstr ""
-
-#. TRANS: Client error when submitting a form with unexpected information.
-#: timelist.php:73
-msgid "Unexpected form submission."
-msgstr ""
-
-#. TRANS: Client error displayed when using an action in a non-AJAX way.
-#: timelist.php:82
-msgid "This action is AJAX only."
-msgstr ""
-
-#. TRANS: Client exception thrown when referring to a non-existing RSVP.
-#. TRANS: RSVP stands for "Please reply".
-#. TRANS: Client exception thrown when referring to a non-existing RSVP ("please respond") item.
-#: showrsvp.php:61 showrsvp.php:77 cancelrsvp.php:82 cancelrsvp.php:89
-msgid "No such RSVP."
-msgstr ""
-
 #. TRANS: Client exception thrown when referring to a non-existing event.
-#: showrsvp.php:68 newrsvp.php:82 newrsvp.php:89 cancelrsvp.php:96
-#: showevent.php:60 showevent.php:68
+#: showevent.php:60 showevent.php:68 cancelrsvp.php:96 newrsvp.php:82
+#: newrsvp.php:89 showrsvp.php:68
 msgid "No such event."
-msgstr ""
-
-#. TRANS: Title for event.
-#. TRANS: %1$s is a user nickname, %2$s is an event title.
-#: showrsvp.php:94
-#, php-format
-msgid "%1$s's RSVP for \"%2$s\""
-msgstr ""
-
-#. TRANS: Possible status for RSVP ("please respond") item.
-#: cancelrsvpform.php:101
-msgid "You will attend this event."
-msgstr ""
-
-#. TRANS: Possible status for RSVP ("please respond") item.
-#: cancelrsvpform.php:105
-msgid "You will not attend this event."
-msgstr ""
-
-#. TRANS: Possible status for RSVP ("please respond") item.
-#: cancelrsvpform.php:109
-msgid "You might attend this event."
-msgstr ""
-
-#. TRANS: Button text to cancel responding to an RSVP ("please respond") item.
-#: cancelrsvpform.php:124
-msgctxt "BUTTON"
-msgid "Cancel"
-msgstr ""
-
-#. TRANS: Title for RSVP ("please respond") action.
-#: newrsvp.php:61
-msgctxt "TITLE"
-msgid "New RSVP"
-msgstr ""
-
-#. TRANS: Client exception thrown when trying to RSVP ("please respond") while not logged in.
-#. TRANS: Client exception thrown when trying tp RSVP ("please respond") while not logged in.
-#: newrsvp.php:96 cancelrsvp.php:103
-msgid "You must be logged in to RSVP for an event."
-msgstr ""
-
-#. TRANS: Client exception thrown when using an invalid value for RSVP ("please respond").
-#: newrsvp.php:113
-msgid "Unknown submit value."
-msgstr ""
-
-#. TRANS: Page title after creating an event.
-#. TRANS: Page title after sending a notice.
-#: newrsvp.php:163 cancelrsvp.php:158 newevent.php:252
-msgid "Event saved"
 msgstr ""
 
 #. TRANS: Title for RSVP ("please respond") action.
@@ -150,32 +134,17 @@ msgctxt "TITLE"
 msgid "Cancel RSVP"
 msgstr ""
 
-#. TRANS: Content for a deleted RSVP list item (RSVP stands for "please respond").
-#: rsvplistitem.php:66 eventlistitem.php:67
-msgid "Deleted."
+#. TRANS: Client exception thrown when referring to a non-existing RSVP ("please respond") item.
+#. TRANS: Client exception thrown when referring to a non-existing RSVP.
+#. TRANS: RSVP stands for "Please reply".
+#: cancelrsvp.php:82 cancelrsvp.php:89 showrsvp.php:61 showrsvp.php:77
+msgid "No such RSVP."
 msgstr ""
 
-#. TRANS: Field label on form to RSVP ("please respond") for an event.
-#: rsvpform.php:97
-msgid "RSVP:"
-msgstr ""
-
-#. TRANS: Button text for RSVP ("please respond") reply to confirm attendence.
-#: rsvpform.php:113
-msgctxt "BUTTON"
-msgid "Yes"
-msgstr ""
-
-#. TRANS: Button text for RSVP ("please respond") reply to deny attendence.
-#: rsvpform.php:115
-msgctxt "BUTTON"
-msgid "No"
-msgstr ""
-
-#. TRANS: Button text for RSVP ("please respond") reply to indicate one might attend.
-#: rsvpform.php:117
-msgctxt "BUTTON"
-msgid "Maybe"
+#. TRANS: Client exception thrown when trying tp RSVP ("please respond") while not logged in.
+#. TRANS: Client exception thrown when trying to RSVP ("please respond") while not logged in.
+#: cancelrsvp.php:103 newrsvp.php:96
+msgid "You must be logged in to RSVP for an event."
 msgstr ""
 
 #. TRANS: Field label on event form.
@@ -273,45 +242,81 @@ msgctxt "BUTTON"
 msgid "Save"
 msgstr ""
 
-#. TRANS: Plugin description.
-#: EventPlugin.php:139
-msgid "Event invitations and RSVPs."
+#. TRANS: Client exception thrown when trying to create an event that already exists.
+#: Happening.php:125
+msgid "Event already exists."
 msgstr ""
 
-#. TRANS: Title for event application.
-#: EventPlugin.php:145
+#. TRANS: Event description. %1$s is a title, %2$s is start time, %3$s is end time,
+#. TRANS: %4$s is location, %5$s is a description.
+#: Happening.php:159
+#, php-format
+msgid "\"%1$s\" %2$s - %3$s (%4$s): %5$s"
+msgstr ""
+
+#. TRANS: Rendered event description. %1$s is a title, %2$s is start time, %3$s is start time,
+#. TRANS: %4$s is end time, %5$s is end time, %6$s is location, %7$s is description.
+#. TRANS: Class names should not be translated.
+#: Happening.php:169
+#, php-format
+msgid ""
+"<span class=\"vevent\"><span class=\"summary\">%1$s</span> <abbr class="
+"\"dtstart\" title=\"%2$s\">%3$s</a> - <abbr class=\"dtend\" title=\"%4$s\">"
+"%5$s</a> (<span class=\"location\">%6$s</span>): <span class=\"description\">"
+"%7$s</span> </span>"
+msgstr ""
+
+#. TRANS: Content for a deleted RSVP list item (RSVP stands for "please respond").
+#: rsvplistitem.php:66 eventlistitem.php:67
+msgid "Deleted."
+msgstr ""
+
+#. TRANS: Error message displayed when trying to perform an action that requires a logged in user.
+#: timelist.php:65
+msgid "Not logged in."
+msgstr ""
+
+#. TRANS: Client error when submitting a form with unexpected information.
+#: timelist.php:73
+msgid "Unexpected form submission."
+msgstr ""
+
+#. TRANS: Client error displayed when using an action in a non-AJAX way.
+#: timelist.php:82
+msgid "This action is AJAX only."
+msgstr ""
+
+#. TRANS: Title for RSVP ("please respond") action.
+#: newrsvp.php:61
 msgctxt "TITLE"
-msgid "Event"
+msgid "New RSVP"
 msgstr ""
 
-#. TRANS: Exception thrown when there are too many activity objects.
-#: EventPlugin.php:173
-msgid "Too many activity objects."
+#. TRANS: Client exception thrown when using an invalid value for RSVP ("please respond").
+#: newrsvp.php:113
+msgid "Unknown submit value."
 msgstr ""
 
-#. TRANS: Exception thrown when event plugin comes across a non-event type object.
-#: EventPlugin.php:180
-msgid "Wrong type for object."
+#. TRANS: Title for event.
+#. TRANS: %1$s is a user nickname, %2$s is an event title.
+#: showrsvp.php:94
+#, php-format
+msgid "%1$s's RSVP for \"%2$s\""
 msgstr ""
 
-#. TRANS: Exception thrown when trying to RSVP for an unknown event.
-#: EventPlugin.php:204
-msgid "RSVP for unknown event."
+#. TRANS: Field label for event description.
+#: eventlistitem.php:117
+msgid "Time:"
 msgstr ""
 
-#. TRANS: Exception thrown when event plugin comes across a undefined verb.
-#: EventPlugin.php:210
-msgid "Unknown verb for events."
+#. TRANS: Field label for event description.
+#: eventlistitem.php:138
+msgid "Location:"
 msgstr ""
 
-#. TRANS: Exception thrown when event plugin comes across a unknown object type.
-#: EventPlugin.php:241
-msgid "Unknown object type."
-msgstr ""
-
-#. TRANS: Exception thrown when referring to a notice that is not an event an in event context.
-#: EventPlugin.php:248
-msgid "Unknown event notice."
+#. TRANS: Field label for event description.
+#: eventlistitem.php:146
+msgid "Description:"
 msgstr ""
 
 #. TRANS: Client exception thrown when trying to save an already existing RSVP ("please respond").
@@ -416,70 +421,66 @@ msgstr ""
 msgid "%1$s might attend %2$s."
 msgstr ""
 
-#. TRANS: Title for new event form.
-#: newevent.php:66
+#. TRANS: Field label on form to RSVP ("please respond") for an event.
+#: rsvpform.php:97
+msgid "RSVP:"
+msgstr ""
+
+#. TRANS: Button text for RSVP ("please respond") reply to confirm attendence.
+#: rsvpform.php:113
+msgctxt "BUTTON"
+msgid "Yes"
+msgstr ""
+
+#. TRANS: Button text for RSVP ("please respond") reply to deny attendence.
+#: rsvpform.php:115
+msgctxt "BUTTON"
+msgid "No"
+msgstr ""
+
+#. TRANS: Button text for RSVP ("please respond") reply to indicate one might attend.
+#: rsvpform.php:117
+msgctxt "BUTTON"
+msgid "Maybe"
+msgstr ""
+
+#. TRANS: Plugin description.
+#: EventPlugin.php:139
+msgid "Event invitations and RSVPs."
+msgstr ""
+
+#. TRANS: Title for event application.
+#: EventPlugin.php:145
 msgctxt "TITLE"
-msgid "New event"
+msgid "Event"
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event while not logged in.
-#: newevent.php:84
-msgid "Must be logged in to post a event."
+#. TRANS: Exception thrown when there are too many activity objects.
+#: EventPlugin.php:173
+msgid "Too many activity objects."
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event without providing a title.
-#: newevent.php:98
-msgid "Title required."
+#. TRANS: Exception thrown when event plugin comes across a non-event type object.
+#: EventPlugin.php:180
+msgid "Wrong type for object."
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event without providing a start date.
-#: newevent.php:110
-msgid "Start date required."
+#. TRANS: Exception thrown when trying to RSVP for an unknown event.
+#: EventPlugin.php:204
+msgid "RSVP for unknown event."
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event without providing an end date.
-#: newevent.php:123
-msgid "End date required."
+#. TRANS: Exception thrown when event plugin comes across a undefined verb.
+#: EventPlugin.php:210
+msgid "Unknown verb for events."
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event with a date that cannot be processed.
-#. TRANS: %s is the data that could not be processed.
-#: newevent.php:141 newevent.php:148
-#, php-format
-msgid "Could not parse date \"%s\"."
+#. TRANS: Exception thrown when event plugin comes across a unknown object type.
+#: EventPlugin.php:241
+msgid "Unknown object type."
 msgstr ""
 
-#. TRANS: Client exception thrown when trying to post an event without providing a title.
-#: newevent.php:196
-msgid "Event must have a title."
-msgstr ""
-
-#. TRANS: Client exception thrown when trying to post an event without providing a start time.
-#: newevent.php:201
-msgid "Event must have a start time."
-msgstr ""
-
-#. TRANS: Client exception thrown when trying to post an event without providing an end time.
-#: newevent.php:206
-msgid "Event must have an end time."
-msgstr ""
-
-#. TRANS: Client exception thrown when trying to post an event with an invalid URL.
-#: newevent.php:211
-msgid "URL must be valid."
-msgstr ""
-
-#. TRANS: Field label for event description.
-#: eventlistitem.php:117
-msgid "Time:"
-msgstr ""
-
-#. TRANS: Field label for event description.
-#: eventlistitem.php:138
-msgid "Location:"
-msgstr ""
-
-#. TRANS: Field label for event description.
-#: eventlistitem.php:146
-msgid "Description:"
+#. TRANS: Exception thrown when referring to a notice that is not an event an in event context.
+#: EventPlugin.php:248
+msgid "Unknown event notice."
 msgstr ""
