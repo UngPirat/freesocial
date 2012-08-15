@@ -144,10 +144,6 @@ class SyncFacebookProfileDaemon extends ParallelizingDaemon
         $profile->location = isset($fbuser['location']['name']) ? $fbuser['location']['name'] : $profile->location;
         $profile->homepage = isset($fbuser['website']) ? $fbuser['website'] : $profile->homepage;
         $profile->update($original);
-
-        if (isset($fbuser['picture'])) {
-            FacebookImport::checkAvatar($profile->id, $flink->foreign_id, $fbuser['picture']);
-        }
     }
 }
 

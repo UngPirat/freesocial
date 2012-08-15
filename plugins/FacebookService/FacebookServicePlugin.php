@@ -57,16 +57,77 @@ class FacebookServicePlugin extends Plugin
     function onPluginVersion(&$versions)
     {
         $versions[] = array(
-            'name' => 'Facebook Bridge',
+            'name' => 'Facebook foreign service',
             'version' => STATUSNET_VERSION,
-            'author' => 'Craig Andrews, Zach Copley, Mikael Nordfeldth',
-            'homepage' => 'http://status.net/wiki/Plugin:FacebookBridge',
+            'author' => 'Mikael Nordfeldth',
+            'homepage' => 'http://status.net/wiki/Plugin:FacebookService',
             'rawdescription' =>
              // TRANS: Plugin description.
             _m('A plugin for integrating StatusNet with Facebook.')
         );
 
         return true;
+    }
+
+	function onStartSubscribe($subscriber, $other) {
+        if (!preg_match('/^https?:\/\/(www\.)?facebook\.com\//', $other->profileurl)) {
+            return true;	// not a Twitter subscription, continue ordinary subscribe process
+        }
+
+		$flink = Foreign_link::getByUserID($subscriber->id, $this->service_id);
+		if ( empty($flink) ) {
+			return false;	// no link, impossible to subscribe
+		}
+
+        // following through statusnet is not possible yet
+        return false;
+
+        return true;
+	}
+
+	function onStartUnsubscribe($subscriber, $other) {
+        if (!preg_match('/^https?:\/\/(www\.)?facebook\.com\//', $other->profileurl)) {
+            return true;	// not a Twitter subscription, continue ordinary subscribe process
+        }
+
+		$flink = Foreign_link::getByUserID($subscriber->id, $this->service_id);
+		if ( empty($flink) ) {
+			return true;	// no link, but let unsubscribe do its magic
+		}
+
+        //unfollowing through statusnet is not possible yet
+
+        return true;
+	}
+
+    function onStartShowSections($action) {
+        if (!isset($action->args['action'])) {
+            return true;
+        }
+        switch ($action->args['action']) {
+        case 'showgroup':
+            $this->groupSyncBlock($action);
+            break;
+        }
+        return true;
+    }
+
+    function groupSyncBlock($action) {
+        $local = Local_group::staticGet('nickname', $action->args['nickname']);
+        if (empty($local)) {
+            return false;
+        }
+        $action->elementStart('div', array('id' => 'foreign_sync', 'class' => 'section'));
+        $action->element('h2', null, _('Foreign sync'));
+        try {
+            $foreign_id = Foreign_group::getForeignID($local->group_id, FACEBOOK_SERVICE);
+            $action->element('p', null, _('This group is synced with a foreign service'));
+            
+        } catch (Exception $e) {
+            // offer to sync with foreign group
+            $action->element('p', null, _('This group is not synced with a foreign service'));
+        }
+        $action->elementEnd('div');
     }
 }
 
@@ -142,7 +203,6 @@ class FacebookService extends ForeignServiceClient {
 
     function getAccessToken()
     {
-common_debug('FBDBG '.$this->client->getAppId());
         return $this->client->getAccessToken();
     }
 

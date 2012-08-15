@@ -207,7 +207,7 @@ class FacebooksettingsAction extends SettingsAction {
         $this->elementStart('li');
         $this->checkbox('friendsync',
                         // TRANS: Checkbox label.
-                _m('Subscribe to my Facebook friends here.'),
+                _m('Follow my Facebook friends here.'),
                 ($this->flink) ?
                     ($this->flink->friendsync & FOREIGN_FRIEND_RECV) :
                     false);

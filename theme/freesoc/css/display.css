@@ -472,7 +472,13 @@ h6 {font-size: 1em;}
 }
 
 #content .notice .entry-title {
-	margin: auto;
+    float: left;
+    margin: auto;
+    width: 80%;
+}
+#content .notice .thumbnails {
+    float: right;
+    width: 20%;
 }
 #content .notice .author .photo {
 	position: static;
@@ -483,7 +489,9 @@ h6 {font-size: 1em;}
     font-size: 0.88em;
     line-height: 1.2em;
     margin-top: 6px;
+    margin-left: 0;
     opacity: 0.6;
+	clear: none;
 }
 .notice p.entry-content {
 	white-space: pre-wrap;
@@ -536,6 +544,8 @@ div.entry-content a.response:after {
 
 .notice-options {
     margin-top: 4px;
+    margin-left: 1em;
+    float: left;
 }
 
 .notice-options .form_repeat.dialogbox {

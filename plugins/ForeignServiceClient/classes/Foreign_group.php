@@ -49,21 +49,24 @@ if (!defined('STATUSNET')) {
 class Foreign_group extends Managed_DataObject
 {
     public $__table = 'foreign_group'; // table name
-    public $group_id;                      // int(4)  not_null
     public $foreign_id;                     // varchar  primary_key not_null
+    public $group_id;                      // int(4)  not_null
     public $service_id;                     // int(4)  not_null
+    public $last_noticesync;                 // datetime()
     public $created;                        // datetime
 
     static function schemaDef()
     {  
         return array(
             'fields' => array(
-                'foreign_id' => array('type' => 'integer',
-                                      'not null' => true),
+                'foreign_id' => array('type' => 'int', 'size' => 'big',
+                                      'unsigned' => true, 'not null' => true,
+                                      'description' => 'foreign group id'),
                 'group_id'  => array('type' => 'integer',
                                       'not null' => true),
                 'service_id' => array('type' => 'integer',
                                       'not null' => true),
+                'last_noticesync' => array('type' => 'datetime', 'description' => 'last time notices were imported'),
                 'created'    => array('type' => 'datetime',
                                       'not null' => true),
             ),
@@ -78,20 +81,25 @@ class Foreign_group extends Managed_DataObject
         );
     }
 
-    function staticGet($k,$v=null) {
+    function staticGet($k,$v=null)
+    {
         return parent::staticGet(__CLASS__,$k,$v);	// does __CLASS__ work here?
     }
+    static function pivotGet($key, $values, $otherCols=array())
+    {
+        return Memcached_DataObject::pivotGet(__CLASS__, $key, $values, $otherCols);
+    }
 
-    static function is_foreign_group($group_id, $service_id) {
+    static function isForeignGroup($group_id, $service_id) {
         try {
-            Foreign_group::get_foreign_id($group_id, $service_id);
+            Foreign_group::getForeignID($group_id, $service_id);
         } catch (Exception $e) {
             return false;
         }
         return true;
     }
 
-    static function get_group_id($foreign_id, $service_id) {
+    static function getGroupID($foreign_id, $service_id) {
         $foreign = new Foreign_group();
         $foreign->foreign_id = $foreign_id;
         $foreign->service_id = $service_id;
@@ -101,8 +109,13 @@ class Foreign_group extends Managed_DataObject
         $foreign->fetch();
         return $foreign->group_id;
     }
+    static function getGroup($foreign_id, $service_id) {
+        $group_id = Foreign_group::getGroupID($foreign_id, $service_id);    // throws exception on failure
+        $result = User_group::staticGet('id', $group_id);
+        return $result;
+    }
 
-    static function get_foreign_id($group_id, $service_id) {
+    static function getForeignID($group_id, $service_id) {
         $foreign = new Foreign_group();
         $foreign->group_id = $group_id;
         $foreign->service_id = $service_id;
@@ -112,12 +125,7 @@ class Foreign_group extends Managed_DataObject
         $foreign->fetch();
         return $foreign->foreign_id;
     }
-    static function get_foreign_group($foreign_id, $service_id) {
-        $group_id = Foreign_group::get_group_id($foreign_id, $service_id);    // throws exception on failure
-        $result = User_group::staticGet('id', $group_id);
-        return $result;
-    }
-    static function delete_group_mapping($group_id, $service_id) {
+    static function deleteMapping($group_id, $service_id) {
         $foreign = new Foreign_group();
         $foreign->group_id = $group_id;
         $foreign->service_id = $service_id;
@@ -144,11 +152,11 @@ class Foreign_group extends Managed_DataObject
             throw new Exception('Unknown service_id');
         }
 
-        if (!Local_group::staticGet('group_id', $group_id)) {
+        if (!Local_group::staticGet('group_id', $group_id)) {	// only accept syncing with local groups
             throw new Exception('Local group does not exist');
         }
 
-        if (Foreign_group::is_foreign_group($group_id, $service_id)) {
+        if (Foreign_group::isForeignGroup($group_id, $service_id)) {
             throw new Exception('Foreign group already mapped');
         }
 

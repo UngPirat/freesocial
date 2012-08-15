@@ -201,6 +201,11 @@ class FacebookBridgePlugin extends Plugin
             array_push(
                 $daemons,
                 INSTALLDIR
+                . '/plugins/FacebookBridge/daemons/facebookgroupfetcher.php'
+                );
+            array_push(
+                $daemons,
+                INSTALLDIR
                 . '/plugins/FacebookBridge/daemons/facebookstatusfetcher.php'
                 );
         }
@@ -209,11 +214,11 @@ class FacebookBridgePlugin extends Plugin
             INSTALLDIR
             . '/plugins/FacebookBridge/daemons/syncfacebookfriends.php'
             );
-        array_push(
+/*        array_push(
             $daemons,
             INSTALLDIR
             . '/plugins/FacebookBridge/daemons/syncfacebookprofile.php'
-            );
+            );*/
 
         return true;
     }
@@ -416,7 +421,7 @@ ENDOFSCRIPT;
             $cur = common_current_user();
             $flink = Foreign_link::getByUserID($cur->id, FACEBOOK_SERVICE);
 
-            if (!empty($flink)) {
+            if (!empty($flink) && !empty($flink->credentials)) {
 
                 $this->facebook->setAccessToken($flink->credentials);
 
@@ -435,12 +440,11 @@ ENDOFSCRIPT;
                     array('next' => $destination)
                 );
 
-                common_log(LOG_INFO, "Logging user out of Facebook ({$cur->id})");
+                common_log(LOG_INFO, "Logging user out of Facebook ({$cur->id}) with $logoutUrl");
 
                 $action->logout();
 
-                common_redirect($logoutUrl, 303);
-                return false; // probably never get here, but hey
+                common_redirect($logoutUrl, 303);	// calls exit
             }
 
             return true;
@@ -587,7 +591,11 @@ ENDOFSCRIPT;
         $flink = Foreign_link::getByUserID($profile->id, FACEBOOK_SERVICE);
 
         if (!empty($flink)) {
-            $fuser = $this->fsrv->getForeignUser($flink->foreign_id);
+            try {
+                $fuser = $this->fsrv->getForeignUser($flink->foreign_id);
+            } catch (Exception $e) {
+                return true;
+            }
 
             if (!empty($fuser)) {
                 $links[] = array("href" => $fuser->uri,

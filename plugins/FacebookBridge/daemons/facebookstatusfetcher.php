@@ -85,7 +85,7 @@ class FacebookStatusFetcher extends ParallelizingDaemon
      */
     function name()
     {
-        return ('facebookfetcher.'.$this->_id);
+        return ('facebookstatusfetcher.'.$this->_id);
     }
 
     /**
@@ -130,7 +130,6 @@ class FacebookStatusFetcher extends ParallelizingDaemon
         $conn = &$flink->getDatabaseConnection();
 
         if (time()-strtotime($flink->last_noticesync) > 120) {
-            common_debug('FBDBG '.$flink->foreign_id.' getting home https://graph.facebook.com/me/home?access_token='.$flink->credentials);
 	        $this->getHome($flink);
             $original = clone($flink);
         	$flink->last_noticesync = common_sql_now();
@@ -150,6 +149,7 @@ class FacebookStatusFetcher extends ParallelizingDaemon
     {
 		$importer = new FacebookImport($flink);
         // home has the user's news feed (i.e. including other users)
+            common_debug('FBDBG '.$flink->foreign_id.' getting home https://graph.facebook.com/me/home?access_token='.$flink->credentials);
         $importer->importUpdates('home');	// Fetching /home too often might be disliked by Facebook
 		return true;
 	}

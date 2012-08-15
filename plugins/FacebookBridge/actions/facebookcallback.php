@@ -67,22 +67,20 @@ class FacebookcallbackAction extends Action
                throw new Exception('Bad Facebook callback POST');
             }
 */
-file_put_contents('/tmp/realtime.txt', date('r').': '.$data);
-file_put_contents('/tmp/realtime-headers.txt', print_r($data,true));
             $data = json_decode($data);
             if ($data->object == 'user') {
                 foreach((array)$data->entry as $entry) {
                     $flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
                     if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
                         $importer = new FacebookImport($flink);
-                        common_debug("FACEBOOK User '{$entry->uid}' has a realtime update, handling it");
+                        common_debug("FBDBG User '{$entry->uid}' has a realtime update, handling it");
 
                         foreach ( $entry->changed_fields as $field ) {
                             $args = array('until'=>$entry->time+1);
                             try {
                                 $importer->importUpdates($field, $args);
                             } catch (Exception $e) {
-                                common_debug('FACEBOOK realtime importUpdates for '.$flink->foreign_id.' returned error: '.$e->getMessage());
+                                common_debug('FBDBG realtime importUpdates for '.$flink->foreign_id.' returned error: '.$e->getMessage());
                             }
                         }
                     }

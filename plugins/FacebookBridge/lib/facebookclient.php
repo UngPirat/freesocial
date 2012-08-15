@@ -206,47 +206,15 @@ class Facebookclient
 
 
     /*
-     * Determine whether we should send this notice using the Graph API or the
-     * old REST API and then dispatch
+     * Send a notice to Facebook using the Graph API
      */
     function sendNotice()
     {
-        if ($this->isFacebookBound()) {
-            common_debug("notice {$this->notice->id} is facebook bound", __FILE__);
-            if (empty($this->flink->credentials)) {
-                throw new Exception('REST interface no longer supported');
-				//return $this->sendOldRest();
-            } else {
-
-                // Otherwise we most likely have an access token
-                return $this->sendGraph();
-            }
+        if (!$this->isFacebookBound() || empty($this->flink->credentials)) {
+            return true;	// dequeue
         }
 
-        // dequeue
-        return true;
-    }
-
-    /*
-     * Send a notice to Facebook using the Graph API
-     */
-    function sendGraph()
-    {
         try {
-
-            $fbuid = $this->flink->foreign_id;
-
-            common_debug(
-                sprintf(
-                    "Attempting use Graph API to post notice %d as a stream item for %s (%d), fbuid %d",
-                    $this->notice->id,
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
-
             $params = array(
                 'access_token' => $this->flink->credentials,
                 // XXX: Need to worrry about length of the message?
@@ -257,47 +225,41 @@ class Facebookclient
 				common_debug("attempting to comment with {$this->notice->id} on FACEBOOK post: $fb_id which is parent of ".$this->getForeignId($this->notice->reply_to));
 				$result = $this->facebook->api(sprintf('/%s/comments', $fb_id), 'post', $params);
 				// attachments not supported for comments in Facebook.;
-			} else {
+                Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
+                return true;
+			}
 
-	            $attachments = $this->notice->attachments();
-	
-    	        if (!empty($attachments)) {
-
-        	        // We can only send one attachment with the Graph API :(
-	
-    	            $first = array_shift($attachments);
-	
-    	            if (substr($first->mimetype, 0, 6) == 'image/'
-        	            || in_array(
-            	            $first->mimetype,
-                	        array('application/x-shockwave-flash', 'audio/mpeg' ))) {
-
+            $attachments = $this->notice->attachments();
+    	    if (!empty($attachments)) {
+        	    // We can only send one attachment with the Graph API :(
+    	        $first = array_shift($attachments);
+                if (substr($first->mimetype, 0, 6) == 'image/'
+        	                || in_array($first->mimetype, array('application/x-shockwave-flash', 'audio/mpeg' ))) {
 	                   $params['picture'] = $first->url;
     	               $params['caption'] = 'Click for full size';
         	           $params['source']  = $first->url;
-                	}
+                }
+            }
 
-            	}
+            $foreign_id = null;
+            $gis = Memcached_DataObject::listGet('Group_inbox', 'notice_id', array($this->notice->id));
+            foreach ($gis[$this->notice->id] as $gi) {
+                try {
+                    $foreign_id = Foreign_group::getForeignID($gi->group_id, FACEBOOK_SERVICE);
+                    break;
+                } catch (Exception $e) {
+                    continue;
+                }
+            }
+            unset($gis);
 
-	            $result = $this->facebook->api(
-   		            sprintf('/%s/feed', $fbuid), 'post', $params
-       		    );
-			}
+            if (empty($foreign_id)) {
+                $foreign_id = 'me';	// references the user whose access_token is passed
+            }
+            $result = $this->facebook->api(sprintf('/%s/feed', $foreign_id), 'post', $params);
 
             // Save a mapping
             Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
-
-            common_log(
-                LOG_INFO,
-                sprintf(
-                    "Posted notice %d as a stream item for %s (%d), fbuid %d",
-                    $this->notice->id,
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
 
         } catch (FacebookApiException $e) {
             return $this->handleFacebookError($e);
@@ -307,13 +269,8 @@ class Facebookclient
     }
 
 // this must be run to get a subscription. not necessary per user!
-//		Facebookclient::subscribeToRealtime($this->fbuid);
-	static function subscribeToRealtime($userid) {
-		if ( !$flink=Foreign_link::getByForeignID($userid, FACEBOOK_SERVICE) ) {
-			common_debug('FACEBOOK failed subscription due to lack of link: '.print_r($userid,true));
-			throw new Exception(_m('No such user'));
-		}
-
+//		Facebookclient::subscribeToRealtime();
+	static function subscribeToRealtime() {
         $appsecret = common_config('facebook', 'appsecret');
         if (empty($appsecret)) {
 			throw new Exception('You have to set the Facebook appsecret in config');
@@ -327,7 +284,7 @@ class Facebookclient
 			'fields' => 'feed,likes',
 			'verify_token' => common_config('facebook', 'callback_token'),
 			);
-		$result = $facebook->api(sprintf('/%s/subscriptions'), 'post', $params);
+		$result = $facebook->api(sprintf('/%s/subscriptions', $facebook->getAppId()), 'post', $params);
 		common_debug('FACEBOOK subscription result: '.print_r($result,true));
 		return $result;
 	}

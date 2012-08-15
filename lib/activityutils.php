@@ -158,7 +158,6 @@ class ActivityUtils
     static function children(DOMNode $element, $tag, $namespace=self::ATOM)
     {
         $results = array();
-file_put_contents(tempnam('/tmp', 'as-element'), $element->nodeValue);
 
         $els = $element->childNodes;
 

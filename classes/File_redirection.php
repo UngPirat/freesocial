@@ -66,6 +66,7 @@ class File_redirection extends Managed_DataObject
         $request = new HTTPClient($url);
         $request->setConfig(array(
             'connect_timeout' => 10, // # seconds to wait
+            'timeout' => 10, // # max execution time, no request should take more than this
             'max_redirs' => $redirs, // # max number of http redirections to follow
             'follow_redirects' => true, // Follow redirects
             'store_body' => false, // We won't need body content here.
@@ -311,7 +312,7 @@ class File_redirection extends Managed_DataObject
         $p = parse_url($out_url);
         if (empty($p['host']) || empty($p['scheme'])) {
             list($scheme) = explode(':', $in_url, 2);
-            switch ($scheme) {
+            switch (strtolower($scheme)) {
             case 'fax':
             case 'tel':
                 $out_url = str_replace('.-()', '', $out_url);

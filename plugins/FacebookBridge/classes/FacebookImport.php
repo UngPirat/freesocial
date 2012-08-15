@@ -38,6 +38,9 @@ define('FACEBOOK__TO_NETWORKS_FRIENDS', 'NETWORKS_FRIENDS');
 define('FACEBOOK__TO_ALL_FRIENDS', 'ALL_FRIENDS');
 define('FACEBOOK__TO_CUSTOM', 'CUSTOM');    //sets 'friends' => 'SOME_FRIENDS' for example
 
+define('FACEBOOK__GROUP_OPEN', 'OPEN');
+define('FACEBOOK__GROUP_SECRET', 'SECRET');
+
 /**
  * Encapsulation of the Facebook update -> notice incoming bridge import.
  * Is used by both the polling facebookstatusfetcher.php daemon, and the
@@ -54,18 +57,24 @@ define('FACEBOOK__TO_CUSTOM', 'CUSTOM');    //sets 'friends' => 'SOME_FRIENDS' f
  */
 class FacebookImport
 {
-    protected $imports = 0;
+    protected $updates = 0;
+    protected $groups = array();
     protected $facebook = null;
     protected $flink = null;
 
-    function __construct($flink) {
-        $this->imports = 0;
-        $this->flink = $flink;
+    function __construct(Foreign_link $flink=null) {
+        $this->updates = 0;
+        $this->groups = array();
         $this->facebook = Facebookclient::getFacebook();
+        $this->flink = $flink;
     }
 
-    public function getImports() {
-        return $this->imports;
+    public function getGroups() {
+        return $this->groups;
+    }
+
+    public function getUpdates() {
+        return $this->updates;
     }
 
     function name()
@@ -73,31 +82,33 @@ class FacebookImport
         return get_class($this);
     }
 
-    function importUpdates($field, $args=array()) {
-        $loops = 0;
-        $this->flink->last_noticesync = common_sql_now();
+    function getAccessToken() {
+        return !empty($this->flink->credentials)
+                ? $this->flink->credentials
+                : $this->facebook->getAccessToken();
+    }
 
-        // I think it's ok to go backwards since oldest threads end up first anyway if newly commented
+    function apiLoop($path, $callback, $args=array(), $max_loops=0) {
+        $loops = 0;
         do {
-            if (!isset($args['access_token'])) {
-                $args['access_token'] = $this->flink->credentials;
+            if (!isset($args['access_token']) || empty($args['access_token'])) {
+                $args['access_token'] = $this->getAccessToken();
             }
             try {
-                $result = $this->facebook->api('/me/'.urlencode($field), 'get', $args);
+                $result = $this->facebook->api($path, 'get', $args);
             } catch (Exception $e) {
-                common_debug('FACEBOOK returned error for https://graph.facebook.com/me/'.$field.'?'.http_build_query($args).' - '.$e->getMessage());
                 return 0;
             }
 
             if (empty($result['data'])) {
-                common_debug('FACEBOOK Data empty in loop '.$loops.' for foreign_id '.$this->flink->foreign_id);
+                common_debug('FBDBG Data empty in loop '.$loops.' for path '.$path);
                 break;
             }
-
+        
             $n = 0;    // number of new, imported posts
-            foreach (array_reverse($result['data']) as $update) {
+            foreach (array_reverse($result['data']) as $entry) {
                 try {
-                    $n += $this->importThread($update);
+                    $n += call_user_func($callback, $entry);
                 } catch (Exception $e) {
                 }
             }
@@ -107,16 +118,34 @@ class FacebookImport
                 parse_str($next, $args);    // overwrite with data that makes us go back in time
             }
             $loops++;
-        } while ($n > 0 && $loops < 7);
+        } while ($n > 0 && ($max_loops == 0 || $loops <= $max_loops));
+    }
+
+    public function importUpdates($field, $args=array()) {
+        if ($this->flink === null) {
+            throw new Exception('No foreign link');
+        }
+
+        // Iterate the loop backwards until >= 7 pages
+        $this->apiLoop('/me/'.urlencode($field), array($this, 'importThread'), $args, 7);
 
         // Okay, record the time we synced with Facebook for posterity
-        $this->flink->update();
-        return $this->getImports();    // number of imported posts
+        $original = clone($this->flink);
+        $this->flink->last_noticesync = common_sql_now();
+        $this->flink->update($original);
+        return $this->getUpdates();    // number of imported posts
+    }
+
+    public function importGroup($group)
+    {
+        common_debug('FBDBG: getting foreign group '.$group->foreign_id.' because it is local group '.$group->group_id);
+        // get this group's feed
+        $this->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'));
     }
 
     protected function importThread($update)
     {
-        $oldImports = $this->getImports();
+        $oldUpdateN = $this->getUpdates();
 
         $scope = (isset($update['privacy']['value'])
                     ? FacebookImport::getPrivacyScope($update['privacy']['value'])
@@ -132,14 +161,21 @@ class FacebookImport
                 // Hacktastic: filter out stuff coming from this StatusNet
                 $source = mb_strtolower(common_config('integration', 'source'));
                 if ( !isset($update['application']) || !preg_match("/$source/", mb_strtolower($update['application']['name'])) ) {
-                    $notice = $this->saveUpdate($update, $scope);
+                    try {
+                        $notice = $this->saveUpdate($update, $scope);
+                    } catch (Exception $e) {
+                        return $this->getUpdates();
+                    }
                 }
                 if ($update['comments']['count']>0) {	// TODO: Check if notice has data?
                     if (isset($update['comments']['data'])) {
                         common_debug('FACEBOOK importing '.$update['comments']['count'].' comments for '.$update['id']);
                         foreach ($update['comments']['data'] as $comment) :
-                            common_debug($this->name()." - Importing comment {$comment['id']} from {$comment['from']['id']}");
-                            $notice = $this->saveUpdate($comment, $scope);
+                            try {
+                                $notice = $this->saveUpdate($comment, $scope);
+                            } catch (Exception $e) {
+                                common_debug('FBDBG discarding comment '.$comment['id'].': '.$e->getMessage());
+                            }
                         endforeach;
 					} else {
 						common_debug('FACEBOOK comment thread empty for '.$update['id'].'. TODO: fetch from API!');
@@ -156,7 +192,7 @@ class FacebookImport
             common_debug('FACEBOOK unknown update type: '.$update['type'].' for '.$update['id']);
         }
 
-        return $this->getImports() - $oldImports;    // new posts this round
+        return $this->getUpdates() - $oldUpdateN;    // new posts this round
     }
 
     static function getPrivacyScope($privacy) {
@@ -179,7 +215,6 @@ class FacebookImport
     {
         try {
             $notice = Foreign_notice_map::get_foreign_notice($update['id'], FACEBOOK_SERVICE);
-            //common_debug($this->name()." - Ignoring duplicate import: {$update['id']}  notice id {$notice->id}");
             return $notice;
         } catch (Exception $e) {
             $notice = new Notice();
@@ -192,6 +227,7 @@ class FacebookImport
         if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
             $doNoticeImport = true;
             $profile = Profile::staticGet('id', $flink->user_id);
+            $flink->free();
             unset($flink);
         } else {
             $profile = $this->ensureProfile($update['from']['id']);
@@ -200,7 +236,9 @@ class FacebookImport
         if (empty($profile)) {
             common_log(LOG_ERR, $this->name() .
                 ' - Problem saving notice. No associated Profile.');
-            throw new Exception('FACEBOOK has no associated profile with '.$update['from']['id'].'/'.$update['from']['name']);
+            throw new Exception('Profile not available');
+        } elseif ($profile->isSilenced()) {
+            throw new Exception('Profile is silenced');
         }
 
         $notice->scope        = $scope;
@@ -216,6 +254,7 @@ class FacebookImport
             $replyToId = $this->getReplyToId($update['id']);
             $reply = Foreign_notice_map::get_foreign_notice($replyToId, FACEBOOK_SERVICE);
             $notice->reply_to     = $reply->id;
+            $notice->scope        = $reply->scope;
             $notice->conversation = $reply->conversation;
         } catch (Exception $e) {
             // either this is the original post or the reply-to post has not been imported/mapped
@@ -255,8 +294,8 @@ class FacebookImport
                     common_log_db_error($notice, 'INSERT', __FILE__);
                     common_log(LOG_ERR, $this->name() .
                         ' - Problem saving notice.');
-                } else {
-                    common_debug('FACEBOOK inserting comment '.$notice->id.' into inbox for '.$this->flink->user_id);
+                } elseif (isset($this->flink)) {	// we're importing a user's home timeline or similar
+                    common_debug('FBDBG putting '.$notice->id.' into inbox for '.$this->flink->user_id);
                     Inbox::insertNotice($this->flink->user_id, $notice->id);
                 }
     
@@ -276,7 +315,7 @@ class FacebookImport
 
         $notice->blowOnInsert();
 
-        $this->imports++;
+        $this->updates++;
         return $notice;
     }
 
@@ -309,13 +348,16 @@ class FacebookImport
 
     function saveUpdateMentions($notice, $update)
     {
-        $users = array();
+        $mentions = array();
 
         if (isset($update['message_tags'])) {
             foreach ($update['message_tags'] as $tag) {
 				switch ($tag['type']) {
                 case 'user':
-                    $users[$tag['id']] = $tag;
+                    $mentions[$tag['id']] = $tag;
+                    break;
+                case 'group':
+                    $mentions[$tag['id']] = $tag;
                     break;
                 default:
                     common_debug(__METHOD__.' has not implemented message_tags type '.$tag['type'].': '.print_r($tag,true));
@@ -325,34 +367,51 @@ class FacebookImport
 
         if (isset($update['to']['data'])) {
             foreach ($update['to']['data'] as $rcpt) {
-                if (!isset($users[$rcpt['id']])) {
-                    $users[$rcpt['id']] = $rcpt;
+                if (!isset($mentions[$rcpt['id']])) {
+                    $mentions[$rcpt['id']] = $rcpt;
                 }
             }
         }
-           if (empty($users)) {
+           if (empty($mentions)) {
             return null;
         }
 
-        $reply = new Reply();
-        foreach ($users as $foreign_id=>$user) {
+        $destinations = array();
+        foreach ($mentions as $foreign_id=>$group) {
+            common_debug('FBDBG: trying '.$foreign_id.' as Foreign_group');
             try {
-                $profile = Foreign_link::getByForeignID($foreign_id, FACEBOOK_SERVICE);
-                if (!empty($profile)) {
-                    $profile = $profile->user_id;
+                $destinations[] = Foreign_group::getGroupID($foreign_id, FACEBOOK_SERVICE);
+                unset($mentions[$foreign_id]);	// it's a group so don't process as user below
+
+            } catch (Exception $e) {
+                common_debug('FBDBG: '.$e->getMessage());
+                continue;
+            }
+        }
+        common_debug('FBDBG: adding '.$notice->id.' to groups '.implode(',', $destinations));
+        $notice->saveKnownGroups($destinations);
+
+        $destinations = array();
+        foreach ($mentions as $foreign_id=>$user) {
+            try {
+                // deliver locally linked users if they exist
+                $fetch = Foreign_link::getByForeignID($foreign_id, FACEBOOK_SERVICE);
+
+                if (!empty($fetch)) {
+                    $fetch = Profile::staticGet($fetch->user_id);	// flink found
                 } else {
-                    $profile = $this->ensureProfile($foreign_id);
-                    $profile = $profile->id;
+                    $fetch = $this->ensureProfile($foreign_id);
                 }
-                $reply->profile_id = $profile;
+                $destinations[] = $fetch->profileurl;	// profile found/created
+                $fetch->free();
             } catch (Exception $e) {
                 continue;
             }
-            $reply->notice_id  = $notice->id;
-            $reply->modified   = $notice->created;
-               common_log(LOG_INFO, "FACEBOOK saving reply: notice {$notice->id} to profile {$profile}");
-            $reply->insert();
         }
+        common_debug('FBDBG: replying '.$notice->id.' to profiles '.implode(' ', $destinations));
+        $notice->saveKnownReplies($destinations);
+
+        return true;
     }
 
     /**
@@ -403,7 +462,7 @@ class FacebookImport
             return $profile;
         }
 
-		// backup profileurl
+		// this updates the profile in case old facebook urls are stored
         $profile->profileurl = 'https://facebook.com/'.$fuser->id;
         if ($profile->find()) {
             $profile->fetch();
@@ -467,9 +526,8 @@ class FacebookImport
 
     static function getAvatarUrl($uid, $type='square') {
         // http://developers.facebook.com/docs/reference/api/#pictures
-        $url = 'https://graph.facebook.com/'.urlencode($uid).'/picture?type='.urlencode($type).'&return_ssl_resources=1';
+        $url = 'http://graph.facebook.com/'.urlencode($uid).'/picture?type='.urlencode($type).'&return_ssl_resources=1';
         $headers = get_headers($url, 1);
-        common_debug('FACEBOOK avatar location for '.$uid.': '.$headers['Location']);
         return (isset($headers['Location']) ? $headers['Location'] : $url);
     }
 
