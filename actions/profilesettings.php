@@ -101,16 +101,16 @@ class ProfilesettingsAction extends SettingsAction
         if (Event::handle('StartProfileFormData', array($this))) {
             $this->elementStart('li');
             // TRANS: Field label in form for profile settings.
-			if (common_config('profile', 'changenick') == true) {
-	            $this->input('nickname', _('Nickname'),
+            if (common_config('profile', 'changenick') == true) {
+                $this->input('nickname', _('Nickname'),
                          ($this->arg('nickname')) ? $this->arg('nickname') : $profile->nickname,
                          // TRANS: Tooltip for field label in form for profile settings.
                          _('1-64 lowercase letters or numbers, no punctuation or spaces.'));
-			} else {
-				$this->elementStart('div');
-				$this->text(sprintf(_m('Editing profile %s'), ($this->arg('nickname') ? $this->arg('nickname') : $profile->nickname)));
-				$this->elementEnd('div');
-			}
+            } else {
+                $this->elementStart('div');
+                $this->text(sprintf(_m('Editing profile %s'), ($this->arg('nickname') ? $this->arg('nickname') : $profile->nickname)));
+                $this->elementEnd('div');
+            }
             $this->elementEnd('li');
             $this->elementStart('li');
             // TRANS: Field label in form for profile settings.
@@ -245,14 +245,14 @@ class ProfilesettingsAction extends SettingsAction
 
         if (Event::handle('StartProfileSaveForm', array($this))) {
 
-			if (common_config('profile', 'changenick') == true) {
-    	        try {
-	                $nickname = Nickname::normalize($this->trimmed('nickname'));
-        	    } catch (NicknameException $e) {
-            	    $this->showForm($e->getMessage());
-	                return;
-    	        }
-			}
+            if (common_config('profile', 'changenick') == true) {
+                try {
+                    $nickname = Nickname::normalize($this->trimmed('nickname'));
+                } catch (NicknameException $e) {
+                    $this->showForm($e->getMessage());
+                    return;
+                }
+            }
 
             $fullname = $this->trimmed('fullname');
             $homepage = $this->trimmed('homepage');
@@ -335,8 +335,6 @@ class ProfilesettingsAction extends SettingsAction
                 $user->language != $language ||
                 $user->timezone != $timezone) {
 
-                common_debug('Updating user nickname from ' . $user->nickname . ' to ' . $nickname,
-                             __FILE__);
                 common_debug('Updating user language from ' . $user->language . ' to ' . $language,
                              __FILE__);
                 common_debug('Updating user timezone from ' . $user->timezone . ' to ' . $timezone,
@@ -344,9 +342,11 @@ class ProfilesettingsAction extends SettingsAction
 
                 $original = clone($user);
 
-				if (common_config('profile', 'changenick') == true) {
-	                $user->nickname = $nickname;
-				}
+                if (common_config('profile', 'changenick') == true) {
+                    common_debug('Updating user nickname from ' . $user->nickname . ' to ' . $nickname,
+                                 __FILE__);
+                    $user->nickname = $nickname;
+                }
                 $user->language = $language;
                 $user->timezone = $timezone;
 
@@ -413,7 +413,7 @@ class ProfilesettingsAction extends SettingsAction
                 $profile->location_ns = $loc->location_ns;
             }
 
-            $profile->profileurl = common_profile_url($nickname);
+            $profile->profileurl = common_profile_url($profile->nickname);
 
             if (common_config('location', 'share') == 'user') {
 
