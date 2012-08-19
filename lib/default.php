@@ -309,6 +309,7 @@ $default =
                                  'QnA' => null,
                                  'SearchSub' => null,
                                  'TagSub' => null,
+                                 'OpenSearch' => null,
                                  'OpenID' => null,
                                  'Directory' => null,
                                  'ExtendedProfile' => null,

@@ -98,23 +98,26 @@ class Action extends HTMLOutputter // lawsuit
      */
     function showPage()
     {
-        if (Event::handle('StartShowHTML', array($this))) {
-            $this->startHTML();
-            $this->flush();
-            Event::handle('EndShowHTML', array($this));
-        }
-        if (Event::handle('StartShowHead', array($this))) {
-            $this->showHead();
-            $this->flush();
-            Event::handle('EndShowHead', array($this));
-        }
-        if (Event::handle('StartShowBody', array($this))) {
-            $this->showBody();
-            Event::handle('EndShowBody', array($this));
-        }
-        if (Event::handle('StartEndHTML', array($this))) {
-            $this->endHTML();
-            Event::handle('EndEndHTML', array($this));
+        if (Event::handle('StartShowPage', array($this))) {
+            if (Event::handle('StartShowHTML', array($this))) {
+                $this->startHTML();
+                $this->flush();
+                Event::handle('EndShowHTML', array($this));
+            }
+            if (Event::handle('StartShowHead', array($this))) {
+                $this->showHead();
+                $this->flush();
+                Event::handle('EndShowHead', array($this));
+            }
+            if (Event::handle('StartShowBody', array($this))) {
+                $this->showBody();
+                Event::handle('EndShowBody', array($this));
+            }
+            if (Event::handle('StartEndHTML', array($this))) {
+                $this->endHTML();
+                Event::handle('EndEndHTML', array($this));
+            }
+            Event::handle('EndShowPage', array($this));
         }
     }
 
@@ -147,7 +150,6 @@ class Action extends HTMLOutputter // lawsuit
             }
             $this->showShortcutIcon();
             $this->showStylesheets();
-            $this->showOpenSearch();
             $this->showFeeds();
             $this->showDescription();
             $this->extraHead();
@@ -401,22 +403,6 @@ class Action extends HTMLOutputter // lawsuit
     function getScriptMessages()
     {
         return array();
-    }
-
-    /**
-     * Show OpenSearch headers
-     *
-     * @return nothing
-     */
-    function showOpenSearch()
-    {
-        $this->element('link', array('rel' => 'search',
-                                     'type' => 'application/opensearchdescription+xml',
-                                     'href' =>  common_local_url('opensearch', array('type' => 'people')),
-                                     'title' => common_config('site', 'name').' People Search'));
-        $this->element('link', array('rel' => 'search', 'type' => 'application/opensearchdescription+xml',
-                                     'href' =>  common_local_url('opensearch', array('type' => 'notice')),
-                                     'title' => common_config('site', 'name').' Notice Search'));
     }
 
     /**

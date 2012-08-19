@@ -11,11 +11,20 @@ class ThemeManagerPlugin extends Plugin {
     function onAutoload($cls)
     {
         switch($cls) {
+        case 'ThemeExtension':
         case 'ThemeManager':
+        case 'ThemeMenu':
         case 'ThemeWidget':
             $file = dirname(__FILE__) . '/classes/' . $cls . '.php';
             break;
+        case 'HomeMenu':
+        case 'PublicMenu':
+            $type = preg_replace('/^(\w+)Menu$/', '\1', $cls);
+            if (!$type || $type == $cls) throw new Exception('Bad Menu class name');	// preg_replace hasn't extracted type!
+            $file = dirname(__FILE__) . '/classes/menus/' . strtolower($type) . '.php';
+            break;
         case 'NoticeWidget':
+        case 'MenuWidget':
             $type = preg_replace('/^(\w+)Widget$/', '\1', $cls);
             if (!$type || $type == $cls) throw new Exception('Bad Widget class name');	// preg_replace hasn't extracted type!
             $file = dirname(__FILE__) . '/classes/widgets/' . strtolower($type) . '.php';

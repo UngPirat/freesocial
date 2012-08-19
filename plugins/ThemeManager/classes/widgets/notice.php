@@ -16,10 +16,12 @@ class NoticeWidget extends ThemeWidget {
         if (!is_a($this->notice, 'Notice')) {
             return false;
         }
-        return true;
+        return parent::validate();
     }
 
     protected function initialize() {
+        parent::initialize();
+
         $this->profile = $this->notice->getProfile();    // $this->notice->_profile is a protected value
     }
 

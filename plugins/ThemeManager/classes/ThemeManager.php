@@ -6,7 +6,7 @@ class ThemeManager {
     protected $name;
     protected $supported;
     protected $template;
-    protected $reldir;
+    protected $urldir;
     protected $sysdir;
 
     protected $out;
@@ -21,13 +21,13 @@ class ThemeManager {
         $this->action = $action;
         $this->name = ucfirst($theme_name).'Theme';
         $this->sysdir = INSTALLDIR . "/theme/{$this->name}";
-        $this->url = '/theme/' . urlencode($this->name);
+        $this->urldir = '/theme/' . urlencode($this->name);
 
         $this->supported = array();
-//        $this->supported = array('remoteprofile');
+if ( isset($this->action->args['tm']))        $this->supported = array('remoteprofile');
 
         if (empty($this->action->args['action'])) {
-            common_debug('THEMEMANAGER unset action: '.print_r($this->action,true));
+            $this->action->args['action'] = strtolower(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action)));
         }
         $this->setTemplate($this->action->args['action']);
 
@@ -78,15 +78,11 @@ class ThemeManager {
     function head() {
         if (Event::handle('StartShowHeadElements', array($this->action))) {
             $this->stylesheets();
-            $this->feeds();
+            $this->the_feeds();
             $this->action->extraHead();	// html head tags
             Event::handle('EndShowHeadElements', array($this->action));
         }
         $this->action->flush();	// I want to get rid of $this->action as output element!
-    }
-
-    function the_notice() {
-        
     }
 
     function content($type) {
@@ -99,14 +95,14 @@ class ThemeManager {
         $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
     }
 
-    function title() {
+    function the_title() {
         echo htmlspecialchars($this->action->title());
     }
-    function lang() {
+    function the_lang() {
         echo htmlspecialchars(common_config('site', 'language'));
     }
 
-    function feeds()
+    function the_feeds()
     {
         foreach ((array)$this->action->getFeeds() as $feed) {	// should we get these as an event?
             $this->out->element('link', array('rel' => $feed->rel(),
@@ -132,12 +128,19 @@ class ThemeManager {
         if (Event::handle('StartShowStyles', array($this->action))) {
             if (Event::handle('StartShowStatusNetStyles', array($this->action))) {
                 $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
-                $this->action->primaryCssLink(null, 'screen, projection, tv, print');
+                $this->the_style();
                 Event::handle('EndShowStatusNetStyles', array($this->action));
             }
             Event::handle('EndShowStyles', array($this->action));
         }
         $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
+    }
+
+    function the_style() {
+        $this->out->element('link', array('rel' => 'stylesheet',
+                                            'type' => 'text/css',
+                                            'href' => $this->urldir . '/css/main.css'));
+        $this->out->flush();
     }
 
     function box($name, $args=array()) {
@@ -156,21 +159,45 @@ class ThemeManager {
         return $loop;
     }
 
+    function menu($name, array $items=array()) {
+        if (!is_subclass_of($name, 'ThemeMenu') && !is_subclass_of($name, 'Menu')) {
+            throw new Exception('Not a menu');
+        } elseif (is_subclass_of($name, 'Menu')) {
+            $menu = new $name($this->action);	// getting rid of this in the future
+        } else {
+            $menu = new $name($items);	// new style menus
+        }
+        $this->widget('MenuWidget', array('action'=>$this->action, 'items'=>$menu->getItems()));
+    }
+
+    function menus(array $list) {
+        foreach ($list as $menu) {
+            $this->menu($menu);	// no args allowed in multi-call... for now at least
+        }
+    }
+
+    function widget($name, $args=null) {
+        if (!is_subclass_of($name, 'ThemeWidget')) {
+            throw new Exception('Not a widget');
+        }
+        $name::run($args);
+    }
+
     function widgets(array $list) {
-        foreach($list as $widget=>$args) {
-            if (is_subclass_of($widget, 'ThemeWidget')) {	// new style widgets
-                $widget::run($args);
-            } elseif (is_subclass_of($widget, 'Widget')) {	// old style widgets
+        foreach($list as $name=>$args) {
+            if (is_subclass_of($name, 'ThemeWidget')) {	// new style widgets
+                $this->widget($name, $args);
+            } elseif (is_subclass_of($name, 'Widget')) {	// old style widgets
                 // oh man, this is ugly, but at least doesn't return errors. Glad to be getting rid of it.
                 // call_user_func_array won't work will it?
                 switch (count($args)) {
-                case 0:	$widget = new $widget(); break;
-                case 1:	$widget = new $widget($args[0]); break;
-                case 2:	$widget = new $widget($args[0], $args[1]); break;
-                case 3:	$widget = new $widget($args[0], $args[1], $args[2]); break;
+                case 0:	$name = new $name(); break;
+                case 1:	$name = new $name($args[0]); break;
+                case 2:	$name = new $name($args[0], $args[1]); break;
+                case 3:	$name = new $name($args[0], $args[1], $args[2]); break;
                 default: throw new Exception('Bad number of arguments');
                 }
-                $widget->show();
+                $name->show();
                 $this->action->flush();
                 $this->out->flush();
             } else {
