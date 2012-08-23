@@ -183,7 +183,7 @@ class TwitterBridgePlugin extends Plugin
         return true;
     }
 
-	function onStartProfileGetAvatar($profile, $width, $avatar) {
+/*	function onStartProfileGetAvatar($profile, $width, $avatar) {
         $avatar = Avatar::pkeyGet(
             array(
                 'profile_id' => $profile->id,
@@ -193,7 +193,7 @@ class TwitterBridgePlugin extends Plugin
         );
 		return empty($avatar);
 	}
-
+*/
 	static function onStartSubscribe($subscriber, $other) {
 			common_debug('TWITTER subscription initializing');
         if (!preg_match('/^https?:\/\/(www\.)?twitter\.com\//', $other->profileurl)) {
