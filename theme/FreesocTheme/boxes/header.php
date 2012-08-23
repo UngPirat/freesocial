@@ -8,9 +8,23 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	    if (isset($args['page']) && $args['page'] >= 2) {
 	        echo ' - ' . sprintf( _m('Page %s'), htmlspecialchars($args['page']));
 	    }
-		$this->siteinfo('name');
+        echo ' | ';
+		$this->the_siteinfo('name');
 ?></title>
 <?php $this->head(); ?>
 </head>
 <body>
 <div id="wrapper">
+<div id="header">
+<?php
+    $this->box('site-title');
+
+    try {
+        $this->widget('Vcard', array('profile'=>$this->profile,'avatarSize'=>48));
+    } catch (Exception $e) {
+        // register/welcome new user 
+    }
+
+    $this->box('topmenu');
+?>
+</div>

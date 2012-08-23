@@ -1,0 +1,10 @@
+.noticelist > li {
+    display: block;
+}
+
+.notice {
+	clear: both;
+}
+.notice .metadata {
+	
+}

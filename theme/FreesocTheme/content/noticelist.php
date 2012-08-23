@@ -1,4 +1,4 @@
-<ul>
+<ul class="noticelist">
 <?php
 	$loop = $this->loop($this->action->notice, 'notice');
 common_debug('THEMEMANAGER created loop');

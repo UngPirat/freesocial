@@ -14,31 +14,22 @@ class ThemeManagerPlugin extends Plugin {
         case 'ThemeExtension':
         case 'ThemeManager':
         case 'ThemeMenu':
+        case 'ThemeSite':
         case 'ThemeWidget':
             $file = dirname(__FILE__) . '/classes/' . $cls . '.php';
+            require_once($file);
+            return false;
             break;
-        case 'HomeMenu':
-        case 'PublicMenu':
-            $type = preg_replace('/^(\w+)Menu$/', '\1', $cls);
-            if (!$type || $type == $cls) throw new Exception('Bad Menu class name');	// preg_replace hasn't extracted type!
-            $file = dirname(__FILE__) . '/classes/menus/' . strtolower($type) . '.php';
-            break;
-        case 'NoticeWidget':
-        case 'MenuWidget':
-            $type = preg_replace('/^(\w+)Widget$/', '\1', $cls);
-            if (!$type || $type == $cls) throw new Exception('Bad Widget class name');	// preg_replace hasn't extracted type!
-            $file = dirname(__FILE__) . '/classes/widgets/' . strtolower($type) . '.php';
-            break;
-        case 'NoticeLoop':
-        case 'ObjectLoop':
-            $type = preg_replace('/^(\w+)Loop$/', '\1', $cls);
-            if (!$type || $type == $cls) throw new Exception('Bad Loop class name');	// preg_replace hasn't extracted type!
-            $file = dirname(__FILE__) . '/classes/loops/' . strtolower($type) . '.php';
-            break;
-        default:
-            return true;
         }
 
+        if (!preg_match('/^(\w+)(Loop|Menu|Widget)$/', $cls, $type)) {
+            return true;
+        }
+        $type = array_map('strtolower', array_map('basename', $type));
+        $file = dirname(__FILE__) . "/classes/{$type[2]}s/{$type[1]}.php";
+        if (!file_exists($file)) {
+            return true;	// keep processing
+        }
         require_once($file);
         return false;
     }

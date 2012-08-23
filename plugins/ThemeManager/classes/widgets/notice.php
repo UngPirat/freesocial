@@ -26,30 +26,9 @@ class NoticeWidget extends ThemeWidget {
     }
 
     function show() {
-        // make this use the htmloutputter
-?>
-            <span class="vcard">
-                <a href="<?php $this->the_profileurl(); ?>" class="url" title="<?php $this->the_nickname(); ?>">
-                    <?php $this->the_avatar(); ?>
-                    <span class="fn"><?php $this->the_name(); ?></span>
-                </a>
-            </span>
-            <div class="note"><?php $this->the_content(); ?></div>
-            <span class="metadata">
-                <a href="<?php $this->the_url(); ?>" class="timestamp" rel="bookmark">
-                    <?php $this->the_timestamp(); ?>
-                </a>
-                <?php $this->the_source(); ?>
-                <?php $this->the_context(); ?>
-            </span>
-<?php
-    }
-
-    function the_avatar() {
-        $this->out->element('img', array('src'    => $this->profile->avatarUrl($this->avatarSize),
-                                         'class'  => 'avatar',
-                                         'alt'    => $this->get_name(),
-                                   ));
+        $this->the_vcard();
+        $this->the_content();
+        $this->the_metadata();
         $this->out->flush();
     }
 
@@ -58,20 +37,40 @@ class NoticeWidget extends ThemeWidget {
                 ? $this->profile->fullname
                 : $this->profile->nickname;
     }
-
-    function the_content() {
-        echo $this->notice->rendered
-                ? $this->notice->rendered
-                : $this->notice->content;
+    function get_permalink() {
+        return $this->notice->url ? $this->notice->url : $this->notice->uri;
     }
-    function the_context() {
+    function get_conversation_url() {
+        return common_local_url('conversation', array('id'=>$this->notice->conversation));
+    }
+    function get_rendered_content() {
+        return $this->notice->rendered
+                ? $this->notice->rendered
+                : common_render_content($this->notice->content, $this->notice);
+    }
+    function get_webfinger() {
+        return $this->profile->nickname . '@' . parse_url($this->profile->profileurl, PHP_URL_HOST);
+    }
+    function the_content() {
+        $this->out->elementStart('span', 'notice-content');
+        $this->out->raw($this->get_rendered_content());
+        $this->out->elementEnd('span');
+    }
+    function the_context_link() {
         if (!$this->notice->hasConversation()) {
             return;
         }
-        echo 'in context';
+        $this->out->element('a', array('href'=>$this->get_conversation_url(), 'rel'=>'bookmark'), _m('in context'));
     }
     function the_id() {
         echo htmlspecialchars($this->notice->id);
+    }
+    function the_metadata() {
+        $this->out->elementStart('span', 'metadata');
+        $this->the_timestamp();
+        $this->the_source();
+        $this->the_context_link();
+        $this->out->elementEnd('span');
     }
     function the_name() {
         echo htmlspecialchars($this->get_name());
@@ -83,27 +82,43 @@ class NoticeWidget extends ThemeWidget {
         echo htmlspecialchars($this->profile->profileurl);
     }
     function the_source() {
-        $ns = $this->notice->getSource();
-        $this->out->elementStart('span', 'device');
+        $ns   = $this->notice->getSource();
+        $name = empty($ns->name)
+                    ? ($ns->code
+                        ? _($ns->code)
+                        : _m('SOURCE','web'))
+                    : _($ns->name);
+        $this->out->elementStart('span', 'source');
         // TRANS: Followed by notice source.
-        $this->out->text(_('from') . ' ');
+        $this->out->text(_m('from') . ' ');
+        $this->out->elementStart('span', 'device');
         if (!empty($ns->url)) {
-            $this->out->element('a', array('href' => $ns->url,
-                                           'rel'  => 'external'),
-                                $ns->name);
+            $this->out->element('a', array('href' => $ns->url, 'rel'  => 'external'), $name);
         } else {
-            $this->out->text($ns->name);
+            $this->out->text($name);
         }
         $this->out->elementEnd('span');
-        $this->out->flush();
+        $this->out->elementEnd('span');
     }
     function the_timestamp() {
-        $this->out->element('abbr', array('title' => common_date_iso8601($this->notice->created)),
+        $this->out->elementStart('span', 'timestamp');
+        $this->out->elementStart('a', array('href'=>$this->get_conversation_url(), 'rel'=>'bookmark'));
+        $this->out->element('span', 'descriptive', _m('Posted'));
+        $this->out->element('abbr', array('class'=>'informative', 'title' => common_date_iso8601($this->notice->created)),
                                 common_date_string($this->notice->created));
-        $this->out->flush();
+        $this->out->elementEnd('a');
+        $this->out->elementEnd('span');
     }
-    function the_url() {
-        echo htmlspecialchars($this->notice->url ? $this->notice->url : $this->notice->uri);
+    function the_vcard() {
+        $this->out->elementStart('span', 'vcard');
+        $this->out->element('img', array('src'    => $this->profile->avatarUrl($this->avatarSize),
+                                         'class'  => 'photo',
+                                         'alt'    => sprintf(_('Photo of %s'), $this->get_name()),
+                                   ));
+        $this->out->element('a', array('href'  => $this->profile->profileurl,
+                                       'class' => 'url fn'),
+                            $this->get_name());
+        $this->out->elementEnd('span');
     }
 }
 

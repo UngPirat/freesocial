@@ -1,11 +1,9 @@
 <?php
 
-class ThemeManager {
-    protected $action;
+class ThemeManager extends ThemeSite {
     protected $boxes;
     protected $name;
-    protected $supported;
-    protected $template;
+
     protected $urldir;
     protected $sysdir;
 
@@ -15,30 +13,14 @@ class ThemeManager {
     {
         // get possible user config and set $theme to user's theme
         $theme_name = common_config('site', 'theme');
-        if ($user = common_current_user()) {
-        }
 
-        $this->action = $action;
         $this->name = ucfirst($theme_name).'Theme';
         $this->sysdir = INSTALLDIR . "/theme/{$this->name}";
         $this->urldir = '/theme/' . urlencode($this->name);
 
-        $this->supported = array();
-if ( isset($this->action->args['tm']))        $this->supported = array('remoteprofile');
-
-        if (empty($this->action->args['action'])) {
-            $this->action->args['action'] = strtolower(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action)));
-        }
-        $this->setTemplate($this->action->args['action']);
-
         $this->out = new HTMLOutputter;	// ...not sure if action should stay or go... sorry...
-    }
 
-    private function setTemplate($template) {
-        if (!in_array($template, $this->supported)) {
-            throw new Exception('Template not supported', 302);
-        }
-        $this->template = $this->sysdir . '/actions/' . $template . '.php';
+        parent::__construct($action);
     }
 
     function run() {
@@ -70,7 +52,7 @@ if ( isset($this->action->args['tm']))        $this->supported = array('remotepr
 
         $this->action->extraHeaders();	// http headers
 
-        include($this->template);	// we can do stuff like $this-> inside the template!
+        include $this->get_template();	// we can do stuff like $this-> inside the template!
         
         return true;
     }
@@ -113,17 +95,6 @@ if ( isset($this->action->args['tm']))        $this->supported = array('remotepr
         $this->out->flush();
     }
 
-    function siteinfo($param='') {
-        switch ($param) {
-        case 'name':
-        case 'server':
-        case 'ssl':
-            $info = common_config('site', $param);
-            break;
-        }
-        return htmlspecialchars($info);
-    }
-
     function stylesheets() {
         if (Event::handle('StartShowStyles', array($this->action))) {
             if (Event::handle('StartShowStatusNetStyles', array($this->action))) {
@@ -159,24 +130,32 @@ if ( isset($this->action->args['tm']))        $this->supported = array('remotepr
         return $loop;
     }
 
-    function menu($name, array $items=array()) {
+    function menu($name, array $args=array()) {
         if (!is_subclass_of($name, 'ThemeMenu') && !is_subclass_of($name, 'Menu')) {
             throw new Exception('Not a menu');
         } elseif (is_subclass_of($name, 'Menu')) {
             $menu = new $name($this->action);	// getting rid of this in the future
         } else {
-            $menu = new $name($items);	// new style menus
+            $menu = new $name($args);	// new style menus
         }
-        $this->widget('MenuWidget', array('action'=>$this->action, 'items'=>$menu->getItems()));
+        $this->widget('MenuWidget', array('action'=>$this->action, 'menu'=>$menu, 'out'=>$this->out));
     }
 
-    function menus(array $list) {
-        foreach ($list as $menu) {
-            $this->menu($menu);	// no args allowed in multi-call... for now at least
-        }
+    function menus(array $list, array $args=array()) {
+        $args['submenu'] = true;
+        $this->out->elementStart('ul', 'menu');
+        foreach ($list as $menu) :
+            $this->out->elementStart('li', 'menu-item');
+            $this->menu($menu, $args);	// no args allowed in multi-call... for now at least
+            $this->out->elementEnd('li');
+        endforeach;
+        $this->out->flush();
     }
 
     function widget($name, $args=null) {
+        if (!preg_match('/^(\w+)Widget$/', $name)) {
+            $name .= 'Widget';
+        }
         if (!is_subclass_of($name, 'ThemeWidget')) {
             throw new Exception('Not a widget');
         }

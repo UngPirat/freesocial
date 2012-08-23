@@ -1,3 +1,18 @@
+@import url("modules/header.css");
+@import url("modules/menu.css");
+@import url("modules/noticelist.css");
+
 body {
 	font-family: sans-serif;
+}
+
+#wrapper {
+	margin: 0 auto;
+	width: 90%
+}
+
+#aside {
+}
+#content {
+	float: left;
 }

@@ -1,11 +1,15 @@
 <?php
 
-class HomeMenu extends ThemeMenu {
+class PersonalMenu extends ThemeMenu {
     protected function initialize() {
         $this->user = common_current_user();
+        if (empty($this->user)) {
+            return false;
+        }
+
         $args = array('nickname'=>$this->user->nickname);
         // list($actionName, $args, $label, $description, $id)
-        $this->title = _m('Home');
+        $this->title = _m('Personal');
         $this->items = array(
                 array('all',           $args, _m('MENU','Home'), _('Home timeline')),
                 array('showstream',    $args, _m('MENU','Profile'), _('Your profile')),
