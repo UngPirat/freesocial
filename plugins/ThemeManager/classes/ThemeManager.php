@@ -52,7 +52,7 @@ class ThemeManager extends ThemeSite {
 
         $this->action->extraHeaders();	// http headers
 
-        include $this->get_template();	// we can do stuff like $this-> inside the template!
+        include $this->get_template_file();	// we can do stuff like $this-> inside the template!
         
         return true;
     }
@@ -129,6 +129,26 @@ class ThemeManager extends ThemeSite {
         $loop = new $class($list);
         return $loop;
     }
+    function pagination(array $pages) {
+        if (!isset($pages['current'])) {
+            return;
+        }
+        $this->out->elementStart('nav', 'paging');
+        foreach(array('prev'=>_m('Older posts'), 'current'=>_m('Current scope'), 'next'=>_m('Newer posts')) as $key=>$trans) {
+            if (!isset($pages[$key])) {
+                continue;
+            } elseif ($key == 'current') {
+                $href = common_local_url($this->action->args['action'], $this->action->args, array('scope'=>$pages[$key]));
+            } else {
+                $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
+            }
+            $this->out->elementStart('span', $key);
+            $this->out->element('a', array('href'=>$href, 'rel'=>$key), $trans);
+            $this->out->elementEnd('span');
+        }
+        $this->out->elementEnd('nav');
+        $this->out->flush();
+    }
 
     function menu($name, array $args=array()) {
         if (!is_subclass_of($name, 'ThemeMenu') && !is_subclass_of($name, 'Menu')) {
@@ -149,6 +169,7 @@ class ThemeManager extends ThemeSite {
             $this->menu($menu, $args);	// no args allowed in multi-call... for now at least
             $this->out->elementEnd('li');
         endforeach;
+        $this->out->elementEnd('ul');
         $this->out->flush();
     }
 

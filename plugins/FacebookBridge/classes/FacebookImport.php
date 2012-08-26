@@ -172,7 +172,7 @@ class FacebookImport
         case 'status':
         case 'link':
         case 'photo':
-            if (isset($update['message'])) :
+            if (isset($update['message'])) {
                 // Hacktastic: filter out stuff coming from this StatusNet
                 $source = mb_strtolower(common_config('integration', 'source'));
                 if ( !isset($update['application']) || !preg_match("/$source/", mb_strtolower($update['application']['name'])) ) {
@@ -194,13 +194,11 @@ class FacebookImport
 					} else {
 						common_debug('FACEBOOK comment thread empty for '.$update['id'].'. TODO: fetch from API!');
 					}
-                } else {
-                    common_debug('FACEBOOK found '.$update['comments']['count'].' comments for '.$update['id']);
                 }
             //} elseif (isset($update['story'])) {
-            else :
+            } else {
                 common_debug('FACEBOOK update '.$update['id'].' with scope '.$this->scope.' does not have a message set');
-            endif;
+            }
             break;
         default:
             common_debug('FACEBOOK unknown update type: '.$update['type'].' for '.$update['id']);
@@ -236,7 +234,6 @@ class FacebookImport
 
         $doNoticeImport = false;    // whether to convert it to a local notice
 
-        common_debug('FACEBOOK importing ('.$update['id'].'): '.$update['message']);
         $flink = Foreign_link::getByForeignID($update['from']['id'], FACEBOOK_SERVICE);
         if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
             $doNoticeImport = true;
@@ -286,6 +283,7 @@ class FacebookImport
         } else {
             $notice->is_local   = Notice::GATEWAY;
             $notice->uri        = $notice->url;
+            unset($notice->url);
             $notice->rendered = common_render_content($message, $notice);
         }
 
@@ -467,7 +465,6 @@ class FacebookImport
         if ($profile->find()) {
             $profile->fetch();
 				// update to new profile link
-			common_debug('FACEBOOK updating profile for foreign_id='.$fuser->id.' to profileurl: '.$fuser->uri.' for new user nick '.$fuser->nickname);
 			$original = clone($profile);
 			$profile->profileurl = $fuser->uri;
 			$profile->nickname = $fuser->nickname;
@@ -488,10 +485,12 @@ class FacebookImport
             $profile = $this->createForeignUserProfile($foreign_user);
         }
 
-        try {
-            FacebookImport::checkAvatar($profile->id, $foreign_id);
-        } catch (Exception $e) {
-            common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
+        if (!$profile->isSilenced()) {
+            try {
+                FacebookImport::checkAvatar($profile->id, $foreign_id);
+            } catch (Exception $e) {
+                common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
+            }
         }
         return $profile;
     }
@@ -524,9 +523,9 @@ class FacebookImport
         return $profile;
     }
 
-    static function getAvatarUrl($uid, $type='square') {
+    static function getAvatarUrl($uid, $type='large') {
         // http://developers.facebook.com/docs/reference/api/#pictures
-        $url = 'http://graph.facebook.com/'.urlencode($uid).'/picture?type='.urlencode($type).'&return_ssl_resources=1';
+        $url = 'http://graph.facebook.com/'.urlencode($uid).'/picture?type='.urlencode($type);
         $headers = get_headers($url, 1);
         return (isset($headers['Location']) ? $headers['Location'] : $url);
     }
@@ -539,7 +538,7 @@ class FacebookImport
 
         $path_parts = pathinfo($url);
         $ext = isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '';
-        $img_root = basename($path_parts['basename'], "_q{$ext}");    // q stands for square
+        $img_root = basename($path_parts['basename'], "_n{$ext}");    // q stands for square
         $filename = "Facebook_{$foreign_id}-original-{$img_root}{$ext}";
 
         try {
@@ -560,24 +559,27 @@ class FacebookImport
                 common_debug('FACEBOOK no avatars to delete');
             }
 
-            FacebookImport::newAvatar($profile_id, 'square', $filename);
+            FacebookImport::newAvatar($profile_id, 180, $filename);
         }
     }
 
-    static function newAvatar($profile_id, $size, $filename)
+    static function newAvatar($profile_id, $size=180, $filename)
     {
+        $imagefile = new ImageFile($profile_id, Avatar::path($filename));
+        $x = floor($imagefile->width/2)-floor($size/2);
+        $y = floor($imagefile->height/2)-floor($size/2);
+        $result = $imagefile->resizeTo(Avatar::path($filename), $size, $size, $x, $y, $size, $size);	// overwrite with cropped image
+
+        if (!$result) {
+            common_debug('FACEBOOK avatar cannot resizeTo '.Avatar::path($filename));
+            @unlink(Avatar::path($filename));
+        }
+
         $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
-
-        switch($size) {
-        case 'square':
-            $avatar->width  = 50;
-            $avatar->height = 50;
-            $avatar->original = 1; // Let's say this is the original...
-            break;
-        default:
-            throw new Exception('FACEBOOK illegal avatar size: '.$size);
-        }
+        $avatar->original = 1; // Let's make this the original/base avatar
+        $avatar->width  = $size;
+        $avatar->height = $size;
 
         $avatar->mediatype = 'image/jpeg';
         $avatar->filename = $filename;
@@ -608,7 +610,6 @@ class FacebookImport
      */
     static function fetchRemoteUrl($url, $filename)
     {
-        common_debug("FacebookImport::fetchRemoteUrl - Fetching FACEBOOK avatar: $url");
         $request = HTTPClient::start();
         $response = $request->get($url);
         if ($response->isOk()) {

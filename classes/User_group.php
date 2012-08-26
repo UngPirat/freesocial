@@ -561,10 +561,10 @@ class User_group extends Managed_DataObject
         return $noun->asString('activity:' . $element);
     }
 
-    function getAvatar()
+    function getAvatar($size=AVATAR_PROFILE_SIZE)
     {
         return empty($this->homepage_logo)
-            ? User_group::defaultLogo(AVATAR_PROFILE_SIZE)
+            ? User_group::defaultLogo($size)
             : $this->homepage_logo;
     }
 

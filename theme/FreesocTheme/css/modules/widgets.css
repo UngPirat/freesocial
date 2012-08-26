@@ -1,0 +1,38 @@
+.widget-title {
+	clear:both;
+}
+
+.widget.not-found {
+    display: none;
+}
+
+.list.widget .list-item .photo {
+}
+.list.widget .list-item {
+	display: block;
+	float: left;
+	margin: 0 1%;
+	padding: 1%;
+	text-align: center;
+	width: 16%;
+    height: 16%;
+	position: relative;
+}
+.list.widget .list-more {
+    padding: 0 1%;
+	text-align: right;
+}
+.list.widget .list-item .url .title {
+	display: none;
+}
+.list.widget .list-item .url:hover .title {
+    display: block;
+	position: absolute;
+	font-size: 1ex;
+	left: 0;
+	right: 0;
+	top: 0;
+	background: white;
+	border: 1px solid;
+	padding: 1ex 1em;
+}

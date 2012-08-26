@@ -434,9 +434,9 @@ class File extends Managed_DataObject
      *
      * @return File_thumbnail
      */
-    function getThumbnail()
+    function getThumbnail($size=AVATAR_PROFILE_SIZE)
     {
-        return File_thumbnail::staticGet('file_id', $this->id);
+        return File_thumbnail::getSized($this->id, $size);
     }
 
     /**

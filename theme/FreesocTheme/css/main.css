@@ -1,18 +1,35 @@
+@import url("modules/grid.css");
 @import url("modules/header.css");
 @import url("modules/menu.css");
+@import url("modules/aside.css");
 @import url("modules/noticelist.css");
+@import url("modules/widgets.css");
 
 body {
+	color: black;
 	font-family: sans-serif;
 }
+a, a:visited, a:active {
+	color: #666;
+	text-decoration: none;
+}
+a:hover {
+	color: #424242;
+}
 
-#wrapper {
+nav.paging {
 	margin: 0 auto;
-	width: 90%
+	width: 66%;
+	text-align: center;
 }
-
-#aside {
+nav.paging span {
+	width: 22%;
 }
-#content {
+nav .prev {
 	float: left;
+}
+nav .current {
+}
+nav .next {
+	float: right;
 }

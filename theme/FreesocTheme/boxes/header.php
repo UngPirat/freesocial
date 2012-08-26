@@ -16,15 +16,18 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <body>
 <div id="wrapper">
 <div id="header">
+<?php $this->box('site-title'); ?>
+	<div id="login">
 <?php
-    $this->box('site-title');
-
     try {
         $this->widget('Vcard', array('profile'=>$this->profile,'avatarSize'=>48));
     } catch (Exception $e) {
-        // register/welcome new user 
-    }
-
-    $this->box('topmenu');
 ?>
+		<p>You are not logged in!</p>
+		<p>Do you wish to <a href="<?php echo common_local_url('login'); ?>">log in</a> or <a href="<?php echo common_local_url('register'); ?>">register an account</a>?</p>
+<?php
+    }
+?>
+	</div>
+<?php $this->box('topmenu'); ?>
 </div>

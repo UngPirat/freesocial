@@ -2,6 +2,7 @@
 	float: left;
 }
 
-#header .vcard {
+#header #login {
 	float: right;
 }
+

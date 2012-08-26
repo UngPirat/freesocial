@@ -313,7 +313,7 @@ class Profile extends Managed_DataObject
         return !empty($request);
     }
 
-    function getGroups($offset=0, $limit=PROFILES_PER_PAGE)
+    function getGroups($offset=0, $limit=PROFILES_PER_PAGE, $desc=false)
     {
         $ids = array();
 
@@ -327,6 +327,7 @@ class Profile extends Managed_DataObject
             $gm = new Group_member();
 
             $gm->profile_id = $this->id;
+            $gm->orderBy('group_id ASC');
 
             if ($gm->find()) {
                 while ($gm->fetch()) {
@@ -335,6 +336,9 @@ class Profile extends Managed_DataObject
             }
 
             self::cacheSet($keypart, implode(',', $ids));
+        }
+        if ($desc==true) {
+            $ids = array_reverse($ids);
         }
 
         if (!is_null($offset) && !is_null($limit)) {

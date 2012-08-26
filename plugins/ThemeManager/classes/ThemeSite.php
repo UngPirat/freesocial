@@ -21,18 +21,22 @@ if ( isset($this->action->args['tm']))        $this->supported = array('profile'
         do {	// get the closest match to current action and set that template
             $template = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $class)));
             if (isset($this->supported[$template])) {
-                $this->template = $this->sysdir . '/actions/' . strtolower($template) . '.php';
+                $this->template = $template;
+                $this->template_file = $this->supported[$this->template];
                 break;
             }
         } while ($class = get_parent_class($class));
 
-        if (!file_exists($this->template) || empty($this->template)) {
+        if (empty($this->template) || !file_exists($this->template_file)) {
             throw new Exception('Template not supported', 302);
         }
     }
 
     function get_template() {
         return $this->template;
+    }
+    function get_template_file() {
+        return $this->template_file;
     }
 
     function get_siteinfo($param='') {

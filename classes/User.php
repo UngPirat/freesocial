@@ -225,7 +225,7 @@ class User extends Managed_DataObject
 
     function getCarrier()
     {
-        return Sms_carrier::staticGet('id', $this->carrier);
+        return null;
     }
 
     /**

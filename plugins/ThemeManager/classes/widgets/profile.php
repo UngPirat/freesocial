@@ -21,7 +21,6 @@ class ProfileWidget extends ThemeWidget {
 
     function show() {
         $this->the_vcard();
-        $this->the_content();
         $this->the_metadata();
         $this->out->flush();
     }

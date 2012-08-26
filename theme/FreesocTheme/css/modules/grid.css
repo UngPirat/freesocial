@@ -1,0 +1,13 @@
+#wrapper {
+	margin: 0 auto;
+	width: 90%
+}
+
+#content {
+	float: left;
+	width: 70%;
+}
+#aside {
+	float: right;
+	width: 30%;
+}

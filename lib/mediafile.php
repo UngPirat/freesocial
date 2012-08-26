@@ -139,7 +139,67 @@ class MediaFile
                                       $height);
     }
 
-    function scaleToFit($width, $height, $maxWidth, $maxHeight)
+    static function getSizedThumbnail($file_id, $size, $square=true)
+    {
+        $size = floor($size);
+        if ($size < 1 || $size > 999) {
+            throw new Exception('Bad thumbnail size');
+        }
+
+        $original = File::staticGet('id', $file_id);
+        if (empty($original) || empty($original->filename)) {
+            throw new Exception('Cannot find local file');
+        }
+        if (!preg_match('/^image\//', $original->mimetype)) {
+            throw new Exception('Can only make thumbnails of images');
+        }
+
+        $oldthumb = new File_thumbnail;
+        $oldthumb->file_id = $file_id;
+        $oldthumb->square = $square;
+        if (!$square) {
+            // find depending on which size requirement is desired
+        }
+        if ($oldthumb->find() && $oldthumb->fetch()) {
+            return $oldthumb;
+        }
+        $oldthumb->free();
+
+        $ext = pathinfo($original->filename, PATHINFO_EXTENSION);
+        if (empty($ext)) {
+            $ext = preg_replace('/^image\/(\w+)$/', '\1', $original->filename);
+        }
+        $outname = "File_{$original->id}-".($square?'q':'t')."{$size}".(!empty($ext) ? ".$ext" : '');
+        $outpath = File::path($outname);
+
+        $imagefile = new ImageFile($original->id, File::path($original->filename), $original->mimetype);
+
+        if ($square) {	// CHANGE!!!!
+            if ($imagefile->width >= $imagefile->height) {
+                $x = floor($imagefile->width/2-$imagefile->height/2);
+                $srcw = $srch = $imagefile->height;
+            } else {
+                $y = floor($imagefile->height/2-$imagefile->width/2);
+                $srcw = $srch = $imagefile->width;
+            }
+            
+            $width = $height = $size;
+        } else {
+            list ($width, $height) = MediaFile::scaleToFit($imagefile->width, $imagefile->height, $size, $size);
+            $x = $y = 0;
+            $srcw = $imagefile->width;
+            $srch = $imagefile->height;
+        }
+
+        $imagefile->resizeTo($outpath, $width, $height, $x, $y, $srcw, $srch);
+        $thumbnail = File_thumbnail::saveThumbnail($original->id, File::url($outname), $width, $height);
+        if (!$thumbnail) {
+            throw new Exception('Could not save thumbnail');
+        }
+        return $thumbnail;
+    }
+
+    static function scaleToFit($width, $height, $maxWidth, $maxHeight)
     {
         $aspect = $maxWidth / $maxHeight;
         $w1 = $maxWidth;

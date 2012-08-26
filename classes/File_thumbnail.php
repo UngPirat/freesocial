@@ -33,8 +33,7 @@ class File_thumbnail extends Managed_DataObject
     public $__table = 'file_thumbnail';                  // table name
     public $file_id;                         // int(4)  primary_key not_null
     public $url;                             // varchar(255)  unique_key
-    public $width;                           // int(4)
-    public $height;                          // int(4)
+    public $size;                            // int(4)
     public $modified;                        // timestamp()   not_null default_CURRENT_TIMESTAMP
 
     /* Static get */
@@ -51,13 +50,29 @@ class File_thumbnail extends Managed_DataObject
                 'url' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL of thumbnail'),
                 'width' => array('type' => 'int', 'description' => 'width of thumbnail'),
                 'height' => array('type' => 'int', 'description' => 'height of thumbnail'),
+                'square' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'description' => 'possibly cropped square'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
             ),
-            'primary key' => array('file_id'),
+            'primary key' => array('file_id', 'width', 'height'),
+            'indexes' => array(
+                'file_thumbnail_file_id_idx' => array('file_id'),
+            ),
             'foreign keys' => array(
                 'file_thumbnail_file_id_fkey' => array('file', array('file_id' => 'id')),
             )
         );
+    }
+
+    public static function getSized($file_id, $size)
+    {
+        try {
+            $thumbnail = MediaFile::getSizedThumbnail($file_id, $size);
+        } catch (Exception $e) {
+            common_debug('File_thumbnail could not get or create newThumbnailSize for '.$file_id.':'.$size);
+            $thumbnail = File_thumbnail::staticGet('file_id', $file_id);
+        }
+
+        return $thumbnail;
     }
 
     /**
@@ -99,6 +114,10 @@ class File_thumbnail extends Managed_DataObject
         $tn->url = $url;
         $tn->width = intval($width);
         $tn->height = intval($height);
+        if ($width === $height) {
+            $tn->square = true;
+        }
         $tn->insert();
+        return $tn;
     }
 }

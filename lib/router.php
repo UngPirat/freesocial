@@ -71,7 +71,6 @@ class Router
         if (empty($this->m)) {
             $this->m = $this->initialize();
         }
-common_debug('THEMEMANAGER blah '.$action);
     }
 
     /**
