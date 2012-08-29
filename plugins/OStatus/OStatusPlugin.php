@@ -718,7 +718,7 @@ class OStatusPlugin extends Plugin
 
         $act = new Activity();
 
-        $act->verb = ActivityVerb::UNFOLLOW;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::UNFOLLOW);
 
         $act->id   = TagURI::mint('unfollow:%d:%d:%s',
                                   $profile->id,
@@ -771,7 +771,7 @@ class OStatusPlugin extends Plugin
                                     common_date_iso8601(time()));
 
             $act->actor = ActivityObject::fromProfile($profile);
-            $act->verb = ActivityVerb::JOIN;
+            $act->verb = ActivityUtils::resolveUri(ActivityVerb::JOIN);
             $act->object = $oprofile->asActivityObject();
 
             $act->time = time();
@@ -823,7 +823,7 @@ class OStatusPlugin extends Plugin
                                     common_date_iso8601(time()));
 
             $act->actor = ActivityObject::fromProfile($member);
-            $act->verb = ActivityVerb::LEAVE;
+            $act->verb = ActivityUtils::resolveUri(ActivityVerb::LEAVE);
             $act->object = $oprofile->asActivityObject();
 
             $act->time = time();
@@ -869,7 +869,7 @@ class OStatusPlugin extends Plugin
                                     common_date_iso8601(time()));
 
             $act->actor = ActivityObject::fromProfile($sub);
-            $act->verb = ActivityVerb::FOLLOW;
+            $act->verb = ActivityUtils::resolveUri(ActivityVerb::FOLLOW);
             $act->object = $oprofile->asActivityObject();
 
             $act->time = time();
@@ -919,7 +919,7 @@ class OStatusPlugin extends Plugin
                                     common_date_iso8601(time()));
 
             $act->actor = ActivityObject::fromProfile($member);
-            $act->verb = ActivityVerb::UNFOLLOW;
+            $act->verb = ActivityUtils::resolveUri(ActivityVerb::UNFOLLOW);
             $act->object = $oprofile->asActivityObject();
 
             $act->time = time();
@@ -998,7 +998,7 @@ class OStatusPlugin extends Plugin
         $tagger = $plist->getTagger();
         $tagged = Profile::staticGet('id', $ptag->tagged);
 
-        $act->verb = ActivityVerb::TAG;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::TAG);
         $act->id   = TagURI::mint('tag_profile:%d:%d:%s',
                                   $plist->tagger, $plist->id,
                                   common_date_iso8601(time()));
@@ -1055,7 +1055,7 @@ class OStatusPlugin extends Plugin
         $tagger = $plist->getTagger();
         $tagged = Profile::staticGet('id', $ptag->tagged);
 
-        $act->verb = ActivityVerb::UNTAG;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::UNTAG);
         $act->id   = TagURI::mint('untag_profile:%d:%d:%s',
                                   $plist->tagger, $plist->id,
                                   common_date_iso8601(time()));
@@ -1105,7 +1105,7 @@ class OStatusPlugin extends Plugin
 
         $act = new Activity();
 
-        $act->verb = ActivityVerb::UNFAVORITE;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::UNFAVORITE);
         $act->id   = TagURI::mint('disfavor:%d:%d:%s',
                                   $profile->id,
                                   $notice->id,
@@ -1225,7 +1225,7 @@ class OStatusPlugin extends Plugin
 
         $act = new Activity();
 
-        $act->verb = ActivityVerb::UPDATE_PROFILE;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::UPDATE_PROFILE);
         $act->id   = TagURI::mint('update-profile:%d:%s',
                                   $profile->id,
                                   common_date_iso8601(time()));

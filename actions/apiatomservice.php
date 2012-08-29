@@ -93,7 +93,7 @@ class ApiAtomServiceAction extends ApiBareAuthAction
                        sprintf(_("%s timeline"),
                                $this->user->nickname));
         $this->element('accept', null, 'application/atom+xml;type=entry');
-        $this->element('activity:verb', null, ActivityVerb::POST);
+        $this->element('activity:verb', null, ActivityUtils::resolveUri(ActivityVerb::POST));
         $this->elementEnd('collection');
         $this->elementStart('collection',
                             array('href' => common_local_url('AtomPubSubscriptionFeed',
@@ -104,7 +104,7 @@ class ApiAtomServiceAction extends ApiBareAuthAction
                        sprintf(_("%s subscriptions"),
                                $this->user->nickname));
         $this->element('accept', null, 'application/atom+xml;type=entry');
-        $this->element('activity:verb', null, ActivityVerb::FOLLOW);
+        $this->element('activity:verb', null, ActivityUtils::resolveUri(ActivityVerb::FOLLOW));
         $this->elementEnd('collection');
         $this->elementStart('collection',
                             array('href' => common_local_url('AtomPubFavoriteFeed',
@@ -115,7 +115,7 @@ class ApiAtomServiceAction extends ApiBareAuthAction
                        sprintf(_("%s favorites"),
                                $this->user->nickname));
         $this->element('accept', null, 'application/atom+xml;type=entry');
-        $this->element('activity:verb', null, ActivityVerb::FAVORITE);
+        $this->element('activity:verb', null, ActivityUtils::resolveUri(ActivityVerb::FAVORITE));
         $this->elementEnd('collection');
         $this->elementStart('collection',
                             array('href' => common_local_url('AtomPubMembershipFeed',
@@ -126,7 +126,7 @@ class ApiAtomServiceAction extends ApiBareAuthAction
                        sprintf(_("%s memberships"),
                                $this->user->nickname));
         $this->element('accept', null, 'application/atom+xml;type=entry');
-        $this->element('activity:verb', null, ActivityVerb::JOIN);
+        $this->element('activity:verb', null, ActivityUtils::resolveUri(ActivityVerb::JOIN));
         $this->elementEnd('collection');
         $this->elementEnd('workspace');
         $this->elementEnd('service');

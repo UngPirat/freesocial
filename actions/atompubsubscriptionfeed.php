@@ -243,7 +243,7 @@ class AtompubsubscriptionfeedAction extends ApiAuthAction
 
         if (Event::handle('StartAtomPubNewActivity', array(&$activity))) {
 
-            if ($activity->verb != ActivityVerb::FOLLOW) {
+            if (!ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::FOLLOW)) {
                 // TRANS: Client error displayed when not using the follow verb.
                 $this->clientError(_('Can only handle Follow activities.'));
                 return;
@@ -251,7 +251,7 @@ class AtompubsubscriptionfeedAction extends ApiAuthAction
 
             $person = $activity->objects[0];
 
-            if ($person->type != ActivityObject::PERSON) {
+            if (!ActivityUtils::compareObjectTypes($person->type, ActivityObject::PERSON)) {
                 // TRANS: Client exception thrown when subscribing to an object that is not a person.
                 $this->clientError(_('Can only follow people.'));
                 return;

@@ -345,7 +345,7 @@ class BookmarkPlugin extends MicroAppPlugin
      */
     static private function _isPostBookmark($activity)
     {
-        return ($activity->verb == ActivityVerb::POST &&
+        return (ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::POST) &&
                 ActivityUtils::compareObjectTypes($activity->objects[0]->type, ActivityObject::BOOKMARK));
     }
 

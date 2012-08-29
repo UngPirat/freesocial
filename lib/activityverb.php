@@ -44,15 +44,15 @@ if (!defined('STATUSNET')) {
  */
 class ActivityVerb
 {
-    const POST     = 'http://activitystrea.ms/schema/1.0/post';
-    const SHARE    = 'http://activitystrea.ms/schema/1.0/share';
-    const SAVE     = 'http://activitystrea.ms/schema/1.0/save';
-    const FAVORITE = 'http://activitystrea.ms/schema/1.0/favorite';
-    const PLAY     = 'http://activitystrea.ms/schema/1.0/play';
-    const FOLLOW   = 'http://activitystrea.ms/schema/1.0/follow';
-    const FRIEND   = 'http://activitystrea.ms/schema/1.0/make-friend';
-    const JOIN     = 'http://activitystrea.ms/schema/1.0/join';
-    const TAG      = 'http://activitystrea.ms/schema/1.0/tag';
+    const POST     = 'post';
+    const SHARE    = 'share';
+    const SAVE     = 'save';
+    const FAVORITE = 'favorite';
+    const PLAY     = 'play';
+    const FOLLOW   = 'follow';
+    const FRIEND   = 'make-friend';
+    const JOIN     = 'join';
+    const TAG      = 'tag';
 
     // Custom OStatus verbs for the flipside until they're standardized
     const DELETE     = 'http://ostatus.org/schema/1.0/unfollow';

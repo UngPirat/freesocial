@@ -129,7 +129,7 @@ class Fave extends Managed_DataObject
 
         $act = new Activity();
 
-        $act->verb = ActivityVerb::FAVORITE;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::FAVORITE);
 
         // FIXME: rationalize this with URL below
 

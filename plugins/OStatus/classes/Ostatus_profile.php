@@ -480,7 +480,7 @@ class Ostatus_profile extends Managed_DataObject
         if (Event::handle('StartHandleFeedEntryWithProfile', array($activity, $this, &$notice)) &&
             Event::handle('StartHandleFeedEntry', array($activity))) {
 
-            switch ($activity->verb) {
+            switch (ActivityUtils::resolveUri($activity->verb, true)) {
             case ActivityVerb::POST:
                 // @todo process all activity objects
                 if (!ActivityUtils::compareObjectTypes($activity->objects[0]->type, array (

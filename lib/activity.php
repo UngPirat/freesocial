@@ -166,7 +166,7 @@ class Activity
         if (!empty($verbEl)) {
             $this->verb = ActivityUtils::resolveUri(trim($verbEl->textContent));
         } else {
-            $this->verb = ActivityVerb::POST;
+            $this->verb = ActivityUtils::resolveUri(ActivityVerb::POST);
             // XXX: do other implied stuff here
         }
 
@@ -266,7 +266,7 @@ class Activity
         if (!empty($verbEl)) {
             $this->verb = ActivityUtils::resolveUri(trim($verbEl->textContent));
         } else {
-            $this->verb = ActivityVerb::POST;
+            $this->verb = ActivityUtils::resolveUri(ActivityVerb::POST);
             // XXX: do other implied stuff here
         }
 
@@ -366,7 +366,7 @@ class Activity
         $activity['id'] = $this->id;
 
         // object
-        if ($this->verb == ActivityVerb::POST && count($this->objects) == 1) {
+        if (ActivityUtils::compareObjectTypes($this->verb, ActivityVerb::POST) && count($this->objects) == 1) {
             $activity['object'] = $this->objects[0]->asArray();
 
             // Context stuff. For now I'm just sticking most of it
@@ -548,7 +548,7 @@ class Activity
             $xs->element('activity:object-type', null, ActivityUtils::resolveUri(ActivityObject::ACTIVITY));
         }
 
-        if ($this->verb == ActivityVerb::POST && count($this->objects) == 1 && $tag == 'entry') {
+        if (ActivityUtils::compareObjectTypes($this->verb, ActivityVerb::POST) && count($this->objects) == 1 && $tag == 'entry') {
 
             $obj = $this->objects[0];
 			$obj->outputTo($xs, null);
@@ -582,7 +582,7 @@ class Activity
             $this->actor->outputTo($xs, 'author');
         }
 
-        if ($this->verb != ActivityVerb::POST || count($this->objects) != 1 || $tag != 'entry') {
+        if (!ActivityUtils::compareObjectTypes($this->verb, ActivityVerb::POST) || count($this->objects) != 1 || $tag != 'entry') {
             foreach($this->objects as $object) {
                 if ($object instanceof Activity) {
                     $object->outputTo($xs, false, true, true, 'activity:object');

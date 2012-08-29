@@ -236,7 +236,7 @@ class AtompubmembershipfeedAction extends ApiAuthAction
         $membership = null;
 
         if (Event::handle('StartAtomPubNewActivity', array(&$activity))) {
-            if ($activity->verb != ActivityVerb::JOIN) {
+            if (!ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::JOIN)) {
                 // TRANS: Client error displayed when not using the join verb.
                 throw new ClientException(_('Can only handle join activities.'));
                 return;
@@ -244,7 +244,7 @@ class AtompubmembershipfeedAction extends ApiAuthAction
 
             $groupObj = $activity->objects[0];
 
-            if ($groupObj->type != ActivityObject::GROUP) {
+            if (!ActivityUtils::compareObjectTypes($groupObj->type, ActivityObject::GROUP)) {
                 // TRANS: Client exception thrown when trying favorite an object that is not a notice.
                 throw new ClientException(_('Can only fave notices.'));
                 return;

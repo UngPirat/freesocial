@@ -168,7 +168,7 @@ class Group_member extends Managed_DataObject
         $act->id = $this->getURI();
 
         $act->actor     = ActivityObject::fromProfile($member);
-        $act->verb      = ActivityVerb::JOIN;
+        $act->verb      = ActivityUtils::resolveUri(ActivityVerb::JOIN);
         $act->objects[] = ActivityObject::fromGroup($group);
 
         $act->time  = strtotime($this->created);

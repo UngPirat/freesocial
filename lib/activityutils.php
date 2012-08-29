@@ -331,7 +331,7 @@ class ActivityUtils
         return null;
     }
 
-    static function compareObjectTypes($uri, $objects)
+    static function compareObjectTypes($uri, $objects)	// this does verbs too!
 	{
 		$uri = ActivityUtils::resolveUri($uri);
 		foreach ((array)$objects as $object) {
@@ -343,11 +343,11 @@ class ActivityUtils
 	}
     static function resolveUri($uri, $make_relative=false)
     {
-        if (parse_url($uri, PHP_URL_SCHEME) == '') {	// relative -> absolute
+        if (!$make_relative && parse_url($uri, PHP_URL_SCHEME) == '') {	// relative -> absolute
             $uri = Activity::SCHEMA . $uri;
         } elseif ($make_relative) {	// absolute -> relative
 			$uri = preg_replace('/^http:\/\/activitystrea\.ms\/schema\/1\.0\//', '', $uri);
-		}
+		} // absolute ostatus.org schemas pass through unharmed
         return $uri;
     }
 }

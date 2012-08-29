@@ -85,7 +85,7 @@ class SalmonAction extends Action
         common_log(LOG_DEBUG, "Got a " . $this->activity->verb);
         if (Event::handle('StartHandleSalmonTarget', array($this->activity, $this->target)) &&
             Event::handle('StartHandleSalmon', array($this->activity))) {
-            switch ($this->activity->verb)
+            switch (ActivityUtils::resolveUri($this->activity->verb, true))
             {
             case ActivityVerb::POST:
                 $this->handlePost();

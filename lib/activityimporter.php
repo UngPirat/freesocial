@@ -66,7 +66,7 @@ class ActivityImporter extends QueueHandler
         try {
             if (Event::handle('StartImportActivity',
                               array($user, $author, $activity, $trusted, &$done))) {
-                switch ($activity->verb) {
+                switch (ActivityUtils::resolveUri($activity->verb)) {
                 case ActivityVerb::FOLLOW:
                     $this->subscribeProfile($user, $author, $activity);
                     break;

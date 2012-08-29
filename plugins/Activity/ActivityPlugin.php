@@ -336,7 +336,7 @@ class ActivityPlugin extends Plugin
 
         $adapter = null;
 
-        switch ($notice->verb) {
+        switch (ActivityUtils::resolveUri($notice->verb, true)) {
         case ActivityVerb::FAVORITE:
         case ActivityVerb::UNFAVORITE:
             $adapter = new SystemListItem($nli);
@@ -368,7 +368,7 @@ class ActivityPlugin extends Plugin
 
     function onEndNoticeAsActivity($notice, &$activity)
     {
-        switch ($notice->verb) {
+        switch (ActivityUtils::resolveUri($notice->verb, true)) {
         case ActivityVerb::FAVORITE:
             $fave = Fave::staticGet('uri', $notice->uri);
             if (!empty($fave)) {
@@ -376,7 +376,7 @@ class ActivityPlugin extends Plugin
                 if (!empty($notice)) {
                     $cur = common_current_user();
                     $target = $notice->asActivity($cur);
-                    if ($target->verb == ActivityVerb::POST) {
+                    if (ActivityUtils::compareObjectTypes($target->verb, ActivityVerb::POST)) {
                         // "I like the thing you posted"
                         $activity->objects = $target->objects;
                     } else {

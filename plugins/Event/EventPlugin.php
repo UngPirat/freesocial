@@ -182,7 +182,7 @@ class EventPlugin extends MicroappPlugin
 
         $notice = null;
 
-        switch ($activity->verb) {
+        switch (ActivityUtils::resolveUri($activity->verb, true)) {
         case ActivityVerb::POST:
         	// FIXME: get startTime, endTime, location and URL
             $notice = Happening::saveNew($actor,

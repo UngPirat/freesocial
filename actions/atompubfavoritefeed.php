@@ -235,7 +235,7 @@ class AtompubfavoritefeedAction extends ApiAuthAction
 
         if (Event::handle('StartAtomPubNewActivity', array(&$activity))) {
 
-            if ($activity->verb != ActivityVerb::FAVORITE) {
+            if (!ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::FAVORITE)) {
                 // TRANS: Client exception thrown when trying use an incorrect activity verb for the Atom pub method.
                 throw new ClientException(_('Can only handle favorite activities.'));
                 return;
@@ -243,7 +243,7 @@ class AtompubfavoritefeedAction extends ApiAuthAction
 
             $note = $activity->objects[0];
 
-            if (!in_array($note->type, array(ActivityObject::NOTE,
+            if (!ActivityUtils::compareObjectTypes($note->type, array(ActivityObject::NOTE,
                                              ActivityObject::BLOGENTRY,
                                              ActivityObject::STATUS))) {
                 // TRANS: Client exception thrown when trying favorite an object that is not a notice.

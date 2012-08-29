@@ -161,7 +161,7 @@ class Facebookclient
         }
         $allowedVerbs = array(ActivityVerb::POST, ActivityVerb::SHARE);
         // Don't send things that aren't posts or repeats (at least for now)
-        if (!in_array($this->notice->verb, $allowedVerbs)) {
+        if (!ActivityUtils::compareObjectTypes($this->notice->verb, $allowedVerbs)) {
             return false;
         }
 

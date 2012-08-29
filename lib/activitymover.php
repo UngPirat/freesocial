@@ -85,7 +85,7 @@ class ActivityMover extends QueueHandler
             throw new Exception(sprintf(_('No such user "%s".'),$act->actor->id));
         }
 
-        switch ($act->verb) {
+        switch (ActivityUtils:resolveUri($act->verb, true)) {
         case ActivityVerb::FAVORITE:
             $this->log(LOG_INFO,
                        "Moving favorite of {$act->objects[0]->id} by ".

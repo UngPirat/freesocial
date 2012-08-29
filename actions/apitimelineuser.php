@@ -343,7 +343,7 @@ class ApiTimelineUserAction extends ApiBareAuthAction
         $saved = null;
 
         if (Event::handle('StartAtomPubNewActivity', array(&$activity, $this->user, &$saved))) {
-            if ($activity->verb != ActivityVerb::POST) {
+            if (!ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::POST)) {
                 // TRANS: Client error displayed when not using the POST verb. Do not translate POST.
                 $this->clientError(_('Can only handle POST activities.'));
                 return;
@@ -351,7 +351,7 @@ class ApiTimelineUserAction extends ApiBareAuthAction
 
             $note = $activity->objects[0];
 
-            if (!in_array($note->type, array(ActivityObject::NOTE,
+            if (!ActivityUtils::compareObjectTypes($note->type, array(ActivityObject::NOTE,
                                              ActivityObject::BLOGENTRY,
                                              ActivityObject::STATUS))) {
                 // TRANS: Client error displayed when using an unsupported activity object type.

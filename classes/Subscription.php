@@ -264,7 +264,7 @@ class Subscription extends Managed_DataObject
 
         $act = new Activity();
 
-        $act->verb = ActivityVerb::FOLLOW;
+        $act->verb = ActivityUtils::resolveUri(ActivityVerb::FOLLOW);
 
         // XXX: rationalize this with the URL
 

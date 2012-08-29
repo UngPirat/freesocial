@@ -109,7 +109,7 @@ class ActivitySink
             }
             $verbs = $path->query('activity:verb', $collection);
             if ($verbs->length == 0) {
-                $this->_addCollection(ActivityVerb::POST, $url);
+                $this->_addCollection(ActivityUtils::resolveUri(ActivityVerb::POST), $url);
             } else {
                 for ($k = 0; $k < $verbs->length; $k++) {
                     $verb = $verbs->item($k);

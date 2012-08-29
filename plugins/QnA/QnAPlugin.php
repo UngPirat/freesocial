@@ -215,7 +215,7 @@ class QnAPlugin extends MicroAppPlugin
 
         $notice = null;
 
-        switch ($activity->verb) {
+        switch (ActivityUtils::resolveUri($activity->verb)) {
         case ActivityVerb::POST:
             $notice = QnA_Question::saveNew(
                 $actor,

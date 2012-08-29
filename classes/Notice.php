@@ -514,13 +514,14 @@ class Notice extends Managed_DataObject
         } else {
             $notice->verb = $verb;
         }
+		$notice->verb = ActivityUtils::resolveUri($notice->verb, true);	// store a maybe shorter version
 
         if (empty($object_type)) {
             $notice->object_type = (empty($notice->reply_to)) ? ActivityObject::NOTE : ActivityObject::COMMENT;
         } else {
             $notice->object_type = $object_type;
         }
-		$notice->object_type = ActivityUtils::resolveUri($object_type, true);	// store a maybe shorter version
+		$notice->object_type = ActivityUtils::resolveUri($notice->object_type, true);	// store a maybe shorter version
 
         if (is_null($scope)) { // 0 is a valid value
             if (!empty($reply)) {
