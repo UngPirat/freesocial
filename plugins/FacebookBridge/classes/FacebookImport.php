@@ -84,7 +84,7 @@ class FacebookImport
     }
 
     function getAccessToken() {
-        return !empty($this->flink->credentials)
+        return (!is_null($this->flink) && !empty($this->flink->credentials))
                 ? $this->flink->credentials
                 : $this->facebook->getAccessToken();
     }
@@ -478,7 +478,7 @@ class FacebookImport
     function ensureProfile($foreign_id)
     {
         $fsrv = new FacebookService();
-        $foreign_user = $fsrv->addForeignUser($foreign_id, $this->flink->credentials);
+        $foreign_user = $fsrv->addForeignUser($foreign_id, $this->getAccessToken());
         try {
 			$profile = $this->getProfileByForeignUser($foreign_user);
 		} catch (Exception $e) {	// no profile found, let's create one!

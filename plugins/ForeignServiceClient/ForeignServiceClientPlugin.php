@@ -141,6 +141,7 @@ abstract class ForeignServiceClient
             while ($switch->fetch()) {
                 $original = clone($switch);
                 $switch->profile_id = $user_id;
+                $switch->is_local = 1;	// turn it into a local post
                 $switch->update($original);
             }
             // and delete the old profile as we do not need it anymore
