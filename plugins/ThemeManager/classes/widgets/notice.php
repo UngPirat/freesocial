@@ -56,7 +56,7 @@ class NoticeWidget extends ThemeWidget {
         return common_local_url('conversation', array('id'=>$this->notice->conversation)).'#notice-'.$this->get_id();
     }
     function get_rendered_content() {
-		$notice = ($this->repeated ? $this->repeated : $this->notice);
+		$notice = (isset($this->repeated) ? $this->repeated : $this->notice);
         return $notice->rendered
                 ? $notice->rendered
                 : common_render_content($notice->content, $notice);
