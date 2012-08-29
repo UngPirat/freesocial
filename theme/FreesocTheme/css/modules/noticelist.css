@@ -1,10 +1,62 @@
-.noticelist > li {
-    display: block;
+.conversation {
+	display: block;
+	margin: 0 auto;
+	width: 60%;
 }
+.conversation:nth-child(2n),
+.noticestream .notice:nth-child(2n) {
+	background-color: #eee;
+}
+.conversation .notice {
+	margin-left: 10%;
+	padding: 1.5em 3ex;
+}
+.conversation .notice:first-child {
+	display: block;
+	margin-left: 0;
+}
+
 
 .notice {
 	clear: both;
+	padding-top: 1.5em;
+	position: relative;
 }
 .notice .metadata {
-	
+	display: block;
+	font-size: 0.75em;
+	position: absolute;
+	top: 1em;
+}
+.notice > * {
+	text-align: left;
+}
+.notice > .vcard {
+	display: block;
+	float: left;
+}
+.notice > .vcard .photo {
+	border-radius: 1ex;
+	display: block;
+	margin: 1ex;
+}
+.notice > .vcard .url {
+	display: none;
+}
+
+.notice .notice-content {
+	display: block;
+	line-height: 1.25em;
+	margin: 1ex 0;
+	white-space: pre-wrap;
+}
+.notice .notice-content.repeat {
+	margin-left: 1em;
+}
+.notice .notice-content.repeat:before {
+	position: absolute;
+	font-size: 2em;
+	content: '\2672';
+	top: 1em;
+	right: -1em;
 }

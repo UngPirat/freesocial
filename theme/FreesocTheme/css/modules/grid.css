@@ -3,11 +3,28 @@
 	width: 90%
 }
 
+header {
+	margin-bottom: 1em;
+}
 #content {
+	clear: both;
 	float: left;
+}
+article {
 	width: 70%;
 }
-#aside {
+article.single {
+	width: auto;
+}
+article > aside {
+	float: left;
+	width: 30%;
+}
+#content > .list {
+	float: right;
+	width: 70%;
+}
+#wrapper > aside {
 	float: right;
 	width: 30%;
 }

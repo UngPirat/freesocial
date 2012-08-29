@@ -23,6 +23,12 @@
 	float: left;
 	position: relative;
 }
+.menu-container .menu-title {
+	color: #eee;
+	font-size: 1em;
+	padding: 0 2em;
+	line-height: 3.333em;
+}
 .menu-container a {
 	color: #eee;
 	display: block;

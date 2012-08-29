@@ -1,5 +1,5 @@
 <?php
-	$loop = $this->loop($this->action->notice);
+	$loop = $this->loop(array('list'=>$this->action->notice), 'Conversation');
 
 	try {
 		$pages = $loop->get_paging($this->action->args['page']);
@@ -7,17 +7,10 @@
         $pages = array();
 	}
 
-	$this->pagination($pages);
-?>
-<ul class="noticelist">
+    $this->pagination($pages);
 
-<?php while($loop->next()) : ?>
-	<li id="notice-<?php $loop->the_id(); ?>" class="notice">
-<?php
-        // initiates a NoticeWidget that renders the notice
-        $this->widgets(array('NoticeWidget'=>array('notice'=>$loop->current())));
-?>
-	</li>
-<?php endwhile; ?>
-</ul>
-<?php $this->pagination($pages); ?>
+    do {
+        $this->widget('Conversation', array('conversation'=>$loop->current(),'out'=>$this->out,'widgetId'=>'conversation-'.$loop->get_id()));
+    } while ($loop->next());
+
+    $this->pagination($pages);

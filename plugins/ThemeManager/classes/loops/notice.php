@@ -2,35 +2,13 @@
 
 class NoticeLoop extends ObjectLoop {
     function prefill() {
-        $notices = $this->list->fetchAll();
-        if (Event::handle('StartNoticeListPrefill', array(&$notices, AVATAR_STREAM_SIZE))) {
-            Notice::fillAttachments($notices);
-            Notice::fillFaves($notices);
-            Notice::fillRepeats($notices);
-            $profiles = Notice::fillProfiles($notices);
+        if (Event::handle('StartNoticeListPrefill', array(&$this->list, AVATAR_STREAM_SIZE))) {
+            Notice::fillAttachments($this->list);
+            Notice::fillFaves($this->list);
+            Notice::fillRepeats($this->list);
+            $profiles = Notice::fillProfiles($this->list);
 
-            Event::handle('EndNoticeListPrefill', array(&$notices, &$profiles, AVATAR_STREAM_SIZE));
+            Event::handle('EndNoticeListPrefill', array(&$this->list, &$profiles, AVATAR_STREAM_SIZE));
         }
-    }
-
-    function the_avatar($size=AVATAR_STREAM_SIZE) {
-        return $this->list->profile->getAvatar($size);
-        
-    }
-
-    function the_avatarurl($size=AVATAR_STREAM_SIZE) {
-        echo htmlspecialchars($this->list->profile->avatarUrl($size));
-    }
-
-    function the_name() {
-        echo htmlspecialchars($this->list->profile->fullname);
-    }
-
-    function the_nickname() {
-        echo htmlspecialchars($this->list->profile->nickname);
-    }
-
-    function the_profileurl() {
-        echo htmlspecialchars($this->list->profile->profileurl);
     }
 }

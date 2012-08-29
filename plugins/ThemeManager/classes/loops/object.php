@@ -1,56 +1,59 @@
 <?php
 
-class ObjectLoop {	// might extend Iterator in the future
-    protected $list;
-    private $count = null;
+class ObjectLoop extends ThemeExtension {	// might extend Iterator in the future
+    protected $list = array();
+    protected $num  = NOTICES_PER_PAGE;
 
-    public function __construct($list) {
-        if (!is_a($list, 'ArrayWrapper')) {
-            throw new Exception('Not a DataObject');
+    private $count  = null;
+
+    public function validate() {
+        if (is_a($this->list, 'ArrayWrapper')) {
+            $this->list = $this->list->fetchAll();
         }
 
-        $this->list = $list;
+        if (!is_array($this->list)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function initialize() {
+        parent::initialize();
+
         $this->prefill();
+		$this->reset();
+        $this->count = count($this->list);
     }
 
     function count() {
-        return $this->list->_count;
+        return $this->count;
+    }
+
+    function merge(array $list) {
+        $this->list = array_merge($this->list, $list);
+        $this->reset();
+		return $this->list;
     }
 
     function next() {
-        return $this->list->fetch();
+        return next($this->list);
     }
 
     function current() {
-        return $this->list->_items[$this->list->_i];
+        return current($this->list);
     }
 
-    function get_paging($page) {
-        $page  = (0+$page === 0 ? 1 : 0+$page);	// convert to (int)
-        if ($page < 1) {
-            throw new ClientException('Invalid paging arguments');
-        }
-
-        $pages = array();
-        if ($page > 1) {
-            $pages['next']   = $page - 1;
-        }
-        if ($this->count() > NOTICES_PER_PAGE) {
-            $pages['prev']   = $page + 1;
-        }
-        if (isset($pages['next']) || isset($pages['prev'])) {
-            $pages['current'] = (0+$this->list->_items[$this->count()-1]->id) . '..' . (0+$this->list->_items[0]->id);
-        }
-        return $pages;
+    function reset() {
+        return reset($this->list);
     }
 
     function prefill() {
         // When you need to fetch stuff like profiles or avatars
     }
 
-    function the_id() {
-        if (!isset($this->list->id)) return false;
-        echo htmlspecialchars($this->list->id);
+    function get_id() {
+        return $this->current()->id;
     }
 
 }

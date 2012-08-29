@@ -1,0 +1,14 @@
+aside .welcome {
+	max-width: 100%;
+}
+
+#profile .notice {
+	padding: 1em;
+}
+#profile .notice .author {
+	display: none;
+}
+#profile .notice .metadata {
+	position: static;
+	clear: both;
+}

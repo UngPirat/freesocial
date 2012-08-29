@@ -1,9 +1,8 @@
 <?php
 
 class AttachmentlistWidget extends ListWidget {
-    protected $num = 10;
-    protected $itemClass   = 'attachment';
-    protected $widgetClass = 'attachments';
+    protected $offset = 0;
+    protected $num    = 10;
 
 	protected $profile;
 
@@ -21,33 +20,40 @@ class AttachmentlistWidget extends ListWidget {
     }
 
     function get_list() {
-        $f2p  = new File_to_post;
-        @$f2p->joinAdd(array('post_id', 'notice:id'));
-        @$f2p->joinAdd(array('file_id', 'file:id'));
-        $f2p->whereAdd('profile_id = '.$this->profile->id);
-        $f2p->whereAdd('mimetype LIKE "image/%"');
-        $f2p->orderBy('post_id DESC');
-        $f2p->limit($this->offset, $this->num);
-
         $ids = array();
-        if ($f2p->find()) :
-            while ($f2p->fetch()) {
-                $ids[$f2p->file_id][] = $f2p->post_id;
-            }
-        endif;
-        $this->ids = $ids;
+        $this->notices = array();
+		do {
+            $f2p = new File_to_post;
+            $f2p->protected = null;
+            @$f2p->joinAdd(array('post_id', 'notice:id'));
+            @$f2p->joinAdd(array('file_id', 'file:id'));
+            @$f2p->joinAdd(array('file_id', 'file_thumbnail:file_id'));
+            $f2p->whereAdd('profile_id = '.$this->profile->id);
+            $f2p->whereAdd('mimetype LIKE "image/%"');
+            $f2p->orderBy('post_id DESC');
+			$f2p->limit($this->offset, $this->offset+$this->num+1);
+
+            if ($f2p->find()) :
+                while ($f2p->fetch()) :
+    				if (count($ids) == $this->num) {
+    					break;
+    				}
+        			$notice = Notice::staticGet('id', $f2p->post_id);
+            		if (!$notice->inScope($this->scoped)) {
+            	        continue;
+            		}
+        			$this->notices[$f2p->file_id][] = $notice;
+        			$ids[$f2p->file_id] = true;
+        		endwhile;
+            endif;
+			$this->offset += $f2p->N;
+		} while (count($ids) < $this->num && $f2p->N > $this->num);
         
         return Memcached_DataObject::multiGet('File', 'id', array_keys($ids));
     }
 
     function the_item($item) {
-        $thumb = $item->getThumbnail(AVATAR_PROFILE_SIZE);
-        $notice = Notice::staticGet('id', $this->ids[$item->id][0]);
-
-        $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$item->id)), 'class'=>'url'));
-        $this->out->element('img', array('src'=>$thumb->url, 'class'=>'photo'));
-        $this->out->element('span', 'title', $notice->content);
-        $this->out->elementEnd('a');
+		PreviewWidget::run(array('item'=>$item, 'notices'=>$this->notices[$item->id], 'out'=>$this->out));
     }
 }
 

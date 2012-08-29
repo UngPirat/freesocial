@@ -1,7 +1,5 @@
-<!DOCTYPE html
-PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php $this->the_lang(); ?>" lang="<?php $this->the_lang(); ?>">
+<!DOCTYPE html>
+<html lang="<?php $this->the_lang(); ?>">
 <head>
 	<title><?php
 		$this->the_title();
@@ -15,7 +13,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 </head>
 <body>
 <div id="wrapper">
-<div id="header">
+<header>
 <?php $this->box('site-title'); ?>
 	<div id="login">
 <?php
@@ -30,4 +28,4 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 ?>
 	</div>
 <?php $this->box('topmenu'); ?>
-</div>
+</header>

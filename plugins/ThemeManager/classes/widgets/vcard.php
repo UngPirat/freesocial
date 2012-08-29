@@ -9,7 +9,6 @@ class VcardWidget extends ProfileWidget {
 
     function show() {
         $this->the_vcard();
-        $this->out->flush();
     }
 }
 

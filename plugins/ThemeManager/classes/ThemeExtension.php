@@ -1,6 +1,7 @@
 <?php
 
 abstract class ThemeExtension {
+    protected $scoped = null;
 
     function __construct($args=null) {
         // iterate class variables and set to either default or given
@@ -15,7 +16,14 @@ abstract class ThemeExtension {
         $this->initialize();
     }
 
-    abstract protected function validate();
+    protected function validate() {
+        if (is_null($this->scoped)) {
+            $user = common_current_user();
+            if (!is_null($user)) {
+                $this->scoped = $user->getProfile();
+            }
+        }
+    }
 
     protected function initialize() {
         return true;

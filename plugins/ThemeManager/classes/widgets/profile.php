@@ -22,7 +22,6 @@ class ProfileWidget extends ThemeWidget {
     function show() {
         $this->the_vcard();
         $this->the_metadata();
-        $this->out->flush();
     }
 
     function get_name() {
@@ -44,13 +43,8 @@ class ProfileWidget extends ThemeWidget {
     }
     function the_vcard() {
         $this->out->elementStart('span', 'vcard');
-        $this->out->element('img', array('src'    => $this->profile->avatarUrl($this->avatarSize),
-                                         'class'  => 'photo',
-                                         'alt'    => sprintf(_('Photo of %s'), $this->get_webfinger()),
-                                   ));
-        $this->out->element('a', array('href'  => $this->profile->profileurl,
-                                       'class' => 'url fn'),
-                            $this->get_name());
+        $this->out->element('img', array('src'=>$this->profile->avatarUrl($this->avatarSize), 'alt'=>'', 'class'=>'photo'));
+        $this->out->element('a', array('href'=>$this->profile->profileurl, 'class'=>'url fn'), $this->get_name());
         $this->out->elementEnd('span');
     }
 }

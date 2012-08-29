@@ -3,17 +3,23 @@
  *  Name: Remote Profile
  */
 	$this->box('header');
-?>
-<div id="content">
-<?php
-	if (is_a($this->action, 'ShowstreamAction')) {
-		$this->content('profile');
-	} else {
-		$this->content('noticelist');
+
+	$this->out->elementStart('article', array('id'=>'content','class'=>($this->is_single()?'single':'')));
+
+	if ($this->is_single()) :
+		if ($this->is_action('showprofile')) {
+			$this->content('showprofile');
+		} else {
+			$this->content('noticelist');
+		}
+	else :
+			$this->content('noticelist');
+	endif;
+	$this->out->elementEnd('article');
+
+	if (!$this->is_single()) {
+    	$this->box('aside');
 	}
-?>
-</div>
-<?php
-    $this->box('aside');
+	$this->out->flush();
     $this->box('footer');
 ?>

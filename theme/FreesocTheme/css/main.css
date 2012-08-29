@@ -1,9 +1,11 @@
+@import url("reset.css");
+
 @import url("modules/grid.css");
 @import url("modules/header.css");
 @import url("modules/menu.css");
-@import url("modules/aside.css");
 @import url("modules/noticelist.css");
 @import url("modules/widgets.css");
+@import url("modules/aside.css");
 
 body {
 	color: black;
@@ -18,7 +20,8 @@ a:hover {
 }
 
 nav.paging {
-	margin: 0 auto;
+    margin: 1em auto;
+    padding: 1px;
 	width: 66%;
 	text-align: center;
 }
@@ -32,4 +35,8 @@ nav .current {
 }
 nav .next {
 	float: right;
+}
+
+article > h2 {
+	display: none;
 }

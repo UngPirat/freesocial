@@ -1051,6 +1051,10 @@ class Router
                 $m->connect(':nickname/',
                             array('action' => 'showstream'),
                             array('nickname' => Nickname::DISPLAY_FMT));
+
+                $m->connect(':nickname/stream',
+                            array('action' => 'showstream'),
+                            array('nickname' => Nickname::DISPLAY_FMT));
             }
 
             // AtomPub API

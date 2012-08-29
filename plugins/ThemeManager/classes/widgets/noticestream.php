@@ -1,27 +1,21 @@
 <?php
 
-abstract class NoticestreamWidget extends ThemeWidget {
-    protected $num = 2;
+abstract class NoticestreamWidget extends ListWidget {
+    protected $offset = 0;
+    protected $num    = 5;
 
-    protected $noticeClass;
-    protected $widgetClass;
-
-    function show() {
-        $this->the_stream();
-        $this->out->flush();
-    }
+    protected $title = null;
+    protected $itemClass   = 'notice';
+    protected $widgetClass = 'noticestream';
 
     abstract function get_stream();
 
-    function the_stream() {
-		$loop = new NoticeLoop($this->get_stream()->getNotices(0, $this->num));
-        $this->out->elementStart('ul', "noticelist widget {$this->widgetClass}");
-        while ($loop->next()) :
-            $this->out->elementStart('li', "notice {$this->noticeClass}");
-            NoticeWidget::run(array('notice'=>$loop->current(), 'out'=>$this->out, 'avatarSize'=>48));
-            $this->out->elementEnd('li');
-        endwhile;
-        $this->out->elementEnd('ul');
+    function get_list() {
+        return $this->get_stream()->getNotices($this->offset, $this->num);
+    }
+
+    function the_item($item) {
+        NoticeWidget::run(array('notice'=>$item, 'out'=>$this->out));
     }
 }
 

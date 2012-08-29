@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-class RemoteProfileAction extends ShowstreamAction
+class RemoteProfileAction extends ShowprofileAction
 {
 	function prepare($args)
 	{

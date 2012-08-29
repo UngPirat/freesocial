@@ -4,9 +4,6 @@ class ThemeManager extends ThemeSite {
     protected $boxes;
     protected $name;
 
-    protected $urldir;
-    protected $sysdir;
-
     protected $out;
 
     function __construct($action)
@@ -77,8 +74,11 @@ class ThemeManager extends ThemeSite {
         $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
     }
 
+    function get_title() {
+		return $this->action->title();
+	}
     function the_title() {
-        echo htmlspecialchars($this->action->title());
+        echo htmlspecialchars($this->get_title());
     }
     function the_lang() {
         echo htmlspecialchars(common_config('site', 'language'));
@@ -124,9 +124,9 @@ class ThemeManager extends ThemeSite {
         include $box;
     }
 
-    function loop($list, $type='Object') {
+    function loop($args, $type='Object') {
         $class = ucfirst($type).'Loop';
-        $loop = new $class($list);
+        $loop = new $class($args);
         return $loop;
     }
     function pagination(array $pages) {
@@ -134,11 +134,9 @@ class ThemeManager extends ThemeSite {
             return;
         }
         $this->out->elementStart('nav', 'paging');
-        foreach(array('prev'=>_m('Older posts'), 'current'=>_m('Current scope'), 'next'=>_m('Newer posts')) as $key=>$trans) {
+        foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
             if (!isset($pages[$key])) {
                 continue;
-            } elseif ($key == 'current') {
-                $href = common_local_url($this->action->args['action'], $this->action->args, array('scope'=>$pages[$key]));
             } else {
                 $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
             }

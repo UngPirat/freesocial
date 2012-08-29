@@ -4,24 +4,40 @@ abstract class ListWidget extends ThemeWidget {
     protected $offset = 0;
     protected $num    = 5;
 
+    protected $scoped = null;
+    protected $title  = null;
+
     protected $itemClass;
-    protected $title;
+    protected $itemTag;
+    protected $loopClass;
+    protected $loopTag;
     protected $widgetClass;
+    protected $widgetTag = 'section';
+    protected $widgetId;
 
     function show() {
         $this->the_content();
-        $this->out->flush();
+    }
+
+    protected function validate() {
+        if (!is_null($this->scoped) && !is_a($this->scoped, 'Profile')) {
+            return false;
+        }
+
+        return parent::validate();
     }
 
     protected function initialize() {
-		parent::initialize();
+        parent::initialize();
+
+        $this->scoped = Profile::current();
 
         $this->loop = $this->get_loop();
     }
 
     // could be overloaded if you want stuff like prefilling notices etc.
     function get_loop() {
-        return new ObjectLoop($this->get_list());
+        return new ObjectLoop(array('list'=>$this->get_list()));
     }
 
     abstract function get_list();	// returns a DataObject with multiple entries
@@ -36,17 +52,22 @@ abstract class ListWidget extends ThemeWidget {
     }
 
     function the_loop() {
-        $this->out->elementStart('ul');
-        while ($this->loop->next()) :
-            $this->out->elementStart('li', "list-item {$this->itemClass}");
+		$this->loopTag && $this->out->elementStart($this->loopTag, $this->loopClass);
+        do {
+			$this->itemTag && $this->out->elementStart($this->itemTag, "list-item {$this->itemClass}");
             $this->the_item($this->loop->current());
-            $this->out->elementEnd('li');
-        endwhile;
-        $this->out->elementEnd('ul');
+            $this->itemTag && $this->out->elementEnd($this->itemTag);
+        } while ($this->loop->next());
+       	$this->loopTag && $this->out->elementEnd($this->loopTag);
     }
 
     function the_content() {
-        $this->out->elementStart('div', "list widget {$this->widgetClass}");
+		$args = array('class'=>"list widget {$this->widgetClass}");
+		if (!empty($this->widgetId)) {
+			$args['id'] = $this->widgetId;
+		}
+
+        $this->widgetTag && $this->out->elementStart($this->widgetTag, $args);
         if (!empty($this->title)) {
             $this->out->element('h3', 'widget-title', $this->title);
         }
@@ -56,7 +77,7 @@ abstract class ListWidget extends ThemeWidget {
         } else {
             $this->the_empty();
         }
-        $this->out->elementEnd('div');
+        $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 }
 

@@ -1,7 +1,4 @@
-<div id="topmenu" class="menu-container">
 <?php
 
-    $this->menus(array('PersonalMenu', 'GlobalMenu'));
+    MenulistWidget::run(array('menus'=>array('PersonalMenu', 'GlobalMenu'), 'action'=>$this->action));
 
-?>
-</div>

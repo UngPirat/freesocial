@@ -1,8 +1,9 @@
 #site-title {
 	float: left;
+	font-size: 2em;
+	line-height: 2em;
 }
 
-#header #login {
+header #login {
 	float: right;
 }
-

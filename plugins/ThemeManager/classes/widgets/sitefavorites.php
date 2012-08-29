@@ -1,10 +1,10 @@
 <?php
 
-class FavoritesWidget extends NoticestreamWidget {
-    protected $noticeClass = 'favorite';
+class SitefavoritesWidget extends NoticestreamWidget {
+    protected $itemClass   = 'notice favorite';
     protected $widgetClass = 'favorites';
 
-	protected $profile;
+	protected $profile;	// used for scoping
 
     static function run($args=null) {
         $class = get_class();
@@ -16,11 +16,12 @@ class FavoritesWidget extends NoticestreamWidget {
         if (!is_a($this->profile, 'Profile')) {
             return false;
         }
+
 		return parent::validate();
     }
 
     function get_stream() {
-        $stream = new PopularNoticeStream($this->profile);
+        $stream = new PopularNoticeStream($this->scoped);
         return $stream;
     }
 }

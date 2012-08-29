@@ -6,33 +6,43 @@
     display: none;
 }
 
-.list.widget .list-item .photo {
+#content > .list:nth-child(2n) {
+	margin-top: 1em;
 }
+
 .list.widget .list-item {
 	display: block;
 	float: left;
-	margin: 0 1%;
-	padding: 1%;
-	text-align: center;
-	width: 16%;
-    height: 16%;
+	margin: 0 1ex;
+	padding: 1em;
 	position: relative;
 }
+#favorites .notice {
+	clear: none;
+	float: left;
+	margin: 0 1%;
+	width: 48%;
+}
 .list.widget .list-more {
+	clear: both;
     padding: 0 1%;
 	text-align: right;
 }
-.list.widget .list-item .url .title {
+.list.widget .url .description,
+.list.widget .notice > .vcard .fn {
 	display: none;
-}
-.list.widget .list-item .url:hover .title {
-    display: block;
 	position: absolute;
 	font-size: 1ex;
 	left: 0;
-	right: 0;
 	top: 0;
 	background: white;
 	border: 1px solid;
 	padding: 1ex 1em;
+}
+.list.widget .url .description {
+	right: 0;
+}
+.list.widget .url:hover .description,
+.list.widget .notice > .vcard:hover .fn {
+    display: block;
 }

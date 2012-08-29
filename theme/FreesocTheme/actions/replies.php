@@ -6,7 +6,7 @@
 	$this->box('header');
 ?>
 <h2 id="content-title"><?php $this->the_title(); ?></h2>
-<div id="content"><?php $this->content('noticelist'); ?></div>
+<article id="content"><?php $this->content('noticelist'); ?></article>
 <?php
     $this->box('aside');
     $this->box('footer');
