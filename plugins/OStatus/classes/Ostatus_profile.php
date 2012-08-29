@@ -316,7 +316,7 @@ class Ostatus_profile extends Managed_DataObject
             $entry->element('summary', null, $text);
             $entry->element('published', null, common_date_w3dtf(common_sql_now()));
 
-            $entry->element('activity:verb', null, $verb);
+            $entry->element('activity:verb', null, ActivityUtils::resolveUri($verb));
             $entry->raw($actor->asAtomAuthor());
             $entry->raw($actor->asActivityActor());
             $entry->raw($object->asActivityNoun('object'));

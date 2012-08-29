@@ -571,7 +571,7 @@ class Activity
 
         }
 
-        $xs->element('activity:verb', null, $this->verb);
+        $xs->element('activity:verb', null, ActivityUtils::resolveUri($this->verb));
 
         $published = self::iso8601Date($this->time);
 

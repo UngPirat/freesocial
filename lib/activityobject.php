@@ -558,7 +558,7 @@ class ActivityObject
         }
 
         if (Event::handle('StartActivityObjectOutputAtom', array($this, $xo))) {
-            $xo->element('activity:object-type', null, $this->type);
+            $xo->element('activity:object-type', null, ActivityUtils::resolveUri($this->type));
 
             // <author> uses URI
 
@@ -734,7 +734,7 @@ class ActivityObject
             // We can probably use the whole schema URL here but probably the
             // relative simple name is easier to parse
             // @fixme this breaks extension URIs
-            $object['objectType'] = substr($this->type, strrpos($this->type, '/') + 1);
+            $object['objectType'] = ActivityUtils::resolveUri($this->type, true);
 
             // summary
             $object['summary'] = $this->summary;

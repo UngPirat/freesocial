@@ -174,6 +174,7 @@ class MediaFile
 
         $imagefile = new ImageFile($original->id, File::path($original->filename), $original->mimetype);
 
+        $x = $y = 0;
         if ($square) {	// CHANGE!!!!
             if ($imagefile->width >= $imagefile->height) {
                 $x = floor($imagefile->width/2-$imagefile->height/2);
@@ -186,7 +187,6 @@ class MediaFile
             $width = $height = $size;
         } else {
             list ($width, $height) = MediaFile::scaleToFit($imagefile->width, $imagefile->height, $size, $size);
-            $x = $y = 0;
             $srcw = $imagefile->width;
             $srch = $imagefile->height;
         }
