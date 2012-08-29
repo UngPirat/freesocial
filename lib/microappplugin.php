@@ -175,7 +175,7 @@ abstract class MicroAppPlugin extends Plugin
      */
     function isMyNotice($notice) {
         $types = $this->types();
-        return ($notice->verb == ActivityVerb::POST) && in_array($notice->object_type, $types);
+        return ($notice->verb == ActivityVerb::POST) && ActivityUtils::compareObjectTypes($notice->object_type, $types);
     }
 
     /**
@@ -195,7 +195,7 @@ abstract class MicroAppPlugin extends Plugin
         return (count($activity->objects) == 1 &&
                 ($activity->objects[0] instanceof ActivityObject) &&
                 ($activity->verb == ActivityVerb::POST) &&
-                in_array($activity->objects[0]->type, $types));
+                ActivityUtils::compareObjectTypes($activity->objects[0]->type, $types));
     }
 
     /**
@@ -508,7 +508,7 @@ abstract class MicroAppPlugin extends Plugin
      */
     function onEndActivityObjectOutputAtom(ActivityObject $obj, XMLOutputter $out)
     {
-        if (in_array($obj->type, $this->types())) {
+        if (ActivityUtils::compareObjectTypes($obj->type, $this->types())) {
             $this->activityObjectOutputAtom($obj, $out);
         }
         return true;
@@ -528,7 +528,7 @@ abstract class MicroAppPlugin extends Plugin
      */
     function onEndActivityObjectOutputJson(ActivityObject $obj, array &$out)
     {
-        if (in_array($obj->type, $this->types())) {
+        if (ActivityUtils::compareObjectTypes($obj->type, $this->types())) {
             $this->activityObjectOutputJson($obj, $out);
         }
         return true;

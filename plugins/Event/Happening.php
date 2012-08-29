@@ -49,7 +49,7 @@ if (!defined('STATUSNET')) {
  */
 class Happening extends Managed_DataObject
 {
-    const OBJECT_TYPE = 'http://activitystrea.ms/schema/1.0/event';
+    const OBJECT_TYPE = 'event';
 
     public $__table = 'happening'; // table name
     public $id;                    // varchar(36) UUID

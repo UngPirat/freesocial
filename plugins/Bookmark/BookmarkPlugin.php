@@ -346,7 +346,7 @@ class BookmarkPlugin extends MicroAppPlugin
     static private function _isPostBookmark($activity)
     {
         return ($activity->verb == ActivityVerb::POST &&
-                $activity->objects[0]->type == ActivityObject::BOOKMARK);
+                ActivityUtils::compareObjectTypes($activity->objects[0]->type, ActivityObject::BOOKMARK));
     }
 
     function types()
@@ -476,7 +476,7 @@ file_put_contents(tempnam('/tmp','as-'), print_r($activity,true)."\n\n==========
         $nb = Bookmark::getByNotice($notice);
 
         $object->id      = $notice->uri;
-        $object->type    = ActivityObject::BOOKMARK;
+        $object->type    = ActivityUtils::resolveUri(ActivityObject::BOOKMARK);
         $object->title   = $nb->title;
         $object->summary = $nb->description;
         $object->link    = $notice->bestUrl();
@@ -576,7 +576,7 @@ file_put_contents(tempnam('/tmp','as-'), print_r($activity,true)."\n\n==========
 
     public function activityObjectOutputJson(ActivityObject $obj, array &$out)
     {
-        assert($obj->type == ActivityObject::BOOKMARK);
+        assert(ActivityUtils::compareObjectTypes($obj->type, ActivityObject::BOOKMARK));
 
         $bm = Bookmark::staticGet('uri', $obj->id);
 

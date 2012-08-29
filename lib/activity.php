@@ -177,8 +177,8 @@ class Activity
         if (count($objectEls) > 0) {
             foreach ($objectEls as $objectEl) {
                 // Special case for embedded activities
-                $objectType = ActivityUtils::childContent($objectEl, self::OBJECTTYPE, self::SPEC);
-                if (!empty($objectType) && $objectType == ActivityObject::ACTIVITY) {
+                $objectType = ActivityUtils::resolveUri(ActivityUtils::childContent($objectEl, self::OBJECTTYPE, self::SPEC));
+                if (!empty($objectType) && ActivityUtils::compareObjectTypes($objectType, ActivityObject::ACTIVITY)) {
                     $this->objects[] = new Activity($objectEl);
                 } else {
                     $this->objects[] = new ActivityObject($objectEl);
@@ -280,7 +280,7 @@ class Activity
             $this->actor = ActivityObject::fromRssAuthor($authorEl);
         } else if ($dcCreatorEl = $this->_child($item, self::CREATOR, self::DC)) {
             $this->actor = ActivityObject::fromDcCreator($dcCreatorEl);
-        } else if ($posterousEl = $this->_child($item, ActivityObject::AUTHOR, ActivityObject::POSTEROUS)) {
+        } else if ($posterousEl = $this->_child($item, ActivityUtils::resolveUri(ActivityObject::AUTHOR), ActivityUtils::resolveUri(ActivityObject::POSTEROUS))) {
             // Special case for Posterous.com
             $this->actor = ActivityObject::fromPosterousAuthor($posterousEl);
         } else if (!empty($channel)) {
@@ -289,7 +289,7 @@ class Activity
             // No actor!
         }
 
-        $this->title = ActivityUtils::childContent($item, ActivityObject::TITLE, self::RSS);
+        $this->title = ActivityUtils::childContent($item, ActivityUtils::resolveUri(ActivityObject::TITLE), self::RSS);
 
         $contentEl = ActivityUtils::child($item, self::ENCODED, self::CONTENTNS);
 
@@ -545,7 +545,7 @@ class Activity
         $xs->elementStart($tag, $attrs);
 
         if ($tag != 'entry') {
-            $xs->element('activity:object-type', null, ActivityObject::ACTIVITY);
+            $xs->element('activity:object-type', null, ActivityUtils::resolveUri(ActivityObject::ACTIVITY));
         }
 
         if ($this->verb == ActivityVerb::POST && count($this->objects) == 1 && $tag == 'entry') {

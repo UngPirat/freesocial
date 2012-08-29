@@ -118,7 +118,7 @@ function is_twitter_bound($notice, $flink) {
     }
 
     // Don't send activity activities (at least for now)
-    if ($notice->object_type == ActivityObject::ACTIVITY) {
+    if (ActivityUtils::compareObjectTypes($notice->object_type, ActivityObject::ACTIVITY)) {
         return false;
     }
 

@@ -331,11 +331,23 @@ class ActivityUtils
         return null;
     }
 
-    static function resolveUri($uri)
+    static function compareObjectTypes($uri, $objects)
+	{
+		$uri = ActivityUtils::resolveUri($uri);
+		foreach ((array)$objects as $object) {
+			if ($uri === ActivityUtils::resolveUri($object)) {
+				return true;
+			}
+		}
+		return false;
+	}
+    static function resolveUri($uri, $make_relative=false)
     {
-        if (parse_url($uri, PHP_URL_SCHEME) == '') {
+        if (parse_url($uri, PHP_URL_SCHEME) == '') {	// relative -> absolute
             $uri = Activity::SCHEMA . $uri;
-        }
+        } elseif ($make_relative) {	// absolute -> relative
+			$uri = preg_replace('/^http:\/\/activitystrea\.ms\/schema\/1\.0\//', '', $uri);
+		}
         return $uri;
     }
 }

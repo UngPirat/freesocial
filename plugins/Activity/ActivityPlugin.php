@@ -193,7 +193,7 @@ class ActivityPlugin extends Plugin
                                             'uri' => $fave->getURI(),
                                             'verb' => ActivityVerb::FAVORITE,
                                             'object_type' => (($notice->verb == ActivityVerb::POST) ?
-                                                             $notice->object_type : ActivityObject::ACTIVITY)));
+                                                             ActivityUtils::resolveUri($notice->object_type, true) : ActivityObject::ACTIVITY)));
         }
         return true;
     }
@@ -237,7 +237,7 @@ class ActivityPlugin extends Plugin
                                             'uri' => $uri,
                                             'verb' => ActivityVerb::UNFAVORITE,
                                             'object_type' => (($notice->verb == ActivityVerb::POST) ?
-                                                             $notice->object_type : ActivityObject::ACTIVITY)));
+                                                             ActivityUtils::resolveUri($notice->object_type, true) : ActivityObject::ACTIVITY)));
         }
         return true;
     }

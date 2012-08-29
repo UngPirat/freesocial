@@ -51,24 +51,25 @@ if (!defined('STATUSNET')) {
  */
 class ActivityObject
 {
-    const ARTICLE   = 'http://activitystrea.ms/schema/1.0/article';
-    const BLOGENTRY = 'http://activitystrea.ms/schema/1.0/blog-entry';
-    const NOTE      = 'http://activitystrea.ms/schema/1.0/note';
-    const STATUS    = 'http://activitystrea.ms/schema/1.0/status';
-    const FILE      = 'http://activitystrea.ms/schema/1.0/file';
-    const PHOTO     = 'http://activitystrea.ms/schema/1.0/photo';
-    const ALBUM     = 'http://activitystrea.ms/schema/1.0/photo-album';
-    const PLAYLIST  = 'http://activitystrea.ms/schema/1.0/playlist';
-    const VIDEO     = 'http://activitystrea.ms/schema/1.0/video';
-    const AUDIO     = 'http://activitystrea.ms/schema/1.0/audio';
-    const BOOKMARK  = 'http://activitystrea.ms/schema/1.0/bookmark';
-    const PERSON    = 'http://activitystrea.ms/schema/1.0/person';
-    const GROUP     = 'http://activitystrea.ms/schema/1.0/group';
-    const _LIST     = 'http://activitystrea.ms/schema/1.0/list'; // LIST is reserved
-    const PLACE     = 'http://activitystrea.ms/schema/1.0/place';
-    const COMMENT   = 'http://activitystrea.ms/schema/1.0/comment';
+	// These MAY all be prepended with Activity::SCHEMA (http://activitystrea.ms/schema/1.0/)
+    const ARTICLE   = 'article';
+    const BLOGENTRY = 'blog-entry';
+    const NOTE      = 'note';
+    const STATUS    = 'status';
+    const FILE      = 'file';
+    const PHOTO     = 'photo';
+    const ALBUM     = 'photo-album';
+    const PLAYLIST  = 'playlist';
+    const VIDEO     = 'video';
+    const AUDIO     = 'audio';
+    const BOOKMARK  = 'bookmark';
+    const PERSON    = 'person';
+    const GROUP     = 'group';
+    const _LIST     = 'list'; // LIST is reserved
+    const PLACE     = 'place';
+    const COMMENT   = 'comment';
     // ^^^^^^^^^^ tea!
-    const ACTIVITY = 'http://activitystrea.ms/schema/1.0/activity';
+    const ACTIVITY  = 'activity';
 
     // Atom elements we snarf
 
@@ -236,7 +237,7 @@ class ActivityObject
                                            Activity::SPEC));
 
         if (empty($this->type)) {
-            $this->type = ActivityObject::NOTE;
+            $this->type = ActivityUtils::resolveUri(ActivityObject::NOTE);
         }
 
         $this->summary = ActivityUtils::childHtmlContent($element, self::SUMMARY);
@@ -262,7 +263,7 @@ class ActivityObject
     // @todo FIXME: rationalize with Activity::_fromRssItem()
     private function _fromRssItem($item)
     {
-        $this->title = ActivityUtils::childContent($item, ActivityObject::TITLE, Activity::RSS);
+        $this->title = ActivityUtils::childContent($item, ActivityUtils::resolveUri(ActivityObject::TITLE), Activity::RSS);
 
         $contentEl = ActivityUtils::child($item, ActivityUtils::CONTENT, Activity::CONTENTNS);
 
@@ -313,7 +314,7 @@ class ActivityObject
 
         $obj->element = $el;
 
-        $obj->type  = ActivityObject::PERSON;
+        $obj->type  = ActivityUtils::resolveUri(ActivityObject::PERSON);
         $obj->title = $name;
 
         if (!empty($email)) {
@@ -334,7 +335,7 @@ class ActivityObject
         $obj->element = $el;
 
         $obj->title = $text;
-        $obj->type  = ActivityObject::PERSON;
+        $obj->type  = ActivityUtils::resolveUri(ActivityObject::PERSON);
 
         return $obj;
     }
@@ -345,9 +346,9 @@ class ActivityObject
 
         $obj->element = $el;
 
-        $obj->type = ActivityObject::PERSON; // @fixme guess better
+        $obj->type = ActivityUtils::resolveUri(ActivityObject::PERSON); // @fixme guess better
 
-        $obj->title = ActivityUtils::childContent($el, ActivityObject::TITLE, Activity::RSS);
+        $obj->title = ActivityUtils::childContent($el, ActivityUtils::resolveUri(ActivityObject::TITLE), Activity::RSS);
         $obj->link  = ActivityUtils::childContent($el, ActivityUtils::LINK, Activity::RSS);
         $obj->id    = ActivityUtils::getLink($el, Activity::SELF);
 
@@ -377,7 +378,7 @@ class ActivityObject
     {
         $obj = new ActivityObject();
 
-        $obj->type = ActivityObject::PERSON; // @fixme any others...?
+        $obj->type = ActivityUtils::resolveUri(ActivityObject::PERSON); // @fixme any others...?
 
         $userImage = ActivityUtils::childContent($el, self::USERIMAGE, self::POSTEROUS);
 
@@ -429,7 +430,7 @@ class ActivityObject
 
         if (Event::handle('StartActivityObjectFromNotice', array($notice, &$object))) {
 
-            $object->type    = (empty($notice->object_type)) ? ActivityObject::NOTE : $notice->object_type;
+            $object->type    = (empty($notice->object_type)) ? ActivityUtils::resolveUri(ActivityObject::NOTE) : ActivityUtils::resolveUri($notice->object_type);
 
             $object->id      = $notice->uri;
             $object->title   = $notice->content;
@@ -447,7 +448,7 @@ class ActivityObject
         $object = new ActivityObject();
 
         if (Event::handle('StartActivityObjectFromProfile', array($profile, &$object))) {
-            $object->type   = ActivityObject::PERSON;
+            $object->type   = ActivityUtils::resolveUri(ActivityObject::PERSON);
             $object->id     = $profile->getUri();
             $object->title  = $profile->getBestName();
             $object->link   = $profile->profileurl;
@@ -512,7 +513,7 @@ class ActivityObject
 
         if (Event::handle('StartActivityObjectFromGroup', array($group, &$object))) {
 
-            $object->type   = ActivityObject::GROUP;
+            $object->type   = ActivityUtils::resolveUri(ActivityObject::GROUP);
             $object->id     = $group->getUri();
             $object->title  = $group->getBestName();
             $object->link   = $group->getUri();
@@ -537,7 +538,7 @@ class ActivityObject
     {
         $object = new ActivityObject();
         if (Event::handle('StartActivityObjectFromPeopletag', array($ptag, &$object))) {
-            $object->type    = ActivityObject::_LIST;
+            $object->type    = ActivityUtils::resolveUri(ActivityObject::_LIST);
 
             $object->id      = $ptag->getUri();
             $object->title   = $ptag->tag;
@@ -613,8 +614,7 @@ class ActivityObject
                 $xo->raw($owner);
             }
 
-            if ($this->type == ActivityObject::PERSON
-                || $this->type == ActivityObject::GROUP) {
+            if (ActivityUtils::compareObjectTypes($this->type, array(ActivityObject::PERSON, ActivityObject::GROUP))) {
 
                 foreach ($this->avatarLinks as $avatar) {
                     $xo->element(
@@ -694,8 +694,7 @@ class ActivityObject
             // id
             $object['id'] = $this->id;
 
-            if ($this->type == ActivityObject::PERSON
-                || $this->type == ActivityObject::GROUP) {
+            if (ActivityUtils::compareObjectTypes($this->type, array(ActivityObject::PERSON, ActivityObject::GROUP))) {
 
                 // XXX: Not sure what the best avatar is to use for the
                 // author's "image". For now, I'm using the large size.

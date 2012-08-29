@@ -65,14 +65,13 @@ class GroupsalmonAction extends SalmonAction
     function handlePost()
     {
         // @fixme process all objects?
-        switch ($this->activity->objects[0]->type) {
-        case ActivityObject::ARTICLE:
-        case ActivityObject::BLOGENTRY:
-        case ActivityObject::NOTE:
-        case ActivityObject::STATUS:
-        case ActivityObject::COMMENT:
-            break;
-        default:
+        if (!ActivityUtils::compareObjectTypes($this->activity->objects[0]->type, array(
+                    ActivityObject::ARTICLE,
+                    ActivityObject::BLOGENTRY,
+                    ActivityObject::NOTE,
+                    ActivityObject::STATUS,
+                    ActivityObject::COMMENT,
+                ))) {
             // TRANS: Client exception.
             throw new ClientException('Cannot handle that kind of post.');
         }

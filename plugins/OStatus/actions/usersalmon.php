@@ -61,14 +61,13 @@ class UsersalmonAction extends SalmonAction
         common_log(LOG_INFO, "Received post of '{$this->activity->objects[0]->id}' from '{$this->activity->actor->id}'");
 
         // @fixme: process all activity objects?
-        switch ($this->activity->objects[0]->type) {
-        case ActivityObject::ARTICLE:
-        case ActivityObject::BLOGENTRY:
-        case ActivityObject::NOTE:
-        case ActivityObject::STATUS:
-        case ActivityObject::COMMENT:
-            break;
-        default:
+        if (!ActivityUtils::compareObjectTypes($this->activity->objects[0]->type, array (
+                    ActivityObject::ARTICLE,
+                    ActivityObject::BLOGENTRY,
+                    ActivityObject::NOTE,
+                    ActivityObject::STATUS,
+                    ActivityObject::COMMENT,
+                ))) {
             // TRANS: Client exception thrown when an undefied activity is performed.
             throw new ClientException(_m('Cannot handle that kind of post.'));
         }
@@ -190,8 +189,8 @@ class UsersalmonAction extends SalmonAction
 
     function handleTag()
     {
-        if ($this->activity->target->type == ActivityObject::_LIST) {
-            if ($this->activity->objects[0]->type != ActivityObject::PERSON) {
+        if (ActivityUtils::compareObjectTypes($this->activity->target->type, ActivityObject::_LIST)) {
+            if (!ActivityUtils::compareObjectTypes($this->activity->objects[0]->type, ActivityObject::PERSON)) {
                 // TRANS: Client exception.
                 throw new ClientException(_m('Not a person object.'));
                 return false;
@@ -224,8 +223,8 @@ class UsersalmonAction extends SalmonAction
 
     function handleUntag()
     {
-        if ($this->activity->target->type == ActivityObject::_LIST) {
-            if ($this->activity->objects[0]->type != ActivityObject::PERSON) {
+        if (ActivityUtils::compareObjectTypes($this->activity->target->type, ActivityObject::_LIST)) {
+            if (!ActivityUtils::compareObjectTypes($this->activity->objects[0]->type, ActivityObject::PERSON)) {
                 // TRANS: Client exception.
                 throw new ClientException(_m('Not a person object.'));
                 return false;
@@ -269,14 +268,13 @@ class UsersalmonAction extends SalmonAction
             throw new ClientException(_m('Cannot favorite/unfavorite without an object.'));
         }
 
-        switch ($object->type) {
-        case ActivityObject::ARTICLE:
-        case ActivityObject::BLOGENTRY:
-        case ActivityObject::NOTE:
-        case ActivityObject::STATUS:
-        case ActivityObject::COMMENT:
-            break;
-        default:
+        if (!ActivityUtils::compareObjectTypes($object->type, array (
+                    ActivityObject::ARTICLE,
+                    ActivityObject::BLOGENTRY,
+                    ActivityObject::NOTE,
+                    ActivityObject::STATUS,
+                    ActivityObject::COMMENT,
+			))) {
             // TRANS: Client exception.
             throw new ClientException(_m('Cannot handle that kind of object for liking/faving.'));
         }

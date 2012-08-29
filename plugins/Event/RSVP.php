@@ -44,9 +44,9 @@ if (!defined('STATUSNET')) {
  */
 class RSVP extends Managed_DataObject
 {
-    const POSITIVE = 'http://activitystrea.ms/schema/1.0/rsvp-yes';
-    const POSSIBLE = 'http://activitystrea.ms/schema/1.0/rsvp-maybe';
-    const NEGATIVE = 'http://activitystrea.ms/schema/1.0/rsvp-no';
+    const POSITIVE = 'rsvp-yes';
+    const POSSIBLE = 'rsvp-maybe';
+    const NEGATIVE = 'rsvp-no';
 
     public $__table = 'rsvp'; // table name
     public $id;                // varchar(36) UUID
@@ -205,7 +205,7 @@ class RSVP extends Managed_DataObject
 
     function codeFor($verb)
     {
-        switch ($verb) {
+        switch (ActivityUtils::resolveUri($verb,true)) {
         case RSVP::POSITIVE:
             return 'Y';
             break;

@@ -483,19 +483,17 @@ class Ostatus_profile extends Managed_DataObject
             switch ($activity->verb) {
             case ActivityVerb::POST:
                 // @todo process all activity objects
-                switch ($activity->objects[0]->type) {
-                case ActivityObject::ARTICLE:
-                case ActivityObject::BLOGENTRY:
-                case ActivityObject::NOTE:
-                case ActivityObject::STATUS:
-                case ActivityObject::COMMENT:
-                case null:
-                    $notice = $this->processPost($activity, $source);
-                    break;
-                default:
+                if (!ActivityUtils::compareObjectTypes($activity->objects[0]->type, array (
+                            ActivityObject::ARTICLE,
+                            ActivityObject::BLOGENTRY,
+                            ActivityObject::NOTE,
+                            ActivityObject::STATUS,
+                            ActivityObject::COMMENT,
+                        ))) {
                     // TRANS: Client exception.
                     throw new ClientException(_m('Cannot handle that kind of post.'));
                 }
+                $notice = $this->processPost($activity, $source);
                 break;
             case ActivityVerb::SHARE:
                 $notice = $this->processShare($activity, $source);
@@ -1170,7 +1168,7 @@ class Ostatus_profile extends Managed_DataObject
 
         if ($items->length > 0) {
             $item = $items->item(0);
-            $authorEl = ActivityUtils::child($item, ActivityObject::AUTHOR, ActivityObject::POSTEROUS);
+            $authorEl = ActivityUtils::child($item, ActivityUtils::resolveUri(ActivityObject::AUTHOR), ActivityUtils::resolveUri(ActivityObject::POSTEROUS));
             if (!empty($authorEl)) {
                 $obj = ActivityObject::fromPosterousAuthor($authorEl);
                 // Posterous has multiple authors per feed, and multiple feeds
@@ -1514,7 +1512,7 @@ class Ostatus_profile extends Managed_DataObject
         $oprofile->created    = common_sql_now();
         $oprofile->modified   = common_sql_now();
 
-        if ($object->type == ActivityObject::PERSON) {
+        if (ActivityUtils::compareObjectTypes($object->type, ActivityObject::PERSON)) {
             $profile = new Profile();
             $profile->created = common_sql_now();
             self::updateProfile($profile, $object, $hints);
@@ -1524,7 +1522,7 @@ class Ostatus_profile extends Managed_DataObject
                 // TRANS: Server exception.
                 throw new ServerException(_m('Cannot save local profile.'));
             }
-        } else if ($object->type == ActivityObject::GROUP) {
+        } else if (ActivityUtils::compareObjectTypes($object->type, ActivityObject::GROUP)) {
             $group = new User_group();
             $group->uri = $homeuri;
             $group->created = common_sql_now();
@@ -1535,7 +1533,7 @@ class Ostatus_profile extends Managed_DataObject
                 // TRANS: Server exception.
                 throw new ServerException(_m('Cannot save local profile.'));
             }
-        } else if ($object->type == ActivityObject::_LIST) {
+        } else if (ActivityUtils::compareObjectTypes($object->type, ActivityObject::_LIST)) {
             $ptag = new Profile_list();
             $ptag->uri = $homeuri;
             $ptag->created = common_sql_now();

@@ -156,7 +156,7 @@ class Facebookclient
         }
     
         // Don't send activity activities (at least for now)
-        if ($this->notice->object_type == ActivityObject::ACTIVITY) {
+        if (ActivityUtils::compareObjectTypes($this->notice->object_type, ActivityObject::ACTIVITY)) {
             return false;
         }
         $allowedVerbs = array(ActivityVerb::POST, ActivityVerb::SHARE);
