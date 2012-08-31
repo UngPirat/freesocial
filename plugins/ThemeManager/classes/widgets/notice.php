@@ -22,21 +22,26 @@ class NoticeWidget extends ThemeWidget {
     protected function initialize() {
         parent::initialize();
 
-        $this->profile = $this->notice->getProfile();    // $this->notice->_profile is a protected value
+		if (!empty($this->notice->repeat_of)) {
+			$this->repeated = Notice::staticGet('id', $this->notice->repeat_of);
+			$this->repeater = $this->notice->getProfile();
+			$this->profile  = $this->repeated->getProfile();	//refer it to the _original_ notice creator
+		} else {
+			$this->repeated = null;
+			$this->repeater = null;
+        	$this->profile  = $this->notice->getProfile();;
+		}
     }
 
     function show() {
         if (!$this->notice->inScope($this->scoped)) {
             return false;
         }
-		if (!empty($this->notice->repeat_of)) {
-			$this->repeated = Notice::staticGet('id', $this->notice->repeat_of);
-		}
         $this->out->elementStart('article', array('id'=>'notice-'.$this->notice->id, 'class'=>'notice'));
         $this->the_vcard();
         $this->the_content();
         $this->the_metadata();
-        $this->the_controls();
+        $this->the_options();
         $this->out->elementEnd('article');
     }
 
@@ -49,81 +54,103 @@ class NoticeWidget extends ThemeWidget {
                 ? $profile->fullname
                 : $profile->nickname;
     }
+	function get_profile_url(Profile $profile=null) {
+		$profile = (is_null($profile) ? $this->profile : $profile);
+		return common_local_url('remoteprofile', array('id'=>$profile->id));
+	}
     function get_permalink() {
         return $this->notice->url ? $this->notice->url : $this->notice->uri;
     }
     function get_conversation_url() {
         return common_local_url('conversation', array('id'=>$this->notice->conversation)).'#notice-'.$this->get_id();
     }
+	function get_context() {
+		if (!empty($this->repeated)) {
+			$context = _m('was repeated');
+		} elseif (!empty($this->notice->reply_to)) {
+			$context = _m('replied');
+		} else {
+			$context = _m('posted this');
+		}
+		return $context;
+	}
+	function get_recipients() {
+		return $this->notice->getReplyProfiles();
+	}
     function get_rendered_content() {
-		$notice = (isset($this->repeated) ? $this->repeated : $this->notice);
+		$notice = !empty($this->repeated) ? $this->repeated : $this->notice;
         return $notice->rendered
                 ? $notice->rendered
                 : common_render_content($notice->content, $notice);
-    }
-    function get_webfinger() {
-        return $this->profile->nickname . '@' . parse_url($this->profile->profileurl, PHP_URL_HOST);
     }
     function the_content() {
         $this->out->elementStart('span', 'notice-content'.($this->repeated ? ' repeat' : ''));
         $this->out->raw($this->get_rendered_content());
         $this->out->elementEnd('span');
     }
-	function the_controls() {
-//		$this->out->elementStart('aside', 'controls');
-//		$this->out->elementEnd('aside');
+	function the_options() {
+		try {
+			NoticeoptionsWidget::run(array('item'=>$this->notice, 'scoped'=>$this->scoped, 'out'=>$this->out));
+		} catch (Exception $e) {
+		}
 	}
     function the_metadata() {
         $this->out->elementStart('footer', 'metadata');
-        $this->the_author();
+		// FIXME: this gets quite ugly for translations. Improve!
+		$this->the_author();
         $this->the_timestamp();
-		$this->the_repeat() or $this->the_source();
+		$this->the_related();
+		$this->the_source();
         $this->out->elementEnd('footer');
     }
-	function the_repeat() {
-		if (empty($this->repeated)) {
-			return false;
+	function the_related() {
+		if (!empty($this->repeated)) {
+            $this->out->elementStart('span', 'source');
+    		$this->out->element('span', 'context', _m('by'));
+            $this->out->element('a', array('href'=>$this->get_profile_url($this->repeater), 'class'=>'repeater'), $this->get_name($this->repeater));
+            $this->out->elementEnd('span');
+		} elseif($recipients = $this->get_recipients()) {
+            $this->out->elementStart('span', 'destination');
+    		$this->out->element('span', 'context', _m('to'));
+			foreach($recipients as $rcpt) {
+            	$this->out->element('a', array('href'=>$this->get_profile_url($rcpt), 'class'=>'recipient'), $this->get_name($rcpt));
+			}
+            $this->out->elementEnd('span');
 		}
-		$profile = $this->repeated->getProfile();
-        $this->out->elementStart('span', 'source repeat');
-		$from = sprintf(_m('as repeat of %s'), $this->get_name($profile));
-        $this->out->element('a', array('href'=>$this->repeated->uri, 'rel'=>'external'), $from);
-        $this->out->elementEnd('span');
 		return true;
 	}
     function the_source() {
+		if (empty($this->repeated)) {
+			return false;
+		}
         $ns   = $this->notice->getSource();
         $name = empty($ns->name)
                     ? ($ns->code
                         ? _($ns->code)
                         : _m('SOURCE','web'))
                     : _($ns->name);
-		$from = sprintf(_m('from %s'), $name);
         $this->out->elementStart('span', 'source device');
+		$this->out->element('span', 'descriptive', _m('using'));
         if (!empty($ns->url)) {
-            $this->out->element('a', array('href'=>$ns->url, 'rel'=>'external'), $from);
+            $this->out->element('a', array('href'=>$ns->url, 'rel'=>'external'), $name);
         } else {
-            $this->out->text($from);
+			$this->out->text($name);
         }
         $this->out->elementEnd('span');
     }
-    function the_author() {
-		$profileurl = common_local_url('remoteprofile', array('id'=>$this->profile->id));
-        $this->out->element('a', array('href'=>$profileurl, 'class'=>'author'), $this->get_name());
+    function the_author() {	// original author if repeated!
+        $this->out->element('a', array('href'=>$this->get_profile_url(), 'class'=>'author'), $this->get_name());
 	}
     function the_timestamp() {
-		$context = $this->notice->reply_to
-					? _m('replied')
-					: _m('posted');
 		$this->out->elementStart('a', array('class'=>'timestamp', 'href'=>$this->get_conversation_url()));
-		$this->out->element('span', 'context', $context);
+		$this->out->element('span', 'context', $this->get_context());
         $this->out->element('time', array('pubdate'=>'pubdate', 'datetime'=>common_date_iso8601($this->notice->created)),
                                 common_date_string($this->notice->created));
         $this->out->elementEnd('a');
     }
     function the_vcard() {
         $this->out->elementStart('span', 'vcard author');
-        $this->out->elementStart('a', array('href'=>common_local_url('remoteprofile', array('id'=>$this->profile->id))));
+        $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
         $this->out->element('img', array('src'=>$this->profile->avatarUrl($this->avatarSize), 'alt'=>'', 'class'=>'photo'));
 		$this->out->element('span', 'fn', $this->get_name());
         $this->out->elementEnd('a');

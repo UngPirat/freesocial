@@ -4,7 +4,9 @@
  */
 	$this->box('header');
 
-	$this->out->elementStart('article', array('id'=>'content','class'=>($this->is_single()?'single':'')));
+	$this->out->elementStart($this->is_single()?'article':'div', array('id'=>'content','class'=>($this->is_single()?'single':'')));
+	$this->out->element('h2', 'content-title', $this->get_title());
+	$this->out->flush();
 
 	if ($this->is_single()) :
 		if ($this->is_action('showprofile')) {
@@ -15,7 +17,8 @@
 	else :
 			$this->content('noticelist');
 	endif;
-	$this->out->elementEnd('article');
+	$this->out->elementEnd($this->is_single()?'article':'div');
+	$this->out->flush();
 
 	if (!$this->is_single()) {
     	$this->box('aside');

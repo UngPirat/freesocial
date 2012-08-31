@@ -133,7 +133,7 @@ class DisfavorForm extends Form
     {
         $this->out->submit('disfavor-submit-' . $this->notice->id,
                            // TRANS: Button text for removing the favourite status for a favourite notice.
-                           _m('BUTTON','Disfavor favorite'),
+                           _m('BUTTON','❤'),
                            'submit',
                            null,
                            // TRANS: Button title for removing the favourite status for a favourite notice.

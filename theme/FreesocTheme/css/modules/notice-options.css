@@ -1,0 +1,48 @@
+.notice-options {
+    float: right;    
+    margin-top: -0.75em;
+    margin-bottom: 0.5em;
+}
+
+.notice-options fieldset {
+    border: none;
+}
+
+.notice-options legend {
+    display: none;
+}
+
+.notice-options input.submit,
+.notice-options .option {
+    display: block;
+	background-color: transparent;
+    border: 0;
+	color: black;
+	font-size: 1.5em;
+	margin: 0.25ex;
+    height: 1em;
+    width: 1em;
+	text-align: center;
+    outline:none;
+}
+
+.notice-options form.form_disfavor input.submit:hover {
+	color: black;
+}
+.notice-options form.form_favor input.submit:hover,
+.notice-options form.form_disfavor input.submit {
+	color: #d00;
+}
+.notice-options .notice_delete {
+	color: red;
+}
+.notice-options form.form_repeat input.submit {
+	color: black;
+}
+.notice-options .repeated,
+.notice-options form.form_repeat input.submit:hover {
+	color: green;
+}
+.notice-options .option.reply:hover {
+	color: #00f;
+}

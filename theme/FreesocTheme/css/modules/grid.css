@@ -3,24 +3,24 @@
 	width: 90%
 }
 
-header {
+#wrapper > header {
 	margin-bottom: 1em;
 }
 #content {
 	clear: both;
 	float: left;
 }
-article {
+#content {
 	width: 70%;
 }
-article.single {
+#content.single {
 	width: auto;
 }
-article > aside {
+#content > aside {
 	float: left;
 	width: 30%;
 }
-#content > .list {
+#content > section {
 	float: right;
 	width: 70%;
 }

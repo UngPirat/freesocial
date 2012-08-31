@@ -2,7 +2,7 @@
 	$loop = $this->loop(array('list'=>$this->action->notice), 'Conversation');
 
 	try {
-		$pages = $loop->get_paging($this->action->args['page']);
+		$pages = $loop->get_paging(isset($this->action->args['page']) ? $this->action->args['page'] : null);
 	} catch (Exception $e) {
         $pages = array();
 	}

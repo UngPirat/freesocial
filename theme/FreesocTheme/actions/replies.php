@@ -4,10 +4,12 @@
  *  Type: noticelist
  */
 	$this->box('header');
-?>
-<h2 id="content-title"><?php $this->the_title(); ?></h2>
-<article id="content"><?php $this->content('noticelist'); ?></article>
-<?php
+
+	$this->elementStart('div', array('id'=>'content'));
+	$this->out->element('h2', 'content-title', $this->get_title());
+	$this->content('noticelist');
+	$this->elementEnd('div');
+
     $this->box('aside');
     $this->box('footer');
 ?>

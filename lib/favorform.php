@@ -132,7 +132,7 @@ class FavorForm extends Form
     {
         $this->out->submit('favor-submit-' . $this->notice->id,
                            // TRANS: Button text for adding the favourite status to a notice.
-                           _m('BUTTON','Favor'),
+                           _m('BUTTON','❤'),
                            'submit',
                            null,
                            // TRANS: Button title for adding the favourite status to a notice.

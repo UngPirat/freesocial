@@ -3,9 +3,10 @@
  *  Name: Remote Profile
  */
 	$this->box('header');
-?>
-<article id="content" class="single">
-<?php
+
+	$this->out->elementStart('article', array('id'=>'content', 'class'=>'single'));
+	$this->out->element('h2', 'content-title', $this->get_title());
+
 	switch ($this->action->args['action']) {
     case 'attachment':
 		$this->content($this->action->args['action']);
@@ -13,9 +14,9 @@
 	default:
 		echo 'unhandled';
 	}
-?>
-</article>
-<?php
+
+	$this->out->elementEnd('article');
+
     $this->box('aside');
     $this->box('footer');
 ?>

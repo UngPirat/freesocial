@@ -9,7 +9,8 @@ abstract class ThemeWidget extends ThemeExtension {
         if (!empty($this->out) && !is_a($this->out, 'HTMLOutputter')) {
             return false;
         }
-        return true;
+
+        return parent::validate();
     }
 
     protected function initialize() {

@@ -1,6 +1,7 @@
 .conversation {
 	display: block;
 	margin: 0 auto;
+	padding: 1ex 3ex;
 	width: 60%;
 }
 .conversation:nth-child(2n),
@@ -9,24 +10,31 @@
 }
 .conversation .notice {
 	margin-left: 10%;
-	padding: 1.5em 3ex;
+	margin-top: 2em;
 }
 .conversation .notice:first-child {
-	display: block;
 	margin-left: 0;
+	margin-top: 1em;
+	padding-top: 1px;
+}
+
+.conversation .notice .notice-options {
+	position: absolute;
+	top: 0;
+	left: 100%;
 }
 
 
 .notice {
 	clear: both;
-	padding-top: 1.5em;
 	position: relative;
 }
 .notice .metadata {
 	display: block;
 	font-size: 0.75em;
 	position: absolute;
-	top: 1em;
+	bottom: 100%;
+	left: 0;
 }
 .notice > * {
 	text-align: left;
@@ -55,8 +63,20 @@
 }
 .notice .notice-content.repeat:before {
 	position: absolute;
-	font-size: 2em;
+	font-size: 3em;
 	content: '\2672';
-	top: 1em;
-	right: -1em;
+	top: 0;
+	right: 100%;
 }
+
+.notice .source.device {
+	display: none;
+}
+
+.notice .destination .recipient:after {
+	content: ',';
+}
+.notice .destination .recipient:last-child:after {
+	content: none;
+}
+
