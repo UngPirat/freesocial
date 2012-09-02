@@ -50,9 +50,9 @@ class BrowseridloginAction extends Action
     {
         parent::handle($args);
 
-        if (common_is_real_login()) {
+        if (common_is_real_login() && $returnto = common_get_returnto()) {
             // TRANS: Client error displayed when trying to log in using Twitter while already logged in to StatusNet.
-            header('Location: '.common_get_returnto());
+            header('Location: '.$returnto);
 			die;
         } elseif ($this->isPost()) {
 			$this->handlePost();
