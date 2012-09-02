@@ -4,33 +4,23 @@ abstract class ListWidget extends ThemeWidget {
     protected $offset = 0;
     protected $num    = 5;
 
-    protected $scoped = null;
     protected $title  = null;
 
     protected $itemClass;
     protected $itemTag;
     protected $loopClass;
     protected $loopTag;
-    protected $widgetClass;
-    protected $widgetTag = 'section';
-    protected $widgetId;
 
     function show() {
         $this->the_content();
     }
 
     protected function validate() {
-        if (!is_null($this->scoped) && !is_a($this->scoped, 'Profile')) {
-            return false;
-        }
-
         return parent::validate();
     }
 
     protected function initialize() {
         parent::initialize();
-
-        $this->scoped = Profile::current();
 
         $this->loop = $this->get_loop();
     }

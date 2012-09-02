@@ -37,11 +37,15 @@ class NoticeWidget extends ThemeWidget {
         if (!$this->notice->inScope($this->scoped)) {
             return false;
         }
-        $this->out->elementStart('article', array('id'=>'notice-'.$this->notice->id, 'class'=>'notice'));
+		$class = 'notice';
+		if ($score = Spam_score::staticGet('notice_id', $this->notice->id)) {
+			$class .= $score->is_spam ? ' spam' : '';
+		}
+        $this->out->elementStart('article', array('id'=>'notice-'.$this->notice->id, 'class'=>$class));
         $this->the_vcard();
         $this->the_content();
         $this->the_metadata();
-        $this->the_options();
+        $this->the_actions();
         $this->out->elementEnd('article');
     }
 
@@ -88,9 +92,9 @@ class NoticeWidget extends ThemeWidget {
         $this->out->raw($this->get_rendered_content());
         $this->out->elementEnd('span');
     }
-	function the_options() {
+	function the_actions() {
 		try {
-			NoticeoptionsWidget::run(array('item'=>$this->notice, 'scoped'=>$this->scoped, 'out'=>$this->out));
+			NoticeactionsWidget::run(array('item'=>$this->notice, 'scoped'=>$this->scoped, 'out'=>$this->out));
 		} catch (Exception $e) {
 		}
 	}

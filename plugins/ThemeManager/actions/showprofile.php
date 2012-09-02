@@ -3,7 +3,7 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
     exit(1);
 }
 
-class ShowprofileAction extends ProfileAction
+class ShowprofileAction extends ShowstreamAction
 {
     function prepare($args)
     {

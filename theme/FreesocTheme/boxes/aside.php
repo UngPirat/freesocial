@@ -3,10 +3,7 @@
 
 	if (common_logged_in()) :
 		$this->out->text('logged in');
-	    $this->out->flush();
-		$nf = new NoticeForm($this->action);
-		$nf->show();
-		$this->action->flush();
+		NoticeFormWidget::run(array('out'=>$this->out, 'returnto'=>$this->action));
 	else :
 		$this->out->text('not logged in');
 	endif;

@@ -18,10 +18,7 @@ abstract class ThemeExtension {
 
     protected function validate() {
         if (is_null($this->scoped)) {
-            $user = common_current_user();
-            if (!is_null($user)) {
-                $this->scoped = $user->getProfile();
-            }
+            $this->scoped = Profile::current();
         } elseif (!is_a($this->scoped, 'Profile')) {
 			return false;
 		}

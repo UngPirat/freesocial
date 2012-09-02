@@ -10,6 +10,7 @@ class ThemeManagerPlugin extends Plugin {
      */
     function onAutoload($cls)
     {
+		$file = null;
         switch($cls) {
         case 'ThemeExtension':
         case 'ThemeManager':
@@ -27,16 +28,19 @@ class ThemeManagerPlugin extends Plugin {
             break;
         }
 
-        if (!preg_match('/^(\w+)(Loop|Menu|Widget)$/', $cls, $type)) {
-            return true;
+        if (preg_match('/^(\w+)(Form|List)(Widget)$/', $cls, $type)) {
+            $type = array_map('strtolower', array_map('basename', $type));
+            $file = dirname(__FILE__) . "/classes/{$type[3]}s/{$type[2]}s/{$type[1]}.php";
+        } elseif (preg_match('/^(\w+)(Loop|Menu|Widget)$/', $cls, $type)) {
+            $type = array_map('strtolower', array_map('basename', $type));
+            $file = dirname(__FILE__) . "/classes/{$type[2]}s/{$type[1]}.php";
+		}
+
+		if (!is_null($file) && file_exists($file)) {
+            require_once($file);
+            return false;
         }
-        $type = array_map('strtolower', array_map('basename', $type));
-        $file = dirname(__FILE__) . "/classes/{$type[2]}s/{$type[1]}.php";
-        if (!file_exists($file)) {
-            return true;	// keep processing
-        }
-        require_once($file);
-        return false;
+		return true;
     }
 
     function onStartInitializeRouter($m)

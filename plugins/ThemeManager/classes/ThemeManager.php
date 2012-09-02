@@ -13,7 +13,7 @@ class ThemeManager extends ThemeSite {
 
         $this->name = ucfirst($theme_name).'Theme';
         $this->sysdir = INSTALLDIR . "/theme/{$this->name}";
-        $this->urldir = '/theme/' . urlencode($this->name);
+        $this->urldir = 'theme/' . urlencode($this->name);
 
         $this->out = new HTMLOutputter;	// ...not sure if action should stay or go... sorry...
 
@@ -56,9 +56,16 @@ class ThemeManager extends ThemeSite {
 
     function head() {
         if (Event::handle('StartShowHeadElements', array($this->action))) {
-            $this->stylesheets();
+            if (Event::handle('StartTmStyles', array('out'=>$this->out, 'action'=>$this->action))) {
+                $this->the_styles();
+                Event::handle('EndTmStyles', array('out'=>$this->out, 'action'=>$this->action));
+            }
+            if (Event::handle('StartTmScripts', array('out'=>$this->out, 'action'=>$this->action))) {
+    			$this->the_scripts();
+                Event::handle('EndTmScripts', array('out'=>$this->out, 'action'=>$this->action));
+    		}
             $this->the_feeds();
-            $this->action->extraHead();	// html head tags
+        	$this->out->flush();
             Event::handle('EndShowHeadElements', array($this->action));
         }
         $this->action->flush();	// I want to get rid of $this->action as output element!
@@ -82,36 +89,6 @@ class ThemeManager extends ThemeSite {
     }
     function the_lang() {
         echo htmlspecialchars(common_config('site', 'language'));
-    }
-
-    function the_feeds()
-    {
-        foreach ((array)$this->action->getFeeds() as $feed) {	// should we get these as an event?
-            $this->out->element('link', array('rel' => $feed->rel(),
-                                         'href' => $feed->url,
-                                         'type' => $feed->mimeType(),
-                                         'title' => $feed->title));
-        }
-        $this->out->flush();
-    }
-
-    function stylesheets() {
-        if (Event::handle('StartShowStyles', array($this->action))) {
-            if (Event::handle('StartShowStatusNetStyles', array($this->action))) {
-                $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
-                $this->the_style();
-                Event::handle('EndShowStatusNetStyles', array($this->action));
-            }
-            Event::handle('EndShowStyles', array($this->action));
-        }
-        $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
-    }
-
-    function the_style() {
-        $this->out->element('link', array('rel' => 'stylesheet',
-                                            'type' => 'text/css',
-                                            'href' => $this->urldir . '/css/main.css'));
-        $this->out->flush();
     }
 
     function box($name, $args=array()) {

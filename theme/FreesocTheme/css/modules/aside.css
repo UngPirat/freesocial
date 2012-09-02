@@ -12,3 +12,8 @@ aside .welcome {
 	position: static;
 	clear: both;
 }
+#profile .notice .actions form,
+#profile .notice .actions .action {
+	display: inline;
+	float: left;
+}

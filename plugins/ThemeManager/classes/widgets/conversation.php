@@ -1,6 +1,6 @@
 <?php
 
-class ConversationWidget extends NoticelistWidget {
+class ConversationWidget extends NoticeListWidget {
     // these values will be set by default or $args-supplied values
     protected $conversation;
 	protected $widgetClass = 'conversation';

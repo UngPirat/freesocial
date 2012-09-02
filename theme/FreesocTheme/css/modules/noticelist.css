@@ -17,9 +17,15 @@
 	margin-top: 1em;
 	padding-top: 1px;
 }
-
-.conversation .notice .notice-options {
+.conversation .notice .notice-content.repeat {
+	margin-left: 1em;
+}
+.conversation .notice .notice-content.repeat:before {
 	position: absolute;
+	font-size: 3em;
+	content: '\2672';
+	margin-left: -0.25em;
+	margin-top: -0.25em;
 	top: 0;
 	left: 100%;
 }
@@ -28,6 +34,10 @@
 .notice {
 	clear: both;
 	position: relative;
+}
+.conversation .spam,
+.noticestream .spam {
+	border: 2px solid red;
 }
 .notice .metadata {
 	display: block;
@@ -57,16 +67,6 @@
 	line-height: 1.25em;
 	margin: 1ex 0;
 	white-space: pre-wrap;
-}
-.notice .notice-content.repeat {
-	margin-left: 1em;
-}
-.notice .notice-content.repeat:before {
-	position: absolute;
-	font-size: 3em;
-	content: '\2672';
-	top: 0;
-	right: 100%;
 }
 
 .notice .source.device {

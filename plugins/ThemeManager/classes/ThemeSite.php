@@ -19,6 +19,7 @@ class ThemeSite {
         $this->action = $action;
         $this->supported = array('showprofile'=>"{$this->sysdir}/actions/profile.php");
 if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php",'replies'=>"{$this->sysdir}/actions/replies.php", 'public'=>"{$this->sysdir}/actions/public.php", 'attachment'=>"{$this->sysdir}/actions/single.php");
+if ( isset($this->action->args['notm']))        $this->supported = array();
         $this->set_template($this->action);
     }
 
@@ -39,7 +40,7 @@ if ( isset($this->action->args['tm']))        $this->supported = array('profile'
     }
 
 	function url($relpath) {
-		return $this->urldir . '/' . $relpath;
+		return common_path($this->urldir . '/' . $relpath);
 	}
 
     function get_template() {
@@ -75,6 +76,25 @@ if ( isset($this->action->args['tm']))        $this->supported = array('profile'
     }
     function is_single() {
         return $this->is_action('Showprofile');
+    }
+
+
+    function the_feeds()
+    {
+        foreach ((array)$this->action->getFeeds() as $feed) {	// should we get these as an event?
+            $this->out->element('link', array('rel' => $feed->rel(),
+                                         'href' => $feed->url,
+                                         'type' => $feed->mimeType(),
+                                         'title' => $feed->title));
+        }
+    }
+    function the_scripts() {
+		$this->out->script($this->url('js/jquery-1.8.1.min.js'));
+	}
+    function the_styles() {
+        $this->out->element('link', array('rel' => 'stylesheet',
+                                            'type' => 'text/css',
+                                            'href' => $this->url('css/main.css')));
     }
 }
 

@@ -21,6 +21,7 @@ class ProfileWidget extends ThemeWidget {
 
     function show() {
         $this->the_vcard();
+        $this->the_actions();
         $this->the_metadata();
     }
 
@@ -41,6 +42,9 @@ class ProfileWidget extends ThemeWidget {
         $this->out->element('dt', null, _m('Tags'));
         // a bunch of dd with the user's tags
     }
+	function the_actions() {
+		ProfileactionsWidget::run(array('out'=>$this->out, 'item'=>$this->profile, 'scoped'=>$this->scoped));
+	}
     function the_vcard() {
         $this->out->elementStart('span', 'vcard');
         $this->out->element('img', array('src'=>$this->profile->avatarUrl($this->avatarSize), 'alt'=>'', 'class'=>'photo'));
