@@ -111,14 +111,17 @@ class BrowseridloginAction extends Action
 			}
 			$data = json_decode($response->getBody());
 			if (!is_object($data)) {
-				throw new ServerException(_m('Got bad data from provider'));
+				throw new ServerException(_m('Got bad json data from provider'));
+			} elseif ($data->status === 'okay') {
+    			$user = User::staticGet('email', $data->email);
+    			if (empty($user)) {
+    				throw new ClientException(_m('No user with that email found'));
+    			}
+    			common_set_user($user);
+    			common_real_login();
+			} else {
+				throw new ServerException(_m('Bad authentication status because: '.$data->reason));
 			}
-			$user = User::staticGet('email', $data->email);
-			if (empty($user)) {
-				throw new ClientException(_m('No user with that email found'));
-			}
-			common_set_user($user);
-			common_real_login();
 		} else {
 			throw new ServerException(_m('No assertion data'));
 		}
