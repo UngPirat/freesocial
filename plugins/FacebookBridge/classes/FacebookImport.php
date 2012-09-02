@@ -223,24 +223,35 @@ class FacebookImport
         }
     }
 
+	function checkNoticeImport(array $update) {
+		$profile = null;
+        $flink = Foreign_link::getByForeignID($update['from']['id'], FACEBOOK_SERVICE);
+        if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
+            $profile = Profile::staticGet('id', $flink->user_id);
+            $flink->free();
+            unset($flink);
+        }
+		return $profile;
+	}
+
     protected function saveUpdate($update, $scope=0)
     {
+        $profile = $this->checkNoticeImport($update);    // possibly set $profile to local profile
+
         try {
             $notice = Foreign_notice_map::get_foreign_notice($update['id'], FACEBOOK_SERVICE);
+/*	we have to make sure it's not in the inbox already...
+        	if (empty($profile) && isset($this->flink)) {	// otherwise foreign users' posts won't get put in the home feed
+				common_debug('FACEBOOK inserting notice id '.(0+$notice->id).' to inbox of user '.(0+$this->flink->user_id));
+            	Inbox::insertNotice($this->flink->user_id, $notice->id);
+			}
+			*/
             return $notice;
         } catch (Exception $e) {
             $notice = new Notice();
         }
 
-        $doNoticeImport = false;    // whether to convert it to a local notice
-
-        $flink = Foreign_link::getByForeignID($update['from']['id'], FACEBOOK_SERVICE);
-        if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
-            $doNoticeImport = true;
-            $profile = Profile::staticGet('id', $flink->user_id);
-            $flink->free();
-            unset($flink);
-        } elseif (!empty($flink)) {
+		if (!empty($flink) && !empty($profile)) {
             // this is actually odd behaviour, but reasonable as users must be able to decide not to be imported
             throw new Exception('Foreign link disallows importing');
         } else {
@@ -277,7 +288,7 @@ class FacebookImport
         $message = $update['message'];
         $notice->content  = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
-        if ($doNoticeImport) {
+        if (!empty($profile)) {
             $notice->is_local   = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
             unset($notice->uri);//unset($noticeOptions['uri']);
         } else {
@@ -288,13 +299,16 @@ class FacebookImport
         }
 
         $noticeOptions = (array)$notice;    // Notice::saveNew should accept a Notice object :(
-        switch ($update['type']) {
-        case 'link':
-            $notice = Bookmark::saveNew($profile, $message, $update['link'], '', $update['description'], $noticeOptions);
-            break;
-        default:
-            $notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
-        }
+		if (!isset($update['type'])) {
+			$update['type'] = 'status';
+		}
+		switch ($update['type']) {
+	    case 'link':
+    	    $notice = Bookmark::saveNew($profile, $message, $update['link'], '', $update['description'], $noticeOptions);
+        	break;
+    	default:
+	        $notice = Notice::saveNew($notice->profile_id, $notice->content, $notice->source, $noticeOptions);
+		}
 
         Foreign_notice_map::saveNew($notice->id, $update['id'], FACEBOOK_SERVICE);
 
@@ -306,8 +320,7 @@ class FacebookImport
             common_debug('FBDBG file download failed for notice '.$notice->id);
         }
 
-        if (!$doNoticeImport && isset($this->flink)) {	// otherwise foreign users' posts won't get put in the home feed
-            common_debug('FBDBG putting '.$notice->id.' into inbox for '.$this->flink->user_id);
+        if (empty($profile) && isset($this->flink)) {	// otherwise foreign users' posts won't get put in the home feed
             Inbox::insertNotice($this->flink->user_id, $notice->id);
         }
 
