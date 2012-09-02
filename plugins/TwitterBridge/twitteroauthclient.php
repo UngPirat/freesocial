@@ -223,6 +223,38 @@ class TwitterOAuthClient extends OAuthClient
     }
 
     /**
+     * Calls Twitter's /statuses/mentions API method
+     *
+     * @param int $since_id show statuses after this id
+     * @param int $max_id   show statuses before this id
+     * @param int $page     page number
+     *
+     * @return mixed an array of statuses
+     */
+    function statusesMentions($since_id = null, $max_id = null,
+                                  $page = null)
+    {
+        $url    = 'https://api.twitter.com/1/statuses/mentions.json';
+
+        $params = array('include_entities' => 'true');
+
+        if (!empty($since_id)) {
+            $params['since_id'] = $since_id;
+        }
+        if (!empty($max_id)) {
+            $params['max_id'] = $max_id;
+        }
+        if (!empty($page)) {
+            $params['page'] = $page;
+        }
+
+        $response = $this->oAuthGet($url, $params);
+        $statuses = json_decode($response);
+        return $statuses;
+    }
+    
+
+    /**
      * Calls Twitter's /statuses/friends API method
      *
      * @param int $id          id of the user whom you wish to see friends of

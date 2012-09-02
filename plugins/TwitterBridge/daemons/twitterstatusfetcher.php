@@ -178,6 +178,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         }
 
         $timeline = null;
+        $mentions = null;
 
         $lastId = Twitter_synch_status::getLastId($flink->foreign_id, 'home_timeline');
 
@@ -188,12 +189,16 @@ class TwitterStatusFetcher extends ParallelizingDaemon
                 common_debug('TWITTER BUG on client: '.print_r($client, true));
             }
             $timeline = $client->statusesHomeTimeline($lastId);
+            $mentions = $client->statusesMentions($lastId);
         } catch (Exception $e) {
             common_log(LOG_WARNING, $this->name() .
-                       ' - Twitter client unable to get friends timeline for user ' .
+                       ' - Twitter client unable to get friends/mentions timeline for user ' .
                        $flink->user_id . ' - code: ' .
                        $e->getCode() . 'msg: ' . $e->getMessage());
         }
+
+		// Merge the two arrays of mentions and timelines
+		$timeline = array_merge($timeline, $mentions);
 
         if (empty($timeline)) {
             common_log(LOG_WARNING, $this->name() .  " - Empty timeline.");
