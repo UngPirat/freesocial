@@ -36,8 +36,8 @@ if (!defined('STATUSNET')) {
 class BrowserIdPlugin extends Plugin
 {
 	function onEndShowStatusNetStyles($action) {
-        $action->script($this->path('browserid.js'));
-        $action->script($this->path('browserid_for_statusnet.js'));
+        $action->script($this->path('js/include.js'));
+        $action->script($this->path('js/browserid_for_statusnet.js'));
 	}
 
     /*
@@ -64,7 +64,6 @@ class BrowserIdPlugin extends Plugin
         $dir = dirname(__FILE__);
 
         switch ($cls) {
-        case 'BrowseridauthAction':
         case 'BrowseridloginAction':
             include_once $dir . '/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
             return false;
@@ -77,11 +76,6 @@ class BrowserIdPlugin extends Plugin
                     'main/browseridlogin',
                     array('action' => 'browseridlogin')
                 );
-        $m->connect(
-                    'main/browseridauth',
-                    array('action' => 'browseridauth')
-                );
-
         return true;
     }
 }

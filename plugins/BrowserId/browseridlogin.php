@@ -52,8 +52,11 @@ class BrowseridloginAction extends Action
 
         if (common_is_real_login()) {
             // TRANS: Client error displayed when trying to log in using Twitter while already logged in to StatusNet.
-            $this->clientError(_m('Already logged in.'));
-        }
+            header('Location: '.common_get_returnto());
+			die;
+        } elseif ($this->isPost()) {
+			$this->handlePost();
+		}
 
         $this->showPage();
     }
@@ -93,4 +96,32 @@ class BrowseridloginAction extends Action
         $nav = new LoginGroupNav($this);
         $nav->show();
     }
+
+	function handlePost() {
+		$assertion = $this->trimmed('assertion');
+		if (!empty($assertion)) {
+            $request = HTTPClient::start();
+			$response = $request->post('https://verifier.login.persona.org/verify', array(),
+									array(
+										'assertion'=>$assertion,
+										'audience'=>common_local_url('public').':'.$_SERVER['SERVER_PORT'])
+									);
+			if (!$response->isOk()) {
+				throw new ServerException(_m('Bad assertion data'));
+			}
+			$data = json_decode($response->getBody());
+			if (!is_object($data)) {
+				throw new ServerException(_m('Got bad data from provider'));
+			}
+			$user = User::staticGet('email', $data->email);
+			if (empty($user)) {
+				throw new ClientException(_m('No user with that email found'));
+			}
+			common_set_user($user);
+			common_real_login();
+		} else {
+			throw new ServerException(_m('No assertion data'));
+		}
+		die;
+	}
 }
