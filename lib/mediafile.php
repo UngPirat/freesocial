@@ -156,9 +156,14 @@ class MediaFile
 
         $oldthumb = new File_thumbnail;
         $oldthumb->file_id = $file_id;
-        $oldthumb->square = $square;
-        if (!$square) {
-            // find depending on which size requirement is desired
+	    $oldthumb->square = $square;
+        if ($square) {
+			$oldthumb->width  = $size;
+			$oldthumb->height = $size;
+		} else {
+			/* TODO: UNTESTED */
+			$oldthumb->whereAdd('(width  <= '.$size.' AND height <= width)');
+			$oldthumb->whereAdd('(height <= '.$size.' AND width <= height)', 'OR');
         }
         if ($oldthumb->find() && $oldthumb->fetch()) {
             return $oldthumb;
