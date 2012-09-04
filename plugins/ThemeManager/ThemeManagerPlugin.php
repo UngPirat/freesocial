@@ -60,7 +60,8 @@ class ThemeManagerPlugin extends Plugin {
         return true;
     }
 
-    function onStartShowPage($action) {
+    function onStartShowHTML($action)
+	{
         try {
             $tm = new ThemeManager($action);
             return !$tm->run();
@@ -71,4 +72,18 @@ class ThemeManagerPlugin extends Plugin {
         }
     }
 
+	function onStartShowHead($action)
+	{
+		return THEME_MANAGER!==true;
+	}
+
+	function onStartShowBody($action)
+	{
+		return THEME_MANAGER!==true;
+	}
+
+	function onStartEndHTML($action)
+	{
+		return THEME_MANAGER!==true;
+	}
 }
