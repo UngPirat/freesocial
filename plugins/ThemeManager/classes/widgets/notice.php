@@ -40,9 +40,9 @@ class NoticeWidget extends ThemeWidget {
         if (!$this->notice->inScope($this->scoped)) {
             return false;
         }
-		if ($score = Spam_score::staticGet('notice_id', $this->notice->id)) {
-			$this->itemClass .= $score->is_spam ? ' spam' : '';
-		}
+        if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->notice->id)) {
+            $this->itemClass .= $score->is_spam ? ' spam' : '';
+        }
         $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->notice->id, 'class'=>$this->itemClass));
         $this->the_vcard();
         $this->the_content();
@@ -61,10 +61,12 @@ class NoticeWidget extends ThemeWidget {
                 ? $profile->fullname
                 : $profile->nickname;
     }
-	function get_profile_url(Profile $profile=null) {
-		$profile = (is_null($profile) ? $this->profile : $profile);
-		return common_local_url('remoteprofile', array('id'=>$profile->id));
-	}
+    function get_profile_url(Profile $profile=null) {
+        $profile = (is_null($profile) ? $this->profile : $profile);
+        return class_exists('ModPlus')
+                ? common_local_url('remoteprofile', array('id'=>$profile->id))
+                : $profile->profileurl;
+    }
     function get_permalink() {
         return $this->notice->url ? $this->notice->url : $this->notice->uri;
     }
