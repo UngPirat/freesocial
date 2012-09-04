@@ -63,7 +63,7 @@ class NoticeWidget extends ThemeWidget {
     }
     function get_profile_url(Profile $profile=null) {
         $profile = (is_null($profile) ? $this->profile : $profile);
-        return class_exists('ModPlus')
+        return class_exists('RemoteProfileAction')
                 ? common_local_url('remoteprofile', array('id'=>$profile->id))
                 : $profile->profileurl;
     }
