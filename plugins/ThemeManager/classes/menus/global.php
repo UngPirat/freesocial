@@ -2,12 +2,18 @@
 
 class GlobalMenu extends ThemeMenu {
     protected function initialize() {
-        // list($actionName, $args, $label, $description, $id)
+		parent::initialize();
+
         $this->title = _m('Global');
-        $this->items = array(
-                array('public',           null, _m('MENU','Timeline'), _('Public timeline')),
-                array('favorited',    null, _m('MENU','Favorites'), _('Popular notices')),
-                array('groups',       null, _m('MENU','Groups'), _('Join a group!')),
-                );
     }
+
+	function get_list() {
+        // list($actionName, $args, $label, $description, $id)
+        $items = array(
+                array('url'=>'public',    'label'=>_m('MENU','Timeline'),  'description'=>_m('Public timeline')),
+                array('url'=>'favorited', 'label'=>_m('MENU','Favorites'), 'description'=>_m('Popular notices')),
+                array('url'=>'groups',    'label'=>_m('MENU','Groups'),    'description'=>_m('Join a group!')),
+                );
+		return $items;
+	}
 }

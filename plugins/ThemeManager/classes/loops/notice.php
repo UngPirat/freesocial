@@ -1,6 +1,8 @@
 <?php
 
 class NoticeLoop extends ObjectLoop {
+    protected $num  = NOTICES_PER_PAGE;
+
     function prefill() {
         if (Event::handle('StartNoticeListPrefill', array(&$this->list, AVATAR_STREAM_SIZE))) {
             Notice::fillAttachments($this->list);

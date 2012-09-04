@@ -1,0 +1,63 @@
+.actions {
+    float: right;    
+}
+.notice .actions {
+	opacity: 0.4;
+}
+.notice .actions:hover {
+	opacity: 1.0;
+}
+
+.actions fieldset {
+    border: none;
+}
+
+.actions legend {
+    display: none;
+}
+
+.conversation .notice .actions {
+	position: absolute;
+	top: 0;
+	right: 100%;
+}
+
+.actions input.submit,
+.actions .action {
+    display: block;
+	background-color: transparent;
+    border: 0;
+	color: black;
+	cursor:pointer;
+	font-size: 1.5em;
+	line-height: 1.25em;
+	vertical-align: middle;
+	text-align: center;
+    outline:none;
+}
+.notice .action {
+	margin: 0.25ex;
+    height: 1em;
+    width: 1em;
+}
+
+.notice .actions form.form_disfavor input.submit:hover {
+	color: black;
+}
+.notice .actions form.form_favor input.submit:hover,
+.notice .actions form.form_disfavor input.submit {
+	color: #d00;
+}
+.notice .actions .notice_delete {
+	color: red;
+}
+.notice .actions form.form_repeat input.submit {
+	color: black;
+}
+.notice .actions .repeated,
+.notice .actions form.form_repeat input.submit:hover {
+	color: green;
+}
+.notice .actions .action.reply:hover {
+	color: #00f;
+}

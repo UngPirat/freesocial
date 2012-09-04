@@ -3,7 +3,7 @@
 class ConversationWidget extends NoticeListWidget {
     // these values will be set by default or $args-supplied values
     protected $conversation;
-	protected $widgetClass = 'conversation';
+	protected $widgetClass = 'conversation notices';
 
     static function run($args=null) {
         $class = get_class();
@@ -24,7 +24,7 @@ class ConversationWidget extends NoticeListWidget {
     }
 
     function the_item($item) {
-        NoticeWidget::run(array('notice'=>$item,'out'=>$this->out));
+        NoticeWidget::run(array('notice'=>$item));
     }
 }
 

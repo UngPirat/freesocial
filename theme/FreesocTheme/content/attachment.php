@@ -1,4 +1,4 @@
 <?php
 
-	AttachmentWidget::run(array('item'=>$this->action->attachment, 'out'=>$this->out));
+	AttachmentWidget::run(array('item'=>$this->action->attachment));
 

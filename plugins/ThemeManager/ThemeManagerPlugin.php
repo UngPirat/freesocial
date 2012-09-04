@@ -42,6 +42,11 @@ class ThemeManagerPlugin extends Plugin {
         }
 		return true;
     }
+	function onStartShowNoticeItem($noticeitem) {
+		return THEME_MANAGER===true
+			? !NoticeWidget::run(array('notice'=>$noticeitem->notice, 'itemTag'=>''))
+			: true;
+	}
 
     function onStartInitializeRouter($m)
     {

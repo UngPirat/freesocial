@@ -6,7 +6,7 @@ abstract class NoticestreamWidget extends ListWidget {
 
     protected $title = null;
     protected $itemClass   = 'notice';
-    protected $widgetClass = 'noticestream';
+    protected $widgetClass = 'notices';
 
     abstract function get_stream();
 
@@ -15,7 +15,7 @@ abstract class NoticestreamWidget extends ListWidget {
     }
 
     function the_item($item) {
-        NoticeWidget::run(array('notice'=>$item, 'out'=>$this->out));
+        NoticeWidget::run(array('notice'=>$item));
     }
 }
 

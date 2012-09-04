@@ -7,6 +7,8 @@
 @import url("modules/actions.css");
 @import url("modules/widgets.css");
 @import url("modules/aside.css");
+@import url("modules/forms.css");
+@import url("modules/oldforms.css");
 
 body {
 	color: black;
@@ -18,6 +20,10 @@ a, a:visited, a:active {
 }
 a:hover {
 	color: #424242;
+}
+
+h2 {
+	display: none;
 }
 
 nav.paging {

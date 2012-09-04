@@ -1,4 +1,4 @@
 <?php
 
-    MenuListWidget::run(array('menus'=>array('PersonalMenu', 'GlobalMenu'), 'action'=>$this->action));
+    $this->menus(array('GlobalMenu', 'PersonalMenu', 'SettingsMenu', 'ConnectionsMenu'), array('action'=>$this->action));
 

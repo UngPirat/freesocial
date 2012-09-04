@@ -2,18 +2,58 @@ aside .welcome {
 	max-width: 100%;
 }
 
+#profile .notices {
+	width: auto;
+}
 #profile .notice {
-	padding: 1em;
+	padding: 2em 1em;
 }
 #profile .notice .author {
 	display: none;
 }
 #profile .notice .metadata {
-	position: static;
 	clear: both;
+	margin: 0.5ex;
+	top: 0;
 }
 #profile .notice .actions form,
 #profile .notice .actions .action {
 	display: inline;
 	float: left;
+}
+#profile .notice .source {
+	display: none;
+}
+
+#settings .menu-container {
+	background: transparent;
+	box-shadow: none;
+	text-align: right;
+}
+#settings .menu-container h3 {
+	color: black;
+	clear: both;
+}
+#settings .menu-container li {
+	float: none;
+}
+#settings .menu-container ul {
+	left: auto;
+	right: 0;
+}
+#settings .menu-container ul ul {
+	display: block;
+	float: none;
+	top: 0;
+	position: relative;
+	margin-left: auto;
+	width: auto;
+}
+#settings .menu-container ul ul a,
+#settings .menu-container ul ul h3 {
+	float: left;
+	width: 47%;
+	padding: 1ex 0;
+	padding-left: 3%;
+	text-align: left;
 }

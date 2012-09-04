@@ -12,15 +12,27 @@ class PersonalMenu extends ThemeMenu {
     }
 
     protected function initialize() {
-        $args = array('nickname'=>$this->profile->nickname);
-        // list($actionName, $args, $label, $description, $id)
+		parent::initialize();
+
         $this->title = _m('Personal');
-        $this->items = array(
-                array('all',           $args, _m('MENU','Home'), _('Home timeline')),
-                array('showprofile',   $args, _m('MENU','Profile'), _('Your profile')),
-                array('replies',       $args, _m('MENU','Mentions'), _('Who mentioned you?')),
-                array('showstream',    $args, _m('MENU','Notices'), _('Your noticestream')),
-                array('showfavorites', $args, _m('MENU','Favorites'), _('Your favorites')),
-                );
     }
+
+	function get_list() {
+		$items = array();
+        // opens up a reference to $items and will replace an Action in events below
+		$adapter = new ThemeMenuAdapter($items, $this->action, $this->out);
+        if (Event::handle('StartPersonalGroupNav', array($adapter))) {
+            $args = array('nickname'=>$this->profile->nickname);
+            // list($actionName, $args, $label, $description, $id)
+            $items = array_merge($items, array(
+                array('url'=>'all', 'args'=>$args, 'label'=>_m('MENU','Home'), 'description'=>_m('Home timeline')),
+                array('url'=>'showprofile',   'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
+                array('url'=>'replies',       'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
+                array('url'=>'showstream',    'args'=>$args, 'label'=>_m('MENU','Notices'), 'description'=>_m('Your noticestream')),
+                array('url'=>'showfavorites', 'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
+                ));
+			Event::handle('EndPersonalGroupNav', array($adapter));
+		}
+    	return $items;
+	}
 }

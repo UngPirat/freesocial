@@ -10,7 +10,7 @@
     $this->pagination($pages);
 
     do {
-        $this->widget('Conversation', array('conversation'=>$loop->current(),'out'=>$this->out,'widgetId'=>'conversation-'.$loop->get_id()));
+        $this->widget('Conversation', array('conversation'=>$loop->current(),'widgetId'=>'conversation-'.$loop->get_id()));
     } while ($loop->next());
 
     $this->pagination($pages);

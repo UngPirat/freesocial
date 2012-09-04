@@ -19,7 +19,7 @@ abstract class ThemeWidget extends ThemeExtension {
 
     protected function initialize() {
         if (empty($this->out)) {
-            $this->out = new HTMLOutputter;
+            $this->out = ThemeManager::getOut();
         }
     }
 }

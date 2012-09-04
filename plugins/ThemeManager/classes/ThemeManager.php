@@ -4,7 +4,7 @@ class ThemeManager extends ThemeSite {
     protected $boxes;
     protected $name;
 
-    protected $out;
+    static protected $htmloutputter = null;
 
     function __construct($action)
     {
@@ -15,10 +15,21 @@ class ThemeManager extends ThemeSite {
         $this->sysdir = INSTALLDIR . "/theme/{$this->name}";
         $this->urldir = 'theme/' . urlencode($this->name);
 
-        $this->out = new HTMLOutputter;	// ...not sure if action should stay or go... sorry...
+		if (is_null(self::$htmloutputter)) {
+			self::$htmloutputter = $action;
+		}
+		$this->out = self::$htmloutputter;
 
         parent::__construct($action);
     }
+
+	static public function getOut()
+	{
+		if (is_null(self::$htmloutputter)) {
+			self::$htmloutputter = new HTMLOutputter;
+		}
+		return self::$htmloutputter;
+	}
 
     function run() {
         if (empty($type)) {
@@ -50,19 +61,20 @@ class ThemeManager extends ThemeSite {
         $this->action->extraHeaders();	// http headers
 
         include $this->get_template_file();	// we can do stuff like $this-> inside the template!
+		$this->out->flush();
         
         return true;
     }
 
     function head() {
         if (Event::handle('StartShowHeadElements', array($this->action))) {
-            if (Event::handle('StartTmStyles', array('out'=>$this->out, 'action'=>$this->action))) {
+            if (Event::handle('StartTmStyles', array('action'=>$this->action))) {
                 $this->the_styles();
-                Event::handle('EndTmStyles', array('out'=>$this->out, 'action'=>$this->action));
+                Event::handle('EndTmStyles', array('action'=>$this->action));
             }
-            if (Event::handle('StartTmScripts', array('out'=>$this->out, 'action'=>$this->action))) {
+            if (Event::handle('StartTmScripts', array('action'=>$this->action))) {
     			$this->the_scripts();
-                Event::handle('EndTmScripts', array('out'=>$this->out, 'action'=>$this->action));
+                Event::handle('EndTmScripts', array('action'=>$this->action));
     		}
             $this->the_feeds();
         	$this->out->flush();
@@ -84,11 +96,8 @@ class ThemeManager extends ThemeSite {
     function get_title() {
 		return $this->action->title();
 	}
-    function the_title() {
-        echo htmlspecialchars($this->get_title());
-    }
-    function the_lang() {
-        echo htmlspecialchars(common_config('site', 'language'));
+    function get_lang() {
+        return common_config('site', 'language');
     }
 
     function box($name, $args=array()) {
@@ -126,6 +135,9 @@ class ThemeManager extends ThemeSite {
     }
 
     function menu($name, array $args=array()) {
+		if (!preg_match('/Menu$/', $name)) {
+			$name .= 'Menu';
+		}
         if (!is_subclass_of($name, 'ThemeMenu') && !is_subclass_of($name, 'Menu')) {
             throw new Exception('Not a menu');
         } elseif (is_subclass_of($name, 'Menu')) {
@@ -133,18 +145,20 @@ class ThemeManager extends ThemeSite {
         } else {
             $menu = new $name($args);	// new style menus
         }
-        $this->widget('MenuWidget', array('action'=>$this->action, 'menu'=>$menu, 'out'=>$this->out));
+        $menu->show();
     }
 
     function menus(array $list, array $args=array()) {
-        $args['submenu'] = true;
-        $this->out->elementStart('ul', 'menu');
+        $this->out->elementStart('nav', 'menu-container');
+            $this->out->elementStart('ul', 'menu');
         foreach ($list as $menu) :
-            $this->out->elementStart('li', 'menu-item');
-            $this->menu($menu, $args);	// no args allowed in multi-call... for now at least
-            $this->out->elementEnd('li');
+            try {
+				$this->menu($menu, $args);	// no args allowed in multi-call... for now at least
+			} catch (Exception $e) {
+			}
         endforeach;
-        $this->out->elementEnd('ul');
+            $this->out->elementEnd('ul');
+        $this->out->elementEnd('nav');
         $this->out->flush();
     }
 

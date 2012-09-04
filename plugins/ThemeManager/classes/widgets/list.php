@@ -25,6 +25,10 @@ abstract class ListWidget extends ThemeWidget {
         $this->loop = $this->get_loop();
     }
 
+	function count() {
+		return $this->loop->count();
+	}
+
     // could be overloaded if you want stuff like prefilling notices etc.
     function get_loop() {
         return new ObjectLoop(array('list'=>$this->get_list()));

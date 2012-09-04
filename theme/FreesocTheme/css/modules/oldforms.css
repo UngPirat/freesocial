@@ -1,0 +1,40 @@
+.form_settings {
+	position: relative;
+}
+.form_settings fieldset {
+	float: left;
+	padding: 1em;
+	border: 1px solid;
+	margin: 1em 1em;
+	float: left;
+}
+.form_settings legend {
+	font-size: 1.5em;
+}
+.form_settings label, .form_settings .form_guide {
+	display: block;
+	text-align: right;
+	margin: 1ex;
+}
+.form_settings input, .form_settings textarea, .form_settings select {
+	float: right;
+}
+
+#form_settings_avatar fieldset {
+	width: 80%;
+	margin: 0 auto;
+}
+#form_settings_avatar .form_data li {
+	clear: none;
+	padding: 0;
+	margin-top: 1em;
+}
+#avatr_original, #avatar_original_view {
+	float: left;
+}
+#avatar_preview {
+	float: right;
+}
+#form_settings_avatar #settings_attach {
+	clear: right;
+}

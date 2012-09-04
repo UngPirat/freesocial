@@ -1,8 +1,9 @@
 <?php
 
 class ObjectLoop extends ThemeExtension {	// might extend Iterator in the future
-    protected $list = array();
-    protected $num  = NOTICES_PER_PAGE;
+    protected $list   = array();
+	protected $offset = 0;
+    protected $num    = 5;
 
     private $count  = null;
 

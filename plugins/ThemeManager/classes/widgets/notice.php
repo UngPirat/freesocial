@@ -5,10 +5,13 @@ class NoticeWidget extends ThemeWidget {
     protected $notice;
     protected $avatarSize = AVATAR_STREAM_SIZE;
 
+	protected $itemClass = 'notice';
+	protected $itemTag = 'article';
+
     static function run($args=null) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
-        $widget->show();
+        return $widget->show();
     }
 
     // always gets run on __construct, which is also called on ::run()
@@ -37,16 +40,16 @@ class NoticeWidget extends ThemeWidget {
         if (!$this->notice->inScope($this->scoped)) {
             return false;
         }
-		$class = 'notice';
 		if ($score = Spam_score::staticGet('notice_id', $this->notice->id)) {
-			$class .= $score->is_spam ? ' spam' : '';
+			$this->itemClass .= $score->is_spam ? ' spam' : '';
 		}
-        $this->out->elementStart('article', array('id'=>'notice-'.$this->notice->id, 'class'=>$class));
+        $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->notice->id, 'class'=>$this->itemClass));
         $this->the_vcard();
         $this->the_content();
         $this->the_metadata();
         $this->the_actions();
-        $this->out->elementEnd('article');
+        $this->itemTag && $this->out->elementEnd($this->itemTag);
+		return true;
     }
 
     function get_id() {
@@ -94,7 +97,7 @@ class NoticeWidget extends ThemeWidget {
     }
 	function the_actions() {
 		try {
-			NoticeactionsWidget::run(array('item'=>$this->notice, 'scoped'=>$this->scoped, 'out'=>$this->out));
+			NoticeactionsWidget::run(array('item'=>$this->notice, 'scoped'=>$this->scoped));
 		} catch (Exception $e) {
 		}
 	}

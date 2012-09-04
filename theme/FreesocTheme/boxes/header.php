@@ -1,31 +1,34 @@
 <!DOCTYPE html>
-<html lang="<?php $this->the_lang(); ?>">
-<head>
-	<title><?php
-		$this->the_title();
-	    if (isset($args['page']) && $args['page'] >= 2) {
-	        echo ' - ' . sprintf( _m('Page %s'), htmlspecialchars($args['page']));
-	    }
-        echo ' | ';
-		$this->the_siteinfo('name');
-?></title>
-<?php $this->head(); ?>
-</head>
-<body>
-<div id="wrapper">
-<header>
-<?php $this->box('site-title'); ?>
-	<div id="login">
 <?php
+	$this->out->elementStart('html', array('lang'=>$this->get_lang()));
+	$this->out->elementStart('head');
+	$this->title = $this->get_title();
+	    if (isset($args['page']) && $args['page'] >= 2) {
+	        $this->title .= ' - ' . sprintf( _m('Page %s'), $args['page']);
+	    }
+    $this->title .= ' | ';
+	$this->title .= $this->get_siteinfo('name');
+	$this->out->element('title', null, $this->title);
+	$this->head();
+$this->out->elementEnd('head');
+$this->out->elementStart('body');
+$this->out->elementStart('div', array('id'=>'wrapper'));
+
+	$this->out->elementStart('header');
+	$this->box('site-title');
+	$this->out->elementStart('div', array('id'=>'login'));
+
     try {
         $this->widget('Vcard', array('profile'=>$this->profile,'avatarSize'=>48));
     } catch (Exception $e) {
-?>
-		<p>You are not logged in!</p>
-		<p>Do you wish to <a href="<?php echo common_local_url('login'); ?>">log in</a> or <a href="<?php echo common_local_url('register'); ?>">register an account</a>?</p>
-<?php
+		$this->out->element('p', null, _m('You are not logged in!'));
+		$this->out->elementStart('p');
+		$this->out->element('a', array('href'=>common_local_url('login')), _m('Log in'));
+		$this->out->text(_m(' or '));
+		$this->out->element('a', array('href'=>common_local_url('register')), _m('register an account'));
+		$this->out->text('.');
     }
-?>
-	</div>
-<?php $this->box('topmenu'); ?>
-</header>
+	$this->out->elementEnd('div');
+	$this->box('topmenu');
+$this->out->elementEnd('header');
+$this->out->flush();

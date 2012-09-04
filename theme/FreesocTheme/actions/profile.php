@@ -15,14 +15,12 @@
 			$this->content('noticelist');
 		}
 	else :
-			$this->content('noticelist');
+		$this->content('noticelist');
 	endif;
 	$this->out->elementEnd($this->is_single()?'article':'div');
 	$this->out->flush();
 
-	if (!$this->is_single()) {
-    	$this->box('aside');
-	}
+    $this->box('aside');
 	$this->out->flush();
     $this->box('footer');
 ?>

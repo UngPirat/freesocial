@@ -43,7 +43,7 @@ class ProfileWidget extends ThemeWidget {
         // a bunch of dd with the user's tags
     }
 	function the_actions() {
-		ProfileactionsWidget::run(array('out'=>$this->out, 'item'=>$this->profile, 'scoped'=>$this->scoped));
+		ProfileactionsWidget::run(array('item'=>$this->profile, 'scoped'=>$this->scoped));
 	}
     function the_vcard() {
         $this->out->elementStart('span', 'vcard');

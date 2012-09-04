@@ -17,8 +17,8 @@ class ThemeSite {
 /* FIXME: errr, urldir and sysdir should be set here... */
 
         $this->action = $action;
-        $this->supported = array('showprofile'=>"{$this->sysdir}/actions/profile.php");
-if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php",'replies'=>"{$this->sysdir}/actions/replies.php", 'public'=>"{$this->sysdir}/actions/public.php", 'attachment'=>"{$this->sysdir}/actions/single.php");
+        $this->supported = array('showprofile'=>"{$this->sysdir}/actions/profile.php", 'settings'=>"{$this->sysdir}/actions/settings.php");
+if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php",'replies'=>"{$this->sysdir}/actions/replies.php", 'public'=>"{$this->sysdir}/actions/public.php", 'settings'=>"{$this->sysdir}/actions/settings.php", 'legacy'=>"{$this->sysdir}/actions/legacy.php");
 if ( isset($this->action->args['notm']))        $this->supported = array();
         $this->set_template($this->action);
     }
@@ -34,9 +34,15 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
             }
         } while ($class = get_parent_class($class));
 
-        if (empty($this->template) || !file_exists($this->template_file)) {
+		if (empty($this->template) && isset($this->action->args['tm'])) {
+			$this->template = 'legacy';
+            $this->template_file = $this->supported[$this->template];
+		} elseif (empty($this->template) || !file_exists($this->template_file)) {
+			define('THEME_MANAGER', false);
             throw new Exception('Template not supported', 302);
         }
+
+		define('THEME_MANAGER', true);
     }
 
 	function url($relpath) {
@@ -62,10 +68,6 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
             break;
         }
         return $info;
-    }
-
-    function the_siteinfo($param='') {
-        echo htmlspecialchars($this->get_siteinfo($param));
     }
 
     function is_action($action=null) {

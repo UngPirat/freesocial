@@ -1,26 +1,35 @@
-.conversation {
+.notices {
 	display: block;
 	margin: 0 auto;
 	padding: 1ex 3ex;
 	width: 60%;
 }
+
 .conversation:nth-child(2n),
-.noticestream .notice:nth-child(2n) {
-	background-color: #eee;
+.notices .notice:nth-child(2n) {
+		background-color: #eee;
 }
 .conversation .notice {
-	margin-left: 10%;
-	margin-top: 2em;
+		margin-left: 10%;
+		margin-top: 2em;
+}
+/* WHY U NO MARGIN??? */
+.conversation .notice:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
 }
 .conversation .notice:first-child {
-	margin-left: 0;
-	margin-top: 1em;
-	padding-top: 1px;
+		margin-left: 0;
+		margin-top: 1em;
+		padding-top: 1px;
 }
-.conversation .notice .notice-content.repeat {
+.conversation .notice-content.repeat {
 	margin-left: 1em;
 }
-.conversation .notice .notice-content.repeat:before {
+.conversation .notice-content.repeat:before {
 	position: absolute;
 	font-size: 3em;
 	content: '\2672';
@@ -35,8 +44,7 @@
 	clear: both;
 	position: relative;
 }
-.conversation .spam,
-.noticestream .spam {
+.notice.spam {
 	border: 2px solid red;
 }
 .notice .metadata {

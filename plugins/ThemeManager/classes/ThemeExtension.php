@@ -3,7 +3,7 @@
 abstract class ThemeExtension {
     protected $scoped = null;	// Profile
 
-    function __construct($args=null) {
+    function __construct(array $args=array()) {
         // iterate class variables and set to either default or given
         foreach (get_class_vars(get_class($this)) as $key=>$val) {
             $this->$key = isset($args[$key]) ? $args[$key] : $val;
