@@ -150,13 +150,13 @@ class FacebookImport
         $this->apiLoop(sprintf('/me/feed', $object->foreign_id), array($this, 'importThread'));
     }
 
-    public function importGroup($group)
+    public function importGroup($group, $limit=25)
     {
         $this->scope = Notice::PUBLIC_SCOPE;	// make it GROUP/FOLLOWER/whatever for private groups!
 
         common_debug('FBDBG: getting foreign group '.$group->foreign_id.' because it is local group '.$group->group_id);
         // get this group's feed
-        $this->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'));
+        $this->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'), array('limit'=>$limit));
     }
 
     protected function importThread($update)
@@ -172,6 +172,7 @@ class FacebookImport
         case 'status':
         case 'link':
         case 'photo':
+        case 'video':
             if (isset($update['message'])) {
                 // Hacktastic: filter out stuff coming from this StatusNet
                 $source = mb_strtolower(common_config('integration', 'source'));
@@ -230,13 +231,17 @@ class FacebookImport
             $profile = Profile::staticGet('id', $flink->user_id);
             $flink->free();
             unset($flink);
-        }
+        } elseif (!empty($flink)) {
+            // this is actually odd behaviour, but reasonable as users must be able to decide not to be imported
+            throw new Exception('Foreign link for '.$flink->user_id.' ('.$flink->foreign_id.') disallows importing');
+		}
 		return $profile;
 	}
 
     protected function saveUpdate($update, $scope=0)
     {
         $profile = $this->checkNoticeImport($update);    // possibly set $profile to local profile
+		$local   = !empty($profile);
 
         try {
             $notice = Foreign_notice_map::get_foreign_notice($update['id'], FACEBOOK_SERVICE);
@@ -251,10 +256,7 @@ class FacebookImport
             $notice = new Notice();
         }
 
-		if (!empty($flink) && !empty($profile)) {
-            // this is actually odd behaviour, but reasonable as users must be able to decide not to be imported
-            throw new Exception('Foreign link disallows importing');
-        } else {
+		if (empty($profile)) {
             $profile = $this->ensureProfile($update['from']['id']);
         }
 
@@ -268,7 +270,6 @@ class FacebookImport
 
         $notice->scope      = $scope;
         $notice->source     = 'facebook';
-        $notice->url        = $this->makeUpdateURI($update['id']);
         $notice->profile_id = $profile->id;
         $notice->created    = strftime(
             '%Y-%m-%d %H:%M:%S',
@@ -285,23 +286,22 @@ class FacebookImport
             // either this is the original post or the reply-to post has not been imported/mapped
         }
 
-        $message = $update['message'];
+		if (!isset($update['type'])) {
+			$update['type'] = 'status';
+		}
+
+		$message = $update['message'];
         $notice->content  = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
-        if (!empty($profile)) {
+        if ($local) {
             $notice->is_local   = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
-            unset($notice->uri);//unset($noticeOptions['uri']);
         } else {
             $notice->is_local   = Notice::GATEWAY;
-            $notice->uri        = $notice->url;
-            unset($notice->url);
+        	$notice->uri        = $this->makeUpdateURI($update['id'], $profile->nickname);
             $notice->rendered = common_render_content($message, $notice);
         }
 
         $noticeOptions = (array)$notice;    // Notice::saveNew should accept a Notice object :(
-		if (!isset($update['type'])) {
-			$update['type'] = 'status';
-		}
 		switch ($update['type']) {
 	    case 'link':
     	    $notice = Bookmark::saveNew($profile, $message, $update['link'], '', $update['description'], $noticeOptions);
@@ -320,7 +320,8 @@ class FacebookImport
             common_debug('FBDBG file download failed for notice '.$notice->id);
         }
 
-        if (empty($profile) && isset($this->flink)) {	// otherwise foreign users' posts won't get put in the home feed
+        if (!$local && isset($this->flink)) {	// otherwise foreign users' posts won't get put in the home feed
+			common_debug('Inserting Notice('.$notice->id.') into Inbox('.$this->flink->user_id.', FB:'.$this->flink->foreign_id.')');
             Inbox::insertNotice($this->flink->user_id, $notice->id);
         }
 
@@ -340,6 +341,11 @@ class FacebookImport
             if (!isset($update['picture'])) {
                 break;
             }
+        case 'video':
+			common_debug('FACEBOOK VIDEO: '.print_r($update,true));
+			$description = $update['description'];
+			File::processNew($update['link'], $notice->id);
+			break;
         case 'photo':
             $url = preg_replace('/\_s\.jpg$/', '_n.jpg', $update['picture']);    // _n is a bigger version
             $filename = 'Facebook_'.urlencode($update['id']).'-original-'.urlencode(basename($url));
@@ -352,6 +358,7 @@ class FacebookImport
             common_debug('FACEBOOK imported File '.$mediafile->fileRecord->id.' by URL to notice '.$notice->id);
             return true;
             break;
+			break;
         default:
             return false;
         }
@@ -408,11 +415,11 @@ class FacebookImport
                 // deliver locally linked users if they exist
                 $fetch = Foreign_link::getByForeignID($foreign_id, FACEBOOK_SERVICE);
 
-                if (!empty($fetch)) {
-                    $fetch = Profile::staticGet($fetch->user_id);	// flink found
-                } else {
-                    $fetch = $this->ensureProfile($foreign_id);
+                if (empty($fetch)) {
+					continue;
                 }
+                $fetch = Profile::staticGet($fetch->user_id);	// flink found
+
                 $destinations[] = $fetch->profileurl;	// profile found/created
                 $fetch->free();
             } catch (Exception $e) {
@@ -432,13 +439,17 @@ class FacebookImport
      *
      * @return string URI
      */
-    function makeUpdateURI($id)
+    function makeUpdateURI($id,$nickname=null)
     {
-        return sprintf('https://facebook.com/%s', preg_replace(array('/_/','/_/'), array('/posts/','?comment_id='), urlencode($id), 1));
+		if (!is_null($nickname)) {
+			$id = preg_replace('/^(\d+)_/', $nickname.'_', $id);
+		}
+        return sprintf('http://facebook.com/%s', preg_replace(array('/_/','/_/'), array('/posts/','?comment_id='), urlencode($id), 1));
     }
 
     static function getReplyToId($id) {
-        if (!preg_match('/^(\d+_\d+)_\d+$/', $id, $matches)) {
+        if (!preg_match('/^([\d\w\.]+)_\d+$/', $id, $matches)) {
+			comment_debug('FBDBG: '.$id.' failed preg_match in getReplyToId');
             throw new Exception('Not a recognized Facebook comment id');
         }
 
@@ -476,6 +487,7 @@ class FacebookImport
 		// this updates the profile in case old facebook urls are stored
         $profile->profileurl = 'https://facebook.com/'.$fuser->id;
         if ($profile->find()) {
+			common_debug('OLD FACEBOOK USER FOUND: '.$profile->nickname.' profileurl: '.$profile->profileurl.' replacing with: '.$fuser->uri);
             $profile->fetch();
 				// update to new profile link
 			$original = clone($profile);
@@ -491,11 +503,12 @@ class FacebookImport
     function ensureProfile($foreign_id)
     {
         $fsrv = new FacebookService();
-        $foreign_user = $fsrv->addForeignUser($foreign_id, $this->getAccessToken());
+        $fuser = $fsrv->addForeignUser($foreign_id, $this->getAccessToken());
+		// addForeignUser throws an exception if it can't get all necessary data, thus $user is always complete
         try {
-			$profile = $this->getProfileByForeignUser($foreign_user);
+			$profile = $this->getProfileByForeignUser($fuser);
 		} catch (Exception $e) {	// no profile found, let's create one!
-            $profile = $this->createForeignUserProfile($foreign_user);
+            $profile = $this->createForeignUserProfile($fuser);
         }
 
         if (!$profile->isSilenced()) {

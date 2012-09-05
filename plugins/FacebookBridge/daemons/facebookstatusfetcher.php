@@ -149,7 +149,7 @@ class FacebookStatusFetcher extends ParallelizingDaemon
     {
 		$importer = new FacebookImport($flink);
         // home has the user's news feed (i.e. including other users)
-            common_debug('FBDBG '.$flink->foreign_id.' getting home https://graph.facebook.com/me/home?access_token='.$flink->credentials);
+            common_debug('FBDBG '.$flink->user_id.':'.$flink->foreign_id.' getting home https://graph.facebook.com/me/home?access_token='.$flink->credentials);
         $importer->importUpdates('home');	// Fetching /home too often might be disliked by Facebook
 		return true;
 	}

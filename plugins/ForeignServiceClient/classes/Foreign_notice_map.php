@@ -125,6 +125,10 @@ class Foreign_notice_map extends Managed_DataObject
     static function get_foreign_notice($foreign_id, $service_id) {
         $notice_id = Foreign_notice_map::get_notice_id($foreign_id, $service_id);    // throws exception on failure
         $result = Notice::staticGet('id', $notice_id);
+		if (empty($result)) {
+			Foreign_notice_map::delete_notice_mapping($notice_id, $service_id);
+			throw new Exception('No notice found');
+		}
         return $result;
     }
     static function delete_notice_mapping($notice_id, $service_id) {

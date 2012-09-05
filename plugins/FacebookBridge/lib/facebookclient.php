@@ -262,6 +262,7 @@ class Facebookclient
             Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
 
         } catch (FacebookApiException $e) {
+			common_debug('Removing Facebook link? Notice:'.$this->notice->id);
             return $this->handleFacebookError($e);
         }
 
@@ -481,21 +482,9 @@ class Facebookclient
             __FILE__
         );
 
-        $result = $this->flink->delete();
-
-        if (empty($result)) {
-            common_log(
-                LOG_ERR,
-                sprintf(
-                    'Could not remove Facebook link for %s (%d), fbuid %d',
-                    $this->user->nickname,
-                    $this->user->id,
-                    $fbuid
-                ),
-                __FILE__
-            );
-            common_log_db_error($flink, 'DELETE', __FILE__);
-        }
+        $original = clone($this->flink);
+        $this->flink->credentials = null;
+		$this->flink->update($original);
 
         // Notify the user that we are removing their Facebook link
         if (!empty($this->user->email)) {

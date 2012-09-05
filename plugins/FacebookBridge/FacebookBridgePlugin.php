@@ -390,7 +390,7 @@ $('#facebook_button').bind('click', function(event) {
     FB.login(function(response) {
         if (response.authResponse) {
             // put the access token in a cookie for the next step
-            //setCookie('fb_access_token', response.authResponse.accessToken);
+            setCookie('fb_access_token', response.authResponse.accessToken);
             window.location.href = '%2\$s';
         } else {
             // NOP (user cancelled login)

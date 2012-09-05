@@ -98,26 +98,23 @@ class Action extends HTMLOutputter // lawsuit
      */
     function showPage()
     {
-        if (Event::handle('StartShowPage', array($this))) {
-            if (Event::handle('StartShowHTML', array($this))) {
-                $this->startHTML();
-                $this->flush();
-                Event::handle('EndShowHTML', array($this));
-            }
-            if (Event::handle('StartShowHead', array($this))) {
-                $this->showHead();
-                $this->flush();
-                Event::handle('EndShowHead', array($this));
-            }
-            if (Event::handle('StartShowBody', array($this))) {
-                $this->showBody();
-                Event::handle('EndShowBody', array($this));
-            }
-            if (Event::handle('StartEndHTML', array($this))) {
-                $this->endHTML();
-                Event::handle('EndEndHTML', array($this));
-            }
-            Event::handle('EndShowPage', array($this));
+        if (Event::handle('StartShowHTML', array($this))) {
+            $this->startHTML();
+            $this->flush();
+            Event::handle('EndShowHTML', array($this));
+        }
+        if (Event::handle('StartShowHead', array($this))) {
+            $this->showHead();
+            $this->flush();
+            Event::handle('EndShowHead', array($this));
+        }
+        if (Event::handle('StartShowBody', array($this))) {
+            $this->showBody();
+            Event::handle('EndShowBody', array($this));
+        }
+        if (Event::handle('StartEndHTML', array($this))) {
+            $this->endHTML();
+            Event::handle('EndEndHTML', array($this));
         }
     }
 

@@ -677,7 +677,7 @@ class NoticeListItem extends Widget
                                            // TRANS: Link title in notice list item to delete a notice.
                                            'title' => _('Delete this notice from the timeline.')),
                                            // TRANS: Link text in notice list item to delete a notice.
-                                           _('Delete'));
+                                           _(''));
         }
     }
 

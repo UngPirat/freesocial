@@ -119,15 +119,6 @@ class SettingsNav extends Menu
                                         $actionName == 'imsettings');
             }
 
-            if (common_config('sms', 'enabled')) {
-                $this->action->menuItem(common_local_url('smssettings'),
-                                        // TRANS: Menu item in settings navigation panel.
-                                        _m('MENU','SMS'),
-                                        // TRANS: Menu item title in settings navigation panel.
-                                        _('Updates by SMS'),
-                                        $actionName == 'smssettings');
-            }
-
             $this->action->menuItem(common_local_url('oauthconnectionssettings'),
                                     // TRANS: Menu item in settings navigation panel.
                                     _m('MENU','Connections'),

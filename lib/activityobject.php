@@ -143,7 +143,9 @@ class ActivityObject
         }
 
         // Some per-type attributes...
-        if ($this->type == self::PERSON || $this->type == self::GROUP) {
+        switch (ActivityUtils::resolveUri($this->type, true)) {
+		case self::PERSON:
+		case self::GROUP:
             $this->displayName = $this->title;
 
             $photos = ActivityUtils::getLinks($element, 'photo');
@@ -159,10 +161,9 @@ class ActivityObject
             }
 
             $this->poco = new PoCo($element);
-        }
+			break;
 
-        if ($this->type == self::PHOTO) {
-
+		case self::PHOTO:
             $this->thumbnail   = ActivityUtils::getLink($element, 'preview');
             $this->largerImage = ActivityUtils::getLink($element, 'enclosure');
 
@@ -171,11 +172,13 @@ class ActivityObject
                 ActivityObject::MEDIA_DESCRIPTION,
                 Activity::MEDIA
             );
-        }
-        if ($this->type == self::_LIST) {
+			break;
+
+		case self::_LIST:
             $owner = ActivityUtils::child($this->element, Activity::AUTHOR, Activity::SPEC);
             $this->owner = new ActivityObject($owner);
-        }
+			break;
+		}
     }
 
     private function _fromAuthor($element)
@@ -185,7 +188,7 @@ class ActivityObject
                                            Activity::SPEC));
 
         if (empty($this->type)) {
-            $this->type = self::PERSON; // XXX: is this fair?
+            $this->type = ActivityUtils::resolveUri(self::PERSON); // XXX: is this fair?
         }
 
         // start with <atom:title>
@@ -233,12 +236,11 @@ class ActivityObject
 
     private function _fromAtomEntry($element)
     {
-        $this->type = ActivityUtils::resolveUri($this->_childContent($element, Activity::OBJECTTYPE,
-                                           Activity::SPEC));
-
+        $this->type = $this->_childContent($element, Activity::OBJECTTYPE, Activity::SPEC);
         if (empty($this->type)) {
-            $this->type = ActivityUtils::resolveUri(ActivityObject::NOTE);
+            $this->type = ActivityObject::NOTE;
         }
+		$this->type = ActivityUtils::resolveUri($this->type);
 
         $this->summary = ActivityUtils::childHtmlContent($element, self::SUMMARY);
         $this->content = ActivityUtils::getContent($element);
@@ -430,7 +432,7 @@ class ActivityObject
 
         if (Event::handle('StartActivityObjectFromNotice', array($notice, &$object))) {
 
-            $object->type    = (empty($notice->object_type)) ? ActivityUtils::resolveUri(ActivityObject::NOTE) : ActivityUtils::resolveUri($notice->object_type);
+            $object->type    = ActivityUtils::resolveUri((empty($notice->object_type)) ? ActivityObject::NOTE : $notice->object_type);
 
             $object->id      = $notice->uri;
             $object->title   = $notice->content;

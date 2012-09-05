@@ -161,11 +161,11 @@ class FacebookService extends ForeignServiceClient {
             if (!$update) {
                return $fuser;
             }
-            $original = clone($fuser);
         } catch (Exception $e) {
             // no Foreign_user, so we must create one
             $fuser = new Foreign_user();
         }
+        $original = clone($fuser);
 
         $fbuser = $this->fetchUserData($foreign_id, $credentials, array('username','link','id'), true);	// verify is true, so throws exception if not all fields are set
 
@@ -195,12 +195,24 @@ class FacebookService extends ForeignServiceClient {
         $result = $this->client->api(sprintf('/%s', $foreign_id), 'get', $params);
         if ($verify) : foreach ($fields as $field) {
             if (empty($result[$field])) {
+				if ($field=='username' && !empty($result['id'])) {
+					$result[$field] = $result['id'];
+					continue;
+				}
                 throw new Exception('Field not returned from API: '.$field);
             }
         } endif;
         return $result;
     }
 
+    function setExtendedAccessToken()
+	{
+		return $this->client->setExtendedAccessToken();
+	}
+    function setAccessToken($token)
+	{
+		return $this->client->setAccessToken($token);
+	}
     function getAccessToken()
     {
         return $this->client->getAccessToken();

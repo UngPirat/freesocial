@@ -154,7 +154,7 @@ class SyncFacebookFriendsDaemon extends ParallelizingDaemon
                     case 463:	//Session has expired at unix time %i. The current unix time is %i.
                         Facebookclient::emailExpiredCredentials($flink->getUser(), $e->getMessage());
                         $original = clone($flink);
-                        $flink->credentials = '';
+                        $flink->credentials = null;
                         $flink->update($original);
                         common_debug('Nulled expired credentials for '.$flink->foreign_id.' due to api error: ['.$r['error']['code'].'/'.$r['error']['error_subcode'].'] '.$e->getMessage());
                         throw new Exception($e->getMessage());
@@ -217,9 +217,6 @@ class SyncFacebookFriendsDaemon extends ParallelizingDaemon
             // Get associated user and subscribe her
             $friend_user = $friend_flink->getUser();
             if (empty($friend_user)) {
-                $tempnam = tempnam('/tmp', 'ffdebug-');
-                common_debug('WARNING: flink getUser returned empty response, dumping friend_flink to: '.$tempnam);
-				file_put_contents($tempnam, print_r($friend_flink, true));
                 continue;
             }
 

@@ -323,7 +323,7 @@ class OpenIDPlugin extends Plugin
      *
      * @return boolean hook return
      */
-    function onEndAccountSettingsNav($action)
+    function onEndConnectSettingsNav($action)
     {
         $action_name = $action->trimmed('action');
 

@@ -141,7 +141,9 @@ class HTTPClient extends HTTP_Request2
         // Turn off verification unless we've configured a CA bundle.
         if (common_config('http', 'ssl_cafile')) {
             $this->config['ssl_cafile'] = common_config('http', 'ssl_cafile');
-        } else {
+        } elseif (common_config('http', 'ssl_capath')) {
+            $this->config['ssl_capath'] = common_config('http', 'ssl_capath');
+		} else {
             $this->config['ssl_verify_peer'] = false;
         }
 

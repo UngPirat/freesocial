@@ -38,7 +38,7 @@ class FacebookloginAction extends Action
     {
         parent::handle($args);
 
-        if (common_is_real_login()) {
+        if (common_is_real_login()) {// || $this->trimmed('signin')==1) {
             $facebook = Facebookclient::getFacebook();
             $params = array(
                 'scope' => 'read_stream,publish_stream,user_status,user_groups,user_location,user_website,email,manage_pages',
@@ -48,7 +48,7 @@ class FacebookloginAction extends Action
 
             $user = common_current_user();
             $flink = Foreign_link::getByUserID($user->id, FACEBOOK_SERVICE);
-//            setcookie('fb_access_token', $flink->credentials, time()+300);
+            setcookie('fb_access_token', $flink->credentials, time()+300);
             
             common_redirect($loginUrl, 303);
             die;
