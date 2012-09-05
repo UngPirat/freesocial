@@ -26,7 +26,7 @@
 	margin-top: 1em;
 	padding-top: 1px;
 }
-.conversation .notice-content.repeat:before {
+.conversation .repeat .notice-content:before {
 	position: absolute;
 	font-size: 3em;
 	content: '\2672';
@@ -56,7 +56,7 @@
 	display: block;
 	font-size: 0.75em;
 	position: absolute;
-	bottom: 100%;
+	top: -1.1em;
 	left: 0;
 }
 .conversation .notice .metadata {
@@ -98,4 +98,18 @@
 .notice + .show-more {
 	font-size: 0.75em;
 	text-align: center;
+}
+
+
+body.showprofile #stream .notice {
+	margin: 2em 0;
+}
+body.showprofile #stream .vcard.author {
+	display: none;
+}
+body.showprofile #stream .repeat .vcard.author {
+	display: block;
+}
+body.showprofile #stream .source {
+	display: none;
 }

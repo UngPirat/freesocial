@@ -72,7 +72,10 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
 
     function is_action($action=null) {
         if (is_null($action)) {
-            return strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action))));
+			$class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action))));
+			$parent = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_parent_class($this->action))));
+            return $class . ($parent!=='action' ? " $parent" : '');
+					
         }
         return is_a($this->action, ucfirst($action.'Action'));
     }

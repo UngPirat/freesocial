@@ -49,8 +49,8 @@
 .notice .actions form.form_disfavor input.submit:hover {
 	color: black;
 }
-.notice .actions .notice_delete {
-	color: red;
+.notice .actions .delete {
+	color: #d00;
 }
 .notice .actions form.form_repeat input.submit {
 	color: black;
@@ -61,4 +61,14 @@
 .notice .actions form.form_repeat input.submit:hover,
 .notice .actions .action.reply:hover {
 	color: green;
+}
+
+body.showprofile .notice .actions {
+	right: 0;
+	top: -1.5em;
+}
+body.showprofile .notice .actions .action,
+body.showprofile .notice .actions input.submit,
+body.showprofile .notice .actions form {
+	float: left;
 }

@@ -448,8 +448,7 @@ class FacebookImport
     }
 
     static function getReplyToId($id) {
-        if (!preg_match('/^([\d\w\.]+)_\d+$/', $id, $matches)) {
-			comment_debug('FBDBG: '.$id.' failed preg_match in getReplyToId');
+        if (!preg_match('/^(\d+_\d+)_\d+$/', $id, $matches)) {
             throw new Exception('Not a recognized Facebook comment id');
         }
 

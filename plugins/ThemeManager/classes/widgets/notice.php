@@ -40,10 +40,13 @@ class NoticeWidget extends ThemeWidget {
         if (!$this->notice->inScope($this->scoped)) {
             return false;
         }
+		if (!empty($this->notice->repeat_of)) {
+			$this->itemClass .= ' repeat';
+		}
         if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->notice->id)) {
             $this->itemClass .= $score->is_spam ? ' spam' : '';
         }
-        $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->notice->id, 'class'=>$this->itemClass));
+        $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->itemClass));
         $this->the_vcard();
         $this->the_content();
         $this->the_metadata();
@@ -60,7 +63,7 @@ class NoticeWidget extends ThemeWidget {
 		return $this->notice;
 	}
 	function get_conversation_id() {
-		$this->get_notice()->conversation;
+		return $this->get_notice()->conversation;
 	}
     function get_notice_id() {
         return $this->get_notice()->id;
@@ -104,7 +107,7 @@ class NoticeWidget extends ThemeWidget {
     }
     function the_content() {
 		$this->out->flush();	// PHP crashes (memory limit?) if we don't flush once in a while
-        $this->out->elementStart('span', 'notice-content'.($this->repeated ? ' repeat' : ''));
+        $this->out->elementStart('span', 'notice-content');
         $this->out->raw($this->get_rendered_content());
         $this->out->elementEnd('span');
     }

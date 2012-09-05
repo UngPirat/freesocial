@@ -3,29 +3,6 @@
 	height: auto;
 }
 
-#profile .notices {
-	width: auto;
-}
-#profile .notice {
-	padding: 2em 1em;
-}
-#profile .notice .author {
-	display: none;
-}
-#profile .notice .metadata {
-	clear: both;
-	margin: 0.5ex;
-	top: 0;
-}
-#profile .notice .actions form,
-#profile .notice .actions .action {
-	display: inline;
-	float: left;
-}
-#profile .notice .source {
-	display: none;
-}
-
 #settings .menu-container {
 	background: transparent;
 	box-shadow: none;
