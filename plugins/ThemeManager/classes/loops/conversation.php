@@ -15,10 +15,6 @@ class ConversationLoop extends ObjectLoop {
         $this->list = Memcached_DataObject::listGet('Notice', 'conversation', $convId);
     }
 
-    function get_id() {
-        return key($this->list);
-    }
-
     function get_paging($page) {
         $page  = (0+$page === 0 ? 1 : 0+$page);    // convert to (int)
         if ($page < 1) {

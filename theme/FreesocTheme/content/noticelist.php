@@ -11,7 +11,7 @@
 
     do {
         $this->widget('Conversation', array('conversation'=>$loop->current(),
-		                                    'widgetId'=>'conversation-'.$loop->get_id(),
+		                                    'widgetId'=>'conversation-'.$loop->key(),
 											'loopArgs'=>array('num'=>1,'saveFirst'=>true),
 										));
     } while ($loop->next());

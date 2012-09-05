@@ -4,11 +4,10 @@
 	padding: 1ex 3ex;
 }
 
-.notices > .notice: {
-	background-color: #eee;
+.conversation {
+	background-color: #f0f0f0;
 }
-.conversation:nth-child(2n),
-#profile .notices .notice:nth-child(2n) {
+.conversation:nth-child(2n) {
 	background-color: #e0e0e0;
 }
 .conversation .notice {

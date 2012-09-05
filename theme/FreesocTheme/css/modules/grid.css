@@ -1,6 +1,6 @@
 #wrapper {
 	margin: 0 auto;
-	width: 90%
+	width: 96%
 }
 
 #wrapper > * {
@@ -15,7 +15,6 @@
 	float: left;
 }
 #content {
-	width: 70%;
 }
 #content.single {
 	width: auto;
@@ -37,5 +36,5 @@ body.public #content > .conversation {
 	clear: none;
 	margin: 1ex;
 	max-width: 40%;
-	min-width: 20%;
+	min-width: 380px;
 }

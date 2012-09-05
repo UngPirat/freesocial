@@ -25,10 +25,12 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
 
 		$first = $this->saveFirst ? array_shift($this->list) : null;
 		$childCount = count($this->list);
-        if ($this->num>=0 && $this->offset==0) {
-			$this->list = array_slice($this->list, 0-$this->num);
-		} elseif ($this->num>=0 && $this->offset!=0) {
+		if ($num >= $childCount) {
+			// list is less than desired num
+		} elseif ($this->num>=0 && !$this->saveFirst) {
 			$this->list = array_slice($this->list, $this->offset, $this->num);
+		} elseif ($this->num>=0 && $this->saveFirst) {
+			$this->list = array_slice($this->list, 0-$this->num);
 		} elseif ($this->num<0 && $this->offset!=0) {
 			$this->list = array_slice($this->list, $this->offset);
 		}
@@ -74,10 +76,6 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
 
     function prefill() {
         // When you need to fetch stuff like profiles or avatars
-    }
-
-    function get_id() {
-        return $this->current()->id;
     }
 
 }
