@@ -13,23 +13,26 @@
 }
 .form_settings label, .form_settings .form_guide {
 	display: block;
-	text-align: right;
+	text-align: left;
 	margin: 1ex;
+	clear: left;
 }
 .form_settings input, .form_settings textarea, .form_settings select {
 	float: right;
+	clear: right;
 }
 
-#form_settings_avatar fieldset {
-	width: 80%;
-	margin: 0 auto;
+.form_settings .form_data li {
+	clear: both;
 }
 #form_settings_avatar .form_data li {
 	clear: none;
 	padding: 0;
 	margin-top: 1em;
 }
-#avatr_original, #avatar_original_view {
+#form_settings_avatar img {
+	max-width: 40%;
+	height: auto;
 	float: left;
 }
 #avatar_preview {

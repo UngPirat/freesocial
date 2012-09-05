@@ -12,15 +12,15 @@ class PersonalMenu extends ThemeMenu {
     }
 
     protected function initialize() {
-		parent::initialize();
+        parent::initialize();
 
         $this->title = _m('Personal');
     }
 
-	function get_list() {
-		$items = array();
+    function get_list() {
+        $items = array();
         // opens up a reference to $items and will replace an Action in events below
-		$adapter = new ThemeMenuAdapter($items, $this->action, $this->out);
+        $adapter = new ThemeMenuAdapter($items, $this->action);
         if (Event::handle('StartPersonalGroupNav', array($adapter))) {
             $args = array('nickname'=>$this->profile->nickname);
             // list($actionName, $args, $label, $description, $id)
@@ -31,8 +31,8 @@ class PersonalMenu extends ThemeMenu {
                 array('url'=>'showstream',    'args'=>$args, 'label'=>_m('MENU','Notices'), 'description'=>_m('Your noticestream')),
                 array('url'=>'showfavorites', 'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
                 ));
-			Event::handle('EndPersonalGroupNav', array($adapter));
-		}
-    	return $items;
-	}
+            Event::handle('EndPersonalGroupNav', array($adapter));
+        }
+        return $items;
+    }
 }

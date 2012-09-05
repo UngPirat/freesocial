@@ -16,11 +16,11 @@ class AttachmentWidget extends ThemeWidget {
         if (!is_a($this->item, 'File')) {
             return false;
         }
-		foreach($this->notices as $notice) {
-			if (!is_a($notice, 'Notice')) {
-				return false;
-			}
-		}
+        foreach($this->notices as $notice) {
+            if (!is_a($notice, 'Notice')) {
+                return false;
+            }
+        }
         return parent::validate();
     }
 
@@ -30,12 +30,12 @@ class AttachmentWidget extends ThemeWidget {
         $this->out->elementStart('a', array('href'=>$this->item->url, 'alt'=>_m('Full size'), 'class'=>'url'));
         $this->out->element('img', array('src'=>$this->item->url, 'alt'=>'', 'class'=>'photo'));
         if (!empty($this->notices)) {
-			$this->out->elementStart('div', 'description');
-			foreach($this->notices as $notice) {
-				$this->out->element('span', 'notice', $notice->content);
-			}
-        	$this->out->elementEnd('div');
-		}
+            $this->out->elementStart('div', 'description');
+            foreach($this->notices as $notice) {
+                $this->out->element('span', 'notice', $notice->content);
+            }
+            $this->out->elementEnd('div');
+        }
         $this->out->elementEnd('a');
         $this->out->elementEnd('marquee');
     }

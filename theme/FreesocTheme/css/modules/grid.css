@@ -5,6 +5,10 @@
 
 #wrapper > * {
 	margin-top: 1em;
+	position: relative;
+}
+#post {
+	clear: both;
 }
 #content {
 	clear: both;
@@ -14,16 +18,24 @@
 	width: 70%;
 }
 #content.single {
+	width: auto;
 }
 #content > aside {
 	float: left;
 	width: 30%;
 }
 #content > section {
-	float: right;
-	width: 70%;
 }
-#wrapper > aside {
+#content.single > section {
 	float: right;
-	width: 30%;
+	width: 60%;
+}
+
+body.favorited #content .notice,
+body.public #content > .conversation {
+	float: left;
+	clear: none;
+	margin: 1ex;
+	max-width: 40%;
+	min-width: 20%;
 }

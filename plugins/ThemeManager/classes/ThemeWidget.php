@@ -9,7 +9,7 @@ abstract class ThemeWidget extends ThemeExtension {
 
     abstract static function run($args=null);
 
-    protected function validate() {	// make sure we don't have garbage
+    protected function validate() {    // make sure we don't have garbage
         if (!empty($this->out) && !is_a($this->out, 'HTMLOutputter')) {
             return false;
         }

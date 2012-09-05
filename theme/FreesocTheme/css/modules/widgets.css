@@ -6,10 +6,6 @@
     display: none;
 }
 
-#content > .list:nth-child(2n) {
-	margin-top: 1em;
-}
-
 .list.widget .list-item {
 	display: block;
 	float: left;

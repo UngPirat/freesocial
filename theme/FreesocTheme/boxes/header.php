@@ -11,7 +11,7 @@
     $this->out->element('title', null, $this->title);
     $this->head();
 $this->out->elementEnd('head');
-$this->out->elementStart('body');
+$this->out->elementStart('body', $this->is_action());
 $this->out->elementStart('div', array('id'=>'wrapper'));
 
     $this->out->elementStart('header');
@@ -32,3 +32,4 @@ $this->out->elementStart('div', array('id'=>'wrapper'));
     $this->out->elementEnd('div');
     $this->box('topmenu');
 $this->out->elementEnd('header');
+$this->box('post');

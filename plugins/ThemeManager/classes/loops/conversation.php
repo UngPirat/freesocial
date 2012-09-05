@@ -20,7 +20,7 @@ class ConversationLoop extends ObjectLoop {
     }
 
     function get_paging($page) {
-        $page  = (0+$page === 0 ? 1 : 0+$page);	// convert to (int)
+        $page  = (0+$page === 0 ? 1 : 0+$page);    // convert to (int)
         if ($page < 1) {
             throw new ClientException('Invalid paging arguments');
         }

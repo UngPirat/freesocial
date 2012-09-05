@@ -1,11 +1,11 @@
 <?php
 
 class NoticeFormWidget extends FormWidget {
-	protected $content   = null;
-	protected $returnto = null;
-	protected $inreplyto = null;
-	protected $private   = null;
-	protected $charlimit  = null;
+    protected $content   = null;
+    protected $returnto = null;
+    protected $inreplyto = null;
+    protected $private   = null;
+    protected $charlimit  = null;
 
     static function run($args=null) {
         $class = get_class();
@@ -13,44 +13,44 @@ class NoticeFormWidget extends FormWidget {
         $widget->show();
     }
 
-	function initialize() {
-		parent::initialize();
+    function initialize() {
+        parent::initialize();
 
-		$this->attributes['action'] = common_local_url('newnotice');
+        $this->attributes['action'] = common_local_url('newnotice');
 
-		if (empty($this->charlimit)) {
-			$this->charlimit = Notice::maxContent();
-		}
-	}
+        if (empty($this->charlimit)) {
+            $this->charlimit = Notice::maxContent();
+        }
+    }
 
-	function the_elements() {
-		$els = new FormElements($this->out);
-		$els->legend(_('Send a notice'));
-		$els->textarea('status_textarea', array('class'=>'notice_data-text', 'cols'=>35, 'rows'=>4), $this->content);
-		$els->span('count', $this->charlimit);
+    function the_elements() {
+        $els = new FormElements($this->out);
+        $els->legend(_('Send a notice'));
+        $els->textarea('status_textarea', array('class'=>'notice_data-text', 'cols'=>35, 'rows'=>4), $this->content);
+        $els->span('count', $this->charlimit);
         if (common_config('attachments', 'uploads')) {
-			$els->hidden('MAX_FILE_SIZE', common_config('attachments', 'file_quota'));
-			$els->input('attach', 'file', _m('Attach a file.'));
-		}
+            $els->hidden('MAX_FILE_SIZE', common_config('attachments', 'file_quota'));
+            $els->input('attach', 'file', _m('Attach a file.'));
+        }
         if (!empty($this->returnto)) {
-			$els->hidden('notice_return-to', $this->returnto, 'returnto');
-		}
-		$els->hidden('notice_in-reply-to', $this->inreplyto, 'inreplyto');
-		return $els;
-	}
+            $els->hidden('notice_return-to', $this->returnto, 'returnto');
+        }
+        $els->hidden('notice_in-reply-to', $this->inreplyto, 'inreplyto');
+        return $els;
+    }
 
     function the_content() {
         $this->out->elementStart('fieldset');
         $this->out->element('legend', null, _('Send a notice'));
 
-		$this->out->element('textarea', array('class' => 'notice_data-text',
+        $this->out->element('textarea', array('class' => 'notice_data-text',
                                                   'cols' => 35,
                                                   'rows' => 4,
                                                   'name' => 'status_textarea'),
-                            	$this->content);
-		if ($this->charlimit) {
-			$this->out->element('span', array('class'=>'count'), $this->charlimit);
-		}
+                                $this->content);
+        if ($this->charlimit) {
+            $this->out->element('span', array('class'=>'count'), $this->charlimit);
+        }
 
         if (common_config('attachments', 'uploads')) {
             $this->out->hidden('MAX_FILE_SIZE', common_config('attachments', 'file_quota'));
@@ -72,7 +72,7 @@ class NoticeFormWidget extends FormWidget {
         $this->out->hidden('notice_in-reply-to', $this->inreplyto, 'inreplyto');
 
         $this->out->elementEnd('fieldset');
-	}
+    }
 
     function the_submit() {
         $this->out->element('input', array('id' => 'notice_action-submit',
@@ -81,7 +81,7 @@ class NoticeFormWidget extends FormWidget {
                                            'type' => 'submit',
                                            // TRANS: Button text for sending notice.
                                            'value' => _m('BUTTON', 'Send')));
-	}
+    }
 }
 
 ?>

@@ -17,6 +17,5 @@
 
 	$this->out->elementEnd('article');
 
-    $this->box('aside');
     $this->box('footer');
 ?>

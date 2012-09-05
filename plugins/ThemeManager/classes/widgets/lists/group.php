@@ -5,7 +5,7 @@ class GroupListWidget extends ListWidget {
     protected $itemClass   = 'group vcard';
     protected $widgetClass = 'groups';
 
-	protected $profile;
+    protected $profile;
 
     static function run($args=null) {
         $class = get_class();
@@ -17,7 +17,7 @@ class GroupListWidget extends ListWidget {
         if (!is_a($this->profile, 'Profile')) {
             return false;
         }
-		return parent::validate();
+        return parent::validate();
     }
 
     function get_list() {

@@ -15,21 +15,21 @@ class ThemeManager extends ThemeSite {
         $this->sysdir = INSTALLDIR . "/theme/{$this->name}";
         $this->urldir = 'theme/' . urlencode($this->name);
 
-		if (is_null(self::$htmloutputter)) {
-			self::$htmloutputter = $action;
-		}
-		$this->out = self::$htmloutputter;
+        if (is_null(self::$htmloutputter)) {
+            self::$htmloutputter = $action;
+        }
+        $this->out = self::$htmloutputter;
 
         parent::__construct($action);
     }
 
-	static public function getOut()
-	{
-		if (is_null(self::$htmloutputter)) {
-			self::$htmloutputter = new HTMLOutputter;
-		}
-		return self::$htmloutputter;
-	}
+    static public function getOut()
+    {
+        if (is_null(self::$htmloutputter)) {
+            self::$htmloutputter = new HTMLOutputter;
+        }
+        return self::$htmloutputter;
+    }
 
     function run() {
         if (empty($type)) {
@@ -58,10 +58,9 @@ class ThemeManager extends ThemeSite {
             header('X-Frame-Options: SAMEORIGIN'); // no rendering if origin mismatch
         }
 
-        $this->action->extraHeaders();	// http headers
+        $this->action->extraHeaders();    // http headers
 
-        include $this->get_template_file();	// we can do stuff like $this-> inside the template!
-		$this->out->flush();
+        include $this->get_template_file();    // we can do stuff like $this-> inside the template!
         
         return true;
     }
@@ -73,29 +72,27 @@ class ThemeManager extends ThemeSite {
                 Event::handle('EndTmStyles', array('action'=>$this->action));
             }
             if (Event::handle('StartTmScripts', array('action'=>$this->action))) {
-    			$this->the_scripts();
+                $this->the_scripts();
                 Event::handle('EndTmScripts', array('action'=>$this->action));
-    		}
+            }
             $this->the_feeds();
-        	$this->out->flush();
             Event::handle('EndShowHeadElements', array($this->action));
         }
-        $this->action->flush();	// I want to get rid of $this->action as output element!
+        $this->out->flush();
     }
 
     function content($type) {
         if (Event::handle('StartShowContentBlock', array($this->action))) {
-            $this->action->flush();
             $content = $this->sysdir . '/content/' . basename($type) . '.php';
             include $content;
             Event::handle('EndShowContentBlock', array($this->action));
         }
-        $this->action->flush();	//...sigh, I haven't even bothered to look for autoflushing
+        $this->out->flush();
     }
 
     function get_title() {
-		return $this->action->title();
-	}
+        return $this->action->title();
+    }
     function get_lang() {
         return common_config('site', 'language');
     }
@@ -103,11 +100,12 @@ class ThemeManager extends ThemeSite {
     function box($name, $args=array()) {
         $box = $this->sysdir . '/boxes/' . basename($name) . '.php';
         if (!file_exists($box)) {
-            throw new Exception('Box not found', 404);	// kills the script in Action
+            throw new Exception('Box not found', 404);    // kills the script in Action
         }
 
         $this->parse_args($args);
         include $box;
+        $this->out->flush();
     }
 
     function loop($args, $type='Object') {
@@ -122,7 +120,7 @@ class ThemeManager extends ThemeSite {
         $this->out->elementStart('nav', 'paging');
         foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
             if (!isset($pages[$key])) {
-                continue;
+                $href = null;
             } else {
                 $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
             }
@@ -131,21 +129,21 @@ class ThemeManager extends ThemeSite {
             $this->out->elementEnd('span');
         }
         $this->out->elementEnd('nav');
-        $this->out->flush();
     }
 
     function menu($name, array $args=array()) {
-		if (!preg_match('/Menu$/', $name)) {
-			$name .= 'Menu';
-		}
+        if (!preg_match('/Menu$/', $name)) {
+            $name .= 'Menu';
+        }
         if (!is_subclass_of($name, 'ThemeMenu') && !is_subclass_of($name, 'Menu')) {
             throw new Exception('Not a menu');
         } elseif (is_subclass_of($name, 'Menu')) {
-            $menu = new $name($this->action);	// getting rid of this in the future
+            $menu = new $name($this->action);    // getting rid of this in the future
         } else {
-            $menu = new $name($args);	// new style menus
+            $menu = new $name($args);    // new style menus
         }
         $menu->show();
+        $this->out->flush();
     }
 
     function menus(array $list, array $args=array()) {
@@ -153,13 +151,12 @@ class ThemeManager extends ThemeSite {
             $this->out->elementStart('ul', 'menu');
         foreach ($list as $menu) :
             try {
-				$this->menu($menu, $args);	// no args allowed in multi-call... for now at least
-			} catch (Exception $e) {
-			}
+                $this->menu($menu, $args);    // no args allowed in multi-call... for now at least
+            } catch (Exception $e) {
+            }
         endforeach;
             $this->out->elementEnd('ul');
         $this->out->elementEnd('nav');
-        $this->out->flush();
     }
 
     function widget($name, $args=null) {
@@ -170,25 +167,24 @@ class ThemeManager extends ThemeSite {
             throw new Exception('Not a widget');
         }
         $name::run($args);
+        $this->out->flush();
     }
 
     function widgets(array $list) {
         foreach($list as $name=>$args) {
-            if (is_subclass_of($name, 'ThemeWidget')) {	// new style widgets
+            if (is_subclass_of($name, 'ThemeWidget')) {    // new style widgets
                 $this->widget($name, $args);
-            } elseif (is_subclass_of($name, 'Widget')) {	// old style widgets
+            } elseif (is_subclass_of($name, 'Widget')) {    // old style widgets
                 // oh man, this is ugly, but at least doesn't return errors. Glad to be getting rid of it.
                 // call_user_func_array won't work will it?
                 switch (count($args)) {
-                case 0:	$name = new $name(); break;
-                case 1:	$name = new $name($args[0]); break;
-                case 2:	$name = new $name($args[0], $args[1]); break;
-                case 3:	$name = new $name($args[0], $args[1], $args[2]); break;
+                case 0:    $name = new $name(); break;
+                case 1:    $name = new $name($args[0]); break;
+                case 2:    $name = new $name($args[0], $args[1]); break;
+                case 3:    $name = new $name($args[0], $args[1], $args[2]); break;
                 default: throw new Exception('Bad number of arguments');
                 }
                 $name->show();
-                $this->action->flush();
-                $this->out->flush();
             } else {
                 throw new Exception('Not a widget');
             }

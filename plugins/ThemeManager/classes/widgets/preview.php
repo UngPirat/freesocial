@@ -19,14 +19,14 @@ class PreviewWidget extends ThemeWidget {
         if (!is_a($this->item, 'File')) {
             return false;
         }
-		foreach($this->notices as $notice) {
-			if (!is_a($notice, 'Notice')) {
-				return false;
-			}
-			if (!$notice->inScope($this->scoped)) {
-				return false;
-			}
-		}
+        foreach($this->notices as $notice) {
+            if (!is_a($notice, 'Notice')) {
+                return false;
+            }
+            if (!$notice->inScope($this->scoped)) {
+                return false;
+            }
+        }
         return parent::validate();
     }
 
@@ -40,12 +40,12 @@ class PreviewWidget extends ThemeWidget {
         $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$this->item->id)), 'class'=>'url'));
         $this->out->element('img', array('src'=>$thumb->url, 'alt'=>'', 'class'=>'photo'));
         if (!empty($this->notices)) {
-			$this->out->elementStart('div', 'description');
-			foreach($this->notices as $notice) {
-				$this->out->element('span', 'notice', $notice->content);
-			}
-        	$this->out->elementEnd('div');
-		}
+            $this->out->elementStart('div', 'description');
+            foreach($this->notices as $notice) {
+                $this->out->element('span', 'notice', $notice->content);
+            }
+            $this->out->elementEnd('div');
+        }
         $this->out->elementEnd('a');
         $this->out->elementEnd('li');
     }

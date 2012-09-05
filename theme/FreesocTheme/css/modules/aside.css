@@ -1,5 +1,6 @@
-aside .welcome {
-	max-width: 100%;
+#post img {
+	width:120px;
+	height: auto;
 }
 
 #profile .notices {

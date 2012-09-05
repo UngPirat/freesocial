@@ -1,9 +1,10 @@
 <?php
 
-class ObjectLoop extends ThemeExtension {	// might extend Iterator in the future
+class ObjectLoop extends ThemeExtension {    // might extend Iterator in the future
     protected $list   = array();
-	protected $offset = 0;
-    protected $num    = 5;
+    protected $offset = 0;
+    protected $num    = -1;
+	protected $saveFirst = false;	// good for conversations where first post should be visible
 
     private $count  = null;
 
@@ -22,8 +23,26 @@ class ObjectLoop extends ThemeExtension {	// might extend Iterator in the future
     public function initialize() {
         parent::initialize();
 
+		$first = $this->saveFirst ? array_shift($this->list) : null;
+		$childCount = count($this->list);
+        if ($this->num>=0 && $this->offset==0) {
+			$this->list = array_slice($this->list, 0-$this->num);
+		} elseif ($this->num>=0 && $this->offset!=0) {
+			$this->list = array_slice($this->list, $this->offset, $this->num);
+		} elseif ($this->num<0 && $this->offset!=0) {
+			$this->list = array_slice($this->list, $this->offset);
+		}
+
+		if (!is_null($first)) {
+			$showCount = count($this->list);
+			if ($showCount < $childCount) {
+				$first->showmore = $childCount-$showCount;
+			}
+			array_unshift($this->list, $first);
+		}
+
         $this->prefill();
-		$this->reset();
+        $this->reset();
         $this->count = count($this->list);
     }
 
@@ -31,10 +50,14 @@ class ObjectLoop extends ThemeExtension {	// might extend Iterator in the future
         return $this->count;
     }
 
+	function key() {
+		return key($this->list);
+	}
+
     function merge(array $list) {
         $this->list = array_merge($this->list, $list);
         $this->reset();
-		return $this->list;
+        return $this->list;
     }
 
     function next() {

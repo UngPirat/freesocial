@@ -1,7 +1,7 @@
 <?php
 
 abstract class ThemeExtension {
-    protected $scoped = null;	// Profile
+    protected $scoped = null;    // Profile
 
     function __construct(array $args=array()) {
         // iterate class variables and set to either default or given
@@ -20,10 +20,10 @@ abstract class ThemeExtension {
         if (is_null($this->scoped)) {
             $this->scoped = Profile::current();
         } elseif (!is_a($this->scoped, 'Profile')) {
-			return false;
-		}
+            return false;
+        }
 
-		return true;
+        return true;
     }
 
     protected function initialize() {

@@ -4,7 +4,7 @@ class SitefavoritesWidget extends NoticestreamWidget {
     protected $itemClass   = 'notice favorite';
     protected $widgetClass = 'favorites';
 
-	protected $profile;	// used for scoping
+    protected $profile;    // used for scoping
 
     static function run($args=null) {
         $class = get_class();
@@ -17,7 +17,7 @@ class SitefavoritesWidget extends NoticestreamWidget {
             return false;
         }
 
-		return parent::validate();
+        return parent::validate();
     }
 
     function get_stream() {

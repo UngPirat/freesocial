@@ -2,19 +2,20 @@
 	display: block;
 	margin: 0 auto;
 	padding: 1ex 3ex;
-	width: 60%;
 }
 
+.notices > .notice: {
+	background-color: #eee;
+}
 .conversation:nth-child(2n),
-.notices .notice:nth-child(2n) {
-		background-color: #eee;
+#profile .notices .notice:nth-child(2n) {
+	background-color: #e0e0e0;
 }
 .conversation .notice {
-		margin-left: 10%;
-		margin-top: 2em;
+	margin-left: 10%;
 }
 /* WHY U NO MARGIN??? */
-.conversation .notice:after {
+.notice:after {
     content: ".";
     display: block;
     height: 0;
@@ -22,12 +23,9 @@
     visibility: hidden;
 }
 .conversation .notice:first-child {
-		margin-left: 0;
-		margin-top: 1em;
-		padding-top: 1px;
-}
-.conversation .notice-content.repeat {
-	margin-left: 1em;
+	margin-left: 0;
+	margin-top: 1em;
+	padding-top: 1px;
 }
 .conversation .notice-content.repeat:before {
 	position: absolute;
@@ -39,6 +37,13 @@
 	left: 100%;
 }
 
+.notice .notice-content {
+	display: block;
+	line-height: 1.25em;
+	margin: 1ex 0;
+	white-space: pre-wrap;
+}
+
 
 .notice {
 	clear: both;
@@ -47,12 +52,16 @@
 .notice.spam {
 	border: 2px solid red;
 }
+.conversation .notice:first-child .metadata,
 .notice .metadata {
 	display: block;
 	font-size: 0.75em;
 	position: absolute;
 	bottom: 100%;
 	left: 0;
+}
+.conversation .notice .metadata {
+	display: none;
 }
 .notice > * {
 	text-align: left;
@@ -70,13 +79,6 @@
 	display: none;
 }
 
-.notice .notice-content {
-	display: block;
-	line-height: 1.25em;
-	margin: 1ex 0;
-	white-space: pre-wrap;
-}
-
 .notice .source.device {
 	display: none;
 }
@@ -88,3 +90,13 @@
 	content: none;
 }
 
+.show-more a:before,
+.show-more a:after {
+	content: '---✂---';
+	font-size: 1.5em;
+	margin: 0 1ex;
+}
+.notice + .show-more {
+	font-size: 0.75em;
+	text-align: center;
+}

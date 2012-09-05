@@ -5,12 +5,12 @@ class MenuListWidget extends ListWidget {
     protected $action;
     protected $menus;
 
-	protected $itemClass = 'menu-item';
-	protected $loopClass = 'menu';
-	protected $widgetClass = 'menu-container';
+    protected $itemClass = 'menu-item';
+    protected $loopClass = 'menu';
+    protected $widgetClass = 'menu-container';
 
     static function run($args=null) {
-        $class = get_class();	// this seems to work as the ThemeWidget class is abstracted!
+        $class = get_class();    // this seems to work as the ThemeWidget class is abstracted!
         $widget = new $class($args);
         $widget->show();
     }
@@ -21,17 +21,17 @@ class MenuListWidget extends ListWidget {
             return false;
         }
         foreach($this->menus as $key=>$menu) {
-			if (!is_subclass_of($menu, 'ThemeMenu')) {
-	            return false;
-			}
+            if (!is_subclass_of($menu, 'ThemeMenu')) {
+                return false;
+            }
         }
 
         return parent::validate();
     }
-	
-	function get_list() {
-		return $this->menus;
-	}
+    
+    function get_list() {
+        return $this->menus;
+    }
 
     function the_loop() {
         $this->out->elementStart('ul', $this->loopClass);
@@ -42,11 +42,11 @@ class MenuListWidget extends ListWidget {
     }
 
     function the_item($item) {
-		try {
-			$menu = new $item;
-		} catch (Exception $e) {
-			return false;
-		}
+        try {
+            $menu = new $item;
+        } catch (Exception $e) {
+            return false;
+        }
         if (!$menu->count()) {
             return false;
         }

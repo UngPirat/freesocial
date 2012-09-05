@@ -1,4 +1,5 @@
 @import url("reset.css");
+@import url("fonts.css");
 
 @import url("modules/grid.css");
 @import url("modules/header.css");
@@ -22,18 +23,23 @@ a:hover {
 	color: #424242;
 }
 
-h2 {
+#content > h2 {
 	display: none;
 }
 
 nav.paging {
+	clear: both;
     margin: 1em auto;
     padding: 1px;
-	width: 66%;
 	text-align: center;
 }
-nav.paging span {
-	width: 22%;
+/* self-clearing bug */
+nav.paging .notice:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
 }
 nav .prev {
 	float: left;

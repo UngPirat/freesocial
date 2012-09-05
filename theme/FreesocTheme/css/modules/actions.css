@@ -1,10 +1,10 @@
-.actions {
-    float: right;    
-}
 .notice .actions {
+	position: absolute;
+	right: 100%;
+	top: 0;
 	opacity: 0.4;
 }
-.notice .actions:hover {
+.notice:hover .actions {
 	opacity: 1.0;
 }
 
@@ -18,35 +18,36 @@
 
 .conversation .notice .actions {
 	position: absolute;
-	top: 0;
+	top: 1ex;
 	right: 100%;
 }
 
 .actions input.submit,
 .actions .action {
-    display: block;
 	background-color: transparent;
     border: 0;
 	color: black;
 	cursor:pointer;
-	font-size: 1.5em;
+    display: block;
+	font-size: 1.25em;
 	line-height: 1.25em;
 	vertical-align: middle;
 	text-align: center;
     outline:none;
+	font-family: FontAwesome;
+	margin: 0.25ex;
+}
+.notice .actions input.submit,
+.notice .actions .action {
+	height: 1em;
+    width: 1em;
+	overflow: hidden;
 }
 .notice .action {
-	margin: 0.25ex;
-    height: 1em;
-    width: 1em;
 }
 
 .notice .actions form.form_disfavor input.submit:hover {
 	color: black;
-}
-.notice .actions form.form_favor input.submit:hover,
-.notice .actions form.form_disfavor input.submit {
-	color: #d00;
 }
 .notice .actions .notice_delete {
 	color: red;
@@ -54,10 +55,10 @@
 .notice .actions form.form_repeat input.submit {
 	color: black;
 }
+.notice .actions form.form_favor input.submit:hover,
+.notice .actions form.form_disfavor input.submit,
 .notice .actions .repeated,
-.notice .actions form.form_repeat input.submit:hover {
-	color: green;
-}
+.notice .actions form.form_repeat input.submit:hover,
 .notice .actions .action.reply:hover {
-	color: #00f;
+	color: green;
 }

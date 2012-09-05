@@ -3,19 +3,35 @@
 	padding: 1em 0;
 	position: relative;
 }
-.form label, .form .form_guide {
+.notice .form label, .form .form_guide {
 	display: block;
 	float: left;
 	text-align: right;
 	width: 40%;
 	clear: left;
 }
-.form input, .form textarea, .form select {
+.notice .form input, .form textarea, .form select {
 	float: left;
 	margin-left: 1em;
 }
-.form .form_guide {
+.notice .form .form_guide {
 	font-size: 1ex;
 }
 .form input, .form textarea {
+}
+
+
+#post textarea {
+	width: 70%;
+}
+#post input.submit {
+	font-size:2em;
+	position:absolute;
+	right:0;
+	top:0;
+	bottom:0;
+	width:20%;
+}
+#post legend {
+	display: none;
 }

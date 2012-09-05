@@ -7,7 +7,7 @@ class FavoriteListWidget extends NoticeListWidget {
     protected $itemClass   = 'favorite notice';
     protected $widgetClass = 'favorites';
 
-	protected $profile;
+    protected $profile;
 
     static function run($args=null) {
         $class = get_class();
@@ -19,7 +19,7 @@ class FavoriteListWidget extends NoticeListWidget {
         if (!is_a($this->profile, 'Profile')) {
             return false;
         }
-		return parent::validate();
+        return parent::validate();
     }
 
     function get_list() {

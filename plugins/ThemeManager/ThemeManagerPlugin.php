@@ -10,7 +10,7 @@ class ThemeManagerPlugin extends Plugin {
      */
     function onAutoload($cls)
     {
-		$file = null;
+        $file = null;
         switch($cls) {
         case 'ThemeExtension':
         case 'ThemeManager':
@@ -34,23 +34,32 @@ class ThemeManagerPlugin extends Plugin {
         } elseif (preg_match('/^(\w+)(Loop|Menu|Widget)$/', $cls, $type)) {
             $type = array_map('strtolower', array_map('basename', $type));
             $file = dirname(__FILE__) . "/classes/{$type[2]}s/{$type[1]}.php";
-		}
+        }
 
-		if (!is_null($file) && file_exists($file)) {
+        if (!is_null($file) && file_exists($file)) {
             require_once($file);
             return false;
         }
-		return true;
+        return true;
     }
 	function onStartShowNoticeItem($noticeitem) {
-		return THEME_MANAGER===true
-			? !NoticeWidget::run(array('notice'=>$noticeitem->notice, 'itemTag'=>''))
-			: true;
+        if (THEME_MANAGER===true) {
+            NoticeWidget::run(array('notice'=>$noticeitem->notice, 'itemTag'=>'li'));
+			return false;
+        }
+		return true;
+	}
+	function onStartOpenNoticeListItemElement($noticeitem) {
+		return !(THEME_MANAGER===true);
+	}
+
+	function onStartCloseNoticeListItemElement($noticeitem) {
+		return !(THEME_MANAGER===true);
 	}
 
     function onStartInitializeRouter($m)
     {
-		// legacy
+        // legacy
         $m->connect(':nickname',
                     array('action' => 'showprofile'),
                     array('nickname' => Nickname::DISPLAY_FMT));
@@ -61,7 +70,7 @@ class ThemeManagerPlugin extends Plugin {
     }
 
     function onStartShowHTML($action)
-	{
+    {  
         try {
             $tm = new ThemeManager($action);
             return !$tm->run();
@@ -72,18 +81,18 @@ class ThemeManagerPlugin extends Plugin {
         }
     }
 
-	function onStartShowHead($action)
-	{
-		return THEME_MANAGER!==true;
-	}
+    function onStartShowHead($action)
+    {  
+        return THEME_MANAGER!==true;
+    }
 
-	function onStartShowBody($action)
-	{
-		return THEME_MANAGER!==true;
-	}
+    function onStartShowBody($action)
+    {  
+        return THEME_MANAGER!==true;
+    }
 
-	function onStartEndHTML($action)
-	{
-		return THEME_MANAGER!==true;
-	}
+    function onStartEndHTML($action)
+    {  
+        return THEME_MANAGER!==true;
+    }
 }

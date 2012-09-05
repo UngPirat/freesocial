@@ -1,7 +1,7 @@
 <?php
 
 class ProfilestreamWidget extends NoticestreamWidget {
-	protected $profile;	// used for scoping
+    protected $profile;    // used for scoping
 
     static function run($args=null) {
         $class = get_class();
@@ -13,7 +13,7 @@ class ProfilestreamWidget extends NoticestreamWidget {
         if (!is_a($this->profile, 'Profile')) {
             return false;
         }
-		return parent::validate();
+        return parent::validate();
     }
 
     function get_stream() {

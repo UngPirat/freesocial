@@ -1,0 +1,17 @@
+@font-face {
+	/* 'Font Awesome - http://fortawesome.github.com/Font-Awesome */
+	font-family: FontAwesome;
+	src: url('../fonts/awesome/awesome.woff');
+}
+
+@font-face {
+	/* Iconic - http://somerandomdude.com/work/iconic/ */
+	font-family: Iconic;
+	src: url('../fonts/iconic/iconic_uni.woff');
+}
+
+@font-face {
+	/* OpenWeb Icons - http://pfefferle.github.com/openwebicons/ */
+	font-family: OpenWeb;
+	src: url('../fonts/openweb/openweb.woff');
+}

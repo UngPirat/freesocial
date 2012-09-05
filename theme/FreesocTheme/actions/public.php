@@ -10,6 +10,5 @@
 	$this->content('noticelist');
 	$this->out->elementEnd('div');
 
-    $this->box('aside');
     $this->box('footer');
 ?>

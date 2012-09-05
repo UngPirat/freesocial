@@ -1,8 +1,8 @@
 <?php
 
 class ThemeSite {
-    protected $action;	// Action
-    protected $profile;	// Profile
+    protected $action;    // Action
+    protected $profile;    // Profile
 
     protected $urldir;
     protected $sysdir;
@@ -18,14 +18,14 @@ class ThemeSite {
 
         $this->action = $action;
         $this->supported = array('showprofile'=>"{$this->sysdir}/actions/profile.php", 'settings'=>"{$this->sysdir}/actions/settings.php");
-if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php",'replies'=>"{$this->sysdir}/actions/replies.php", 'public'=>"{$this->sysdir}/actions/public.php", 'settings'=>"{$this->sysdir}/actions/settings.php", 'legacy'=>"{$this->sysdir}/actions/legacy.php");
+if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php", 'legacy'=>"{$this->sysdir}/actions/legacy.php");
 if ( isset($this->action->args['notm']))        $this->supported = array();
         $this->set_template($this->action);
     }
 
     private function set_template($action) {
         $class = get_class($action);
-        do {	// get the closest match to current action and set that template
+        do {    // get the closest match to current action and set that template
             $template = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $class)));
             if (isset($this->supported[$template])) {
                 $this->template = $template;
@@ -34,20 +34,20 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
             }
         } while ($class = get_parent_class($class));
 
-		if (empty($this->template) && isset($this->action->args['tm'])) {
-			$this->template = 'legacy';
+        if (empty($this->template) && isset($this->supported['legacy'])) {
+            $this->template = 'legacy';
             $this->template_file = $this->supported[$this->template];
-		} elseif (empty($this->template) || !file_exists($this->template_file)) {
-			define('THEME_MANAGER', false);
+        } elseif (empty($this->template) || !file_exists($this->template_file)) {
+            define('THEME_MANAGER', false);
             throw new Exception('Template not supported', 302);
         }
 
-		define('THEME_MANAGER', true);
+        define('THEME_MANAGER', true);
     }
 
-	function url($relpath) {
-		return common_path($this->urldir . '/' . $relpath);
-	}
+    function url($relpath) {
+        return common_path($this->urldir . '/' . $relpath);
+    }
 
     function get_template() {
         return $this->template;
@@ -71,9 +71,9 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
     }
 
     function is_action($action=null) {
-		if (is_null($action)) {
+        if (is_null($action)) {
             return strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action))));
-		}
+        }
         return is_a($this->action, ucfirst($action.'Action'));
     }
     function is_single() {
@@ -83,7 +83,7 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
 
     function the_feeds()
     {
-        foreach ((array)$this->action->getFeeds() as $feed) {	// should we get these as an event?
+        foreach ((array)$this->action->getFeeds() as $feed) {    // should we get these as an event?
             $this->out->element('link', array('rel' => $feed->rel(),
                                          'href' => $feed->url,
                                          'type' => $feed->mimeType(),
@@ -91,8 +91,8 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
         }
     }
     function the_scripts() {
-		$this->out->script($this->url('js/jquery-1.8.1.min.js'));
-	}
+        $this->out->script($this->url('js/jquery-1.8.1.min.js'));
+    }
     function the_styles() {
         $this->out->element('link', array('rel' => 'stylesheet',
                                             'type' => 'text/css',
