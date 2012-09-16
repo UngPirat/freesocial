@@ -190,17 +190,18 @@ class TwitterOAuthClient extends OAuthClient
     /**
      * Calls Twitter's /statuses/home_timeline API method
      *
-     * @param int $since_id show statuses after this id
-     * @param int $max_id   show statuses before this id
-     * @param int $cnt      number of statuses to show
-     * @param int $page     page number
+     * @param int $since_id    show statuses after this id
+     * @param int $timelineUri timeline to poll statuses from
+     * @param int $max_id      show statuses before this id
+     * @param int $cnt         number of statuses to show
+     * @param int $page        page number
      *
      * @return mixed an array of statuses
      */
-    function statusesHomeTimeline($since_id = null, $max_id = null,
-                                  $cnt = null, $page = null)
+    function statusesTimeline($since_id = null, $timelineUri = 'home_timeline',
+	                          $max_id = null, $cnt = null, $page = null)
     {
-        $url    = 'https://api.twitter.com/1/statuses/home_timeline.json';
+        $url    = 'https://api.twitter.com/1/statuses/'.$timelineUri.'.json';
 
         $params = array('include_entities' => 'true');
 
@@ -221,38 +222,6 @@ class TwitterOAuthClient extends OAuthClient
         $statuses = json_decode($response);
         return $statuses;
     }
-
-    /**
-     * Calls Twitter's /statuses/mentions API method
-     *
-     * @param int $since_id show statuses after this id
-     * @param int $max_id   show statuses before this id
-     * @param int $page     page number
-     *
-     * @return mixed an array of statuses
-     */
-    function statusesMentions($since_id = null, $max_id = null,
-                                  $page = null)
-    {
-        $url    = 'https://api.twitter.com/1/statuses/mentions.json';
-
-        $params = array('include_entities' => 'true');
-
-        if (!empty($since_id)) {
-            $params['since_id'] = $since_id;
-        }
-        if (!empty($max_id)) {
-            $params['max_id'] = $max_id;
-        }
-        if (!empty($page)) {
-            $params['page'] = $page;
-        }
-
-        $response = $this->oAuthGet($url, $params);
-        $statuses = json_decode($response);
-        return $statuses;
-    }
-    
 
     /**
      * Calls Twitter's /statuses/friends API method
