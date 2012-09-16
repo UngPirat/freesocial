@@ -46,9 +46,12 @@
 .notice .action {
 }
 
+.notice .actions .form-train-ham .submit:hover,
 .notice .actions form.form_disfavor input.submit:hover {
 	color: black;
 }
+.notice .actions .form-train-spam .submit:hover,
+.notice .actions .form-train-ham .submit,
 .notice .actions .delete {
 	color: #d00;
 }

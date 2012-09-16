@@ -24,52 +24,54 @@ class NoticeactionsWidget extends ThemeWidget {
     }
 
     function get_actions() {
-        $actions = array (
-            'favor' => ($this->scoped->hasFave($this->item)
+        $items = array();
+		 
+        if (Event::handle('StartShowNoticeActions', array(&$items, $this->item, $this))) {
+            $items['favor'] = ($this->scoped->hasFave($this->item)
                         ? new DisfavorForm($this->out, $this->item)
-                        : new FavorForm($this->out, $this->item)),
-
-            );
-        if (in_array($this->item->scope, array(Notice::PUBLIC_SCOPE, Notice::SITE_SCOPE))) {
-            if ($this->scoped->hasRepeated($this->item->id)) {
-                $actions['repeat'] = array('element' => 'span',
-                                            'args'   => array('class'=>'action final repeated',
-                                                            'title'=>_m('You repeated this')),
-                                            'content'=> ' Repeated', // '',
-                                            );
-            } else {
-                $actions['repeat'] = new RepeatForm($this->out, $this->item);
+                        : new FavorForm($this->out, $this->item));
+    
+            if (in_array($this->item->scope, array(Notice::PUBLIC_SCOPE, Notice::SITE_SCOPE))) {
+                if ($this->scoped->hasRepeated($this->item->id)) {
+                    $items['repeat'] = array('element' => 'span',
+                                                'args'   => array('class'=>'action final repeated',
+                                                                'title'=>_m('You repeated this')),
+                                                'content'=> ' Repeated', // '',
+                                                );
+                } else {
+                    $items['repeat'] = new RepeatForm($this->out, $this->item);
+                }
             }
+            if (!empty($this->item->repeat_of)) {
+                $replyto = $this->item->profile_id;
+                $inreplyto = $this->item->repeat_of;
+            } else {
+                $replyto = $this->item->profile_id;
+                $inreplyto = $this->item->id;
+            }
+            $items['reply']  = array('element'=>'a',
+                                        'args'=>array('href' => common_local_url('newnotice', array(
+                                                                    'replyto' => $replyto,
+                                                                    'inreplyto' => $inreplyto)),
+                                                       'class' => 'action reply',
+                                                    // TRANS: Link title in notice list item to reply to a notice.
+                                                    'title' => _('Reply to this notice.')),
+                                        'content'=>_m(' Reply'),    // ↩
+                                        );
+            if (!empty($this->scoped) &&
+                ($this->item->profile_id == $this->scoped->id || $this->scoped->hasRight(Right::DELETEOTHERSNOTICE))) {
+                $items['delete'] = array('element'=>'a',
+                                           'args'=>array('href' => common_local_url('deletenotice',
+                                                                                    array('notice' => $this->item->id)),
+                                                         'class' => 'action delete',
+                                               // TRANS: Link title in notice list item to delete a notice.
+                                               'title'  => _('Delete this notice from the timeline.')),
+                                           'content'=> _m(' Delete'),
+                                           );
+            }
+            Event::handle('EndShowNoticeActions', array(&$items, $this->item, $this));
         }
-        if (!empty($this->item->repeat_of)) {
-            $replyto = $this->item->profile_id;
-            $inreplyto = $this->item->repeat_of;
-        } else {
-            $replyto = $this->item->profile_id;
-            $inreplyto = $this->item->id;
-        }
-        $actions['reply']  = array('element'=>'a',
-                                    'args'=>array('href' => common_local_url('newnotice', array(
-                                                                'replyto' => $replyto,
-                                                                'inreplyto' => $inreplyto)),
-                                                   'class' => 'action reply',
-                                                // TRANS: Link title in notice list item to reply to a notice.
-                                                'title' => _('Reply to this notice.')),
-                                    'content'=>_m(' Reply'),	// ↩
-                                    );
-        if (!empty($this->scoped) &&
-            ($this->item->profile_id == $this->scoped->id || $this->scoped->hasRight(Right::DELETEOTHERSNOTICE))) {
-            $actions['delete'] = array('element'=>'a',
-                                       'args'=>array('href' => common_local_url('deletenotice',
-                                                                                array('notice' => $this->item->id)),
-                                                     'class' => 'action delete',
-                                           // TRANS: Link title in notice list item to delete a notice.
-                                           'title'  => _('Delete this notice from the timeline.')),
-                                       'content'=> _m(' Delete'),
-                                       );
-        }
-
-        return $actions;
+        return $items;
     }
 
     function show() {

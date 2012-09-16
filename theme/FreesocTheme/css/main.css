@@ -26,6 +26,12 @@ a:hover {
 #content > h2 {
 	display: none;
 }
+#content.legacy > h2 {
+	display: block;
+	font-size: 2em;
+	font-family: serif;
+	margin: 1em 0;
+}
 
 nav.paging {
 	clear: both;

@@ -20,7 +20,7 @@ class PersonalMenu extends ThemeMenu {
     function get_list() {
         $items = array();
         // opens up a reference to $items and will replace an Action in events below
-        $adapter = new ThemeMenuAdapter($items, $this->action);
+        $adapter = new ThemeManagerAdapter($items, $this->action);
         if (Event::handle('StartPersonalGroupNav', array($adapter))) {
             $args = array('nickname'=>$this->profile->nickname);
             // list($actionName, $args, $label, $description, $id)

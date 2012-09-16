@@ -18,8 +18,13 @@ abstract class ThemeWidget extends ThemeExtension {
     }
 
     protected function initialize() {
-        if (empty($this->out)) {
-            $this->out = ThemeManager::getOut();
-        }
+        $this->getOut();
     }
+
+	function getOut() {
+        if (empty($this->out)) {
+		    $this->out = ThemeManager::getOut();
+        }
+		return $this->out;
+	}
 }

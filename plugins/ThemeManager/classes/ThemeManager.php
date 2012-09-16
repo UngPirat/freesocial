@@ -119,13 +119,13 @@ class ThemeManager extends ThemeSite {
         }
         $this->out->elementStart('nav', 'paging');
         foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
-            if (!isset($pages[$key])) {
-                $href = null;
-            } else {
-                $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
-            }
             $this->out->elementStart('span', $key);
-            $this->out->element('a', array('href'=>$href, 'rel'=>$key), $trans);
+            if (isset($pages[$key])) {
+                $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
+            	$this->out->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
+			} else {
+				$this->out->text($trans);
+			}
             $this->out->elementEnd('span');
         }
         $this->out->elementEnd('nav');
@@ -196,4 +196,31 @@ class ThemeManager extends ThemeSite {
             parse_str($args, $args);
         }
     }
+}
+
+class ThemeManagerAdapter {
+    protected $items = array();
+
+    function __construct(&$items, $action) {
+        $this->items =& $items;
+        $this->action = $action;
+        if (is_a($this->action, 'Action')) {
+			$this->actionName = $action->trimmed('action');
+		}
+        $this->out    = $this;
+    }
+    
+    function trimmed($action) {
+        return $this->action->trimmed($action);
+    }
+    function menuItem($url, $label, $description, $current) {
+        $item = array();
+        foreach(array('url', 'label', 'description', 'current') as $arg) {
+            $item[$arg]  = $$arg;
+        }    // the above should be put into items instead of below array
+        $this->items[] = $item;
+    }
+	function getOut() {
+		return $this->action;
+	}
 }

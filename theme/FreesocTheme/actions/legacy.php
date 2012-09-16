@@ -4,10 +4,16 @@
  */
 	$this->box('header');
 
-	$this->out->elementStart('article', array('id'=>'content', 'class'=>'legacy'));
-//	$this->out->element('h2', 'content-title', $this->get_title());
+	$this->out->elementStart('article', array('id'=>'content', 'class'=>'legacy'.($this->is_single()?' single':'')));
+    $this->out->element('h2', 'content-title', $this->get_title());
 
-	if (isset($this->action->notice)) {
+	if (isset($this->action->notice) &&
+			(isset($this->action->user) || isset($this->action->profile))) {
+		if (isset($this->action->user)) {
+			$this->action->profile = $this->action->user->getProfile();
+		}
+		$this->content('profile-noticelist');
+	} elseif (isset($this->action->notice)) {
 		$this->content('noticelist');
 	} else {
 		$this->action->showContent();

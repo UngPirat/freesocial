@@ -20,7 +20,7 @@ class ConnectionsMenu extends ThemeMenu {
     function get_list() {
         $items = array();
         // opens up a reference to $items and will replace an Action in events below
-        $adapter = new ThemeMenuAdapter($items, $this->action);
+        $adapter = new ThemeManagerAdapter($items, $this->action);
 
            $items[] = array(
                         'url'=>'oauthconnectionssettings',

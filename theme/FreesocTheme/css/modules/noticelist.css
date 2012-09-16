@@ -11,6 +11,7 @@
 	background-color: #e0e0e0;
 }
 .conversation .notice {
+	font-size: 0.75em;
 	margin-left: 10%;
 }
 /* WHY U NO MARGIN??? */
@@ -22,18 +23,17 @@
     visibility: hidden;
 }
 .conversation .notice:first-child {
+	font-size: 1em;
 	margin-left: 0;
 	margin-top: 1em;
 	padding-top: 1px;
 }
 .conversation .repeat .notice-content:before {
 	position: absolute;
-	font-size: 3em;
+	font-size: 2em;
 	content: '\2672';
-	margin-left: -0.25em;
-	margin-top: -0.25em;
-	top: 0;
-	left: 100%;
+	top: -0.666em;
+	right: 100%;
 }
 
 .notice .notice-content {

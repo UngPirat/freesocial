@@ -25,7 +25,7 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
 
 		$first = $this->saveFirst ? array_shift($this->list) : null;
 		$childCount = count($this->list);
-		if ($num >= $childCount) {
+		if ($this->num >= $childCount) {
 			// list is less than desired num
 		} elseif ($this->num>=0 && !$this->saveFirst) {
 			$this->list = array_slice($this->list, $this->offset, $this->num);
@@ -48,7 +48,29 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
         $this->count = count($this->list);
     }
 
+    function get_paging($page) {
+        $page  = (0+$page === 0 ? 1 : 0+$page);    // convert to (int)
+        if ($page < 1) {
+            throw new ClientException('Invalid paging arguments');
+        }
+
+        $pages = array();
+        if ($page > 1) {
+            $pages['next']   = $page - 1;
+        }
+        if ($this->count() > $this->num) {
+            $pages['prev']   = $page + 1;
+        }
+        if (isset($pages['next']) || isset($pages['prev'])) {
+            $pages['current'] = $page;
+        }
+        return $pages;
+    }
+
     function count() {
+		if (empty($this->count)) {
+			$this->count = count($this->list);
+		}
         return $this->count;
     }
 
@@ -71,6 +93,7 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
     }
 
     function reset() {
+		$this->count = count($this->list);
         return reset($this->list);
     }
 

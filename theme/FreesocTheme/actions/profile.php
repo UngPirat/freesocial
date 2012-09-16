@@ -10,10 +10,12 @@
     if ($this->is_single()) :
         if ($this->is_action('showprofile')) {
             $this->content('showprofile');
+    	} elseif ($this->is_action('gallery')) {
+			$this->content('gallery');
         } else {
             $this->content('noticelist');
         }
-    else :
+	else :
         $this->content('noticelist');
     endif;
     $this->out->elementEnd($this->is_single()?'article':'div');

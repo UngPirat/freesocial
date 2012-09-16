@@ -18,7 +18,7 @@ abstract class ThemeExtension {
 
     protected function validate() {
         if (is_null($this->scoped)) {
-            $this->scoped = Profile::current();
+			$this->getScoped();
         } elseif (!is_a($this->scoped, 'Profile')) {
             return false;
         }
@@ -30,4 +30,10 @@ abstract class ThemeExtension {
         return true;
     }
 
+	function getScoped() {
+		if (empty($this->scoped)) {
+            $this->scoped = Profile::current();
+		}
+		return $this->scoped;
+	}
 }

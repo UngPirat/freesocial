@@ -9,6 +9,10 @@ class NoticeListWidget extends ListWidget {
         $widget->show();
     }
     protected function validate() {
+        if (is_a($this->list, 'ArrayWrapper')) {
+            $this->list = $this->list->fetchAll();
+        }
+
         if (!is_null($this->list) && !is_array($this->list)) {
             return false;
         }

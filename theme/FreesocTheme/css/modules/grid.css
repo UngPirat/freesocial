@@ -1,6 +1,7 @@
 #wrapper {
 	margin: 0 auto;
-	width: 96%
+	width: 96%;
+	max-width: 1200px;
 }
 
 #wrapper > * {

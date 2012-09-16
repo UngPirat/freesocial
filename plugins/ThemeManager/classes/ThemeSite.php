@@ -80,7 +80,8 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
         return is_a($this->action, ucfirst($action.'Action'));
     }
     function is_single() {
-        return $this->is_action('Showprofile');
+		return (isset($this->action->user) || isset($this->action->profile))
+			|| $this->is_action('Showprofile');
     }
 
 

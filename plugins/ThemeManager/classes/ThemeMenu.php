@@ -85,25 +85,3 @@ class ThemeMenu extends ListWidget {
         $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 }
-
-class ThemeMenuAdapter {
-    protected $items = array();
-
-    function __construct(&$items, $action) {
-        $this->items =& $items;
-        $this->actionName = $action->trimmed('action');
-        $this->action = $action;
-        $this->out    = $this;
-    }
-    
-    function trimmed($action) {
-        return $this->action->trimmed($action);
-    }
-    function menuItem($url, $label, $description, $current) {
-        $item = array();
-        foreach(array('url', 'label', 'description', 'current') as $arg) {
-            $item[$arg]  = $$arg;
-        }    // the above should be put into items instead of below array
-        $this->items[] = $item;
-    }
-}
