@@ -278,6 +278,7 @@ class User extends Managed_DataObject
 
         $nickname = common_canonical_nickname($nickname);
         $profile->nickname = $nickname;
+        $profile->type = Profile::USER;
         if(! User::allowed_nickname($nickname)){
             common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname),
                        __FILE__);
