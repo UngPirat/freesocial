@@ -93,7 +93,7 @@ class TrainSpamForm extends Form {
     function formActions()
     {
         $this->submit('train-spam-submit-' . $this->notice->id,
-                      _('Train spam'),
+                      ' ' . _('Train spam'),
                       'submit',
                       null,
                       _("Mark as spam"));

@@ -203,6 +203,32 @@ class ActivitySpamPlugin extends Plugin
 
         return true;
     }
+
+    function onEndShowNoticeActions(&$items, Notice $notice, ThemeWidget $widget)
+    {
+        $scoped = $widget->getScoped();
+
+        if (!empty($scoped) && $scoped->hasRight(self::TRAINSPAM)) {
+
+            if (!empty($notice)) {
+
+                $score = Spam_score::staticGet('notice_id', $notice->id);
+				$out = $widget->getOut();
+
+                if (empty($score)) {
+                    // If it's empty, we can train it.
+                    $form = new TrainSpamForm($out, $notice);
+                } else if ($score->is_spam) {
+                    $form = new TrainHamForm($out, $notice);
+                } else if (!$score->is_spam) {
+                    $form = new TrainSpamForm($out, $notice);
+                }
+				$items['spam'] = $form;
+            }
+        }
+
+        return true;
+    }
     
     /**
      * Map URLs to actions
