@@ -38,6 +38,7 @@ class Profile extends Managed_DataObject
     public $type;                            // tinyint(1)  not_null
     public $nickname;                        // varchar(64)  multiple_key not_null
     public $fullname;                        // varchar(255)  multiple_key
+    public $uri;                             // varchar(255)  unique_key
     public $profileurl;                      // varchar(255)
     public $homepage;                        // varchar(255)  multiple_key
     public $bio;                             // text()  multiple_key
@@ -66,6 +67,7 @@ class Profile extends Managed_DataObject
                 'type' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'description' => '0=user, 1=group, 2=page'),
                 'nickname' => array('type' => 'varchar', 'length' => 64, 'not null' => true, 'description' => 'nickname or username', 'collate' => 'utf8_general_ci'),
                 'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name', 'collate' => 'utf8_general_ci'),
+                'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universal identifier'),
                 'profileurl' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL, cached so we dont regenerate'),
                 'homepage' => array('type' => 'varchar', 'length' => 255, 'description' => 'identifying URL', 'collate' => 'utf8_general_ci'),
                 'bio' => array('type' => 'text', 'description' => 'descriptive biography', 'collate' => 'utf8_general_ci'),
@@ -83,6 +85,7 @@ class Profile extends Managed_DataObject
             ),
             'primary key' => array('id'),
             'indexes' => array(
+                'profile_uri_idx' => array('uri'),
                 'profile_nickname_idx' => array('nickname'),
             )
         );
