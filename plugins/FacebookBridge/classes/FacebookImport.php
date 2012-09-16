@@ -279,10 +279,12 @@ class FacebookImport
         try {
             $replyToId = $this->getReplyToId($update['id']);
             $reply = Foreign_notice_map::get_foreign_notice($replyToId, FACEBOOK_SERVICE);
+			$rprofile = $reply->getProfile();
             $notice->reply_to     = $reply->id;
             $notice->scope        = $reply->scope;
             $notice->conversation = $reply->conversation;
         } catch (Exception $e) {
+        	$reply = null;
             // either this is the original post or the reply-to post has not been imported/mapped
         }
 
@@ -294,10 +296,10 @@ class FacebookImport
         $notice->content  = html_entity_decode($message, ENT_QUOTES, 'UTF-8');
 
         if ($local) {
-            $notice->is_local   = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
+            $notice->is_local = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
         } else {
-            $notice->is_local   = Notice::GATEWAY;
-        	$notice->uri        = $this->makeUpdateURI($update['id'], $profile->nickname);
+            $notice->is_local = Notice::GATEWAY;
+        	$notice->uri      = $this->makeUpdateURI($update['id'], (!is_null($reply) ? $rprofile->nickname : $profile->nickname));
             $notice->rendered = common_render_content($message, $notice);
         }
 

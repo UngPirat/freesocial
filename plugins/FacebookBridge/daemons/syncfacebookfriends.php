@@ -108,6 +108,10 @@ class SyncFacebookFriendsDaemon extends ParallelizingDaemon
     }
 
     function childTask($flink) {
+		if (empty($flink->credentials)) {
+			return false;
+		}
+
         // Each child ps needs its own DB connection
 
         // Note: DataObject::getDatabaseConnection() creates
@@ -152,10 +156,10 @@ class SyncFacebookFriendsDaemon extends ParallelizingDaemon
                     case 458:	//User %i has not authorized application %i.
                     case 460:	//The session has been invalidated because the user has changed the password.
                     case 463:	//Session has expired at unix time %i. The current unix time is %i.
-                        Facebookclient::emailExpiredCredentials($flink->getUser(), $e->getMessage());
                         $original = clone($flink);
-                        $flink->credentials = null;
+                        $flink->credentials = '';
                         $flink->update($original);
+                        Facebookclient::emailExpiredCredentials($flink->getUser(), $e->getMessage());
                         common_debug('Nulled expired credentials for '.$flink->foreign_id.' due to api error: ['.$r['error']['code'].'/'.$r['error']['error_subcode'].'] '.$e->getMessage());
                         throw new Exception($e->getMessage());
                         break;

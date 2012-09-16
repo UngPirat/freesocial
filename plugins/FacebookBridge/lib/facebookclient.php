@@ -221,10 +221,11 @@ class Facebookclient
                 'message'      => $this->notice->content
             );
 
+			common_debug('FBDBG: should I comment? reply_to: '.$this->notice->reply_to.' original id= '.FacebookImport::getOriginalId($this->getForeignId($this->notice->reply_to)));
 			if (!empty($this->notice->reply_to) && $fb_id = FacebookImport::getOriginalId($this->getForeignId($this->notice->reply_to))) {
-				common_debug("attempting to comment with {$this->notice->id} on FACEBOOK post: $fb_id which is parent of ".$this->getForeignId($this->notice->reply_to));
+				common_debug("FBDBG: attempting to comment with {$this->notice->id} on FACEBOOK post: $fb_id which is parent of ".$this->getForeignId($this->notice->reply_to).' with url: https://graph.facebook.com/'.$fb_id.'/comments?'.http_build_query($params));
 				$result = $this->facebook->api(sprintf('/%s/comments', $fb_id), 'post', $params);
-				// attachments not supported for comments in Facebook.;
+				// attachments not supported for comments in Facebook.
                 Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
                 return true;
 			}
@@ -469,6 +470,9 @@ class Facebookclient
      */
     function disconnect()
     {
+		if (empty($this->flink->credentials)) {
+			return false;
+		}
         $fbuid = $this->flink->foreign_id;
 
         common_log(
@@ -483,7 +487,7 @@ class Facebookclient
         );
 
         $original = clone($this->flink);
-        $this->flink->credentials = null;
+        $this->flink->credentials = '';
 		$this->flink->update($original);
 
         // Notify the user that we are removing their Facebook link
