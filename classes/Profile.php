@@ -48,6 +48,9 @@ class Profile extends Managed_DataObject
     public $location_ns;                     // int(4)
     public $created;                         // datetime()   not_null
     public $modified;                        // timestamp()   not_null default_CURRENT_TIMESTAMP
+	// group profile stuff, makes no sense for ordinary users
+    public $join_policy;                     // tinyint(4)
+    public $force_scope;                     // tinyint(4)
 
     /* Static get */
     function staticGet($k,$v=NULL) {
@@ -71,6 +74,9 @@ class Profile extends Managed_DataObject
                 'lon' => array('type' => 'numeric', 'precision' => 10, 'scale' => 7, 'description' => 'longitude'),
                 'location_id' => array('type' => 'int', 'description' => 'location id if possible'),
                 'location_ns' => array('type' => 'int', 'description' => 'namespace for location'),
+
+                'join_policy' => array('type' => 'int', 'size' => 'tiny', 'description' => 'group join policy'),
+                'force_scope' => array('type' => 'int', 'size' => 'tiny', 'description' => 'group scope forcing'),
 
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
