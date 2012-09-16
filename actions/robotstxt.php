@@ -67,7 +67,7 @@ class RobotstxtAction extends Action
                 $disallow = common_config('robotstxt', 'disallow');
 
                 foreach ($disallow as $dir) {
-                    print "Disallow: /$dir/\n";
+                    print "Disallow: $dir\n";
                 }
 
                 $crawldelay = common_config('robotstxt', 'crawldelay');

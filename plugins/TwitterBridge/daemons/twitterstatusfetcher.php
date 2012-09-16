@@ -180,7 +180,6 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         }
 
         $timeline = null;
-        $mentions = null;
 
         $lastId = Twitter_synch_status::getLastId($flink->foreign_id, $timelineUri);
 
@@ -197,9 +196,6 @@ class TwitterStatusFetcher extends ParallelizingDaemon
                        ' - Unable to get ' . $timelineUri . ' timeline for user ' . $flink->user_id .
                        ' - code: ' . $e->getCode() . 'msg: ' . $e->getMessage());
         }
-
-        // Merge the two arrays of mentions and timelines
-        $timeline = array_merge($timeline, $mentions);
 
         if (empty($timeline)) {
             common_log(LOG_WARNING, $this->name() .  " - Empty '" . $timelineUri . "' timeline.");
