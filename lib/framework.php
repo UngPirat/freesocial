@@ -28,10 +28,10 @@ define('LACONICA_VERSION', STATUSNET_VERSION); // compatibility
 define('STATUSNET_CODENAME', 'Don\'t Play No Game That I Can\'t Win');
 
 define('AVATAR_PROFILE_SIZE', 128);
-define('AVATAR_STREAM_SIZE', 80);
+define('AVATAR_STREAM_SIZE', 96);
 define('AVATAR_MINI_SIZE', 24);
 
-define('NOTICES_PER_PAGE', 6);
+define('NOTICES_PER_PAGE', 10);
 define('PROFILES_PER_PAGE', 20);
 define('MESSAGES_PER_PAGE', 20);
 define('GROUPS_PER_PAGE', 20);
