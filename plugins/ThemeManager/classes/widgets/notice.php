@@ -65,6 +65,9 @@ class NoticeWidget extends ThemeWidget {
 	function get_conversation_id() {
 		return $this->get_notice()->conversation;
 	}
+	function get_conversation_url() {
+        return common_local_url('conversation', array('id'=>$this->get_conversation_id())).'#notice-'.$this->get_notice_id();
+	}
     function get_notice_id() {
         return $this->get_notice()->id;
     }
@@ -81,20 +84,18 @@ class NoticeWidget extends ThemeWidget {
                 : $profile->profileurl;
     }
     function get_permalink() {
+		return common_local_url('shownotice', array('notice'=>$this->notice->id));
         return $this->notice->url ? $this->notice->url : $this->notice->uri;
     }
-    function get_conversation_url() {
-        return common_local_url('conversation', array('id'=>$this->get_conversation_id())).'#notice-'.$this->get_notice_id();
-    }
-    function get_context() {
+    function get_verb() {
         if (!empty($this->repeated)) {
-            $context = _m('was repeated');
+            $verb = _m('was repeated');
         } elseif (!empty($this->notice->reply_to)) {
-            $context = _m('replied');
+            $verb = _m('replied');
         } else {
-            $context = _m('posted this');
+            $verb = _m('posted this');
         }
-        return $context;
+        return $verb;
     }
     function get_recipients() {
         return $this->notice->getReplyProfiles();
@@ -119,9 +120,10 @@ class NoticeWidget extends ThemeWidget {
     }
     function the_metadata() {
         $this->out->elementStart('footer', 'metadata');
-        // FIXME: this gets quite ugly for translations. Improve!
         $this->the_author();
+        $this->the_verb();
         $this->the_timestamp();
+        $this->the_context();
         $this->the_related();
         $this->the_source();
         $this->out->elementEnd('footer');
@@ -161,15 +163,25 @@ class NoticeWidget extends ThemeWidget {
         }
         $this->out->elementEnd('span');
     }
+    function the_permalink() {
+        $this->out->element('a', array('href'=>$this->get_permalink(), 'class'=>'permalink'), _m('Permalink'));
+    }
+	function the_verb() {
+		$this->out->element('span', 'verb', $this->get_verb());
+	}
     function the_author() {    // original author if repeated!
         $this->out->element('a', array('href'=>$this->get_profile_url(), 'class'=>'author'), $this->get_name());
     }
+	function the_context() {
+		if ($this->notice->hasConversation()) {
+	        $this->out->element('a', array('href'=>$this->get_conversation_url(), 'class'=>'context'), _m('in context'));
+		}
+	}
     function the_timestamp() {
-        $this->out->elementStart('a', array('class'=>'timestamp', 'href'=>$this->get_conversation_url()));
-        $this->out->element('span', 'context', $this->get_context());
+		$this->out->elementStart('a', array('href'=>$this->get_permalink(), 'class'=>'permalink timestamp', 'title'=>_m('Permalink')));
         $this->out->element('time', array('pubdate'=>'pubdate', 'datetime'=>common_date_iso8601($this->notice->created)),
                                 common_date_string($this->notice->created));
-        $this->out->elementEnd('a');
+		$this->out->elementEnd('a');
     }
     function the_vcard() {
         $this->out->elementStart('span', 'vcard author');

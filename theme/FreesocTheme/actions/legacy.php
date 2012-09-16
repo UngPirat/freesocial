@@ -13,7 +13,7 @@
 			$this->action->profile = $this->action->user->getProfile();
 		}
 		$this->content('profile-noticelist');
-	} elseif (isset($this->action->notice)) {
+	} elseif (isset($this->action->notice) || isset($this->action->notices)) {
 		$this->content('noticelist');
 	} else {
 		$this->action->showContent();
