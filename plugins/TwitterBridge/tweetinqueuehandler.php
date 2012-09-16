@@ -51,12 +51,16 @@ class TweetInQueueHandler extends QueueHandler
         $importer = new TwitterImport();
         $notice = $importer->importStatus($status);
         if ($notice) {
-            $flink = Foreign_link::getByForeignID(TWITTER_SERVICE, $receiver);
+            $flink = Foreign_link::getByForeignID($receiver, TWITTER_SERVICE);
             if ($flink) {
+				common_log(LOG_DEBUG, "TweetInQueueHandler - Got flink so add notice ".
+				           $notice->id." to inbox ".$flink->user_id);
                 // @fixme this should go through more regular channels?
                 Inbox::insertNotice($flink->user_id, $notice->id);
 // maybe?				Subscription::start($flink->user_id, $notice->profile_id);
-            }
+            } else {
+				common_log(LOG_DEBUG, "TweetInQueueHandler - No flink found for foreign user ".$receiver);
+			}
         }
 
         return true;

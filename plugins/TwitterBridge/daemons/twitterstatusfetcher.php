@@ -137,19 +137,19 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         $conn = &$flink->getDatabaseConnection();
 
         $profile = Profile::staticGet('id', $flink->user_id);
-		if (empty($profile)) {
-			common_debug('TWITTER user does not have a profile: '.$flink->user_id);
-		} elseif ($profile->isSilenced()) {
-			common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
-		} else {
-	        $this->getTimeline($flink);
+        if (empty($profile)) {
+            common_debug('TWITTER user does not have a profile: '.$flink->user_id);
+        } elseif ($profile->isSilenced()) {
+            common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
+        } else {
+            $this->getTimeline($flink);
 
-	        $flink->last_noticesync = common_sql_now();
-	        $flink->update();
-		}
+            $flink->last_noticesync = common_sql_now();
+            $flink->update();
+        }
 
         $conn->disconnect();
-			
+            
         // XXX: Couldn't find a less brutal way to blow
         // away a cached connection
         global $_DB_DATAOBJECT;
@@ -197,8 +197,8 @@ class TwitterStatusFetcher extends ParallelizingDaemon
                        $e->getCode() . 'msg: ' . $e->getMessage());
         }
 
-		// Merge the two arrays of mentions and timelines
-		$timeline = array_merge($timeline, $mentions);
+        // Merge the two arrays of mentions and timelines
+        $timeline = array_merge($timeline, $mentions);
 
         if (empty($timeline)) {
             common_log(LOG_WARNING, $this->name() .  " - Empty timeline.");
@@ -207,23 +207,18 @@ class TwitterStatusFetcher extends ParallelizingDaemon
 
         common_debug($this->name() . ' - Retrieved ' . sizeof($timeline) . ' statuses from Twitter.');
 
-        $importer = new TwitterImport();
-
-        // Reverse to preserve order
-
-        foreach (array_reverse($timeline) as $status) {
-            $notice = $importer->importStatus($status);
-
-            try {
-                if (!empty($notice)) {
-                    Inbox::insertNotice($flink->user_id, $notice->id);
-                }
-            } catch (Exception $e) {
-                common_debug($this->name() . " failed to insert Twitter status as Notice:{$notice->id} for user_id {$flink->user_id}");
-            }
-        }
-
         if (!empty($timeline)) {
+            $qm = QueueManager::get();
+
+            // Reverse to preserve order
+            foreach (array_reverse($timeline) as $status) {
+                $data = array(
+                    'status' => $status,
+                    'for_user' => $flink->foreign_id,
+                );
+                $qm->enqueue($data, 'tweetin');
+            }
+
             $lastId = twitter_id($timeline[0]);
             Twitter_synch_status::setLastId($flink->foreign_id, 'home_timeline', $lastId);
             common_debug("Set lastId value '$lastId' for foreign id '{$flink->foreign_id}' and timeline 'home_timeline'");
