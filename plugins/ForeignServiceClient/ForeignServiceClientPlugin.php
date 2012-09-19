@@ -60,6 +60,7 @@ class ForeignServiceClientPlugin extends Plugin
         $dir = dirname(__FILE__);
 
         switch ($cls) {
+        case 'ForeignQueueHandler':
         case 'Foreign_group':
         case 'Foreign_notice_map':
             require_once $dir . '/classes/' . $cls . '.php';
@@ -90,7 +91,7 @@ class ForeignServiceClientPlugin extends Plugin
 
 abstract class ForeignServiceClient
 {
-    private $service = null;
+    private $service_id = null;
     protected $client = null;
 
     function __construct(array $params) {

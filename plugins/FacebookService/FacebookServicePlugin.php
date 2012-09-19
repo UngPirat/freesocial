@@ -69,12 +69,18 @@ class FacebookServicePlugin extends Plugin
         return true;
     }
 
+    function onEndInitializeQueueManager($manager)
+    {
+        //$manager->connect(FacebookService::TRANSPORT, 'FacebookQueueHandler');
+        return true;
+    }
+
 	function onStartSubscribe($subscriber, $other) {
         if (!preg_match('/^https?:\/\/(www\.)?facebook\.com\//', $other->profileurl)) {
             return true;	// not a Twitter subscription, continue ordinary subscribe process
         }
 
-		$flink = Foreign_link::getByUserID($subscriber->id, $this->service_id);
+		$flink = Foreign_link::getByUserID($subscriber->id, FACEBOOK_SERVICE);
 		if ( empty($flink) ) {
 			return false;	// no link, impossible to subscribe
 		}
@@ -90,7 +96,7 @@ class FacebookServicePlugin extends Plugin
             return true;	// not a Twitter subscription, continue ordinary subscribe process
         }
 
-		$flink = Foreign_link::getByUserID($subscriber->id, $this->service_id);
+		$flink = Foreign_link::getByUserID($subscriber->id, FACEBOOK_SERVICE);
 		if ( empty($flink) ) {
 			return true;	// no link, but let unsubscribe do its magic
 		}
@@ -132,6 +138,8 @@ class FacebookServicePlugin extends Plugin
 }
 
 class FacebookService extends ForeignServiceClient {
+	const TRANSPORT = 'facebookin';
+
     function __construct(array $params=array())
     {
         $params['service_id'] = FACEBOOK_SERVICE;	// sneak it in there
@@ -240,3 +248,18 @@ class FacebookService extends ForeignServiceClient {
         }
     }
 }
+/*class FacebookQueueHandler extends ForeignQueueHandler {
+	protected $service_id = FACEBOOK_SERVICE;
+
+	function transport()
+	{
+		return FacebookService::TRANSPORT;
+	}
+
+	static function handleItem($item)
+	{
+		return true;
+		$fsrv = new FacebookService();
+		$fsrv->importUpdate($item);
+	}
+}*/

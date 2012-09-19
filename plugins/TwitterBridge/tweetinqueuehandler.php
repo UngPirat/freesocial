@@ -61,7 +61,7 @@ class TweetInQueueHandler extends QueueHandler
             } else {
 				common_log(LOG_DEBUG, "TweetInQueueHandler - No flink found for foreign user ".$receiver);
 			}
-        }
+		}
 
         return true;
     }
