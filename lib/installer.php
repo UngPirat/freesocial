@@ -315,7 +315,7 @@ abstract class Installer
             return false;
         }
 
-        foreach (array('sms_carrier' => 'SMS carrier',
+        foreach (array(
                     'notice_source' => 'notice source',
                     'foreign_services' => 'foreign service')
               as $scr => $name) {

@@ -51,11 +51,6 @@ class User extends Managed_DataObject
     public $language;                        // varchar(50)
     public $timezone;                        // varchar(50)
     public $emailpost;                       // tinyint(1)   default_1
-    public $sms;                             // varchar(64)  unique_key
-    public $carrier;                         // int(4)
-    public $smsnotify;                       // tinyint(1)
-    public $smsreplies;                      // tinyint(1)
-    public $smsemail;                        // varchar(255)
     public $uri;                             // varchar(255)  unique_key
     public $autosubscribe;                   // tinyint(1)
     public $subscribe_policy;                // tinyint(1)
@@ -90,11 +85,6 @@ class User extends Managed_DataObject
                 'language' => array('type' => 'varchar', 'length' => 50, 'description' => 'preferred language'),
                 'timezone' => array('type' => 'varchar', 'length' => 50, 'description' => 'timezone'),
                 'emailpost' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Post by email'),
-                'sms' => array('type' => 'varchar', 'length' => 64, 'description' => 'sms phone number'),
-                'carrier' => array('type' => 'int', 'description' => 'foreign key to sms_carrier'),
-                'smsnotify' => array('type' => 'int', 'size' => 'tiny', 'default' => 0, 'description' => 'whether to send notices to SMS'),
-                'smsreplies' => array('type' => 'int', 'size' => 'tiny', 'default' => 0, 'description' => 'whether to send notices to SMS on replies'),
-                'smsemail' => array('type' => 'varchar', 'length' => 255, 'description' => 'built from sms and carrier'),
                 'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universally unique identifier, usually a tag URI'),
                 'autosubscribe' => array('type' => 'int', 'size' => 'tiny', 'default' => 0, 'description' => 'automatically subscribe to users who subscribe to us'),
                 'subscribe_policy' => array('type' => 'int', 'size' => 'tiny', 'default' => 0, 'description' => '0 = anybody can subscribe; 1 = require approval'),
@@ -115,7 +105,6 @@ class User extends Managed_DataObject
             ),
             'foreign keys' => array(
                 'user_id_fkey' => array('profile', array('id' => 'id')),
-                'user_carrier_fkey' => array('sms_carrier', array('carrier' => 'id')),
             ),
             'indexes' => array(
                 'user_smsemail_idx' => array('smsemail'),

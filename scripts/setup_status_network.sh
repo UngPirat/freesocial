@@ -36,7 +36,7 @@ export username=$nickname$USERBASE
 
 mysqladmin -h $DBHOST -u $ADMIN --password=$ADMINPASS create $database
 
-for f in statusnet.sql innodb.sql sms_carrier.sql foreign_services.sql notice_source.sql; do
+for f in statusnet.sql innodb.sql foreign_services.sql notice_source.sql; do
     mysql -h $DBHOST -u $ADMIN --password=$ADMINPASS $database < ../db/$f;
 done
 

@@ -100,6 +100,7 @@ class PublicSite extends SiteProfileSettings
             'plugins' => array(
                 'default' => array(
                     'Activity'                => null,
+                    'ActivitySpam'            => null,
                     'Bookmark'                => null,
                     'ClientSideShorten'       => null,
                     'Directory'               => null,
@@ -152,7 +153,6 @@ class PrivateSite extends SiteProfileSettings
                     'Event'                   => null,
                     'ExtendedProfile'         => null,
                     'EmailRegistration'       => null,
-                    'Geonames'                => null,
                     'NewMenu'                 => null,
                     'MobileProfile'           => null,
                     'OpenID'                  => null,
@@ -165,21 +165,6 @@ class PrivateSite extends SiteProfileSettings
              ),
             'profile'       => array('delete' => 'true'),
             'license'       => array('type'   => 'private'),
-            'attachments'   => array(
-                // Only allow uploads of pictures and MS Office files
-                'supported' => array(
-                    'image/png',
-                    'image/jpeg',
-                    'image/gif',
-                    'image/svg+xml',
-                    'application/pdf',
-                    'application/msword',
-                    'application/vnd.ms-office',
-                    'application/vnd.ms-excel',
-                    'application/vnd.ms-powerpoint',
-                    'application/ogg'
-                )
-             ),
             'discovery' => array('cors'   => false) // Allow Cross-Origin Resource Sharing for service discovery (host-meta, XRD, etc.)
         );
     }
