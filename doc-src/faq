@@ -22,8 +22,7 @@ How is %%site.name%% different from Twitter?
 
 Like [Twitter](http://twitter.com/), %%site.name%% is a light service
 with a stream-oriented interface. It uses @-replies, hashtags,
-provides search, and has private messages. It provides an API, and can
-be integrated with SMS systems. You can create lists.
+provides search, and has private messages. It provides an API, can be integrated with various other communication systems. You can create lists.
 
 Unlike Twitter, %%site.name%% allows more data than just plain text
 and links to travel across the network. You can install the StatusNet

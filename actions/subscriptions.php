@@ -205,7 +205,7 @@ class SubscriptionsListItem extends SubscriptionListItem
 
         $transports = array();
         Event::handle('GetImTransports', array(&$transports));
-        if (!$transports && !common_config('sms', 'enabled')) {
+        if (!$transports) {
             return;
         }
 
@@ -229,21 +229,6 @@ class SubscriptionsListItem extends SubscriptionListItem
             $this->out->element('label', array('for' => 'jabber-'.$this->profile->id), _m('LABEL','IM'));
         } else {
             $this->out->hidden('jabber', $sub->jabber);
-        }
-        if (common_config('sms', 'enabled')) {
-            $attrs = array('name' => 'sms',
-                           'type' => 'checkbox',
-                           'class' => 'checkbox',
-                           'id' => 'sms-'.$this->profile->id);
-            if ($sub->sms) {
-                $attrs['checked'] = 'checked';
-            }
-
-            $this->out->element('input', $attrs);
-            // TRANS: Checkbox label for enabling SMS messages for a profile in a subscriptions list.
-            $this->out->element('label', array('for' => 'sms-'.$this->profile->id), _('SMS'));
-        } else {
-            $this->out->hidden('sms', $sub->sms);
         }
         // TRANS: Save button for settings for a profile in a subscriptions list.
         $this->out->submit('save', _m('BUTTON','Save'));

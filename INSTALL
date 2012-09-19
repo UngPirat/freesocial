@@ -94,8 +94,8 @@ A design goal of StatusNet is that the basic Web functionality should
 work on even the most restrictive commercial hosting services.
 However, additional functionality, such as receiving messages by
 Jabber/GTalk, require that you be able to run long-running processes
-on your account. In addition, posting by email or from SMS require
-that you be able to install a mail filter in your mail server.
+on your account. In addition, posting by email require that you be
+able to install a mail filter in your mail server.
 
 Installation
 ============
@@ -260,60 +260,6 @@ php on the client side, which itself depends on the sphinx development files.
 
 See plugins/SphinxSearch/README for more details and server setup.
 
-SMS
----
-
-StatusNet supports a cheap-and-dirty system for sending update messages
-to mobile phones and for receiving updates from the mobile. Instead of
-sending through the SMS network itself, which is costly and requires
-buy-in from the wireless carriers, it simply piggybacks on the email
-gateways that many carriers provide to their customers. So, SMS
-configuration is essentially email configuration.
-
-Each user sends to a made-up email address, which they keep a secret.
-Incoming email that is "From" the user's SMS email address, and "To"
-the users' secret email address on the site's domain, will be
-converted to a notice and stored in the DB.
-
-For this to work, there *must* be a domain or sub-domain for which all
-(or most) incoming email can pass through the incoming mail filter.
-
-1. Run the SQL script carrier.sql in your StatusNet database. This will
-   usually work:
-
-       mysql -u "statusnetuser" --password="statusnetpassword" statusnet < db/carrier.sql
-
-   This will populate your database with a list of wireless carriers
-   that support email SMS gateways.
-
-2. Make sure the maildaemon.php file is executable:
-
-       chmod +x scripts/maildaemon.php
-
-   Note that "daemon" is kind of a misnomer here; the script is more
-   of a filter than a daemon.
-
-2. Edit /etc/aliases on your mail server and add the following line:
-
-       *: /path/to/statusnet/scripts/maildaemon.php
-
-3. Run whatever code you need to to update your aliases database. For
-   many mail servers (Postfix, Exim, Sendmail), this should work:
-
-       newaliases
-
-   You may need to restart your mail server for the new database to
-   take effect.
-
-4. Set the following in your config.php file:
-
-       $config['mail']['domain'] = 'yourdomain.example.net';
-
-At this point, post-by-email and post-by-SMS-gateway should work. Note
-that if your mail server is on a different computer from your email
-server, you'll need to have a full installation of StatusNet, a working
-config.php, and access to the StatusNet database from the mail server.
-
 XMPP
 ----
 
@@ -343,7 +289,7 @@ On a default installation, your site can broadcast messages using
 XMPP. Users won't be able to post messages using XMPP unless you've
 got the XMPP daemon running.  See 'Queues and daemons' below for how
 to set that up. Also, once you have a sizable number of users, sending
-a lot of SMS, OStatus, and XMPP messages whenever someone posts a message
+a lot of OStatus, and XMPP messages whenever someone posts a message
 can really slow down your site; it may cause posting to timeout.
 
 NOTE: stream_select(), a crucial function for network programming, is
@@ -371,7 +317,7 @@ consider setting up queues and daemons.
 Queues and daemons
 ------------------
 
-Some activities that StatusNet needs to do, like broadcast OStatus, SMS,
+Some activities that StatusNet needs to do, like broadcast OStatus
 and XMPP messages, can be 'queued' and done by off-line bots instead.
 For this to work, you must be able to run long-running offline
 processes, either on your main Web server or on another server you
@@ -402,7 +348,7 @@ server is probably a good idea for high-volume sites.
 This will run the queue handlers:
 
 * queuedaemon.php - polls for queued items for inbox processing and
-  pushing out to OStatus, SMS, XMPP, etc.
+  pushing out to OStatus, XMPP, etc.
 * xmppdaemon.php - listens for new XMPP messages from users and stores
   them as notices in the database; also pulls queued XMPP output from
   queuedaemon.php to push out to clients.

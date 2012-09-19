@@ -39,7 +39,7 @@ class Invitation extends Managed_DataObject
                 'code' => array('type' => 'varchar', 'length' => 32, 'not null' => true, 'description' => 'random code for an invitation'),
                 'user_id' => array('type' => 'int', 'not null' => true, 'description' => 'who sent the invitation'),
                 'address' => array('type' => 'varchar', 'length' => 255, 'not null' => true, 'description' => 'invitation sent to'),
-                'address_type' => array('type' => 'varchar', 'length' => 8, 'not null' => true, 'description' => 'address type ("email", "xmpp", "sms")'),
+                'address_type' => array('type' => 'varchar', 'length' => 8, 'not null' => true, 'description' => 'address type ("email", "xmpp")'),
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'registered_user_id' => array('type' => 'int', 'not null' => false, 'description' => 'if the invitation is converted, who the new user is'),
             ),

@@ -100,14 +100,10 @@ class User extends Managed_DataObject
                 'user_nickname_key' => array('nickname'),
                 'user_email_key' => array('email'),
                 'user_incomingemail_key' => array('incomingemail'),
-                'user_sms_key' => array('sms'),
                 'user_uri_key' => array('uri'),
             ),
             'foreign keys' => array(
                 'user_id_fkey' => array('profile', array('id' => 'id')),
-            ),
-            'indexes' => array(
-                'user_smsemail_idx' => array('smsemail'),
             ),
         );
     }
@@ -147,7 +143,7 @@ class User extends Managed_DataObject
     {
         $this->_connect();
         $parts = array();
-        foreach (array('nickname', 'email', 'incomingemail', 'sms', 'carrier', 'smsemail', 'language', 'timezone') as $k) {
+        foreach (array('nickname', 'email', 'incomingemail', 'language', 'timezone') as $k) {
             if (strcmp($this->$k, $orig->$k) != 0) {
                 $parts[] = $k . ' = ' . $this->_quote($this->$k);
             }
@@ -210,11 +206,6 @@ class User extends Managed_DataObject
     {
         $profile = $this->getProfile();
         return $profile->getCurrentNotice();
-    }
-
-    function getCarrier()
-    {
-        return null;
     }
 
     /**

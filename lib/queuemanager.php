@@ -234,9 +234,6 @@ abstract class QueueManager extends IoManager
         if (Event::handle('StartInitializeQueueManager', array($this))) {
             $this->connect('distrib', 'DistribQueueHandler');
             $this->connect('ping', 'PingQueueHandler');
-            if (common_config('sms', 'enabled')) {
-                $this->connect('sms', 'SmsQueueHandler');
-            }
 
             // Background user management tasks...
             $this->connect('deluser', 'DelUserQueueHandler');

@@ -94,7 +94,7 @@ class ConfirmfirstemailAction extends Action
         }
 
         if (!empty($this->user->email) && $this->user->email == $confirm->address) {
-            // TRANS: Client error for an already confirmed email/jabber/sms address.
+            // TRANS: Client error for an already confirmed email/jabber address.
             throw new ClientException(_m('That address has already been confirmed.'));
         }
 

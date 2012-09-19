@@ -18,7 +18,7 @@ instructions; read to the end first before trying them.
    xmppdaemon.php process and all other daemons that you're running.
    If you've got "monit" or "cron" automatically restarting your
    daemons, make sure to turn that off, too.
-4. Shut down SMS and email access to your site. The easy way to do
+4. Shut down email access to your site. The easy way to do
    this is to comment out the line piping incoming email to your
    maildaemon.php file, and running something like "newaliases".
 5. Once all writing processes to your site are turned off, make a

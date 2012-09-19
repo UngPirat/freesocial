@@ -37,7 +37,7 @@ require_once INSTALLDIR . '/lib/apiauth.php';
 /**
  * Sets which channel (device) StatusNet delivers updates to for
  * the authenticating user. Sending none as the device parameter
- * will disable IM and/or SMS updates.
+ * will disable IM updates.
  *
  * @category API
  * @package  StatusNet
@@ -98,10 +98,10 @@ class ApiAccountUpdateDeliveryDeviceAction extends ApiAuthAction
 
         // Note: Twitter no longer supports IM
 
-        if (!in_array(strtolower($this->device), array('sms', 'im', 'none'))) {
+        if (!in_array(strtolower($this->device), array('im', 'none'))) {
             // TRANS: Client error displayed when no valid device parameter is provided for a user's delivery device setting.
             $this->clientError(_( 'You must specify a parameter named ' .
-                                  '\'device\' with a value of one of: sms, im, none.' ));
+                                  '\'device\' with a value of one of: im, none.' ));
             return;
         }
 
@@ -113,15 +113,12 @@ class ApiAccountUpdateDeliveryDeviceAction extends ApiAuthAction
 
         $original = clone($this->user);
 
-        if (strtolower($this->device) == 'sms') {
-            $this->user->smsnotify = true;
-        } elseif (strtolower($this->device) == 'im') {
+        if (strtolower($this->device) == 'im') {
             //TODO IM is pluginized now, so what should we do?
             //Enable notifications for all IM plugins?
             //For now, don't do anything
             //$this->user->jabbernotify = true;
         } elseif (strtolower($this->device == 'none')) {
-            $this->user->smsnotify    = false;
             //TODO IM is pluginized now, so what should we do?
             //Disable notifications for all IM plugins?
             //For now, don't do anything

@@ -1762,7 +1762,7 @@ class Notice extends Managed_DataObject
 
     static function getReplyTo($reply_to, $profile_id, $source, $content)
     {
-        static $lb = array('xmpp', 'mail', 'sms', 'omb');
+        static $lb = array('xmpp', 'mail', 'omb');
 
         // If $reply_to is specified, we check that it exists, and then
         // return it if it does

@@ -48,7 +48,7 @@ class SiteConfirmReminderHandler extends QueueHandler
      * services; must be defined for all subclasses.
      *
      * Must be 8 characters or less to fit in the queue_item database.
-     * ex "email", "jabber", "sms", "irc", ...
+     * ex "email", "jabber", "irc", ...
      *
      * @return string
      */

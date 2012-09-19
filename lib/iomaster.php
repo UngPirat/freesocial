@@ -317,7 +317,7 @@ abstract class IoMaster
      * Send thread state update to the monitoring server, if configured.
      *
      * @param string $state ('init', 'queue', 'shutdown' etc)
-     * @param string $substate (optional, eg queue name 'omb' 'sms' etc)
+     * @param string $substate (optional, eg queue name 'omb' etc)
      */
     protected function logState($state, $substate='')
     {

@@ -176,7 +176,7 @@ class Router
             // settings
 
             foreach (array('profile', 'avatar', 'password', 'im', 'oauthconnections',
-                           'oauthapps', 'email', 'sms', 'url') as $s) {
+                           'oauthapps', 'email', 'url') as $s) {
                 $m->connect('settings/'.$s, array('action' => $s.'settings'));
             }
 

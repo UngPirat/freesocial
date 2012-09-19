@@ -192,13 +192,7 @@ class MailChannel extends Channel
 
     function setNotify($user, $value)
     {
-        $orig = clone($user);
-        $user->smsnotify = $value;
-        $result = $user->update($orig);
-        if (!$result) {
-            common_log_db_error($user, 'UPDATE', __FILE__);
-            return false;
-        }
+//TODO: remove entire class? smsnotify is removed
         return true;
     }
 }

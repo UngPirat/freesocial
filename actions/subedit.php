@@ -80,7 +80,6 @@ class SubeditAction extends Action
             $orig = clone($sub);
 
             $sub->jabber = $this->boolean('jabber');
-            $sub->sms = $this->boolean('sms');
 
             $result = $sub->update($orig);
 

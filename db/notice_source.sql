@@ -48,7 +48,6 @@ VALUES
     ('royalewithcheese','Royale With Cheese','http://p.hellyeah.org/', now()),
     ('rssdent','rssdent','http://github.com/zcopley/rssdent/tree/master', now()),
     ('rygh.no','rygh.no','http://rygh.no/', now()),
-    ('ryghsms','ryghsms','http://sms.rygh.no/', now()),
     ('smob','SMOB','http://smob.sioc-project.org/', now()),
     ('socialoomphBfD4pMqz31', 'SocialOomph', 'http://www.socialoomph.com/', now()),
     ('spaz','Spaz','http://funkatron.com/spaz', now()),

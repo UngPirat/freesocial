@@ -1479,9 +1479,6 @@ function common_enqueue_notice($notice)
     static $localTransports = array('ping');
 
     $transports = array();
-    if (common_config('sms', 'enabled')) {
-        $transports[] = 'sms';
-    }
     if (Event::hasHandler('HandleQueuedNotice')) {
         $transports[] = 'plugin';
     }
@@ -2030,13 +2027,6 @@ function common_profile_uri($profile)
 
     // XXX: this is a very bad profile!
     return $uri;
-}
-
-function common_canonical_sms($sms)
-{
-    // strip non-digits
-    preg_replace('/\D/', '', $sms);
-    return $sms;
 }
 
 function common_error_handler($errno, $errstr, $errfile, $errline, $errcontext)

@@ -232,7 +232,6 @@ class NudgeCommand extends Command
                 mail_notify_nudge($this->user, $recipient);
             }
             // XXX: notify by IM
-            // XXX: notify by SMS
             // TRANS: Message given having nudged another user.
             // TRANS: %s is the nickname of the user that was nudged.
             $channel->output($this->user, sprintf(_('Nudge sent to %s.'),

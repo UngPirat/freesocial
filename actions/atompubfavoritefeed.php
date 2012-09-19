@@ -368,7 +368,6 @@ class AtompubfavoritefeedAction extends ApiAuthAction
                 mail_notify_fave($other, $user, $notice);
             }
             // XXX: notify by IM
-            // XXX: notify by SMS
         }
     }
 }

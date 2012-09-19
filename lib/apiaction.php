@@ -255,7 +255,7 @@ class ApiAction extends Action
                                                'subscribed' => $profile->id));
 
             if ($sub) {
-                $twitter_user['notifications'] = ($sub->jabber || $sub->sms);
+                $twitter_user['notifications'] = ($sub->jabber);
             }
         }
 
@@ -553,7 +553,7 @@ class ApiAction extends Action
                 $source->id, 'subscribed' => $target->id));
 
             if (!empty($sub)) {
-                $notifications = ($sub->jabber || $sub->sms);
+                $notifications = ($sub->jabber);
             }
         }
 

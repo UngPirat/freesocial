@@ -178,7 +178,7 @@ queue
 -----
 
 You can configure the software to queue time-consuming tasks, like
-sending out SMS email or XMPP messages, for off-line processing. See
+sending out email or XMPP messages, for off-line processing. See
 'Queues and daemons' above for how to set this up.
 
 enabled: Whether to uses queues. Defaults to false.
@@ -467,14 +467,6 @@ For post-by-email.
 enabled: Whether to enable post-by-email. Defaults to true. You will
     also need to set up maildaemon.php.
 
-sms
----
-
-For SMS integration.
-
-enabled: Whether to enable SMS integration. Defaults to true. Queues
-    should also be enabled.
-
 integration
 -----------
 
@@ -733,7 +725,7 @@ Configuration options for the login command.
 disabled: whether to enable this command. If enabled, users who send
     the text 'login' to the site through any channel will
     receive a link to login to the site automatically in return.
-    Possibly useful for users who primarily use an XMPP or SMS
+    Possibly useful for users who primarily use an XMPP
     interface and can't be bothered to remember their site
     password. Note that the security implications of this are
     pretty serious and have not been thoroughly tested. You

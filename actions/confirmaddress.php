@@ -34,7 +34,7 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
 /**
  * Confirm an address
  *
- * When users change their SMS, email, Jabber, or other addresses, we send out
+ * When users change their email, Jabber, or other addresses, we send out
  * a confirmation code to make sure the owner of that address approves. This class
  * accepts those codes.
  *
@@ -89,17 +89,17 @@ class ConfirmaddressAction extends Action
         $type = $confirm->address_type;
         $transports = array();
         Event::handle('GetImTransports', array(&$transports));
-        if (!in_array($type, array('email', 'sms')) && !in_array($type, array_keys($transports))) {
-            // TRANS: Server error for an unknown address type, which can be 'email', 'sms', or the name of an IM network (such as 'xmpp' or 'aim')
+        if (!in_array($type, array('email')) && !in_array($type, array_keys($transports))) {
+            // TRANS: Server error for an unknown address type, which can be 'email', or the name of an IM network (such as 'xmpp' or 'aim')
             $this->serverError(sprintf(_('Unrecognized address type %s'), $type));
             return;
         }
         $this->address = $confirm->address;
         $cur->query('BEGIN');
-        if (in_array($type, array('email', 'sms')))
+        if (in_array($type, array('email')))
         {
             if ($cur->$type == $confirm->address) {
-                // TRANS: Client error for an already confirmed email/jabber/sms address.
+                // TRANS: Client error for an already confirmed email/jabber address.
                 $this->clientError(_('That address has already been confirmed.'));
                 return;
             }
@@ -107,12 +107,6 @@ class ConfirmaddressAction extends Action
             $orig_user = clone($cur);
 
             $cur->$type = $confirm->address;
-
-            if ($type == 'sms') {
-                $cur->carrier  = ($confirm->address_extra)+0;
-                $carrier       = Sms_carrier::staticGet($cur->carrier);
-                $cur->smsemail = $carrier->toEmailAddress($cur->sms);
-            }
 
             $result = $cur->updateKeys($orig_user);
 
@@ -200,7 +194,7 @@ class ConfirmaddressAction extends Action
 
         $this->element('p', null,
                        // TRANS: Success message for the contact address confirmation action.
-                       // TRANS: %s can be 'email', 'jabber', or 'sms'.
+                       // TRANS: %s can be 'email', 'jabber'.
                        sprintf(_('The address "%s" has been '.
                                  'confirmed for your account.'),
                                $this->address));

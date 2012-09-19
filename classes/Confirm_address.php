@@ -32,9 +32,9 @@ class Confirm_address extends Managed_DataObject
             'fields' => array(
                 'code' => array('type' => 'varchar', 'length' => 32, 'not null' => true, 'description' => 'good random code'),
                 'user_id' => array('type' => 'int', 'not null' => true, 'description' => 'user who requested confirmation'),
-                'address' => array('type' => 'varchar', 'length' => 255, 'not null' => true, 'description' => 'address (email, xmpp, SMS, etc.)'),
-                'address_extra' => array('type' => 'varchar', 'length' => 255, 'not null' => true, 'description' => 'carrier ID, for SMS'),
-                'address_type' => array('type' => 'varchar', 'length' => 8, 'not null' => true, 'description' => 'address type ("email", "xmpp", "sms")'),
+                'address' => array('type' => 'varchar', 'length' => 255, 'not null' => true, 'description' => 'address (email, xmpp, etc.)'),
+                'address_extra' => array('type' => 'varchar', 'length' => 255, 'not null' => true, 'description' => 'historically used for SMS carrier ID'),
+                'address_type' => array('type' => 'varchar', 'length' => 8, 'not null' => true, 'description' => 'address type ("email", "xmpp")'),
                 'claimed' => array('type' => 'datetime', 'description' => 'date this was claimed for queueing'),
                 'sent' => array('type' => 'datetime', 'description' => 'date this was sent for queueing'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),

@@ -49,7 +49,7 @@ class QueueMonitor
      *
      * @param string $thread ID (eg 'generic.1')
      * @param string $state ('init', 'queue', 'shutdown' etc)
-     * @param string $substate (optional, eg queue name 'omb' 'sms' etc)
+     * @param string $substate (optional, eg queue name 'omb' etc)
      */
     public function logState($threadId, $state, $substate='')
     {

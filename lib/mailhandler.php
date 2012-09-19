@@ -110,9 +110,6 @@ class MailHandler
         $from = $froms[0];
         $addr = common_canonical_email($from['address']);
         $user = User::staticGet('email', $addr);
-        if (!$user) {
-            $user = User::staticGet('smsemail', $addr);
-        }
         return $user;
     }
 

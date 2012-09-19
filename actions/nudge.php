@@ -125,7 +125,6 @@ class NudgeAction extends Action
                 mail_notify_nudge($user, $other);
             }
             // XXX: notify by IM
-            // XXX: notify by SMS
         }
     }
 

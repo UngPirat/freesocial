@@ -36,7 +36,6 @@ class Subscription extends Managed_DataObject
     public $subscriber;                      // int(4)  primary_key not_null
     public $subscribed;                      // int(4)  primary_key not_null
     public $jabber;                          // tinyint(1)   default_1
-    public $sms;                             // tinyint(1)   default_1
     public $token;                           // varchar(255)
     public $secret;                          // varchar(255)
     public $uri;                             // varchar(255)
@@ -50,7 +49,6 @@ class Subscription extends Managed_DataObject
                 'subscriber' => array('type' => 'int', 'not null' => true, 'description' => 'profile listening'),
                 'subscribed' => array('type' => 'int', 'not null' => true, 'description' => 'profile being listened to'),
                 'jabber' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'deliver jabber messages'),
-                'sms' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'deliver sms messages'),
                 'token' => array('type' => 'varchar', 'length' => 255, 'description' => 'authorization token'),
                 'secret' => array('type' => 'varchar', 'length' => 255, 'description' => 'token secret'),
                 'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universally unique identifier'),
@@ -163,7 +161,6 @@ class Subscription extends Managed_DataObject
         $sub->subscriber = $subscriber_id;
         $sub->subscribed = $other_id;
         $sub->jabber     = 1;
-        $sub->sms        = 1;
         $sub->created    = common_sql_now();
         $sub->uri        = self::newURI($sub->subscriber,
                                         $sub->subscribed,
@@ -182,7 +179,7 @@ class Subscription extends Managed_DataObject
 
     function notify()
     {
-        // XXX: add other notifications (Jabber, SMS) here
+        // XXX: add other notifications (Jabber) here
         // XXX: queue this and handle it offline
         // XXX: Whatever happens, do it in Twitter-like API, too
 
