@@ -60,15 +60,17 @@ class RawPopularNoticeStream extends NoticeStream
 {
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
-        $weightexpr = common_sql_weight('modified', common_config('popular', 'dropoff'));
-        $cutoff = sprintf("modified > '%s'",
+        $weightexpr = common_sql_weight('fave.modified', common_config('popular', 'dropoff'));
+        $cutoff = sprintf("fave.modified > '%s'",
                           common_sql_date(time() - common_config('popular', 'cutoff')));
 
         $fave = new Fave();
         $fave->selectAdd();
         $fave->selectAdd('notice_id');
         $fave->selectAdd("$weightexpr as weight");
+		$fave->joinAdd(array('notice_id', 'notice:id'));
         $fave->whereAdd($cutoff);
+        $fave->whereAdd('notice.is_local != ' . Notice::GATEWAY);
         $fave->orderBy('weight DESC');
         $fave->groupBy('notice_id');
 
