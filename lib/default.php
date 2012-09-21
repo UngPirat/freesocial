@@ -226,6 +226,7 @@ $default =
                                    'image/jpeg',
                                    'image/gif',
                                    'image/svg+xml',
+                                   'audio/mp4',
                                    'audio/mpeg',
                                    'audio/x-speex',
                                    'application/ogg',
