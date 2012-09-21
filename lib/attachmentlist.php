@@ -76,7 +76,7 @@ class AttachmentList extends Widget
      */
     function show()
     {
-    	$att = $this->notice->attachments();
+        $att = $this->notice->attachments();
         if (empty($att)) return 0;
         $this->showListStart();
 
@@ -343,6 +343,22 @@ class Attachment extends AttachmentListItem
                     $this->out->element('param', array('name' => 'src', 'value' => $this->attachment->url));
                     $this->out->element('param', array('name' => 'autoStart', 'value' => 1));
                     $this->out->elementEnd('object');
+                    break;
+
+                case 'audio/ogg':
+                case 'video/ogg':
+                case 'audio/mp4':
+                case 'video/mp4':
+					$element = substr($this->attachment->mimetype, 0, 5);
+                    $arr  = array(
+                        'controls' => 'controls',
+                    );
+                    $this->out->elementStart($element, $arr);
+					$this->out->element('source', array(
+							'src' => $this->attachment->url,
+							'type' => $this->attachment->mimetype,
+						));
+                    $this->out->elementEnd($element);
                     break;
 
                 case 'text/html':
