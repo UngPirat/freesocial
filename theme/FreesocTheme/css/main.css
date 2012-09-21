@@ -1,6 +1,7 @@
 @import url("reset.css");
 @import url("fonts.css");
 
+@import url("modules/avatar.css");
 @import url("modules/grid.css");
 @import url("modules/header.css");
 @import url("modules/menu.css");

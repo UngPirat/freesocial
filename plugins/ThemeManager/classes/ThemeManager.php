@@ -80,6 +80,11 @@ class ThemeManager extends ThemeSite {
         }
         $this->out->flush();
     }
+    function foot() {
+        $this->action->showScripts();
+//		$this->out->script('jcrop/jquery.Jcrop-v0.9.10.js');
+//		$this->out->script('jcrop/jquery.Jcrop.go.js');
+	}
 
     function content($type) {
         if (Event::handle('StartShowContentBlock', array($this->action))) {
@@ -122,10 +127,10 @@ class ThemeManager extends ThemeSite {
             $this->out->elementStart('span', $key);
             if (isset($pages[$key])) {
                 $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
-            	$this->out->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
-			} else {
-				$this->out->text($trans);
-			}
+                $this->out->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
+            } else {
+                $this->out->text($trans);
+            }
             $this->out->elementEnd('span');
         }
         $this->out->elementEnd('nav');
@@ -205,8 +210,8 @@ class ThemeManagerAdapter {
         $this->items =& $items;
         $this->action = $action;
         if (is_a($this->action, 'Action')) {
-			$this->actionName = $action->trimmed('action');
-		}
+            $this->actionName = $action->trimmed('action');
+        }
         $this->out    = $this;
     }
     
@@ -220,7 +225,7 @@ class ThemeManagerAdapter {
         }    // the above should be put into items instead of below array
         $this->items[] = $item;
     }
-	function getOut() {
-		return $this->action;
-	}
+    function getOut() {
+        return $this->action;
+    }
 }

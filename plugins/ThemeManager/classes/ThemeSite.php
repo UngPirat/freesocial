@@ -37,7 +37,8 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
         if (empty($this->template) && isset($this->supported['legacy'])) {
             $this->template = 'legacy';
             $this->template_file = $this->supported[$this->template];
-        } elseif (empty($this->template) || !file_exists($this->template_file)) {
+        }
+        if (empty($this->template) || !file_exists($this->template_file)) {
             define('THEME_MANAGER', false);
             throw new Exception('Template not supported', 302);
         }
@@ -72,16 +73,15 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
 
     function is_action($action=null) {
         if (is_null($action)) {
-			$class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action))));
-			$parent = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_parent_class($this->action))));
-            return $class . ($parent!=='action' ? " $parent" : '');
-					
+            $class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', get_class($this->action))));
+            return "$class-action";
+                    
         }
         return is_a($this->action, ucfirst($action.'Action'));
     }
     function is_single() {
-		return (isset($this->action->user) || isset($this->action->profile))
-			|| $this->is_action('Showprofile');
+        return (isset($this->action->user) || isset($this->action->profile))
+            || $this->is_action('Showprofile');
     }
 
 

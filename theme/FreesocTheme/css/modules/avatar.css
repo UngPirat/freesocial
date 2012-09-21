@@ -1,0 +1,7 @@
+@import url("jquery.Jcrop.css");
+
+#avatar_preview_view {
+	height: 96px;
+	overflow: hidden;
+	width: 96px;
+}

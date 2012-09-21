@@ -13,7 +13,7 @@ $(function(){
     var w = ($('#avatar_crop_w').val()) ? $('#avatar_crop_w').val() : $("#avatar_original img").attr("width");
     var h = ($('#avatar_crop_h').val()) ? $('#avatar_crop_h').val() : $("#avatar_original img").attr("height");
 
-    jQuery("#avatar_original img").Jcrop({
+    $("#avatar_original img").Jcrop({
         onChange: showPreview,
         setSelect: [ x, y, w, h ],
         onSelect: updateCoords,
@@ -33,7 +33,7 @@ function showPreview(coords) {
     var img_height = $("#avatar_original img").attr("height");
 
     $('#avatar_preview img').css({
-        width: Math.round(rx *img_width) + 'px',
+        width: Math.round(rx * img_width) + 'px',
         height: Math.round(ry * img_height) + 'px',
         marginLeft: '-' + Math.round(rx * coords.x) + 'px',
         marginTop: '-' + Math.round(ry * coords.y) + 'px'
