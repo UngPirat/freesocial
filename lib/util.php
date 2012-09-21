@@ -1520,7 +1520,7 @@ function common_broadcast_profile(Profile $profile)
 
 function common_profile_url($nickname)
 {
-    return common_local_url('showprofile', array('nickname' => $nickname),
+    return common_local_url('showstream', array('nickname' => $nickname),
                             null, null, false);
 }
 
