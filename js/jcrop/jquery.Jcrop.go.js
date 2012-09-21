@@ -26,8 +26,8 @@ $(function(){
 });
 
 function showPreview(coords) {
-    var rx = 96 / coords.w;
-    var ry = 96 / coords.h;
+    var rx = 128 / coords.w;
+    var ry = 128 / coords.h;
 
     var img_width = $("#avatar_original img").attr("width");
     var img_height = $("#avatar_original img").attr("height");
