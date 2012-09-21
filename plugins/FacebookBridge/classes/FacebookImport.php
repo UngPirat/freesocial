@@ -89,8 +89,13 @@ class FacebookImport
                 : $this->facebook->getAccessToken();
     }
 
-    function apiLoop($path, $callback, $args=array(), $max_loops=0) {
+    function apiLoop($path, $callback, $args=array(), $callbackArgs=array()) {
         $loops = 0;
+		$max_loops = 0;
+		if (isset($args['max_loops'])) {
+			$max_loops = $args['max_loops'];
+			unset($args['max_loops']);
+		}
         do {
             if (!isset($args['access_token']) || empty($args['access_token'])) {
                 $args['access_token'] = $this->getAccessToken();
@@ -109,7 +114,9 @@ class FacebookImport
             $n = 0;    // number of new, imported posts
             foreach (array_reverse($result['data']) as $entry) {
                 try {
-                    $n += call_user_func($callback, $entry);
+					// entry post will be overwritten on merge
+					$callbackArgs = array_merge($callbackArgs, array('entry'=>$entry));
+                    $n += call_user_func($callback, $callbackArgs);
                 } catch (Exception $e) {
                 }
             }
@@ -122,14 +129,15 @@ class FacebookImport
         } while ($n > 0 && ($max_loops == 0 || $loops <= $max_loops));
     }
 
-    public function importUpdates($field, $args=array()) {
+    public function importUpdates($field, array $args=array()) {
         if ($this->flink === null) {
             throw new Exception('No foreign link');
         }
         $this->scope = Notice::PUBLIC_SCOPE;
 
-        // Iterate the loop backwards until >= 7 pages
-        $this->apiLoop('/me/'.urlencode($field), array($this, 'importThread'), $args, 7);
+        // Iterate the loop backwards <=7 pages
+		$args['max_loops'] = 7;
+        $this->apiLoop('/me/'.urlencode($field), array($this, 'importThread'), $args);
 
         // Okay, record the time we synced with Facebook for posterity
         $original = clone($this->flink);
@@ -159,8 +167,9 @@ class FacebookImport
         $this->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'), array('limit'=>$limit));
     }
 
-    protected function importThread($update)
+    protected function importThread(array $args)
     {
+		$update = $args['entry'];
         $oldUpdateN = $this->getUpdates();
 
         $this->scope = (isset($update['privacy']['value'])
@@ -314,6 +323,13 @@ class FacebookImport
 
         Foreign_notice_map::saveNew($notice->id, $update['id'], FACEBOOK_SERVICE);
 
+        if (isset($update['likes'])) {
+			file_put_contents('/tmp/fb-update-with-likes', print_r($update, true));
+			try {
+				$this->apiLoop(sprintf('/%s/likes', $update['id']), array($this, 'saveLike'), array(), array('notice'=>$notice));
+			} catch (Exception $e) {
+			}
+		}
         $this->saveUpdateMentions($notice, $update);
 
         try {
@@ -332,6 +348,17 @@ class FacebookImport
         $this->updates++;
         return $notice;
     }
+    function saveLike(array $args)
+	{
+		$notice = $args['notice'];
+		$entry  = $args['entry'];
+		
+        $profile = $this->ensureProfile($entry['id']);
+		common_debug('FBDBG adding favorite from FB user '.$entry['id'].' (profile '.$profile->id.') for notice '.$notice->id);
+		Fave::addNew($profile, $notice);
+
+		file_put_contents('/tmp/fb-update-entries-'.$notice->id, print_r($entry,true), FILE_APPEND);
+	}
 
     protected function saveUpdateAttachments($notice, $update, $profile) {
         if (!isset($update['type']) || !common_config('attachments', 'process_links')) {
