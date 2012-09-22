@@ -144,5 +144,7 @@ class File_opengraph extends Managed_DataObject
                 $file_og->$field = $data->$field;
             }
         endforeach;
+
+		//TODO: error handle this $file_og->insert();
     }
 }

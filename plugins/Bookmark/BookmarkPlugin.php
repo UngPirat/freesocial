@@ -156,6 +156,9 @@ class BookmarkPlugin extends MicroAppPlugin
         case 'ImportdeliciousAction':
             include_once $dir . '/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
             return false;
+        case 'BookmarkWidget':
+            include_once $dir . '/widgets/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
+            return false;
         case 'Bookmark':
             include_once $dir.'/'.$cls.'.php';
             return false;
@@ -588,4 +591,11 @@ class BookmarkPlugin extends MicroAppPlugin
 
         return true;
     }
+
+	function onStartRunNoticeWidget($args) {
+		if ($this->isMyNotice($args['item'])) {
+			BookmarkWidget::run($args);
+			return false;
+		}
+	}
 }

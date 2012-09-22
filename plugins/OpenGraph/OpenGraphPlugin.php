@@ -56,6 +56,10 @@ class OpenGraphPlugin extends Plugin
     {
         switch ($cls)
         {
+        case 'File_opengraph':
+        case 'OpenGraph2OEmbed':
+            require_once __DIR__ . '/classes/' . $cls . '.php';
+			return false;
         case 'OpenGraph':
             require_once __DIR__ . '/extlib/' . strtolower($cls) . '/' . $cls . '.php';
             return false;
