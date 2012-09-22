@@ -138,8 +138,6 @@ class FacebookServicePlugin extends Plugin
 }
 
 class FacebookService extends ForeignServiceClient {
-	const TRANSPORT = 'facebookin';
-
     function __construct(array $params=array())
     {
         $params['service_id'] = FACEBOOK_SERVICE;	// sneak it in there
@@ -248,18 +246,3 @@ class FacebookService extends ForeignServiceClient {
         }
     }
 }
-/*class FacebookQueueHandler extends ForeignQueueHandler {
-	protected $service_id = FACEBOOK_SERVICE;
-
-	function transport()
-	{
-		return FacebookService::TRANSPORT;
-	}
-
-	static function handleItem($item)
-	{
-		return true;
-		$fsrv = new FacebookService();
-		$fsrv->importUpdate($item);
-	}
-}*/
