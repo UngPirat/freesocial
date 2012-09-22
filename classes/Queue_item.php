@@ -70,13 +70,8 @@ class Queue_item extends Managed_DataObject
             $qi->claimed = common_sql_now();
             $result = $qi->update($orig);
             if ($result) {
-                common_log(LOG_DEBUG, 'claim succeeded for queue item id = ' . $qi->id .
-    			           ' for transport ' . $qi->transport);
                 return $qi;
-            } else {
-                common_log(LOG_WARNING, 'claim failed for queue item id = ' . $qi->id .
-    			           ' for transport ' . $qi->transport);
-            }
+            }	// else the claim failed
         }
         $qi = null;
         return null;

@@ -132,7 +132,6 @@ abstract class IoMaster
                 $write = array();
                 $except = array();
                 $this->logState('listening');
-                common_log(LOG_DEBUG, "Waiting up to $timeout seconds for socket data...");
                 $ready = stream_select($read, $write, $except, $timeout, 0);
 
                 if ($ready === false) {

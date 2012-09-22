@@ -81,7 +81,6 @@ class XmppManager extends ImManager
     {
         // Process the queue for as long as needed
         try {
-            common_log(LOG_DEBUG, "Servicing the XMPP queue.");
             $this->stats('xmpp_process');
             $this->conn->processTime(0);
         } catch (XMPPHP_Exception $e) {
