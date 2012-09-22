@@ -27,10 +27,6 @@ class ProfilestreamListWidget extends NoticeListWidget {
 		$stream = new ProfileNoticeStream($this->profile, $this->scoped); 
         return $stream->getNotices($this->offset, $this->num);
     }
-
-    function the_item($item) {
-        NoticeWidget::run(array('notice'=>$item));
-    }
 }
 
 ?>

@@ -27,7 +27,7 @@ class ConversationWidget extends NoticeListWidget {
 
     function the_item($item) {
 		$avatarSize = $this->key()>0 ? AVATAR_STREAM_SIZE : AVATAR_PROFILE_SIZE;
-        NoticeWidget::run(array('notice'=>$item, 'avatarSize'=>$avatarSize));
+        NoticeWidget::run(array('item'=>$item, 'avatarSize'=>$avatarSize));
         if (isset($item->showmore)) {
             $this->out->elementStart('aside', array('id'=>'more-'.$item->conversation, 'class'=>'show-more'));
             $href = common_local_url('conversation', array('id'=>$item->conversation)).'#notice-'.$item->id;

@@ -44,7 +44,7 @@ class ThemeManagerPlugin extends Plugin {
     }
 	function onStartShowNoticeItem($noticeitem) {
         if (THEME_MANAGER===true) {
-            NoticeWidget::run(array('notice'=>$noticeitem->notice, 'itemTag'=>'li'));
+            NoticeWidget::run(array('item'=>$noticeitem->notice, 'itemTag'=>'li'));
 			return false;
         }
 		return true;

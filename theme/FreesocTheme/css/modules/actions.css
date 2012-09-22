@@ -66,12 +66,12 @@
 	color: green;
 }
 
-body.showprofile .notice .actions {
+.showprofile-action .notice .actions {
 	right: 0;
 	top: -1.5em;
 }
-body.showprofile .notice .actions .action,
-body.showprofile .notice .actions input.submit,
-body.showprofile .notice .actions form {
+.showprofile-action .notice .actions .action,
+.showprofile-action .notice .actions input.submit,
+.showprofile-action .notice .actions form {
 	float: left;
 }

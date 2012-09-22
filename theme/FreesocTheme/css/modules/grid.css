@@ -31,8 +31,8 @@
 	width: 60%;
 }
 
-body.favorited #content .notice,
-body.public #content > .conversation {
+.favorited-action #content .notice,
+.public-action #content > .conversation {
 	float: left;
 	clear: none;
 	margin: 1ex;

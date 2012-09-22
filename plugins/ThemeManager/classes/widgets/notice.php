@@ -2,21 +2,24 @@
 
 class NoticeWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
-    protected $notice;
+    protected $item;
     protected $avatarSize = AVATAR_STREAM_SIZE;
 
     protected $itemClass = 'notice';
     protected $itemTag = 'article';
 
     static function run($args=null) {
-        $class = get_class();
-        $widget = new $class($args);    // runs validate()
-        return $widget->show();
+        if (Event::handle('StartRunNoticeWidget', array($args))) {
+            $class = get_class();
+            $widget = new $class($args);    // runs validate()
+            $widget->show();
+			Event::handle('EndRunNoticeWidget', array($widget));
+		}
     }
 
     // always gets run on __construct, which is also called on ::run()
     protected function validate() {
-        if (!is_a($this->notice, 'Notice')) {
+        if (!is_a($this->item, 'Notice')) {
             return false;
         }
         return parent::validate();
@@ -25,34 +28,38 @@ class NoticeWidget extends ThemeWidget {
     protected function initialize() {
         parent::initialize();
 
-        if (!empty($this->notice->repeat_of)) {
-            $this->repeated = Notice::staticGet('id', $this->notice->repeat_of);
-            $this->repeater = $this->notice->getProfile();
+        if (!empty($this->item->repeat_of)) {
+            $this->repeated = Notice::staticGet('id', $this->item->repeat_of);
+            $this->repeater = $this->item->getProfile();
             $this->profile  = $this->repeated->getProfile();    //refer it to the _original_ notice creator
         } else {
             $this->repeated = null;
             $this->repeater = null;
-            $this->profile  = $this->notice->getProfile();;
+            $this->profile  = $this->item->getProfile();;
         }
     }
 
     function show() {
-        if (!$this->notice->inScope($this->scoped)) {
+        if (!$this->item->inScope($this->scoped)) {
             return false;
         }
-		if (!empty($this->notice->repeat_of)) {
+		if (!empty($this->item->repeat_of)) {
 			$this->itemClass .= ' repeat';
 		}
-        if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->notice->id)) {
+        if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->item->id)) {
             $this->itemClass .= $score->is_spam ? ' spam' : '';
         }
+		$this->the_item();
+        return true;
+	}
+
+	function the_item() {
         $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->itemClass));
         $this->the_vcard();
         $this->the_content();
         $this->the_metadata();
         $this->the_actions();
         $this->itemTag && $this->out->elementEnd($this->itemTag);
-        return true;
     }
 
 	function get_notice() {
@@ -60,7 +67,7 @@ class NoticeWidget extends ThemeWidget {
 			return $this->repeated;
 		}
 
-		return $this->notice;
+		return $this->item;
 	}
 	function get_conversation_id() {
 		return $this->get_notice()->conversation;
@@ -84,13 +91,12 @@ class NoticeWidget extends ThemeWidget {
                 : $profile->profileurl;
     }
     function get_permalink() {
-		return common_local_url('shownotice', array('notice'=>$this->notice->id));
-        return $this->notice->url ? $this->notice->url : $this->notice->uri;
+		return common_local_url('shownotice', array('notice'=>$this->item->id));
     }
     function get_verb() {
         if (!empty($this->repeated)) {
             $verb = _m('was repeated');
-        } elseif (!empty($this->notice->reply_to)) {
+        } elseif (!empty($this->item->reply_to)) {
             $verb = _m('replied');
         } else {
             $verb = _m('posted this');
@@ -98,7 +104,7 @@ class NoticeWidget extends ThemeWidget {
         return $verb;
     }
     function get_recipients() {
-        return $this->notice->getReplyProfiles();
+        return $this->item->getReplyProfiles();
     }
     function get_rendered_content() {
         $notice = $this->get_notice();
@@ -148,7 +154,7 @@ class NoticeWidget extends ThemeWidget {
         if (empty($this->repeated)) {
             return false;
         }
-        $ns   = $this->notice->getSource();
+        $ns   = $this->item->getSource();
         $name = empty($ns->name)
                     ? ($ns->code
                         ? _($ns->code)
@@ -173,14 +179,14 @@ class NoticeWidget extends ThemeWidget {
         $this->out->element('a', array('href'=>$this->get_profile_url(), 'class'=>'author'), $this->get_name());
     }
 	function the_context() {
-		if ($this->notice->hasConversation()) {
+		if ($this->item->hasConversation()) {
 	        $this->out->element('a', array('href'=>$this->get_conversation_url(), 'class'=>'context'), _m('in context'));
 		}
 	}
     function the_timestamp() {
 		$this->out->elementStart('a', array('href'=>$this->get_permalink(), 'class'=>'permalink timestamp', 'title'=>_m('Permalink')));
-        $this->out->element('time', array('pubdate'=>'pubdate', 'datetime'=>common_date_iso8601($this->notice->created)),
-                                common_date_string($this->notice->created));
+        $this->out->element('time', array('pubdate'=>'pubdate', 'datetime'=>common_date_iso8601($this->item->created)),
+                                common_date_string($this->item->created));
 		$this->out->elementEnd('a');
     }
     function the_vcard() {

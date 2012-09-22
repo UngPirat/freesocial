@@ -25,7 +25,7 @@ class NoticeListWidget extends ListWidget {
     }
 
     function the_item($item) {
-        NoticeWidget::run(array('notice'=>$item));
+        NoticeWidget::run(array('item'=>$item));
     }
 }
 

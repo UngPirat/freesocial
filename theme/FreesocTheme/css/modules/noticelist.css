@@ -101,15 +101,15 @@
 }
 
 
-body.showprofile #stream .notice {
+.showprofile-action #stream .notice {
 	margin: 2em 0;
 }
-body.showprofile #stream .vcard.author {
+.showprofile-action #stream .vcard.author {
 	display: none;
 }
-body.showprofile #stream .repeat .vcard.author {
+.showprofile-action #stream .repeat .vcard.author {
 	display: block;
 }
-body.showprofile #stream .source {
+.showprofile-action #stream .source {
 	display: none;
 }
