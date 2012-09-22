@@ -28,7 +28,7 @@ class Queue_item extends Managed_DataObject
             'fields' => array(
                 'id' => array('type' => 'serial', 'not null' => true, 'description' => 'unique identifier'),
                 'frame' => array('type' => 'blob', 'not null' => true, 'description' => 'data: object reference or opaque string'),
-                'transport' => array('type' => 'varchar', 'length' => 8, 'not null' => true, 'description' => 'queue for what? "email", "xmpp", "irc", ...'), // @fixme 8 chars is too short; bump up.
+                'transport' => array('type' => 'varchar', 'length' => 16, 'not null' => true, 'description' => 'queue for what? "email", "xmpp", "irc", ...'),
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'claimed' => array('type' => 'datetime', 'description' => 'date this item was claimed'),
             ),
