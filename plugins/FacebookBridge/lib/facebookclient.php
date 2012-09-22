@@ -121,6 +121,48 @@ class Facebookclient
         );
     }
 
+    static function apiLoop($path, $callback, $args=array(), $callbackArgs=array()) {
+		$facebook = self::getFacebook();
+
+        $loops = 0;
+        $max_loops = 0;
+        if (isset($args['max_loops'])) {
+            $max_loops = $args['max_loops'];
+            unset($args['max_loops']);
+        }
+        do {
+            if (!isset($args['access_token']) || empty($args['access_token'])) {
+                $args['access_token'] = $facebook->getAccessToken();
+            }
+            try {
+                $result = $facebook->api($path, 'get', $args);
+            } catch (Exception $e) {
+                return 0;
+            }
+
+            if (empty($result['data'])) {
+                common_debug('FBDBG Data empty in loop '.$loops.' for path '.$path);
+                break;
+            }
+        
+            $foundnew = false;    // number of new, imported posts
+            foreach (array_reverse($result['data']) as $entry) {
+                try {
+                    // entry post will be overwritten on merge
+                    $callbackArgs = array_merge($callbackArgs, array('entry'=>$entry));
+                    $foundnew = call_user_func($callback, $callbackArgs);
+                } catch (Exception $e) {
+                }
+            }
+
+            if (isset($result['paging']['next'])) {
+                $next = parse_url($result['paging']['next'], PHP_URL_QUERY);
+                parse_str($next, $args);    // overwrite with data that makes us go back in time
+            }
+            $loops++;
+        } while ($foundnew==true && ($max_loops == 0 || $loops <= $max_loops));
+    }
+
     /*
      * Broadcast a notice to Facebook
      *

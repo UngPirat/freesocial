@@ -126,6 +126,7 @@ class FacebookBridgePlugin extends Plugin
             include_once $dir . '/lib/' . strtolower($cls) . '.php';
             return false;
         case 'FacebookImport':
+        case 'FacebookInQueueHandler':
             include_once $dir . '/classes/' . $cls . '.php';
             return false;
         default:
@@ -499,6 +500,7 @@ ENDOFSCRIPT;
     {
         if (self::hasApplication()) {
             $manager->connect('facebook', 'FacebookQueueHandler');
+            $manager->connect('facebookin', 'FacebookInQueueHandler');
         }
         return true;
     }
