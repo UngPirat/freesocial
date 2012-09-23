@@ -122,8 +122,8 @@ class AvatarsettingsAction extends SettingsAction
 
         if (Event::handle('StartAvatarFormData', array($this))) {
             $this->elementStart('ul', 'form_data');
-        	try {
-				$original = Avatar::getOriginal($profile->id);
+            try {
+                $original = Avatar::getOriginal($profile->id);
 
                 $this->elementStart('li', array('id' => 'avatar_original',
                                                 'class' => 'avatar_view'));
@@ -137,8 +137,8 @@ class AvatarsettingsAction extends SettingsAction
                 $this->elementEnd('div');
                 $this->elementEnd('li');
             } catch (Exception $e) {
-				//common_debug($e->getMessage());
-			}
+                //common_debug($e->getMessage());
+            }
 
             $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
 
@@ -418,6 +418,23 @@ class AvatarsettingsAction extends SettingsAction
     {
         parent::showStylesheets();
         $this->cssLink('css/jquery.Jcrop.css','base','screen, projection, tv');
+    }
+
+    /**
+     * Add the jCrop scripts
+     *
+     * @return void
+     */
+    function showTmScripts()
+    {
+        parent::showTmScripts();
+
+        if ($this->mode == 'crop') {
+            $this->script('jcrop/jquery.Jcrop.min.js');
+            $this->script('jcrop/jquery.Jcrop.go.js');
+        }
+
+        $this->autofocus('avatarfile');
     }
 
     /**

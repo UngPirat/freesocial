@@ -288,6 +288,15 @@ class Action extends HTMLOutputter // lawsuit
     }
 
     /**
+     * Show javascript headers for ThemeManager
+     *
+     * @return nothing
+     */
+    function showTmScripts()
+    {
+    }
+
+    /**
      * Show javascript headers
      *
      * @return nothing
@@ -369,7 +378,7 @@ class Action extends HTMLOutputter // lawsuit
 
             $messages = array_merge($messages, $this->getScriptMessages());
 
-	    Event::handle('EndScriptMessages', array($this, &$messages));
+        Event::handle('EndScriptMessages', array($this, &$messages));
         }
 
         if (!empty($messages)) {

@@ -69,11 +69,11 @@ class ThemeManager extends ThemeSite {
         if (Event::handle('StartShowHeadElements', array($this->action))) {
             if (Event::handle('StartTmStyles', array('action'=>$this->action))) {
                 $this->the_styles();
-                Event::handle('EndTmStyles', array('action'=>$this->action));
+                Event::handle('EndTmHeadStyles', array('action'=>$this->action));
             }
-            if (Event::handle('StartTmScripts', array('action'=>$this->action))) {
+            if (Event::handle('StartTmHeadScripts', array('action'=>$this->action))) {
                 $this->the_scripts();
-                Event::handle('EndTmScripts', array('action'=>$this->action));
+                Event::handle('EndTmFootScripts', array('action'=>$this->action));
             }
             $this->the_feeds();
             Event::handle('EndShowHeadElements', array($this->action));
@@ -81,9 +81,10 @@ class ThemeManager extends ThemeSite {
         $this->out->flush();
     }
     function foot() {
-        $this->action->showScripts();
-//		$this->out->script('jcrop/jquery.Jcrop-v0.9.10.js');
-//		$this->out->script('jcrop/jquery.Jcrop.go.js');
+        if (Event::handle('StartTmFootScripts', array('action'=>$this->action))) {
+        	$this->action->showTmScripts();
+            Event::handle('EndTmFootScripts', array('action'=>$this->action));
+		}
 	}
 
     function content($type) {
@@ -152,7 +153,7 @@ class ThemeManager extends ThemeSite {
     }
 
     function menus(array $list, array $args=array()) {
-        $this->out->elementStart('nav', 'menu-container');
+        $this->out->elementStart('nav', 'menu-container'.(isset($args['navClass'])?" {$args['navClass']}":''));
             $this->out->elementStart('ul', 'menu');
         foreach ($list as $menu) :
             try {
