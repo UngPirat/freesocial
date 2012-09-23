@@ -115,9 +115,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
                 FOREIGN_NOTICE_RECV) {
                 $flinks[] = clone($flink);
                 common_log(LOG_INFO, "sync: foreign id $flink->foreign_id");
-            } else {
-                common_log(LOG_INFO, "nothing to sync");
-            }
+            } // else nothing to sync
         }
 
         $flink->free();
