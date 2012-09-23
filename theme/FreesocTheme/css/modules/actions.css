@@ -15,11 +15,8 @@
 .actions legend {
     display: none;
 }
-
-.conversation .notice .actions {
-	position: absolute;
-	top: 1ex;
-	right: 100%;
+.actions h3 {
+	display: none;
 }
 
 .actions input.submit,
@@ -37,33 +34,13 @@
 	font-family: FontAwesome;
 	margin: 0.25ex;
 }
-.notice .actions input.submit,
-.notice .actions .action {
+.actions input.submit,
+.actions .action {
 	height: 1em;
     width: 1em;
 	overflow: hidden;
 }
 .notice .action {
-}
-
-.notice .actions .form-train-ham .submit:hover,
-.notice .actions form.form_disfavor input.submit:hover {
-	color: black;
-}
-.notice .actions .form-train-spam .submit:hover,
-.notice .actions .form-train-ham .submit,
-.notice .actions .delete {
-	color: #d00;
-}
-.notice .actions form.form_repeat input.submit {
-	color: black;
-}
-.notice .actions form.form_favor input.submit:hover,
-.notice .actions form.form_disfavor input.submit,
-.notice .actions .repeated,
-.notice .actions form.form_repeat input.submit:hover,
-.notice .actions .action.reply:hover {
-	color: green;
 }
 
 .showprofile-action .notice .actions {
@@ -74,4 +51,46 @@
 .showprofile-action .notice .actions input.submit,
 .showprofile-action .notice .actions form {
 	float: left;
+}
+
+#profile .actions input, #profile .actions .action {
+	font-size: 2em;
+}
+.actions .entity_subscribe input {
+	font-family: OpenWeb;
+}
+
+/* WHY U NO MARGIN??? */
+#profile .actions:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.actions > ul > li {
+	float: left;
+}
+
+/* colors */
+.notice .actions .form-train-ham .submit:hover,
+.notice .actions form.form_disfavor input.submit:hover {
+	color: black;
+}
+
+.notice .actions .form-train-spam .submit:hover,
+.notice .actions .form-train-ham .submit,
+.notice .actions .delete {
+	color: #d00;
+}
+.notice .actions form.form_repeat input.submit {
+	color: black;
+}
+
+.notice .actions form.form_favor input.submit:hover,
+.notice .actions form.form_disfavor input.submit,
+.notice .actions .repeated,
+.notice .actions form.form_repeat input.submit:hover,
+.notice .actions .action.reply:hover {
+	color: green;
 }

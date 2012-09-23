@@ -91,6 +91,8 @@ class UrlsettingsAction extends SettingsAction
                                           'action' =>
                                           common_local_url('urlsettings')));
         $this->elementStart('fieldset');
+        // TRANS: Form legend for e-mail settings form.
+        $this->element('legend', null, _('URL settings'));
         $this->hidden('token', common_session_token());
         $this->elementStart('ul', 'form_data');
 

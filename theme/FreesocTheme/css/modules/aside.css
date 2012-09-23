@@ -3,23 +3,26 @@
 	height: auto;
 }
 
-#settings .menu-container {
+.settings.menu-container {
 	background: transparent;
 	box-shadow: none;
 	text-align: right;
+	clear: none;
+	float: right;
+	width: 20%;
 }
-#settings .menu-container h3 {
+.settings.menu-container h3 {
 	color: black;
 	clear: both;
 }
-#settings .menu-container li {
+.settings.menu-container li {
 	float: none;
 }
-#settings .menu-container ul {
+.settings.menu-container ul {
 	left: auto;
 	right: 0;
 }
-#settings .menu-container ul ul {
+.settings.menu-container ul ul {
 	display: block;
 	float: none;
 	top: 0;
@@ -27,8 +30,8 @@
 	margin-left: auto;
 	width: auto;
 }
-#settings .menu-container ul ul a,
-#settings .menu-container ul ul h3 {
+.settings.menu-container ul ul a,
+.settings.menu-container ul ul h3 {
 	float: left;
 	width: 47%;
 	padding: 1ex 0;

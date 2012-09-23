@@ -98,7 +98,6 @@ class EmailsettingsAction extends SettingsAction
                                           'class' => 'form_settings',
                                           'action' =>
                                           common_local_url('emailsettings')));
-        $this->elementStart('fieldset');
         $this->elementStart('fieldset', array('id' => 'settings_email_address'));
         // TRANS: Form legend for e-mail settings form.
         $this->element('legend', null, _('Email address'));
@@ -249,7 +248,6 @@ class EmailsettingsAction extends SettingsAction
         $this->elementEnd('ul');
         // TRANS: Button label to save e-mail preferences.
         $this->submit('save', _m('BUTTON','Save'));
-        $this->elementEnd('fieldset');
         $this->elementEnd('fieldset');
         $this->elementEnd('form');
     }

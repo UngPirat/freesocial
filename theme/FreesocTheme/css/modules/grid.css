@@ -15,7 +15,8 @@
 	clear: both;
 	float: left;
 }
-#content {
+.settings-action #content {
+	width: 80%;
 }
 #content.single {
 	width: auto;

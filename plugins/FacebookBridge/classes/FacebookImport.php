@@ -266,7 +266,6 @@ class FacebookImport
         $local   = !empty($profile);
 
         try {
-			common_debug('FACEBOOK getting foreign notice map for: '.$update['id']);
             $notice = Foreign_notice_map::get_foreign_notice($update['id'], FACEBOOK_SERVICE);
             return $notice;
         } catch (Exception $e) {

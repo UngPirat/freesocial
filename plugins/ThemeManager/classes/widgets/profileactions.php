@@ -20,23 +20,46 @@ class ProfileactionsWidget extends ThemeWidget {
         return parent::validate();
     }
 
+    // only gets called for with in users
     function get_actions() {
-        $actions = array (
-            'subscribe' => new SubscribeForm($this->out, $this->item),
-            );
+        $actions = array();
+        if ($this->scoped->isSubscribed($this->item)) {
+            $actions['subscribe'] = new UnsubscribeForm($this->out, $this->item);
+        } else if ($this->scoped->hasPendingSubscription($this->item)) {
+            $actions['subscribe'] = new CancelSubscriptionForm($this->out, $this->item);
+        } else {
+            $actions['subscribe'] = new SubscribeForm($this->out, $this->item);
+        }
         return $actions;
     }
 
     function show() {
-        $this->out->elementStart($this->widgetTag, "actions {$this->widgetClass}");
-        foreach ($this->get_actions() as $action=>$data) {
-            if (is_a($data, 'Form')) {
-                $data->show();
-            } elseif (is_array($data)) {
-                $this->out->element($data['element'], $data['args'], $data['content']);
+        if (Event::handle('StartProfilePageActionsSection', array($this->out, $this->item))) {
+            $this->out->elementStart($this->widgetTag, "actions {$this->widgetClass}");
+            $this->out->element('h3', null, _m('Profile actions'));
+            $this->out->elementStart('ul');
+            if (Event::handle('StartProfilePageActionsElements', array($this->out, $this->item))) {
+                if (empty($this->scoped)) { // not logged in
+                    if (Event::handle('StartProfileRemoteSubscribe', array($this->out, $this->item))) {
+                        Event::handle('EndProfileRemoteSubscribe', array($this->out, $this->item));
+                    }
+                } else {
+                    foreach ($this->get_actions() as $action=>$data) {
+                        $this->out->elementStart('li', "entity_{$action}");
+                        if (is_a($data, 'Form')) {
+                            $data->show();
+                        } elseif (is_array($data)) {
+                            $this->out->element($data['element'], $data['args'], $data['content']);
+                        }
+                        $this->out->elementEnd('li');
+                    }
+                }
+                Event::handle('EndProfilePageActionsElements', array($this->out, $this->item));
             }
+            $this->out->elementEnd('ul');
+            $this->out->elementEnd($this->widgetTag);
+            Event::handle('EndProfilePageActionsSection', array($this->out, $this->item));
         }
-        $this->out->elementEnd($this->widgetTag);
     }
 }
 

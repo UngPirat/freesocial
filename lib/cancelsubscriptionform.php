@@ -119,6 +119,6 @@ class CancelSubscriptionForm extends Form
     function formActions()
     {
         // TRANS: Button text for form action to cancel a subscription request.
-        $this->out->submit('submit', _m('BUTTON','Cancel subscription request'));
+        $this->out->submit('submit', _m('BUTTON',' '.'Cancel subscription request'));
     }
 }

@@ -7,6 +7,7 @@
 	border: 1px solid;
 	margin: 1em 1em;
 	float: left;
+	max-width: 50%;
 }
 .form_settings legend {
 	font-size: 1.5em;

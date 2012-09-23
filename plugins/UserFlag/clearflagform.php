@@ -73,7 +73,7 @@ class ClearFlagForm extends ProfileActionForm
     function title()
     {
         // TRANS: Form title for action on a profile.
-        return _m('Clear');
+        return ' '._m('Clear');
     }
 
     /**
