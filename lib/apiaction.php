@@ -210,9 +210,10 @@ class ApiAction extends Action
         $twitter_user['location'] = ($profile->location) ? $profile->location : null;
         $twitter_user['description'] = ($profile->bio) ? $profile->bio : null;
 
-        $avatar = $profile->getAvatar(AVATAR_STREAM_SIZE);
-        $twitter_user['profile_image_url'] = ($avatar) ? $avatar->displayUrl() :
-            Avatar::defaultImage(AVATAR_STREAM_SIZE);
+        if (class_exists('Avatar')) {    //TODO: do this as an Event
+            $avatarUrl = Avatar::getUrlByProfile($profile, Avatar::STREAM_SIZE);
+            $twitter_user['profile_image_url'] = $avatarUrl;
+        }
 
         $twitter_user['url'] = ($profile->homepage) ? $profile->homepage : null;
         $twitter_user['protected'] = (!empty($user) && $user->private_stream) ? true : false;
@@ -306,10 +307,10 @@ class ApiAction extends Action
         if ($ns) {
             if (!empty($ns->name) && !empty($ns->url)) {
                 $source = '<a href="'
-		    . htmlspecialchars($ns->url)
-		    . '" rel="nofollow">'
-		    . htmlspecialchars($ns->name)
-		    . '</a>';
+            . htmlspecialchars($ns->url)
+            . '" rel="nofollow">'
+            . htmlspecialchars($ns->name)
+            . '</a>';
             } else {
                 $source = $ns->code;
             }
@@ -911,12 +912,14 @@ class ApiAction extends Action
         $this->element('id', null, $entry['id']);
         $this->element('published', null, $entry['published']);
         $this->element('updated', null, $entry['updated']);
-        $this->element('link', array('type' => 'text/html',
+        if (class_exists('Avatar')) {    //TODO: do this as an Event
+            $this->element('link', array('type' => 'text/html',
                                      'href' => $entry['link'],
                                      'rel' => 'alternate'));
-        $this->element('link', array('type' => $entry['avatar-type'],
+            $this->element('link', array('type' => $entry['avatar-type'],
                                      'href' => $entry['avatar'],
                                      'rel' => 'image'));
+        }
         $this->elementStart('author');
 
         $this->element('name', null, $entry['author-name']);
@@ -991,10 +994,11 @@ class ApiAction extends Action
         $entry['author-name'] = $from->getBestName();
         $entry['author-uri'] = $from->homepage;
 
-        $avatar = $from->getAvatar(AVATAR_STREAM_SIZE);
-
-        $entry['avatar']      = (!empty($avatar)) ? $avatar->url : Avatar::defaultImage(AVATAR_STREAM_SIZE);
-        $entry['avatar-type'] = (!empty($avatar)) ? $avatar->mediatype : 'image/png';
+        if (class_exists('Avatar')) {    //TODO: do this as an Event
+            $avatar = Avatar::getByProfile($from, Avatar::STREAM_SIZE);
+            $entry['avatar']      = (!empty($avatar)) ? $avatar->url : Avatar::defaultImage(Avatar::STREAM_SIZE);
+            $entry['avatar-type'] = (!empty($avatar)) ? $avatar->mediatype : 'image/png';
+        }
 
         // RSS item specific
 

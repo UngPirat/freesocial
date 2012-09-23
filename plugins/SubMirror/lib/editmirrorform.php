@@ -63,13 +63,15 @@ class EditMirrorForm extends Form
 
         $this->out->hidden('profile', $this->profile->id);
 
-        $this->out->elementStart('div', array('style' => 'float: left; width: 80px;'));
-        $img = $this->getAvatar($this->profile);
         $feed = $this->getFeed($this->profile);
-        $this->out->elementStart('a', array('href' => $this->profile->profileurl));
-        $this->out->element('img', array('src' => $img, 'style' => 'float: left'));
-        $this->out->elementEnd('a');
-        $this->out->elementEnd('div');
+		if (class_exists('Avatar')) {	//TODO: do this as an Event
+        	$this->out->elementStart('div', array('style' => 'float: left; width: 80px;'));
+	        $img = Avatar::getUrlByProfile($this->profile, Avatar::STREAM_SIZE);
+	        $this->out->elementStart('a', array('href' => $this->profile->profileurl));
+    	    $this->out->element('img', array('src' => $img, 'style' => 'float: left'));
+        	$this->out->elementEnd('a');
+	        $this->out->elementEnd('div');
+		}
 
 
         $this->out->elementStart('div', array('style' => 'margin-left: 80px; margin-right: 20px'));
@@ -128,16 +130,6 @@ class EditMirrorForm extends Form
 
         $this->out->elementEnd('div');
         $this->out->elementEnd('fieldset');
-    }
-
-    private function getAvatar($profile)
-    {
-        $avatar = $this->profile->getAvatar(48);
-        if ($avatar) {
-            return $avatar->displayUrl();
-        } else {
-            return Avatar::defaultImage(48);
-        }
     }
 
     private function getFeed($profile)

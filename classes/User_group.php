@@ -80,9 +80,9 @@ class User_group extends Managed_DataObject
 
     function defaultLogo($size)
     {
-        static $sizenames = array(AVATAR_PROFILE_SIZE => 'profile',
-                                  AVATAR_STREAM_SIZE => 'stream',
-                                  AVATAR_MINI_SIZE => 'mini');
+        static $sizenames = array(Avatar::PROFILE_SIZE => 'profile',
+                                  Avatar::STREAM_SIZE => 'stream',
+                                  Avatar::MINI_SIZE => 'mini');
         return Theme::path('default-avatar-'.$sizenames[$size].'.png');
     }
 
@@ -315,9 +315,9 @@ class User_group extends Managed_DataObject
 
         $orig = clone($this);
         $this->original_logo = Avatar::url($filename);
-        $this->homepage_logo = Avatar::url($imagefile->resize(AVATAR_PROFILE_SIZE));
-        $this->stream_logo = Avatar::url($imagefile->resize(AVATAR_STREAM_SIZE));
-        $this->mini_logo = Avatar::url($imagefile->resize(AVATAR_MINI_SIZE));
+        $this->homepage_logo = Avatar::url($imagefile->resize(Avatar::PROFILE_SIZE));
+        $this->stream_logo = Avatar::url($imagefile->resize(Avatar::STREAM_SIZE));
+        $this->mini_logo = Avatar::url($imagefile->resize(Avatar::MINI_SIZE));
         common_debug(common_log_objstring($this));
         return $this->update($orig);
     }
@@ -564,11 +564,11 @@ class User_group extends Managed_DataObject
     function getOriginal()
     {
         return empty($this->homepage_logo)
-            ? User_group::defaultLogo(AVATAR_PROFILE_SIZE)
+            ? User_group::defaultLogo(Avatar::PROFILE_SIZE)
             : $this->homepage_logo;
     }
 
-    function getAvatar($size=AVATAR_PROFILE_SIZE)
+    function getAvatar($size=Avatar::PROFILE_SIZE)
     {
         return empty($this->homepage_logo)
             ? User_group::defaultLogo($size)

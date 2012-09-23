@@ -135,12 +135,15 @@ class AutocompleteAction extends Action
         $results = array();
         foreach($this->users as $user){
             $profile = $user->getProfile();
-            $avatar = $profile->getAvatar(AVATAR_MINI_SIZE);
-            // sigh.... encapsulate this upstream!
-            if ($avatar) {
-                $avatar = $avatar->displayUrl();
-            } else {
-                $avatar = Avatar::defaultImage(AVATAR_MINI_SIZE);
+            $avatar = null;
+            if (class_exists('Avatar')) {
+                $avatar = Avatar::getByProfile($profile, Avatar::MINI_SIZE);
+                // sigh.... encapsulate this upstream!
+                if ($avatar) {
+                    $avatar = $avatar->displayUrl();
+                } else {
+                    $avatar = Avatar::defaultImage(Avatar::MINI_SIZE);
+                }
             }
             $results[] = array(
                 'nickname' => $user->nickname,
@@ -154,7 +157,7 @@ class AutocompleteAction extends Action
             if ($group->mini_logo) {
                 $avatar = $group->mini_logo;
             } else {
-                $avatar = User_group::defaultLogo(AVATAR_MINI_SIZE);
+                $avatar = User_group::defaultLogo(Avatar::MINI_SIZE);
             }
             $results[] = array(
                 'nickname' => $group->nickname,

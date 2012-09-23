@@ -31,7 +31,7 @@ class PreviewWidget extends ThemeWidget {
     }
 
     function show() {
-        $thumb = $this->item->getThumbnail(AVATAR_PROFILE_SIZE);
+        $thumb = $this->item->getThumbnail(Avatar::PROFILE_SIZE);
         if (empty($thumb)) {
             return false;
         }

@@ -76,7 +76,7 @@ class AtomListNoticeFeed extends AtomNoticeFeed
         );
         $this->setSubtitle($subtitle);
 
-        $avatar = $this->tagger->avatarUrl(AVATAR_PROFILE_SIZE);
+        $avatar = Avatar::getByProfile($this->tagger);
         $this->setLogo($avatar);
 
         $this->setUpdated('now');

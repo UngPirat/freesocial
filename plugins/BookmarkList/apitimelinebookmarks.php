@@ -100,7 +100,7 @@ class ApiTimelineBookmarksAction extends ApiBareAuthAction
     function showTimeline()
     {
         $profile  = $this->user->getProfile();
-        $avatar   = $profile->getAvatar(AVATAR_PROFILE_SIZE);
+        $avatar   = Avatar::getByProfile($profile, Avatar::PROFILE_SIZE);
 
         $sitename = common_config('site', 'name');
         $title    = sprintf(
@@ -125,7 +125,7 @@ class ApiTimelineBookmarksAction extends ApiBareAuthAction
         );
         $logo = !empty($avatar)
             ? $avatar->displayUrl()
-            : Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+            : Avatar::defaultImage(Avatar::PROFILE_SIZE);
 
         $link = common_local_url(
             'bookmarks',

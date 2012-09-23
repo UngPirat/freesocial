@@ -202,7 +202,6 @@ class ApiTimelineFriendsAction extends ApiBareAuthAction
     function showTimeline()
     {
         $profile    = $this->user->getProfile();
-        $avatar     = $profile->getAvatar(AVATAR_PROFILE_SIZE);
         $sitename   = common_config('site', 'name');
         // TRANS: Title of API timeline for a user and friends.
         // TRANS: %s is a username.
@@ -224,9 +223,8 @@ class ApiTimelineFriendsAction extends ApiBareAuthAction
 
         $self = $this->getSelfUri();
 
-        $logo = (!empty($avatar))
-            ? $avatar->displayUrl()
-            : Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+			//TODO: do this as an Event
+		$logo = class_exists('Avatar') ? Avatar::getUrlByProfile($profile) : null;
 
         switch($this->format) {
         case 'xml':

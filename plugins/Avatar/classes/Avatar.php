@@ -6,7 +6,11 @@ require_once INSTALLDIR.'/classes/Memcached_DataObject.php';
 
 class Avatar extends Managed_DataObject
 {
-    public $__table = 'avatar';                          // table name
+    const PROFILE_SIZE = 128;
+    const STREAM_SIZE  =  96;
+    const MINI_SIZE    =  24;
+
+    public $__table = 'avatar';              // table name
     public $profile_id;                      // int(4)  primary_key not_null
     public $original;                        // tinyint(1)
     public $width;                           // int(4)  primary_key not_null
@@ -21,11 +25,11 @@ class Avatar extends Managed_DataObject
     function staticGet($k,$v=null)
     { return Memcached_DataObject::staticGet('Avatar',$k,$v); }
 
-	static function pivotGet($keyCol, $keyVals, $otherCols)
-	{
-	    return Memcached_DataObject::pivotGet('Avatar', $keyCol, $keyVals, $otherCols);
-	}
-	
+    static function pivotGet($keyCol, $keyVals, $otherCols)
+    {
+        return Memcached_DataObject::pivotGet('Avatar', $keyCol, $keyVals, $otherCols);
+    }
+    
     public static function schemaDef()
     {
         return array(
@@ -77,22 +81,49 @@ class Avatar extends Managed_DataObject
         }
         return $avatar;
     }
+	static function getUrlByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null, $fallback=true) {
+		$avatar = self::getByProfile($profile, $width, $height);
+        if ($avatar) {
+            return $avatar->displayUrl();
+        } else {
+            return self::defaultImage($width);
+        }
+	}
 
-	static function getProfileAvatars($profile_id) {
+    static function getByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null) {
+        if (empty($height)) {
+            $height = $width;
+        }
+
+        $avatar = null;
+
+        if (Event::handle('StartProfileGetAvatar', array($profile, $width, &$avatar))) {
+            $avatar = Avatar::pkeyGet(
+                array(
+                    'profile_id' => $profile->id,
+                    'width'      => $width,
+                    'height'     => $height
+                )
+            ); 
+            Event::handle('EndProfileGetAvatar', array($profile, $width, &$avatar));
+        }
+
+        if (empty($avatar)) {
+            try {
+                $avatar = Avatar::newSize($profile->id, $width);
+            } catch (Exception $e) {
+                common_debug($e->getMessage());
+            }
+        }
+
+        return $avatar;
+    }
+    static function getProfileAvatars($profile_id) {
         $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
 
-		return $avatar->fetchAll();
-	
-/*
-        if (!$avatar->find()) {
-			throw new Exception _m('Found no avatars for profile');
-		}
-            while ($avatar->fetch()) {
-                $avatars[] = clone($avatar);
-            }
-        }*/
-	}
+        return $avatar->fetchAll();
+    }
 
     /**
      * Where should the avatar go for this user?
@@ -163,41 +194,45 @@ class Avatar extends Managed_DataObject
 
     static function defaultImage($size)
     {
-        static $sizenames = array(AVATAR_PROFILE_SIZE => 'profile',
-                                  AVATAR_STREAM_SIZE => 'stream',
-                                  AVATAR_MINI_SIZE => 'mini');
+        static $sizenames = array(Avatar::PROFILE_SIZE => 'profile',
+                                  Avatar::STREAM_SIZE => 'stream',
+                                  Avatar::MINI_SIZE => 'mini');
         return Theme::path('default-avatar-'.$sizenames[$size].'.png');
     }
 
     static function deleteFromProfile($profile_id) {
-		$avatars = Avatar::getProfileAvatars($profile_id);
-		foreach ($avatars as $avatar) {
-			$avatar->delete();
-		}
+        $avatars = Avatar::getProfileAvatars($profile_id);
+        foreach ($avatars as $avatar) {
+            $avatar->delete();
+        }
     }
 
 
-	static function newSize($profile_id, $size) {
-		$safesize = floor($size);
-		if ($safesize < 1 || $safesize > 999) {
-			throw new Exception('Bad avatar size: '.$size);
-		}
+    static function newSize($profile_id, $size) {
+        $safesize = floor($size);
+        if ($safesize < 1 || $safesize > 999) {
+            throw new Exception('Bad avatar size: '.$size);
+        }
 
-		$original = Avatar::getOriginal($profile_id);
+        $original = Avatar::getOriginal($profile_id);
 
         $imagefile = new ImageFile($profile_id, Avatar::path($original->filename));
-		$filename = $imagefile->resize($safesize);
+        $filename = $imagefile->resize($safesize);
 
-		$scaled = clone($original);
-		$scaled->original = false;
-		$scaled->width = $safesize;
-		$scaled->height = $safesize;
-		$scaled->url = Avatar::url($filename);
-		$scaled->created = DB_DataObject_Cast::dateTime();
+        $scaled = clone($original);
+        $scaled->original = false;
+        $scaled->width = $safesize;
+        $scaled->height = $safesize;
+        $scaled->url = Avatar::url($filename);
+        $scaled->created = DB_DataObject_Cast::dateTime();
 
         if (!$scaled->insert()) {
-	        throw new Exception('Could not create new avatar from original image for profile_id='.$profile_id);
+            throw new Exception('Could not create new avatar from original image for profile_id='.$profile_id);
         }
         return $scaled;
-	}
+    }
 }
+
+define('AVATAR_PROFILE_SIZE', Avatar::PROFILE_SIZE);
+define('AVATAR_STREAM_SIZE',  Avatar::STREAM_SIZE);
+define('AVATAR_MINI_SIZE',    Avatar::MINI_SIZE);

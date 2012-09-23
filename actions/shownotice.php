@@ -102,7 +102,7 @@ class ShownoticeAction extends Action
 
         $this->user = User::staticGet('id', $this->profile->id);
 
-        $this->avatar = $this->profile->getAvatar(AVATAR_PROFILE_SIZE);
+        $this->avatar = Avatar::getByProfile($this->profile);
 
         return true;
     }
@@ -319,10 +319,7 @@ class ShownoticeAction extends Action
             'title'=>'oEmbed'),null);
 
         // Extras to aid in sharing notices to Facebook
-        $avatar = $this->profile->getAvatar(AVATAR_PROFILE_SIZE);
-        $avatarUrl = ($avatar) ?
-                     $avatar->displayUrl() :
-                     Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+        $avatarUrl = Avatar::getUrlByProfile($this->profile);
         $this->element('meta', array('property' => 'og:image',
                                      'content' => $avatarUrl));
         $this->element('meta', array('property' => 'og:description',
@@ -335,6 +332,6 @@ class SingleNoticeItem extends DoFollowListItem
 {
     function avatarSize()
     {
-        return AVATAR_STREAM_SIZE;
+        return Avatar::STREAM_SIZE;
     }
 }

@@ -74,12 +74,12 @@ if ( isset($this->action->args['notm']))        $this->supported = array();
     function is_action($action=null) {
         if (is_null($action)) {
 			$next = get_class($this->action);
-            $class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next)));
+            $class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))).'-action';
 			while(!empty($next) && 'Action' != ($next = get_parent_class($next))) {
 				// get top-type action
-				$parent .= ' '.strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))) . '-action';
+				$class .= ' '.strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))) . '-action';
 			}
-            return "$class-action" . (!empty($parent) ? $parent : '');
+            return $class;
         }
         return is_a($this->action, ucfirst($action.'Action'));
     }

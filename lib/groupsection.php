@@ -86,14 +86,13 @@ class GroupSection extends Section
                                             'class' => 'url'));
         $this->out->text(' ');
         $logo = ($group->stream_logo) ?
-          $group->stream_logo : User_group::defaultLogo(AVATAR_STREAM_SIZE);
+          $group->stream_logo : User_group::defaultLogo(Avatar::STREAM_SIZE);
         $this->out->element('img', array('src' => $logo,
-                                         'width' => AVATAR_MINI_SIZE,
-                                         'height' => AVATAR_MINI_SIZE,
+                                         'width' => Avatar::MINI_SIZE,
+                                         'height' => Avatar::MINI_SIZE,
                                          'class' => 'avatar photo',
-                                         'alt' =>  ($group->fullname) ?
-                                         $group->fullname :
-                                         $group->nickname));
+                                         'alt' =>  $group->getBestName()
+										 ));
         $this->out->text(' ');
         $this->out->element('span', 'fn org nickname', $group->nickname);
         $this->out->elementEnd('a');

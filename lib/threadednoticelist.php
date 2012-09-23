@@ -278,7 +278,7 @@ class ThreadedNoticeListSubItem extends NoticeListItem
 
     function avatarSize()
     {
-        return AVATAR_STREAM_SIZE; // @fixme would like something in between
+        return Avatar::STREAM_SIZE; // @fixme would like something in between
     }
 
     function showNoticeLocation()

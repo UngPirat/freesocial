@@ -51,7 +51,7 @@ if (!defined('STATUSNET')) {
  */
 class ActivityObject
 {
-	// These MAY all be prepended with Activity::SCHEMA (http://activitystrea.ms/schema/1.0/)
+    // These MAY all be prepended with Activity::SCHEMA (http://activitystrea.ms/schema/1.0/)
     const ARTICLE   = 'article';
     const BLOGENTRY = 'blog-entry';
     const NOTE      = 'note';
@@ -144,8 +144,8 @@ class ActivityObject
 
         // Some per-type attributes...
         switch (ActivityUtils::resolveUri($this->type, true)) {
-		case self::PERSON:
-		case self::GROUP:
+        case self::PERSON:
+        case self::GROUP:
             $this->displayName = $this->title;
 
             $photos = ActivityUtils::getLinks($element, 'photo');
@@ -161,9 +161,9 @@ class ActivityObject
             }
 
             $this->poco = new PoCo($element);
-			break;
+            break;
 
-		case self::PHOTO:
+        case self::PHOTO:
             $this->thumbnail   = ActivityUtils::getLink($element, 'preview');
             $this->largerImage = ActivityUtils::getLink($element, 'enclosure');
 
@@ -172,13 +172,13 @@ class ActivityObject
                 ActivityObject::MEDIA_DESCRIPTION,
                 Activity::MEDIA
             );
-			break;
+            break;
 
-		case self::_LIST:
+        case self::_LIST:
             $owner = ActivityUtils::child($this->element, Activity::AUTHOR, Activity::SPEC);
             $this->owner = new ActivityObject($owner);
-			break;
-		}
+            break;
+        }
     }
 
     private function _fromAuthor($element)
@@ -240,7 +240,7 @@ class ActivityObject
         if (empty($this->type)) {
             $this->type = ActivityObject::NOTE;
         }
-		$this->type = ActivityUtils::resolveUri($this->type);
+        $this->type = ActivityUtils::resolveUri($this->type);
 
         $this->summary = ActivityUtils::childHtmlContent($element, self::SUMMARY);
         $this->content = ActivityUtils::getContent($element);
@@ -455,45 +455,36 @@ class ActivityObject
             $object->title  = $profile->getBestName();
             $object->link   = $profile->profileurl;
 
-            try {
-				$orig = Avatar::getOriginal($profile->id);
-    	        $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
-			} catch (Exception $e) {
-				//common_debug($e->getMessage());
-			}
-
-            $sizes = array(
-                AVATAR_PROFILE_SIZE,
-                AVATAR_STREAM_SIZE,
-                AVATAR_MINI_SIZE
-            );
-
-            foreach ($sizes as $size) {
-                $alink  = null;
-                $avatar = $profile->getAvatar($size);
-
-                if (!empty($avatar)) {
-                    $alink = AvatarLink::fromAvatar($avatar);
-                } else {
-                    $alink = new AvatarLink();
-                    $alink->type   = 'image/png';
-                    $alink->height = $size;
-                    $alink->width  = $size;
-                    $alink->url    = Avatar::defaultImage($size);
-
-                    if ($size == AVATAR_PROFILE_SIZE) {
-                        // Hack for Twitter import: we don't have a 96x96 image,
-                        // but we do have a 73x73 image. For now, fake it with that.
-                        $avatar = $profile->getAvatar(73);
-                        if ($avatar) {
-                            $alink = AvatarLink::fromAvatar($avatar);
-                            $alink->height= $size;
-                            $alink->width = $size;
-                        }
-                    }
+            if (class_exists('Avatar')) {    //TODO: do this as an Event
+                try {
+                    $orig = Avatar::getOriginal($profile->id);
+                    $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
+                } catch (Exception $e) {
+                    //common_debug($e->getMessage());
                 }
-
-                $object->avatarLinks[] = $alink;
+    
+                $sizes = array(
+                    Avatar::PROFILE_SIZE,
+                    //Avatar::STREAM_SIZE,
+                    //Avatar::MINI_SIZE
+                );
+    
+                foreach ($sizes as $size) {
+                    $alink  = null;
+                    $avatar = Avatar::getByProfile($profile, $size);
+    
+                    if (!empty($avatar)) {
+                        $alink = AvatarLink::fromAvatar($avatar);
+                    } else {
+                        $alink = new AvatarLink();
+                        $alink->type   = 'image/png';
+                        $alink->height = $size;
+                        $alink->width  = $size;
+                        $alink->url    = Avatar::defaultImage($size);
+                    }
+    
+                    $object->avatarLinks[] = $alink;
+                }
             }
 
             if (isset($profile->lat) && isset($profile->lon)) {
@@ -520,14 +511,16 @@ class ActivityObject
             $object->title  = $group->getBestName();
             $object->link   = $group->getUri();
 
-            $object->avatarLinks[] = AvatarLink::fromFilename($group->homepage_logo,
-                                                              AVATAR_PROFILE_SIZE);
+            if (class_exists('Avatar')) {    //TODO: should do this as an Event
+                $object->avatarLinks[] = AvatarLink::fromFilename($group->homepage_logo,
+                                                              Avatar::PROFILE_SIZE);
 
-            $object->avatarLinks[] = AvatarLink::fromFilename($group->stream_logo,
-                                                              AVATAR_STREAM_SIZE);
+                $object->avatarLinks[] = AvatarLink::fromFilename($group->stream_logo,
+                                                              Avatar::STREAM_SIZE);
 
-            $object->avatarLinks[] = AvatarLink::fromFilename($group->mini_logo,
-                                                              AVATAR_MINI_SIZE);
+                $object->avatarLinks[] = AvatarLink::fromFilename($group->mini_logo,
+                                                              Avatar::MINI_SIZE);
+            }
 
             $object->poco = PoCo::fromGroup($group);
             Event::handle('EndActivityObjectFromGroup', array($group, &$object));
@@ -716,7 +709,7 @@ class ActivityObject
                     );
 
                     // Find the big avatar to use as the "image"
-                    if ($a->height == AVATAR_PROFILE_SIZE) {
+                    if ($a->height == Avatar::PROFILE_SIZE) {
                         $imgLink = $avatar;
                     }
 

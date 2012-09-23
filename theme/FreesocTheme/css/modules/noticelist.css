@@ -4,15 +4,18 @@
 	padding: 1ex 3ex;
 }
 
-.conversation {
+.conversation .notice {
+	margin-left: 10%;
+}
+.conversation,
+.conversation:nth-child(2n) .notice,
+.conversation .notice:first-child {
 	background-color: #f0f0f0;
 }
-.conversation:nth-child(2n) {
+.conversation:nth-child(2n),
+.conversation .notice,
+.conversation:nth-child(2n) .notice:first-child {
 	background-color: #e0e0e0;
-}
-.conversation .notice {
-	font-size: 0.75em;
-	margin-left: 10%;
 }
 /* WHY U NO MARGIN??? */
 .notice:after {

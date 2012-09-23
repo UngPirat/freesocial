@@ -378,6 +378,6 @@ class Peopletag extends PeopletagListItem
 
     function showAvatar()
     {
-        parent::showAvatar(AVATAR_PROFILE_SIZE);
+        parent::showAvatar(Avatar::PROFILE_SIZE);
     }
 }

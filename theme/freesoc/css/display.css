@@ -15,6 +15,12 @@ address {
 	margin: 10px 0 0;
 }
 
+address img {
+	border-radius: 1ex;
+    float: left;
+	margin-right: 1em;
+}
+
 body {
     background-color: #000000;
     font-family: Helvetica, Arial, sans-serif;

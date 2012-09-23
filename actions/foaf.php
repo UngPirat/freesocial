@@ -145,8 +145,8 @@ class FoafAction extends Action
 			$avatar = Avatar::getOriginal($this->profile->id);
             $this->elementStart('img');
             $this->elementStart('Image', array('rdf:about' => $avatar->url));
-            foreach (array(AVATAR_PROFILE_SIZE, AVATAR_STREAM_SIZE, AVATAR_MINI_SIZE) as $size) {
-                $scaled = $this->profile->getAvatar($size);
+            foreach (array(Avatar::PROFILE_SIZE, Avatar::STREAM_SIZE, Avatar::MINI_SIZE) as $size) {
+                $scaled = Avatar::getByProfile($this->profile, $size);
                 if (!$scaled->original) { // sometimes the original has one of our scaled sizes
                     $this->elementStart('thumbnail');
                     $this->element('Image', array('rdf:about' => $scaled->url));

@@ -91,18 +91,17 @@ class GroupList extends Widget
         $this->out->elementStart('div', 'entity_profile vcard entry-content');
 
         $logo = ($this->group->stream_logo) ?
-          $this->group->stream_logo : User_group::defaultLogo(AVATAR_STREAM_SIZE);
+          $this->group->stream_logo : User_group::defaultLogo(Avatar::STREAM_SIZE);
 
         $this->out->elementStart('a', array('href' => $this->group->homeUrl(),
                                             'class' => 'url entry-title',
                                             'rel' => 'contact group'));
         $this->out->element('img', array('src' => $logo,
                                          'class' => 'photo avatar',
-                                         'width' => AVATAR_STREAM_SIZE,
-                                         'height' => AVATAR_STREAM_SIZE,
-                                         'alt' =>
-                                         ($this->group->fullname) ? $this->group->fullname :
-                                         $this->group->nickname));
+                                         'width' => Avatar::STREAM_SIZE,
+                                         'height' => Avatar::STREAM_SIZE,
+                                         'alt' => $this->group->getBestName()
+										 ));
         $this->out->text(' ');
         $hasFN = ($this->group->fullname) ? 'nickname' : 'fn org nickname';
         $this->out->elementStart('span', $hasFN);

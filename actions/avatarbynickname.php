@@ -88,14 +88,14 @@ class AvatarbynicknameAction extends Action
         if ($size == 'original') {
             $avatar = $profile->getOriginal();
         } else {
-            $avatar = $profile->getAvatar($size+0);
+            $avatar = Avatar::getByProfile($profile, $size+0);
         }
 
         if ($avatar) {
             $url = $avatar->url;
         } else {
             if ($size == 'original') {
-                $url = Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+                $url = Avatar::defaultImage(Avatar::PROFILE_SIZE);
             } else {
                 $url = Avatar::defaultImage($size+0);
             }

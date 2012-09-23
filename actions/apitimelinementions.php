@@ -106,7 +106,6 @@ class ApiTimelineMentionsAction extends ApiBareAuthAction
     function showTimeline()
     {
         $profile = $this->user->getProfile();
-        $avatar     = $profile->getAvatar(AVATAR_PROFILE_SIZE);
 
         $sitename   = common_config('site', 'name');
         $title      = sprintf(
@@ -131,7 +130,7 @@ class ApiTimelineMentionsAction extends ApiBareAuthAction
             _('%1$s updates that reply to updates from %2$s / %3$s.'),
             $sitename, $this->user->nickname, $profile->getBestName()
         );
-        $logo = ($avatar) ? $avatar->displayUrl() : Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+        $logo = Avatar::getUrlByProfile($profile);
 
         switch($this->format) {
         case 'xml':

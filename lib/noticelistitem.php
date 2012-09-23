@@ -318,11 +318,9 @@ class NoticeListItem extends Widget
     {
         $avatar_size = $this->avatarSize();
 
-        $avatar = $this->profile->getAvatar($avatar_size);
+        $avatarUrl = Avatar::getUrlByProfile($this->profile, $avatar_size);
 
-        $this->out->element('img', array('src' => ($avatar) ?
-                                         $avatar->displayUrl() :
-                                         Avatar::defaultImage($avatar_size),
+        $this->out->element('img', array('src' => $avatarUrl,
                                          'class' => 'avatar photo',
                                          'width' => $avatar_size,
                                          'height' => $avatar_size,
@@ -334,7 +332,7 @@ class NoticeListItem extends Widget
 
     function avatarSize()
     {
-        return AVATAR_STREAM_SIZE;
+        return Avatar::STREAM_SIZE;
     }
 
     /**

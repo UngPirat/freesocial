@@ -122,7 +122,7 @@ class NoticeList extends Widget
         return new NoticeListItem($notice, $this->out);
     }
     
-    static function prefill(&$notices, $avatarSize=AVATAR_STREAM_SIZE)
+    static function prefill(&$notices, $avatarSize=Avatar::STREAM_SIZE)
     {
         if (Event::handle('StartNoticeListPrefill', array(&$notices, $avatarSize))) {
 
@@ -134,8 +134,6 @@ class NoticeList extends Widget
             Notice::fillRepeats($notices);
             // Prefill the profiles
             $profiles = Notice::fillProfiles($notices);
-            // Prefill the avatars
-            Profile::fillAvatars($profiles, $avatarSize);
     	
             $p = Profile::current();
     	

@@ -74,7 +74,7 @@ class AtomGroupNoticeFeed extends AtomNoticeFeed
         $this->setSubtitle($subtitle);
 
         $avatar = $group->homepage_logo;
-        $logo = ($avatar) ? $avatar : User_group::defaultLogo(AVATAR_PROFILE_SIZE);
+        $logo = ($avatar) ? $avatar : User_group::defaultLogo(Avatar::PROFILE_SIZE);
         $this->setLogo($logo);
 
         $this->setUpdated('now');

@@ -86,15 +86,16 @@ class ProfileSection extends Section
                                        'rel' => 'contact member',
                                        'class' => 'url'));
         $this->out->text(' ');
-        $avatar = $profile->getAvatar(AVATAR_MINI_SIZE);
-        $this->out->element('img', array('src' => (($avatar) ? $avatar->displayUrl() :  Avatar::defaultImage(AVATAR_MINI_SIZE)),
-                                    'width' => AVATAR_MINI_SIZE,
-                                    'height' => AVATAR_MINI_SIZE,
+		if (class_exists('Avatar')) {	//TODO: do this as an Event
+	        $avatarUrl = Avatar::getUrlByProfile($profile, Avatar::MINI_SIZE);
+    	    $this->out->element('img', array('src' => $avatarUrl,
+                                    'width' => Avatar::MINI_SIZE,
+                                    'height' => Avatar::MINI_SIZE,
                                     'class' => 'avatar photo',
-                                    'alt' =>  ($profile->fullname) ?
-                                    $profile->fullname :
-                                    $profile->nickname));
-        $this->out->text(' ');
+                                    'alt' => $profile->getBestName()
+									));
+        	$this->out->text(' ');
+		}
         $this->out->element('span', 'fn nickname', $profile->nickname);
         $this->out->elementEnd('a');
         $this->out->elementEnd('span');

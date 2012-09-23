@@ -99,7 +99,6 @@ class ApiTimelineFavoritesAction extends ApiBareAuthAction
     function showTimeline()
     {
         $profile  = $this->user->getProfile();
-        $avatar   = $profile->getAvatar(AVATAR_PROFILE_SIZE);
 
         $sitename = common_config('site', 'name');
         $title    = sprintf(
@@ -122,9 +121,9 @@ class ApiTimelineFavoritesAction extends ApiBareAuthAction
             $profile->getBestName(),
             $this->user->nickname
         );
-        $logo = !empty($avatar)
-            ? $avatar->displayUrl()
-            : Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+
+			//TODO: do this as an Event
+		$logo = class_exists('Avatar') ? Avatar::getUrlByProfile($profile) : null;
 
         $link = common_local_url(
             'showfavorites',

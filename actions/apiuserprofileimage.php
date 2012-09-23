@@ -90,12 +90,7 @@ class ApiUserProfileImageAction extends ApiPrivateAuthAction
         }
 
         $size = $this->avatarSize();
-        $avatar = $profile->getAvatar($size);
-        if ($avatar) {
-            $url = $avatar->displayUrl();
-        } else {
-            $url = Avatar::defaultImage($size);
-        }
+        $url = Avatar::getUrlByProfile($profile, $size);
 
         // We don't actually output JSON or XML data -- redirect!
         common_redirect($url, 302);
@@ -110,12 +105,12 @@ class ApiUserProfileImageAction extends ApiPrivateAuthAction
     {
         switch ($this->size) {
             case 'mini':
-                return AVATAR_MINI_SIZE; // 24x24
+                return Avatar::MINI_SIZE; // 24x24
             case 'bigger':
-                return AVATAR_PROFILE_SIZE; // Twitter does 73x73, but we do 96x96
+                return Avatar::PROFILE_SIZE; // Twitter does 73x73, but we do 96x96
             case 'normal': // fall through
             default:
-                return AVATAR_STREAM_SIZE; // 48x48
+                return Avatar::STREAM_SIZE; // 48x48
         }
     }
 

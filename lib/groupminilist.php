@@ -76,15 +76,14 @@ class GroupMiniList extends GroupList
                                        'class' => 'url'));
 
         $logo = ($this->group->mini_logo) ?
-          $this->group->mini_logo : User_group::defaultLogo(AVATAR_MINI_SIZE);
+          $this->group->mini_logo : User_group::defaultLogo(Avatar::MINI_SIZE);
 
         $this->out->element('img', array('src' => $logo,
-                                    'width' => AVATAR_MINI_SIZE,
-                                    'height' => AVATAR_MINI_SIZE,
+                                    'width' => Avatar::MINI_SIZE,
+                                    'height' => Avatar::MINI_SIZE,
                                     'class' => 'avatar photo',
-                                    'alt' =>  ($this->group->fullname) ?
-                                    $this->group->fullname :
-                                    $this->group->nickname));
+                                    'alt' =>  $this->group->getBestName()
+									));
         $this->out->element('span', 'fn org nickname', $this->group->nickname);
         $this->out->elementEnd('a');
         $this->out->elementEnd('li');

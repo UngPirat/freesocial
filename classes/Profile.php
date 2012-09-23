@@ -118,69 +118,9 @@ class Profile extends Managed_DataObject
         return $this->_user;
     }
 
-    protected $_avatars;
-
     function getAvatar($width, $height=null)
     {
-        if (is_null($height)) {
-            $height = $width;
-        }
-
-        $avatar = $this->_getAvatar($width);
-
-        if (empty($avatar)) {
-            if (Event::handle('StartProfileGetAvatar', array($this, $width, &$avatar))) {
-                $avatar = Avatar::pkeyGet(
-                    array(
-                        'profile_id' => $this->id,
-                        'width'      => $width,
-                        'height'     => $height
-                    )
-                );
-
-                Event::handle('EndProfileGetAvatar', array($this, $width, &$avatar));
-            }
-
-			if (empty($avatar)) {
-				try {
-					$avatar = Avatar::newSize($this->id, $width);
-				} catch (Exception $e) {
-					common_debug($e->getMessage());
-				}
-			}
-
-			if (!empty($avatar)) {
-	            $this->_fillAvatar($width, $avatar);
-			}
-        }
-
-        return $avatar;
-    }
-
-    // XXX: @Fix me gargargar
-    function _getAvatar($width)
-    {
-        if (empty($this->_avatars)) {
-            $this->_avatars = array();
-        }
-
-        // GAR! I cannot figure out where _avatars gets pre-filled with the avatar from
-        // the previously used profile! Please shoot me now! --Zach
-        if (array_key_exists($width, $this->_avatars)) {
-            // Don't return cached avatar unless it's really for this profile
-            if ($this->_avatars[$width]->profile_id == $this->id) {
-                return $this->_avatars[$width];
-            }
-        }
-
-        return null;
-    }
-
-    function _fillAvatar($width, $avatar)
-    {
-        if (is_object($avatar)) {
-            $this->_avatars[$width] = $avatar;
-        }
+		return Avatar::getByProfile($this, $width, $height);
     }
 
     function setOriginal($filename)
@@ -204,7 +144,7 @@ class Profile extends Managed_DataObject
             return null;
         }
 
-        foreach (array(AVATAR_PROFILE_SIZE, AVATAR_STREAM_SIZE, AVATAR_MINI_SIZE) as $size) {
+        foreach (array(Avatar::PROFILE_SIZE, Avatar::STREAM_SIZE, Avatar::MINI_SIZE) as $size) {
             // We don't do a scaled one if original is our scaled size
             if (!($avatar->width == $size && $avatar->height == $size)) {
 				try {
@@ -629,14 +569,9 @@ class Profile extends Managed_DataObject
         }
     }
 
-    function avatarUrl($size=AVATAR_PROFILE_SIZE)
+    function avatarUrl($size=Avatar::PROFILE_SIZE)
     {
-        $avatar = $this->getAvatar($size);
-        if ($avatar) {
-            return $avatar->displayUrl();
-        } else {
-            return Avatar::defaultImage($size);
-        }
+		Avatar::getUrlByProfile($this, $size);
     }
 
     function getSubscriptions($offset=0, $limit=null)
@@ -1466,25 +1401,6 @@ class Profile extends Managed_DataObject
         $vars = parent::__sleep();
         $skip = array('_user', '_avatars');
         return array_diff($vars, $skip);
-    }
-    
-    static function fillAvatars(&$profiles, $width)
-    {
-    	$ids = array();
-    	foreach ($profiles as $profile) {
-            if (!empty($profile)) {
-                $ids[] = $profile->id;
-            }
-    	}
-    	
-    	$avatars = Avatar::pivotGet('profile_id', $ids, array('width' => $width,
-															  'height' => $width));
-    	
-    	foreach ($profiles as $profile) {
-            if (!empty($profile)) { // ???
-                $profile->_fillAvatar($width, $avatars[$profile->id]);
-            }
-    	}
     }
     
     // Can't seem to find how to fix this.

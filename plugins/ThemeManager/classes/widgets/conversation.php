@@ -26,7 +26,7 @@ class ConversationWidget extends NoticeListWidget {
     }
 
     function the_item($item) {
-		$avatarSize = $this->key()>0 ? AVATAR_STREAM_SIZE : AVATAR_PROFILE_SIZE;
+		$avatarSize = $this->key()>0 ? Avatar::STREAM_SIZE : Avatar::PROFILE_SIZE;
         NoticeWidget::run(array('item'=>$item, 'avatarSize'=>$avatarSize));
         if (isset($item->showmore)) {
             $this->out->elementStart('aside', array('id'=>'more-'.$item->conversation, 'class'=>'show-more'));

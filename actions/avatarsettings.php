@@ -140,7 +140,7 @@ class AvatarsettingsAction extends SettingsAction
                 //common_debug($e->getMessage());
             }
 
-            $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
+            $avatar = Avatar::getByProfile($profile);
 
             if ($avatar) {
                 $this->elementStart('li', array('id' => 'avatar_preview',
@@ -149,8 +149,8 @@ class AvatarsettingsAction extends SettingsAction
                 $this->element('h2', null, _("Preview"));
                 $this->elementStart('div', array('id'=>'avatar_preview_view'));
                 $this->element('img', array('src' => $avatar->url,
-                                            'width' => AVATAR_PROFILE_SIZE,
-                                            'height' => AVATAR_PROFILE_SIZE,
+                                            'width' => Avatar::PROFILE_SIZE,
+                                            'height' => Avatar::PROFILE_SIZE,
                                             'alt' => $user->nickname));
                 $this->elementEnd('div');
                 if (!empty($avatar->filename)) {
@@ -229,8 +229,8 @@ class AvatarsettingsAction extends SettingsAction
         $this->element('h2', null, _('Preview'));
         $this->elementStart('div', array('id'=>'avatar_preview_view'));
         $this->element('img', array('src' => Avatar::url($this->filedata['filename']),
-                                    'width' => AVATAR_PROFILE_SIZE,
-                                    'height' => AVATAR_PROFILE_SIZE,
+                                    'width' => Avatar::PROFILE_SIZE,
+                                    'height' => Avatar::PROFILE_SIZE,
                                     'alt' => $user->nickname));
         $this->elementEnd('div');
 

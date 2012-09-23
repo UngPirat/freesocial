@@ -142,7 +142,9 @@ class OStatusSubAction extends Action
             $ok = true;
         }
 
-        $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
+	    $avatar = class_exists('Avatar')	//TODO: should do this as an Event
+					? Avatar::getByProfile($profile)
+					: null;
         $avatarUrl = $avatar ? $avatar->displayUrl() : false;
 
         $this->showEntity($profile,
@@ -159,16 +161,19 @@ class OStatusSubAction extends Action
         $homepage = $entity->homepage;
         $location = $entity->location;
 
-        if (!$avatar) {
-            $avatar = Avatar::defaultImage(AVATAR_PROFILE_SIZE);
-        }
-
         $this->elementStart('div', 'entity_profile vcard');
-        $this->element('img', array('src' => $avatar,
+
+		if (class_exists('Avatar')) {	//TODO: should do this as an Event
+	        if (!$avatar) {
+    	        $avatar = Avatar::defaultImage(Avatar::PROFILE_SIZE);
+        	}
+
+	        $this->element('img', array('src' => $avatar,
                                     'class' => 'photo avatar entity_depiction',
-                                    'width' => AVATAR_PROFILE_SIZE,
-                                    'height' => AVATAR_PROFILE_SIZE,
+                                    'width' => Avatar::PROFILE_SIZE,
+                                    'height' => Avatar::PROFILE_SIZE,
                                     'alt' => $nickname));
+		}
 
         $hasFN = ($fullname !== '') ? 'nickname' : 'fn nickname entity_nickname';
         $this->elementStart('a', array('href' => $profile,

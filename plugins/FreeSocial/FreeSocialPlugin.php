@@ -122,11 +122,11 @@ class FreeSocialPlugin extends Plugin {
         if ((common_logged_in() || common_config('singleuser', 'enabled'))
 				&& ($domain = parse_url($url, PHP_URL_HOST))) {
 			$profile = $user->getProfile();
-			$avatar = $profile->getAvatar(48);
+			$avatarUrl = Avatar::getUrlByProfile($profile, 48);
 
 			$acct = "{$user->nickname}@{$domain}";
 			$out->elementStart('a', array('href' => "$url"));
-//			$out->element('img', array('class' => 'logo', 'src'=>$avatar->displayUrl()));
+			$out->element('img', array('class' => 'logo photo', 'src'=>$avatarUrl));
 			$out->elementStart('span', array('id' => 'acct', 'class' => 'logo', 'href' => "$url"));
 			$out->text($acct);
 			$out->elementEnd('span');

@@ -3,7 +3,7 @@
 class ProfileWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
     protected $profile;
-    protected $avatarSize = AVATAR_PROFILE_SIZE;
+    protected $avatarSize = Avatar::PROFILE_SIZE;
 
     static function run($args=null) {
         $class = get_class();
@@ -47,7 +47,7 @@ class ProfileWidget extends ThemeWidget {
     }
     function the_vcard() {
         $this->out->elementStart('span', 'vcard');
-        $this->out->element('img', array('src'=>$this->profile->avatarUrl($this->avatarSize), 'alt'=>'', 'class'=>'photo'));
+        $this->out->element('img', array('src'=>Avatar::getUrlByProfile($this->profile, $this->avatarSize), 'class'=>'photo'));
         $this->out->element('a', array('href'=>$this->profile->profileurl, 'class'=>'url fn'), $this->get_name());
         $this->out->elementEnd('span');
     }

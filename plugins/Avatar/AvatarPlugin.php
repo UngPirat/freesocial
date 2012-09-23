@@ -32,10 +32,7 @@ if (!defined('STATUSNET')) {
 }
 
 /**
- * Plugin for OpenID authentication and identity
- *
- * This class enables consumer support for OpenID, the distributed authentication
- * and identity system.
+ * Plugin for graphical representations of online user profiles
  *
  * @category Plugin
  * @package  StatusNet
@@ -46,6 +43,7 @@ if (!defined('STATUSNET')) {
  * @link     http://status.net/
  * @link     http://openid.net/
  */
+
 class AvatarPlugin extends Plugin
 {
     /**

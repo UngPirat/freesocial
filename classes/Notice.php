@@ -1616,7 +1616,7 @@ class Notice extends Managed_DataObject
                 $act->source->links['alternate'] = $profile->profileurl;
                 $act->source->links['self']      = $atom_feed;
 
-                $act->source->icon = $profile->avatarUrl(AVATAR_PROFILE_SIZE);
+                $act->source->icon = Avatar::getByProfile($profile);
 
                 $notice = $profile->getCurrentNotice();
 

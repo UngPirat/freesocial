@@ -547,7 +547,6 @@ class FacebookImport
             try {
                 FacebookImport::checkAvatar($profile->id, $foreign_id);
             } catch (Exception $e) {
-                common_debug('AVATAR GENERATION GONE WRONG:' .$e->getMessage());
             }
         }
         return $profile;

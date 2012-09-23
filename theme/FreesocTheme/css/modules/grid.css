@@ -34,9 +34,6 @@
 
 .favorited-action #content .notice,
 .public-action #content > .conversation {
-	float: left;
 	clear: none;
 	margin: 1ex;
-	max-width: 40%;
-	min-width: 380px;
 }

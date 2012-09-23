@@ -163,7 +163,7 @@ abstract class ProfileBlock extends Widget
 
     function avatarSize()
     {
-        return AVATAR_PROFILE_SIZE;
+        return Avatar::PROFILE_SIZE;
     }
 
     function showTags()

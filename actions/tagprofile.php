@@ -107,11 +107,11 @@ class TagprofileAction extends Action
             // TRANS: Header in list form.
             $this->element('h2', null, _('User profile'));
 
-            $avatar = $this->profile->getAvatar(AVATAR_PROFILE_SIZE);
-            $this->element('img', array('src' => ($avatar) ? $avatar->displayUrl() : Avatar::defaultImage(AVATAR_PROFILE_SIZE),
+            $avatarUrl = Avatar::getByProfile($this->profile);
+            $this->element('img', array('src' => $avatarUrl,
                                         'class' => 'photo avatar entity_depiction',
-                                        'width' => AVATAR_PROFILE_SIZE,
-                                        'height' => AVATAR_PROFILE_SIZE,
+                                        'width' => Avatar::PROFILE_SIZE,
+                                        'height' => Avatar::PROFILE_SIZE,
                                         'alt' =>
                                         ($this->profile->fullname) ? $this->profile->fullname :
                                         $this->profile->nickname));

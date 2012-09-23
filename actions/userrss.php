@@ -108,7 +108,7 @@ class UserrssAction extends Rss10Action
             $this->serverError(_('User has no profile.'));
             return null;
         }
-        $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
+        $avatar = Avatar::getByProfile($profile);
         return ($avatar) ? $avatar->url : null;
     }
 

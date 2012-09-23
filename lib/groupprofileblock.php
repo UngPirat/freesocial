@@ -57,7 +57,7 @@ class GroupProfileBlock extends ProfileBlock
     function avatar()
     {
         return ($this->group->homepage_logo) ?
-            $this->group->homepage_logo : User_group::defaultLogo(AVATAR_PROFILE_SIZE);
+            $this->group->homepage_logo : User_group::defaultLogo(Avatar::PROFILE_SIZE);
     }
 
     function name()

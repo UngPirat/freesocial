@@ -170,7 +170,7 @@ class SortableGroupListItem extends SortableSubscriptionListItem
     function showAvatar()
     {
         $logo = ($this->profile->stream_logo) ?
-        $this->profile->stream_logo : User_group::defaultLogo(AVATAR_STREAM_SIZE);
+        $this->profile->stream_logo : User_group::defaultLogo(Avatar::STREAM_SIZE);
 
         $this->out->elementStart(
             'a',
@@ -185,8 +185,8 @@ class SortableGroupListItem extends SortableSubscriptionListItem
             array(
                 'src'    => $logo,
                 'class'  => 'photo avatar',
-                'width'  => AVATAR_STREAM_SIZE,
-                'height' => AVATAR_STREAM_SIZE,
+                'width'  => Avatar::STREAM_SIZE,
+                'height' => Avatar::STREAM_SIZE,
                 'alt'    => ($this->profile->fullname)
                     ? $this->profile->fullname : $this->profile->nickname
             )

@@ -1272,11 +1272,11 @@ class Ostatus_profile extends Managed_DataObject
      */
     public static function getActivityObjectAvatar($object, $hints=array())
     {
-        if ($object->avatarLinks) {
+        if (class_exists('Avatar') && $object->avatarLinks) {	//TODO: do this with Event
             $best = false;
             // Take the exact-size avatar, or the largest avatar, or the first avatar if all sizeless
             foreach ($object->avatarLinks as $avatar) {
-                if ($avatar->width == AVATAR_PROFILE_SIZE && $avatar->height = AVATAR_PROFILE_SIZE) {
+                if ($avatar->width == Avatar::PROFILE_SIZE && $avatar->height = Avatar::PROFILE_SIZE) {
                     // Exact match!
                     $best = $avatar;
                     break;

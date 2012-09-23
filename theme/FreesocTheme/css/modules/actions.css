@@ -1,7 +1,7 @@
 .notice .actions {
+	right: 0;
+	top: -1.5em;
 	position: absolute;
-	right: 100%;
-	top: 0;
 	opacity: 0.4;
 }
 .notice:hover .actions {
@@ -19,6 +19,7 @@
 	display: none;
 }
 
+.actions form,
 .actions input.submit,
 .actions .action {
 	background-color: transparent;
@@ -26,31 +27,20 @@
 	color: black;
 	cursor:pointer;
     display: block;
-	font-size: 1.25em;
-	line-height: 1.25em;
+	float: left;
 	vertical-align: middle;
 	text-align: center;
     outline:none;
-	font-family: FontAwesome;
-	margin: 0.25ex;
 }
 .actions input.submit,
 .actions .action {
+	font-family: FontAwesome;
+	font-size: 1.25em;
+	line-height: 1.25em;
+	margin: 0.25ex;
 	height: 1em;
     width: 1em;
 	overflow: hidden;
-}
-.notice .action {
-}
-
-.showprofile-action .notice .actions {
-	right: 0;
-	top: -1.5em;
-}
-.showprofile-action .notice .actions .action,
-.showprofile-action .notice .actions input.submit,
-.showprofile-action .notice .actions form {
-	float: left;
 }
 
 #profile .actions input, #profile .actions .action {

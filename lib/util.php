@@ -2001,7 +2001,7 @@ function common_user_property($property)
         return $profile->$property;
         break;
     case 'avatar':
-        return $profile->getAvatar(AVATAR_STREAM_SIZE);
+        return Avatar::getByProfile($profile, Avatar::STREAM_SIZE);
         break;
     case 'bestname':
         return $profile->getBestName();

@@ -82,8 +82,7 @@ class AtomUserNoticeFeed extends AtomNoticeFeed
         );
         $this->setSubtitle($subtitle);
 
-        $avatar = $profile->getAvatar(AVATAR_PROFILE_SIZE);
-        $logo = ($avatar) ? $avatar->displayUrl() : Avatar::defaultImage(AVATAR_PROFILE_SIZE);
+        $logo = Avatar::getUrlByProfile($profile);
         $this->setLogo($logo);
 
         $this->setUpdated('now');

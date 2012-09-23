@@ -219,8 +219,8 @@ class GrouplogoAction extends GroupAction
             $this->element('h2', null, _('Preview'));
             $this->elementStart('div', array('id'=>'avatar_preview_view'));
             $this->element('img', array('src' => $this->group->homepage_logo,
-                                        'width' => AVATAR_PROFILE_SIZE,
-                                        'height' => AVATAR_PROFILE_SIZE,
+                                        'width' => Avatar::PROFILE_SIZE,
+                                        'height' => Avatar::PROFILE_SIZE,
                                         'alt' => $this->group->nickname));
             $this->elementEnd('div');
             $this->elementEnd('li');
@@ -283,8 +283,8 @@ class GrouplogoAction extends GroupAction
         $this->element('h2', null, _('Preview'));
         $this->elementStart('div', array('id'=>'avatar_preview_view'));
         $this->element('img', array('src' => Avatar::url($this->filedata['filename']),
-                                    'width' => AVATAR_PROFILE_SIZE,
-                                    'height' => AVATAR_PROFILE_SIZE,
+                                    'width' => Avatar::PROFILE_SIZE,
+                                    'height' => Avatar::PROFILE_SIZE,
                                     'alt' => $this->group->nickname));
         $this->elementEnd('div');
 

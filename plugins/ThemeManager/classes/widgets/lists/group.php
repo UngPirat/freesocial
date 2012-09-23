@@ -34,7 +34,7 @@ class GroupListWidget extends ListWidget {
     function the_item($item) {
         $this->out->elementStart('li', "list-item {$this->itemClass}");
         $this->out->elementStart('a', array('href'=>$item->uri, 'class'=>'url'));
-        $this->out->element('img', array('src'=>$item->getAvatar(AVATAR_STREAM_SIZE), 'alt'=>'', 'class'=>'photo avatar'));
+        $this->out->element('img', array('src'=>Avatar::getByProfile($item, Avatar::STREAM_SIZE), 'alt'=>'', 'class'=>'photo avatar'));
         $this->out->element('span', 'fn description', $item->fullname);
         $this->out->elementEnd('a');
         $this->out->elementEnd('li');

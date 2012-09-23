@@ -43,18 +43,18 @@ class ThemeManagerPlugin extends Plugin {
         return true;
     }
 	function onStartShowNoticeItem($noticeitem) {
-        if (THEME_MANAGER===true) {
+        if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
             NoticeWidget::run(array('item'=>$noticeitem->notice, 'itemTag'=>'li'));
 			return false;
         }
 		return true;
 	}
 	function onStartOpenNoticeListItemElement($noticeitem) {
-		return !(THEME_MANAGER===true);
+		return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
 	}
 
 	function onStartCloseNoticeListItemElement($noticeitem) {
-		return !(THEME_MANAGER===true);
+		return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
 	}
 
     function onStartInitializeRouter($m)

@@ -314,7 +314,6 @@ class TwitterImport
         }
 
         if ($newname != $oldname) {
-            common_debug('TWITTER AVATAR newname ('.$newname.') vs. oldname ('.$oldname.')');
             common_debug($this->name() . ' - Avatar for Twitter user ' .
                          "$profile_id has changed.");
             common_debug($this->name() . " - old: $oldname new: $newname");
@@ -427,7 +426,6 @@ class TwitterImport
                 return false;
             }
         } catch (Exception $e) {
-            common_debug('TWITTER AVATAR failed due to: '.$e->getMessage());
             return false;
         }
         return true;
