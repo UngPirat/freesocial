@@ -181,7 +181,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
 
         $timeline = null;
 
-        $lastId = Twitter_synch_status::getLastId($flink->foreign_id, $timelineUri);
+        $lastId = Foreign_sync_status::get_last_id($flink->foreign_id, $timelineUri, TWITTER_SERVICE);
 
         common_log(LOG_DEBUG, "Got lastId value '" . $lastId . "' for foreign id '" .
                    $flink->foreign_id . "' and timeline " . $timelineUri);
@@ -217,7 +217,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
             }
 
             $lastId = twitter_id($timeline[0]);
-            Twitter_synch_status::setLastId($flink->foreign_id, $timelineUri, $lastId);
+            Foreign_sync_status::set_last_id($flink->foreign_id, $timelineUri, TWITTER_SERVICE, $lastId);
             common_debug("Set lastId value '$lastId' for foreign id '{$flink->foreign_id}' and timeline '" .
                          $timelineUri ."'");
         }

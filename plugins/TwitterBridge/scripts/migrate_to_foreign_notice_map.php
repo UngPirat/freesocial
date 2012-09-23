@@ -36,6 +36,15 @@ require_once INSTALLDIR.'/scripts/commandline.inc';
 // Twitter that we don't have a status_id for. Note that
 // this won't catch notices that originated at this StatusNet site.
 
+/*
+    I'll throw this in here before I forget. To migrate Twitter_synch_status
+        to Foreign_sync_status you do this single command:
+    INSERT INTO foreign_sync_status
+        (foreign_id, service_id, timeline, last_id, created, modified)
+        SELECT foreign_id, 1, timeline, last_id, created, modified
+        FROM twitter_synch_status;
+*/
+
 $n = new Notice();
 
 $n->query('SELECT notice.id, notice.uri ' .

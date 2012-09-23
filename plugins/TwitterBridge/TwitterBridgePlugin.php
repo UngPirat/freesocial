@@ -273,9 +273,6 @@ class TwitterBridgePlugin extends Plugin
         case 'TwitterUserStream':
             include_once $dir . '/twitterstreamreader.php';
             return false;
-        case 'Twitter_synch_status':
-            include_once $dir . '/' . $cls . '.php';
-            return false;
         default:
             return true;
         }
@@ -444,41 +441,6 @@ class TwitterBridgePlugin extends Plugin
         } else {
             return true;
         }
-    }
-
-    /**
-     * Database schema setup
-     *
-     * We maintain a table mapping StatusNet notices to Twitter statuses
-     *
-     * @see Schema
-     * @see ColumnDef
-     *
-     * @return boolean hook value; true means continue processing, false means stop.
-     */
-    function onCheckSchema()
-    {
-        $schema = Schema::get();
-
-        // For saving the last-synched status of various timelines
-        // home_timeline, messages (in), messages (out), ...
-
-        $schema->ensureTable('twitter_synch_status',
-                             array(new ColumnDef('foreign_id', 'bigint', null,
-                                                 false, 'PRI'),
-                                   new ColumnDef('timeline', 'varchar', 255,
-                                                 false, 'PRI'),
-                                   new ColumnDef('last_id', 'bigint', null, // XXX: check for PostgreSQL
-                                                 false),
-                                   new ColumnDef('created', 'datetime', null,
-                                                 false),
-                                   new ColumnDef('modified', 'datetime', null,
-                                                 false)));
-
-        // For storing user-submitted flags on profiles
-
-
-        return true;
     }
 
     /**

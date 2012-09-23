@@ -43,15 +43,16 @@ require_once INSTALLDIR . '/classes/Memcached_DataObject.php';
  * @category Action
  * @package  StatusNet
  * @author   Evan Prodromou <evan@status.net>
+ * @author   Mikael Nordfeldth <mmn@hethane.se>
  * @license  http://www.fsf.org/licensing/licenses/agpl.html AGPLv3
  * @link     http://status.net/
  *
  * @see      DB_DataObject
  */
-class Twitter_synch_status extends Memcached_DataObject
+class Foreign_sync_status extends Managed_DataObject
 {
-    public $__table = 'twitter_synch_status'; // table name
-    public $foreign_id;                         // int(4)  primary_key not_null
+    public $__table = 'foreign_sync_status'; // table name
+    public $foreign_id;                      // int(4)  primary_key not_null
     public $timeline;                        // varchar(255)  primary_key not_null
     public $last_id;                         // bigint not_null
     public $created;                         // datetime not_null
@@ -63,7 +64,7 @@ class Twitter_synch_status extends Memcached_DataObject
      * @param string $k Key to use to lookup (usually 'foreign_id' for this class)
      * @param mixed  $v Value to lookup
      *
-     * @return Twitter_synch_status object found, or null for no hits
+     * @return nothing, exception is always thrown!
      */
     function staticGet($k, $v=null)
     {
@@ -80,78 +81,38 @@ class Twitter_synch_status extends Memcached_DataObject
      */
     function pkeyGet($kv)
     {
-        return Memcached_DataObject::pkeyGet('Twitter_synch_status', $kv);
+        return Memcached_DataObject::pkeyGet('Foreign_sync_status', $kv);
     }
 
-    /**
-     * return table definition for DB_DataObject
-     *
-     * DB_DataObject needs to know something about the table to manipulate
-     * instances. This method provides all the DB_DataObject needs to know.
-     *
-     * @return array array of column definitions
-     */
-    function table()
-    {
-        return array('foreign_id' => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                     'timeline' => DB_DATAOBJECT_STR + DB_DATAOBJECT_NOTNULL,
-                     'last_id' => DB_DATAOBJECT_INT + DB_DATAOBJECT_NOTNULL,
-                     'created' => DB_DATAOBJECT_STR + DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME + DB_DATAOBJECT_NOTNULL,
-                     'modified' => DB_DATAOBJECT_STR + DB_DATAOBJECT_DATE + DB_DATAOBJECT_TIME + DB_DATAOBJECT_NOTNULL
-                     );
-    }
+	public static function schemaDef()
+	{
+		return array(
+			'fields' => array(
+				'foreign_id' => array('type' => 'varchar',
+									'length' => 255,
+									'not null' => true),
+				'service_id' => array('type' => 'integer', 'not null' => true),
+				'timeline'   => array('type' => 'varchar',
+									'length' => 255,
+									'not null' => true),
+				'last_id'    => array('type' => 'varchar',
+									'length' => 255,
+									'not null' => true),
+				'created'    => array('type' => 'datetime', 'not null' => true),
+				'modified'   => array ('type' => 'timestamp', 'not null' => true),
+			),
+			'primary_key' => array('foreign_id', 'timeline', 'service_id'),
+			'indexes' => array(
+				'foreign_sync_status_last_id_idx' => array('last_id'),
+			),
+		);
+	}
 
-    /**
-     * return key definitions for DB_DataObject
-     *
-     * DB_DataObject needs to know about keys that the table has, since it
-     * won't appear in StatusNet's own keys list. In most cases, this will
-     * simply reference your keyTypes() function.
-     *
-     * @return array list of key field names
-     */
-    function keys()
-    {
-        return array_keys($this->keyTypes());
-    }
-
-    /**
-     * return key definitions for Memcached_DataObject
-     *
-     * Our caching system uses the same key definitions, but uses a different
-     * method to get them. This key information is used to store and clear
-     * cached data, so be sure to list any key that will be used for static
-     * lookups.
-     *
-     * @return array associative array of key definitions, field name to type:
-     *         'K' for primary key: for compound keys, add an entry for each component;
-     *         'U' for unique keys: compound keys are not well supported here.
-     */
-    function keyTypes()
-    {
-        return array('foreign_id' => 'K',
-                     'timeline' => 'K');
-    }
-
-    /**
-     * Magic formula for non-autoincrementing integer primary keys
-     *
-     * If a table has a single integer column as its primary key, DB_DataObject
-     * assumes that the column is auto-incrementing and makes a sequence table
-     * to do this incrementation. Since we don't need this for our class, we
-     * overload this method and return the magic formula that DB_DataObject needs.
-     *
-     * @return array magic three-false array that stops auto-incrementing.
-     */
-    function sequenceKey()
-    {
-        return array(false, false, false);
-    }
-
-    static function getLastId($foreign_id, $timeline)
+    static function get_last_id($foreign_id, $timeline, $service_id)
     {
         $tss = self::pkeyGet(array('foreign_id' => $foreign_id,
-                                   'timeline' => $timeline));
+                                   'timeline'   => $timeline,
+								   'service_id' => $service_id));
 
         if (empty($tss)) {
             return null;
@@ -160,16 +121,18 @@ class Twitter_synch_status extends Memcached_DataObject
         }
     }
 
-    static function setLastId($foreign_id, $timeline, $last_id)
+    static function set_last_id($foreign_id, $timeline, $service_id, $last_id)
     {
         $tss = self::pkeyGet(array('foreign_id' => $foreign_id,
-                                   'timeline' => $timeline));
+                                   'timeline'   => $timeline,
+								   'service_id' => $service_id));
 
         if (empty($tss)) {
-            $tss = new Twitter_synch_status();
+            $tss = new Foreign_sync_status();
 
             $tss->foreign_id = $foreign_id;
             $tss->timeline   = $timeline;
+            $tss->service_id = $service_id;
             $tss->last_id    = $last_id;
             $tss->created    = common_sql_now();
             $tss->modified   = $tss->created;

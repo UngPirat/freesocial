@@ -63,7 +63,7 @@ class Foreign_notice_map extends Managed_DataObject
     public $service_id;                     // int(4)  not_null
     public $created;                        // datetime
 
-    static function schemaDef()
+    public static function schemaDef()
     {  
         return array(
             'fields' => array(

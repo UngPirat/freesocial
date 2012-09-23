@@ -63,6 +63,7 @@ class ForeignServiceClientPlugin extends Plugin
         case 'ForeignQueueHandler':
         case 'Foreign_group':
         case 'Foreign_notice_map':
+        case 'Foreign_sync_status':
             require_once $dir . '/classes/' . $cls . '.php';
             return false;
         default:
@@ -85,6 +86,7 @@ class ForeignServiceClientPlugin extends Plugin
         $schema = Schema::get();
         $schema->ensureTable('foreign_group', Foreign_group::schemaDef());
         $schema->ensureTable('foreign_notice_map', Foreign_notice_map::schemaDef());
+        $schema->ensureTable('foreign_sync_status', Foreign_sync_status::schemaDef());
         return true;
     }
 }
