@@ -42,15 +42,15 @@ if (!defined('STATUSNET')) {
  *
  * @see      DB_DataObject
  */
-class Bookmark extends Memcached_DataObject
+class Bookmark extends Managed_DataObject
 {
     public $__table = 'bookmark'; // table name
     public $id;          // char(36) primary_key not_null
     public $profile_id;  // int(4) not_null
+    public $uri;         // varchar(255)
     public $url;         // varchar(255) not_null
     public $title;       // varchar(255)
     public $description; // text
-    public $uri;         // varchar(255)
     public $created;     // datetime
 
     /**
@@ -68,7 +68,7 @@ class Bookmark extends Memcached_DataObject
     {
         return Memcached_DataObject::staticGet('Bookmark', $k, $v);
     }
-	
+    
     /**
      * Get an instance by compound key
      *
@@ -86,41 +86,41 @@ class Bookmark extends Memcached_DataObject
         return Memcached_DataObject::pkeyGet('Bookmark', $kv);
     }
 
-	/**
-	 * The One True Thingy that must be defined and declared.
-	 */
-	static function schemaDef()
-	{
-		return array(
-			'fields' => array(
-				'id' => array('type' => 'char',
-							'length' => 36,
-							'not null' => true),
-				'profile_id' => array('type' => 'int', 'not null' => true),
-				'uri' => array('type' => 'varchar',
-							'length' => 255,
-							'not null' => true),
-				'url' => array('type' => 'varchar',
-							'length' => 255,
-							'not null' => true),
-				'title' => array('type' => 'varchar',
-							'length' => 255),
-				'description' => array('type' => 'text'),
-				'created' => array('type' => 'datetime',
-							'not null' => true),
-			),
-			'primary key' => array('id'),
-			'unique keys' => array(
-				'bookmark_uri_key' => array('uri'),
-			),
-			'foreign keys' => array('bookmark_profile_id_fkey' => array('profile', array('profile_id' => 'id'))),
-			'indexes' => array('bookmark_created_idx' => array('created'),
-							'bookmark_url_idx' => array('url'),
-							'bookmark_profile_id_idx' => array('profile_id'),
-			),
-		);
-	}
-				
+    /**
+     * The One True Thingy that must be defined and declared.
+     */
+    public static function schemaDef()
+    {
+        return array(
+            'fields' => array(
+                'id' => array('type' => 'char',
+                            'length' => 36,
+                            'not null' => true),
+                'profile_id' => array('type' => 'int', 'not null' => true),
+                'uri' => array('type' => 'varchar',
+                            'length' => 255,
+                            'not null' => true),
+                'url' => array('type' => 'varchar',
+                            'length' => 255,
+                            'not null' => true),
+                'title' => array('type' => 'varchar', 'length' => 255),
+                'description' => array('type' => 'text'),
+                'created' => array('type' => 'datetime', 'not null' => true),
+            ),
+            'primary key' => array('id'),
+            'unique keys' => array(
+                'bookmark_uri_key' => array('uri'),
+            ),
+            'foreign keys' => array(
+                'bookmark_profile_id_fkey' => array('profile', array('profile_id' => 'id'))
+            ),
+            'indexes' => array('bookmark_created_idx' => array('created'),
+                            'bookmark_url_idx' => array('url'),
+                            'bookmark_profile_id_idx' => array('profile_id'),
+            ),
+        );
+    }
+                
     /**
      * Get a bookmark based on a notice
      *
@@ -281,7 +281,7 @@ class Bookmark extends Memcached_DataObject
 
         // TRANS: Bookmark content.
         // TRANS: %1$s is a title, %2$s is a short URL, %3$s is the bookmark description,
-	// TRANS: %4$s is space separated list of hash tags.
+        // TRANS: %4$s is space separated list of hash tags.
         $content = sprintf(_m('"%1$s" %2$s %3$s %4$s'),
                            $title,
                            $shortUrl,
@@ -290,7 +290,7 @@ class Bookmark extends Memcached_DataObject
 
         // TRANS: Rendered bookmark content.
         // TRANS: %1$s is a URL, %2$s the bookmark title, %3$s is the bookmark description,
-	// TRANS: %4$s is space separated list of hash tags.
+        // TRANS: %4$s is space separated list of hash tags.
         $rendered = sprintf(_m('<span class="xfolkentry">'.
                               '<a class="taggedlink" href="%1$s">%2$s</a> '.
                               '<span class="description">%3$s</span> '.
