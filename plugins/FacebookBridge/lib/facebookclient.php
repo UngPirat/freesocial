@@ -140,7 +140,7 @@ class Facebookclient
         do {
             try {
                 $result = $this->facebook->api($path, 'get', $args['api']);
-            } catch (Exception $e) {
+            } catch (FacebookApiException $e) {
 				return $this->handleFacebookError($e);
             }
 
@@ -354,10 +354,11 @@ class Facebookclient
         // The Facebook PHP SDK seems to always set the code attribute
         // of the Exception to 0; they put the real error code in
         // the message. Gar!
-        if ($code == 0) {
-            preg_match('/^\(#(?<code>\d+)\)/', $errmsg, $matches);
+        if ($code == 0 && preg_match('/^\(#(?<code>\d+)\)/', $errmsg, $matches)) {
             $code = $matches['code'];
-        }
+        } elseif ($code == 0 && preg_match('/^Error validating access token/', $errmsg)) {
+			$code = 190;
+		}
 
         // XXX: Check for any others?
         switch($code) {
