@@ -382,7 +382,7 @@ class Facebookclient
             return true;
             break;
 		case 190:
-			// this will only happen on flink'd calls
+			// this will only happen on flink'd API calls
             $original = clone($this->flink);
             $this->flink->credentials = '';
             $this->flink->update($original);

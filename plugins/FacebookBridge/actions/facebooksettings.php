@@ -161,8 +161,9 @@ class FacebooksettingsAction extends SettingsAction {
         $this->hidden('token', common_session_token());
 
 
+		$this->elementStart('fieldset');
         // TRANS: Form note. User is connected to facebook.
-        $this->element('p', 'form_note', _m('Connected Facebook user'));
+        $this->element('legend', null, _m('Connected Facebook user'));
 
         $this->elementStart('p', array('class' => 'facebook-user-display'));
 
@@ -228,6 +229,7 @@ class FacebooksettingsAction extends SettingsAction {
 
         $this->elementEnd('ul');
 
+		$this->elementEnd('fieldset');
         $this->elementStart('fieldset');
 
         // TRANS: Fieldset legend for form to disconnect from Facebook.
