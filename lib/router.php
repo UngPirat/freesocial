@@ -938,7 +938,7 @@ class Router
                 $m->connect('rsd.xml', array('action' => 'rsd'));
 
                 foreach (array('subscriptions', 'subscribers',
-                               'nudge', 'all', 'foaf', 'replies',
+                               'all', 'foaf', 'replies',
                                'inbox', 'outbox', 'microsummary') as $a) {
                     $m->connect(':nickname/'.$a,
                                 array('action' => $a),

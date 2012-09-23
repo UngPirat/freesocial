@@ -173,17 +173,6 @@ class AccountProfileBlock extends ProfileBlock
                         }
                         $this->out->elementEnd('li');
 
-                        if ($cur->mutuallySubscribed($this->profile)) {
-                            // nudge
-
-                            if ($this->user && $this->user->email && $this->user->emailnotifynudge) {
-                                $this->out->elementStart('li', 'entity_nudge');
-                                $nf = new NudgeForm($this->out, $this->user);
-                                $nf->show();
-                                $this->out->elementEnd('li');
-                            }
-                        }
-
                         // return-to args, so we don't have to keep re-writing them
 
                         list($action, $r2args) = $this->out->returnToArgs();

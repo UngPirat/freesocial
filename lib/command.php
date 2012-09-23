@@ -212,34 +212,6 @@ class UntrackCommand extends UnimplementedCommand
     }
 }
 
-class NudgeCommand extends Command
-{
-    var $other = null;
-    function __construct($user, $other)
-    {
-        parent::__construct($user);
-        $this->other = $other;
-    }
-
-    function handle($channel)
-    {
-        $recipient = $this->getUser($this->other);
-        if ($recipient->id == $this->user->id) {
-            // TRANS: Command exception text shown when a user tries to nudge themselves.
-            throw new CommandException(_('It does not make a lot of sense to nudge yourself!'));
-        } else {
-            if ($recipient->email && $recipient->emailnotifynudge) {
-                mail_notify_nudge($this->user, $recipient);
-            }
-            // XXX: notify by IM
-            // TRANS: Message given having nudged another user.
-            // TRANS: %s is the nickname of the user that was nudged.
-            $channel->output($this->user, sprintf(_('Nudge sent to %s.'),
-                           $recipient->nickname));
-        }
-    }
-}
-
 class InviteCommand extends UnimplementedCommand
 {
     var $other = null;
@@ -1069,8 +1041,6 @@ class HelpCommand extends Command
                           "on <nickname>" => _m('COMMANDHELP', "not yet implemented."),
                           // TRANS: Help message for IM/SMS command "off <nickname>".
                           "off <nickname>" => _m('COMMANDHELP', "not yet implemented."),
-                          // TRANS: Help message for IM/SMS command "nudge <nickname>".
-                          "nudge <nickname>" => _m('COMMANDHELP', "remind a user to update."),
                           // TRANS: Help message for IM/SMS command "invite <phone number>".
                           "invite <phone number>" => _m('COMMANDHELP', "not yet implemented."),
                           // TRANS: Help message for IM/SMS command "track <word>".

@@ -232,13 +232,13 @@ class ShowstreamAction extends ProfileAction
             } else {
                 // TRANS: Second sentence of empty  list message for a non-self timeline. %1$s is a user nickname, %2$s is a part of a URL.
                 // TRANS: This message contains a Markdown link. Keep "](" together.
-                $message .= sprintf(_('You can try to nudge %1$s or [post something to them](%%%%action.newnotice%%%%?status_textarea=%2$s).'), $this->user->nickname, '@' . $this->user->nickname);
+                $message .= sprintf(_('You can try to [post something to them](%%%%action.newnotice%%%%?status_textarea=%2$s).'), $this->user->nickname, '@' . $this->user->nickname);
             }
         }
         else {
             // TRANS: Second sentence of empty message for anonymous users. %s is a user nickname.
             // TRANS: This message contains a Markdown link. Keep "](" together.
-            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then nudge %s or post a notice to them.'), $this->user->nickname);
+            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then post a notice to them.'), $this->user->nickname);
         }
 
         $this->elementStart('div', 'guide');

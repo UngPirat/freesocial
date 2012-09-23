@@ -117,7 +117,7 @@ class ConversationAction extends Action
      * Show content.
      *
      * Display a hierarchical unordered list in the content area.
-     * Uses ConversationTree to do most of the heavy lifting.
+     * Uses FullThreadedNoticeList to do most of the heavy lifting.
      *
      * @return void
      */
@@ -125,11 +125,7 @@ class ConversationAction extends Action
     {
         $user = common_current_user();
 
-        if (!empty($user) && $user->conversationTree()) {
-            $nl = new ConversationTree($this->notices, $this);
-        } else {
-            $nl = new FullThreadedNoticeList($this->notices, $this, $this->userProfile);
-        }
+        $nl = new FullThreadedNoticeList($this->notices, $this, $this->userProfile);
 
         $cnt = $nl->show();
     }

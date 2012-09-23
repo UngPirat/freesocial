@@ -58,11 +58,7 @@ class AllAction extends ProfileAction
 
         $user = common_current_user();
 
-        if (!empty($user) && $user->streamModeOnly()) {
-            $stream = new InboxNoticeStream($this->user, Profile::current());
-        } else {
-            $stream = new ThreadingInboxNoticeStream($this->user, Profile::current());
-        }
+        $stream = new ThreadingInboxNoticeStream($this->user, Profile::current());
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                             NOTICES_PER_PAGE + 1);
@@ -157,12 +153,12 @@ class AllAction extends ProfileAction
             } else {
                 // TRANS: %1$s is user nickname, %2$s is user nickname, %2$s is user nickname prefixed with "@".
                 // TRANS: This message contains Markdown links. Keep "](" together.
-                $message .= sprintf(_('You can try to [nudge %1$s](../%2$s) from their profile or [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->user->nickname, $this->user->nickname, '@' . $this->user->nickname);
+                $message .= sprintf(_('You can try to [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->user->nickname, $this->user->nickname, '@' . $this->user->nickname);
             }
         } else {
             // TRANS: Encouragement displayed on empty timeline user pages for anonymous users.
             // TRANS: %s is a user nickname. This message contains Markdown links. Keep "](" together.
-            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then nudge %s or post a notice to them.'), $this->user->nickname);
+            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then post a notice to them.'), $this->user->nickname);
         }
 
         $this->elementStart('div', 'guide');
@@ -182,11 +178,7 @@ class AllAction extends ProfileAction
                 $profile = $current_user->getProfile();
             }
 
-            if (!empty($current_user) && $current_user->streamModeOnly()) {
-                $nl = new NoticeList($this->notice, $this);
-            } else {
-                $nl = new ThreadedNoticeList($this->notice, $this, $profile);
-            }
+            $nl = new ThreadedNoticeList($this->notice, $this, $profile);
 
             $cnt = $nl->show();
 

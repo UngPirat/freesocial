@@ -422,42 +422,6 @@ function mail_new_incoming_address()
 }
 
 /**
- * send a mail message to notify a user of a 'nudge'
- *
- * @param User $from user nudging
- * @param User $to   user being nudged
- *
- * @return boolean success flag
- */
-function mail_notify_nudge($from, $to)
-{
-    common_switch_locale($to->language);
-    // TRANS: Subject for 'nudge' notification email.
-    // TRANS: %s is the nudging user.
-    $subject = sprintf(_('You have been nudged by %s'), $from->nickname);
-
-    $from_profile = $from->getProfile();
-
-    // TRANS: Body for 'nudge' notification email.
-    // TRANS: %1$s is the nuding user's long name, $2$s is the nudging user's nickname,
-    // TRANS: %3$s is a URL to post notices at.
-    $body = sprintf(_("%1\$s (%2\$s) is wondering what you are up to ".
-                      "these days and is inviting you to post some news.\n\n".
-                      "So let's hear from you :)\n\n".
-                      "%3\$s\n\n".
-                      "Don't reply to this email; it won't get to them."),
-                    $from_profile->getBestName(),
-                    $from->nickname,
-                    common_local_url('all', array('nickname' => $to->nickname))) .
-            mail_footer_block();
-    common_switch_locale();
-
-    $headers = _mail_prepare_headers('nudge', $to->nickname, $from->nickname);
-
-    return mail_to_user($to, $subject, $body, $headers);
-}
-
-/**
  * Notify a user that one of their notices has been chosen as a 'fave'
  *
  * Doesn't check that the user has an email address nor if they

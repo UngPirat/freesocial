@@ -44,7 +44,6 @@ class User extends Managed_DataObject
     public $incomingemail;                   // varchar(255)  unique_key
     public $emailnotifysub;                  // tinyint(1)   default_1
     public $emailnotifyfav;                  // tinyint(1)   default_1
-    public $emailnotifynudge;                // tinyint(1)   default_1
     public $emailnotifymsg;                  // tinyint(1)   default_1
     public $emailnotifyattn;                 // tinyint(1)   default_1
     public $emailmicroid;                    // tinyint(1)   default_1
@@ -78,7 +77,6 @@ class User extends Managed_DataObject
                 'incomingemail' => array('type' => 'varchar', 'length' => 255, 'description' => 'email address for post-by-email'),
                 'emailnotifysub' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Notify by email of subscriptions'),
                 'emailnotifyfav' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Notify by email of favorites'),
-                'emailnotifynudge' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Notify by email of nudges'),
                 'emailnotifymsg' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Notify by email of direct messages'),
                 'emailnotifyattn' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'Notify by email of @-replies'),
                 'emailmicroid' => array('type' => 'int', 'size' => 'tiny', 'default' => 1, 'description' => 'whether to publish email microid'),
@@ -318,7 +316,6 @@ class User extends Managed_DataObject
         // doesn't know about the defaults in the database.
         $user->emailnotifysub = 1;
         $user->emailnotifyfav = 1;
-        $user->emailnotifynudge = 1;
         $user->emailnotifymsg = 1;
         $user->emailnotifyattn = 1;
         $user->emailmicroid = 1;
@@ -1125,30 +1122,6 @@ class User extends Managed_DataObject
         $headers = _mail_prepare_headers('recoverpassword', $user->nickname, $user->nickname);
         // TRANS: Subject for password recovery e-mail.
         mail_to_user($user, _('Password recovery requested'), $body, $headers, $confirm->address);
-    }
-
-    function streamModeOnly()
-    {
-        if (common_config('oldschool', 'enabled')) {
-            $osp = Old_school_prefs::staticGet('user_id', $this->id);
-            if (!empty($osp)) {
-                return $osp->stream_mode_only;
-            } 
-        }
-
-        return false;
-    }
-
-    function conversationTree()
-    {
-        if (common_config('oldschool', 'enabled')) {
-            $osp = Old_school_prefs::staticGet('user_id', $this->id);
-            if (!empty($osp)) {
-                return $osp->conversation_tree;
-            }
-        }
-
-        return false;
     }
 
     function streamNicknames()

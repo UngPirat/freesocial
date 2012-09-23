@@ -60,7 +60,7 @@ class ConversationRepliesAction extends ConversationAction
      * Show content.
      *
      * Display a hierarchical unordered list in the content area.
-     * Uses ConversationTree to do most of the heavy lifting.
+     * Uses FullThreadedNoticeList to do most of the heavy lifting.
      *
      * @return void
      */

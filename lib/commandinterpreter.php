@@ -243,18 +243,6 @@ class CommandInterpreter
                     }
                 }
                 break;
-            case 'nudge':
-                if (!$arg) {
-                    $result = null;
-                } else {
-                    list($other, $extra) = $this->split_arg($arg);
-                    if ($extra) {
-                        $result = null;
-                    } else {
-                        $result = new NudgeCommand($user, $other);
-                    }
-                }
-                break;
             case 'stats':
                 if ($arg) {
                     $result = null;

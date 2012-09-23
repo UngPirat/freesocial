@@ -217,13 +217,13 @@ class RepliesAction extends Action
             } else {
                 // TRANS: Empty list message for page with replies for a user for all logged in users but the user themselves.
                 // TRANS: %1$s, %2$s and %3$s are a user nickname. This message contains a Markdown link in the form [link text](link).
-                $message .= sprintf(_('You can try to [nudge %1$s](../%2$s) or [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->user->nickname, $this->user->nickname, '@' . $this->user->nickname);
+                $message .= sprintf(_('You can try to [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->user->nickname, $this->user->nickname, '@' . $this->user->nickname);
             }
         }
         else {
             // TRANS: Empty list message for page with replies for a user for not logged in users.
             // TRANS: %1$s is a user nickname. This message contains a Markdown link in the form [link text](link).
-            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then nudge %s or post a notice to them.'), $this->user->nickname);
+            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then post a notice to them.'), $this->user->nickname);
         }
 
         $this->elementStart('div', 'guide');
