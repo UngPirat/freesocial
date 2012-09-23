@@ -59,11 +59,13 @@ class Facebookclient
 
         $this->notice = $notice;
 
-        $profile_id = $profile ? $profile->id : $notice->profile_id;
-        $this->flink = Foreign_link::getByUserID(
-            $profile_id,
-            FACEBOOK_SERVICE
-        );
+		if (!empty($notice) || !empty($profile)) {
+	        $profile_id = $profile ? $profile->id : $notice->profile_id;
+    	    $this->flink = Foreign_link::getByUserID(
+        	    $profile_id,
+	            FACEBOOK_SERVICE
+    	    );
+		}
 
         if (!empty($this->flink)) {
             $this->user = $this->flink->getUser();
@@ -121,23 +123,25 @@ class Facebookclient
         );
     }
 
-    static function apiLoop($path, $callback, $args=array(), $callbackArgs=array()) {
-		$facebook = self::getFacebook();
+    function apiLoop($path, $callback, array $args=array()) {
+		if (isset($args['feed'])) {
+			common_debug('FBDBG importing updates in feed '.$args['feed']);
+		}
 
         $loops = 0;
-        $max_loops = 0;
-        if (isset($args['max_loops'])) {
-            $max_loops = $args['max_loops'];
-            unset($args['max_loops']);
-        }
+        $max_loops = isset($args['max_loops']) ? $args['max_loops'] : 0;
+		if (!isset($args['api'])) {
+			$args['api'] = array();
+		}
+		if (!isset($args['callback'])) {
+			$args['callback'] = array();
+		}
+
         do {
-            if (!isset($args['access_token']) || empty($args['access_token'])) {
-                $args['access_token'] = $facebook->getAccessToken();
-            }
             try {
-                $result = $facebook->api($path, 'get', $args);
+                $result = $this->facebook->api($path, 'get', $args['api']);
             } catch (Exception $e) {
-                return 0;
+				return $this->handleFacebookError($e);
             }
 
             if (empty($result['data'])) {
@@ -149,7 +153,7 @@ class Facebookclient
             foreach (array_reverse($result['data']) as $entry) {
                 try {
                     // entry post will be overwritten on merge
-                    $callbackArgs = array_merge($callbackArgs, array('entry'=>$entry));
+                    $callbackArgs = array_merge($args['callback'], array('entry'=>$entry));
                     $foundnew = call_user_func($callback, $callbackArgs);
                 } catch (Exception $e) {
                 }
@@ -157,7 +161,7 @@ class Facebookclient
 
             if (isset($result['paging']['next'])) {
                 $next = parse_url($result['paging']['next'], PHP_URL_QUERY);
-                parse_str($next, $args);    // overwrite with data that makes us go back in time
+                parse_str($next, $args['api']);    // overwrite with data that makes us go back in time
             }
             $loops++;
         } while ($foundnew==true && ($max_loops == 0 || $loops <= $max_loops));
@@ -305,7 +309,6 @@ class Facebookclient
             Foreign_notice_map::saveNew($this->notice->id, $result['id'], FACEBOOK_SERVICE);
 
         } catch (FacebookApiException $e) {
-			common_debug('Removing Facebook link? Notice:'.$this->notice->id);
             return $this->handleFacebookError($e);
         }
 
@@ -342,9 +345,11 @@ class Facebookclient
      */
     function handleFacebookError($e)
     {
-        $fbuid  = $this->flink->foreign_id;
+        $fbuid  = (!is_null($this->flink)) ? $this->flink->foreign_id : 'APP_CALL';
         $errmsg = $e->getMessage();
         $code   = $e->getCode();
+
+		common_debug('FBDBG got FacebookError ['.$e->getCode().']:'.$e->getMessage().' dump:'.print_r($e, true));
 
         // The Facebook PHP SDK seems to always set the code attribute
         // of the Exception to 0; they put the real error code in
@@ -375,6 +380,15 @@ class Facebookclient
             );
             return true;
             break;
+		case 190:
+			// this will only happen on flink'd calls
+            $original = clone($this->flink);
+            $this->flink->credentials = '';
+            $this->flink->update($original);
+			common_debug('FBDBG emailing about expired credentials for flink '.$this->flink->foreign_id.' and message '.$e->getMessage());
+            self::emailExpiredCredentials($flink->getUser(), $e->getMessage());
+			return true;
+			break;
          case 200: // Permissions error
          case 250: // Updating status requires the extended permission status_update
             $this->disconnect();

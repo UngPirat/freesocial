@@ -192,7 +192,7 @@ class TwitterStatusFetcher extends ParallelizingDaemon
             }
             $timeline = $client->statusesTimeline($lastId, $timelineUri);
         } catch (Exception $e) {
-            common_log(LOG_ERROR, $this->name() .
+            common_log(LOG_ERR, $this->name() .
                        ' - Unable to get ' . $timelineUri . ' timeline for user ' . $flink->user_id .
                        ' - code: ' . $e->getCode() . 'msg: ' . $e->getMessage());
         }
