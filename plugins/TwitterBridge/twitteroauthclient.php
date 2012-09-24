@@ -203,7 +203,8 @@ class TwitterOAuthClient extends OAuthClient
     {
         $url    = 'https://api.twitter.com/1/statuses/'.$timelineUri.'.json';
 
-        $params = array('include_entities' => 'true');
+        $params = array('include_entities' => 'true',
+						'include_rts' => 'true');
 
         if (!empty($since_id)) {
             $params['since_id'] = $since_id;
