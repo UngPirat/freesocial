@@ -190,13 +190,7 @@ class NoticeWidget extends ThemeWidget {
 		$this->out->elementEnd('a');
     }
     function the_vcard() {
-        $this->out->elementStart('span', 'vcard author');
-        $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
-        $this->out->element('img', array('src'=>Avatar::getUrlByProfile($this->profile, $this->avatarSize), 'class'=>'photo'));
-        $this->out->element('span', 'fn', $this->get_name());
-        $this->out->elementEnd('a');
-        $this->out->element('a', array('href'=>$this->profile->profileurl, 'class' => 'url'), _m('Original profile'));
-        $this->out->elementEnd('span');
+		VcardWidget::run(array('profile'=>$this->profile, 'avatarSize'=>$this->avatarSize));
     }
 }
 

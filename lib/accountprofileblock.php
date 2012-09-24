@@ -60,7 +60,10 @@ class AccountProfileBlock extends ProfileBlock
 
     function avatar()
     {
-        return Avatar::getUrlByProfile($this->profile);
+        if (!Event::handle('GetAvatarUrl', array(&$avatarUrl, $this->profile, $this->avatarSize()))) {
+			return $avatarUrl;
+        }
+        return null;
     }
 
     function name()

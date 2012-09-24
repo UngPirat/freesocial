@@ -223,8 +223,8 @@ class ApiTimelineFriendsAction extends ApiBareAuthAction
 
         $self = $this->getSelfUri();
 
-			//TODO: do this as an Event
-		$logo = class_exists('Avatar') ? Avatar::getUrlByProfile($profile) : null;
+		$logo = null;
+        Event::handle('GetAvatarUrl', array(&$logo, $profile));
 
         switch($this->format) {
         case 'xml':

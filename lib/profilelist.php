@@ -199,17 +199,18 @@ class ProfileListItem extends Widget
 
     function showAvatar()
     {
-		//TODO: do this as an Event
-        $avatarUrl = Avatar::getUrlByProfile($this->profile, Avatar::STREAM_SIZE);
         $aAttrs = $this->linkAttributes();
         $this->out->elementStart('a', $aAttrs);
-        $this->out->element('img', array('src' => $avatarUrl,
-                                         'class' => 'photo avatar',
-                                         'width' => Avatar::STREAM_SIZE,
-                                         'height' => Avatar::STREAM_SIZE,
-                                         'alt' => $this->profile->getBestName()
-										 ));
-        $this->out->text(' ');
+        if (!Event::handle('GetAvatarElement', array(
+                                &$element, $this->profile, Avatar::STREAM_SIZE,
+                                array(
+									'width'  => Avatar::STREAM_SIZE,
+									'height' => Avatar::STREAM_SIZE,
+									'alt'    => $this->profile->getBestName(),
+                                ))
+                            )) {
+            $this->out->element($element['tag'], $element['args']);
+        }
         $hasFN = (!empty($this->profile->fullname)) ? 'nickname' : 'fn nickname';
         $this->out->elementStart('span', $hasFN);
         $this->out->raw($this->highlight($this->profile->nickname));

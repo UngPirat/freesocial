@@ -161,4 +161,35 @@ class AvatarPlugin extends Plugin
     {
         return true;
     }
+
+	// ThemeManager integration
+	function onGetAvatar(&$avatar, Profile $profile, $size=Avatar::PROFILE_SIZE, array $args=array())
+	{
+		try {
+			$avatar = Avatar::getByProfile($profile, $size, $size, $args);
+		} catch (Exception $e) {
+			return true;
+		}
+		return false;
+	}
+	function onGetAvatarElement(&$element, Profile $profile, $size=Avatar::PROFILE_SIZE, array $args=array())
+	{
+		if (!Event::handle('GetAvatarUrl', array(&$avatarUrl, $profile, $size, $args))) {
+			$class = isset($args['class']) ? $args['class'] : 'photo avatar';
+			$element = array(
+					'tag'  => 'img',
+					'args' => array('src'=>$avatarUrl, 'class'=>$class),
+				);
+			return false;
+		}
+	}
+	function onGetAvatarUrl(&$avatarUrl, Profile $profile, $size=Avatar::PROFILE_SIZE, array $args=array())
+	{
+		try {
+			$avatarUrl = Avatar::getUrlByProfile($profile, $size);
+		} catch (Exception $e) {
+			return true;
+		}
+		return false;
+	}
 }

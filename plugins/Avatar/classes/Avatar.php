@@ -83,19 +83,19 @@ class Avatar extends Managed_DataObject
         }
         return $avatar;
     }
-	static function getUrlByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null, $fallback=true) {
-		$avatar = self::getByProfile($profile, $width, $height);
-        if ($avatar) {
-            return $avatar->displayUrl();
-        } else {
-            return self::defaultImage($width);
-        }
+	static function getUrlByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null, array $args=array()) {
+		if (!isset($args['fallback'])) {
+			$args['fallback'] = true;
+		}
+		$avatar = self::getByProfile($profile, $width, $height, $args);
+		return $avatar ? $avatar->displayUrl() : null;
 	}
 
-    static function getByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null) {
+    static function getByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null, array $args=array()) {
         if (empty($height)) {
             $height = $width;
         }
+		$fallback = isset($args['fallback']) ? $args['fallback'] : false;
 
 		if ($avatar = self::getCached($profile->id, $width, $height)) {
 			return $avatar;
@@ -119,6 +119,13 @@ class Avatar extends Managed_DataObject
                 common_debug($e->getMessage());
             }
         }
+		if (empty($avatar) && $fallback) {
+			$avatar = new Avatar;
+			$avatar->url = Avatar::defaultImage($width, $height);
+			$avatar->mediatype = 'image/png';	//TODO: get default mediatype correctly!
+			$avatar->width = $width;
+			$avatar->height = $height;
+		}
 		if (!empty($avatar)) {
 			self::setCached($avatar, $profile->id, $width, $height);
 		}
@@ -209,12 +216,13 @@ class Avatar extends Managed_DataObject
         }
     }
 
-    static function defaultImage($size)
+    static function defaultImage($width, $height=null)
     {
+		// height is not handled yet
         static $sizenames = array(Avatar::PROFILE_SIZE => 'profile',
                                   Avatar::STREAM_SIZE => 'stream',
                                   Avatar::MINI_SIZE => 'mini');
-        return Theme::path('default-avatar-'.$sizenames[$size].'.png');
+        return Theme::path('default-avatar-'.$sizenames[$width].'.png');
     }
 
     static function deleteFromProfile($profile_id) {

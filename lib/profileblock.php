@@ -68,6 +68,11 @@ abstract class ProfileBlock extends Widget
 
     function showAvatar()
     {
+		$avatarUrl = $this->avatar();
+		if (empty($avatarUrl)) {
+			return false;
+		}
+
         $size = $this->avatarSize();
 
         $this->out->element(

@@ -81,7 +81,7 @@ class NoticeListItem extends Widget
                 $this->repeat = $notice;
             }
         } else {
-            $this->notice  = $notice;
+            $this->notice = $notice;
         }
         $this->profile = $this->notice->getProfile();
     }
@@ -316,18 +316,16 @@ class NoticeListItem extends Widget
      */
     function showAvatar()
     {
-        $avatar_size = $this->avatarSize();
-
-        $avatarUrl = Avatar::getUrlByProfile($this->profile, $avatar_size);
-
-        $this->out->element('img', array('src' => $avatarUrl,
-                                         'class' => 'avatar photo',
-                                         'width' => $avatar_size,
-                                         'height' => $avatar_size,
-                                         'alt' =>
-                                         ($this->profile->fullname) ?
-                                         $this->profile->fullname :
-                                         $this->profile->nickname));
+        if (!Event::handle('GetAvatarElement', array(
+                                &$element, $this->profile, $this->avatarSize(),
+                                array(
+									'width' => $this->avatarSize(),
+									'height' => $this->avatarSize(),
+									'alt' => $this->profile->getBestName(),
+                                ))
+                            )) {
+            $this->out->element($element['tag'], $element['args']);
+        }
     }
 
     function avatarSize()

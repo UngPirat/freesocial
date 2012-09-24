@@ -210,10 +210,9 @@ class ApiAction extends Action
         $twitter_user['location'] = ($profile->location) ? $profile->location : null;
         $twitter_user['description'] = ($profile->bio) ? $profile->bio : null;
 
-        if (class_exists('Avatar')) {    //TODO: do this as an Event
-            $avatarUrl = Avatar::getUrlByProfile($profile, Avatar::STREAM_SIZE);
-            $twitter_user['profile_image_url'] = $avatarUrl;
-        }
+		$avatarUrl = null;
+        Event::handle('GetAvatarUrl', array(&$avatarUrl, $profile, Avatar::STREAM_SIZE));
+        $twitter_user['profile_image_url'] = $avatarUrl;
 
         $twitter_user['url'] = ($profile->homepage) ? $profile->homepage : null;
         $twitter_user['protected'] = (!empty($user) && $user->private_stream) ? true : false;
@@ -912,14 +911,14 @@ class ApiAction extends Action
         $this->element('id', null, $entry['id']);
         $this->element('published', null, $entry['published']);
         $this->element('updated', null, $entry['updated']);
-        if (class_exists('Avatar')) {    //TODO: do this as an Event
-            $this->element('link', array('type' => 'text/html',
+        $this->element('link', array('type' => 'text/html',
                                      'href' => $entry['link'],
                                      'rel' => 'alternate'));
-            $this->element('link', array('type' => $entry['avatar-type'],
+		if (isset($entry['avatar'])) {
+	        $this->element('link', array('type' => $entry['avatar-type'],
                                      'href' => $entry['avatar'],
                                      'rel' => 'image'));
-        }
+		}
         $this->elementStart('author');
 
         $this->element('name', null, $entry['author-name']);
@@ -994,10 +993,9 @@ class ApiAction extends Action
         $entry['author-name'] = $from->getBestName();
         $entry['author-uri'] = $from->homepage;
 
-        if (class_exists('Avatar')) {    //TODO: do this as an Event
-            $avatar = Avatar::getByProfile($from, Avatar::STREAM_SIZE);
-            $entry['avatar']      = (!empty($avatar)) ? $avatar->url : Avatar::defaultImage(Avatar::STREAM_SIZE);
-            $entry['avatar-type'] = (!empty($avatar)) ? $avatar->mediatype : 'image/png';
+        if (!Event::handle('GetAvatar', array(&$avatar, $from, Avatar::STREAM_SIZE)) {
+            $entry['avatar']      = $avatar->url;
+            $entry['avatar-type'] = $avatar->mediatype;
         }
 
         // RSS item specific

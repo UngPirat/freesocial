@@ -26,9 +26,13 @@ class ProfileWidget extends ThemeWidget {
     }
 
     function get_name() {
-        return $this->profile->fullname
-                ? $this->profile->fullname
-                : $this->profile->nickname;
+        return $this->profile->getBestName();
+    }
+    function get_profile_url(Profile $profile=null) {
+        $profile = (is_null($profile) ? $this->profile : $profile);
+        return class_exists('RemoteProfileAction')
+                ? common_local_url('remoteprofile', array('id'=>$profile->id))
+                : $profile->profileurl;
     }
     function get_webfinger() {
         return $this->profile->nickname . '@' . parse_url($this->profile->profileurl, PHP_URL_HOST);
@@ -46,9 +50,16 @@ class ProfileWidget extends ThemeWidget {
         ProfileactionsWidget::run(array('item'=>$this->profile, 'scoped'=>$this->scoped));
     }
     function the_vcard() {
-        $this->out->elementStart('span', 'vcard');
-        $this->out->element('img', array('src'=>Avatar::getUrlByProfile($this->profile, $this->avatarSize), 'class'=>'photo'));
-        $this->out->element('a', array('href'=>$this->profile->profileurl, 'class'=>'url fn'), $this->get_name());
+        $this->out->elementStart('span', 'vcard author');
+        $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
+        if (!Event::handle('GetAvatarElement', array(
+								&$element, $this->profile, $this->avatarSize
+							))) {
+			$this->out->element($element['tag'], $element['args']);
+		}
+        $this->out->element('span', 'fn', $this->get_name());
+        $this->out->elementEnd('a');
+        $this->out->element('a', array('href'=>$this->profile->profileurl, 'class' => 'url'), _m('Original profile'));
         $this->out->elementEnd('span');
     }
 }

@@ -38,7 +38,7 @@ class PreviewWidget extends ThemeWidget {
 
         $this->out->elementStart('li', "list-item {$this->itemClass}");
         $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$this->item->id)), 'class'=>'url'));
-        $this->out->element('img', array('src'=>$thumb->url, 'alt'=>'', 'class'=>'photo'));
+        $this->out->element('img', array('src'=>$thumb->url));
         if (!empty($this->notices)) {
             $this->out->elementStart('div', 'description');
             foreach($this->notices as $notice) {
