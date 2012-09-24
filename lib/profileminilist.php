@@ -79,7 +79,8 @@ class ProfileMiniListItem extends ProfileListItem
             if (Event::handle('StartProfileListItemAvatar', array($this))) {
                 $aAttrs = $this->linkAttributes();
                 $this->out->elementStart('a', $aAttrs);
-                $avatarUrl = Avatar::getUrlByProfile($this->profile, Avatar::MINI_SIZE);
+				$profile = $this->profile->_items[$this->profile->_i];
+                $avatarUrl = Avatar::getUrlByProfile($profile, Avatar::MINI_SIZE);
                 $this->out->element('img', array('src' => $avatarUrl,
                                                  'width' => Avatar::MINI_SIZE,
                                                  'height' => Avatar::MINI_SIZE,
