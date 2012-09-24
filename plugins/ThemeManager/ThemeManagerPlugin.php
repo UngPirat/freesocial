@@ -42,6 +42,14 @@ class ThemeManagerPlugin extends Plugin {
         }
         return true;
     }
+
+	function onGetTmSupported(&$supported) {
+		$supported = array_merge($supported, array(
+				'showprofile' => 'profile',
+				));
+	}
+
+
 	function onStartTmConversationList($list, $num) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
 			ConversationListWidget::run(array('list'=>$list, 'num'=>$num));

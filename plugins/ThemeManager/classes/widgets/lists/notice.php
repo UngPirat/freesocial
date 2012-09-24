@@ -2,6 +2,7 @@
 
 class NoticeListWidget extends ListWidget {
     protected $list = null;
+    protected $widgetClass = 'notices';
 
     static function run($args=null) {
         $class = get_class();

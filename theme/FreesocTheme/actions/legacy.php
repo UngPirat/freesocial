@@ -1,6 +1,6 @@
 <?php
 /*
- *  Name: Remote Profile
+ *  Name: Legacy
  */
 	$this->box('header');
 
@@ -15,6 +15,8 @@
 		$this->content('profile-noticelist');
 	} elseif (isset($this->action->notice) || isset($this->action->notices)) {
 		$this->content('noticelist');
+	} elseif ($this->get_template() != 'legacy') {
+		$this->content($this->get_template());
 	} else {
 		$this->action->showContent();
 	}

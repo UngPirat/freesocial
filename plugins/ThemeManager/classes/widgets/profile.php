@@ -2,7 +2,7 @@
 
 class ProfileWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
-    protected $profile;
+    protected $item;
     protected $avatarSize = Avatar::PROFILE_SIZE;
 
     static function run($args=null) {
@@ -13,7 +13,7 @@ class ProfileWidget extends ThemeWidget {
 
     // always gets run on __construct, which is also called when instantiated with ::run()
     protected function validate() {
-        if (!is_a($this->profile, 'Profile')) {
+        if (!is_a($this->item, 'Profile')) {
             return false;
         }
         return parent::validate();
@@ -26,16 +26,16 @@ class ProfileWidget extends ThemeWidget {
     }
 
     function get_name() {
-        return $this->profile->getBestName();
+        return $this->item->getBestName();
     }
     function get_profile_url(Profile $profile=null) {
-        $profile = (is_null($profile) ? $this->profile : $profile);
+        $profile = (is_null($profile) ? $this->item : $profile);
         return class_exists('RemoteProfileAction')
                 ? common_local_url('remoteprofile', array('id'=>$profile->id))
                 : $profile->profileurl;
     }
     function get_webfinger() {
-        return $this->profile->nickname . '@' . parse_url($this->profile->profileurl, PHP_URL_HOST);
+        return $this->item->nickname . '@' . parse_url($this->item->profileurl, PHP_URL_HOST);
     }
     function the_metadata() {
         $this->out->elementStart('dl', 'metadata');
@@ -47,19 +47,19 @@ class ProfileWidget extends ThemeWidget {
         // a bunch of dd with the user's tags
     }
     function the_actions() {
-        ProfileactionsWidget::run(array('item'=>$this->profile, 'scoped'=>$this->scoped));
+        ProfileactionsWidget::run(array('item'=>$this->item, 'scoped'=>$this->scoped));
     }
     function the_vcard() {
         $this->out->elementStart('span', 'vcard author');
         $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
         if (!Event::handle('GetAvatarElement', array(
-								&$element, $this->profile, $this->avatarSize
+								&$element, $this->item, $this->avatarSize
 							))) {
 			$this->out->element($element['tag'], $element['args']);
 		}
         $this->out->element('span', 'fn', $this->get_name());
         $this->out->elementEnd('a');
-        $this->out->element('a', array('href'=>$this->profile->profileurl, 'class' => 'url'), _m('Original profile'));
+        $this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), _m('Original profile'));
         $this->out->elementEnd('span');
     }
 }

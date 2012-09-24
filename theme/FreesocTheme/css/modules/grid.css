@@ -24,7 +24,7 @@
 	float: left;
 	width: 30%;
 }
-body.showprofile-action #content > section {
+#content #profile + section {
 	float: right;
 	width: 60%;
 }

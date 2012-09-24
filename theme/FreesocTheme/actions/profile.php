@@ -1,6 +1,6 @@
 <?php
 /*
- *  Name: Remote Profile
+ *  Name: Profile
  */
     $this->box('header');
 

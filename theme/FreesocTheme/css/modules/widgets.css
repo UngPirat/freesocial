@@ -9,8 +9,8 @@
 .list.widget .list-item {
 	display: block;
 	float: left;
-	margin: 0 1ex;
-	padding: 1em;
+	margin: 1ex;
+	padding: 1ex;
 	position: relative;
 }
 #favorites .notice {

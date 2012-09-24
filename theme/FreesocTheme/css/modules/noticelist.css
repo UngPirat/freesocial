@@ -1,5 +1,5 @@
 .conversations .conversation {
-	font-size: 0.75em;
+	font-size: 0.8em;
 	float: left;
 	width: 44%;
 }
@@ -11,16 +11,14 @@
 
 .conversation .notice {
 	margin-left: 10%;
+	padding: 1ex;
 }
 .conversation,
-.conversation:nth-child(2n) .notice,
 .conversation .notice:first-child {
-	background-color: #f0f0f0;
-}
-.conversation:nth-child(2n),
-.conversation .notice,
-.conversation:nth-child(2n) .notice:first-child {
 	background-color: #e0e0e0;
+}
+.conversation .notice {
+	background-color: #ececec;
 }
 /* WHY U NO MARGIN??? */
 .notice:after {

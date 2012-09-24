@@ -128,7 +128,7 @@ class ThemeManager extends ThemeSite {
         foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
             $action->elementStart('span', $key);
             if (isset($pages[$key])) {
-                $href = common_local_url($action->args['name'], $action->args, array('page'=>$pages[$key]));
+                $href = common_local_url($action->args['action'], $action->args, array('page'=>$pages[$key]));
                 $action->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
             } else {
                 $action->text($trans);

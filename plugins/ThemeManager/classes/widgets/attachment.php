@@ -25,7 +25,6 @@ class AttachmentWidget extends ThemeWidget {
     }
 
     function show() {
-//        var_dump($this->item);
         $this->out->elementStart('marquee', array('direction'=>'right','scrolldelay'=>'50'));
         $this->out->elementStart('a', array('href'=>$this->item->url, 'alt'=>_m('Full size'), 'class'=>'url'));
         $this->out->element('img', array('src'=>$this->item->url, 'alt'=>'', 'class'=>'photo'));

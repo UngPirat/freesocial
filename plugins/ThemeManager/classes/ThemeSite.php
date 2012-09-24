@@ -7,7 +7,7 @@ class ThemeSite {
     protected $urldir;
     protected $sysdir;
 
-    private $supported = array();
+    static private $supported = array();
     private $template  = null;
 
     function __construct($action) {
@@ -17,27 +17,43 @@ class ThemeSite {
 /* FIXME: errr, urldir and sysdir should be set here... */
 
         $this->action = $action;
-        $this->supported = array('showprofile'=>"{$this->sysdir}/actions/profile.php", 'settings'=>"{$this->sysdir}/actions/settings.php");
-if ( isset($this->action->args['tm']))        $this->supported = array('profile'=>"{$this->sysdir}/actions/profile.php", 'legacy'=>"{$this->sysdir}/actions/legacy.php");
-if ( isset($this->action->args['notm']))        $this->supported = array();
+
+		$supported = array();
+		if (Event::handle('GetTmSupported', array(&$supported))) {
+			$this->add_supported($supported);
+		}
+
+if ( isset($this->action->args['tm']))        self::$supported['legacy'] = "{$this->sysdir}/actions/legacy.php";
+if ( isset($this->action->args['notm']))        self::$supported = array();
         $this->set_template($this->action);
     }
+	
+	private function add_supported(array $supported) {
+		self::$supported = array_merge(self::$supported, $supported);
+	}
 
     private function set_template($action) {
         $class = get_class($action);
         do {    // get the closest match to current action and set that template
             $template = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $class)));
-            if (isset($this->supported[$template])) {
+            if (isset(self::$supported[$template])) {
                 $this->template = $template;
-                $this->template_file = $this->supported[$this->template];
+                $this->template_file = self::$supported[$this->template];
                 break;
-            }
+            } elseif (isset(self::$supported['legacy']) &&
+						file_exists("{$this->sysdir}/content/{$template}.php")) {
+				$this->template = $template;
+				$this->template_file = "{$this->sysdir}/actions/legacy.php";
+			}
         } while ($class = get_parent_class($class));
 
-        if (empty($this->template) && isset($this->supported['legacy'])) {
+        if (empty($this->template) && isset(self::$supported['legacy'])) {
             $this->template = 'legacy';
-            $this->template_file = $this->supported[$this->template];
+            $this->template_file = self::$supported[$this->template];
         }
+		if (!empty($this->template) && !preg_match('/^\//', $this->template_file)) {
+			$this->template_file = "{$this->sysdir}/actions/{$this->template_file}.php";
+		}
         if (empty($this->template) || !file_exists($this->template_file)) {
             define('THEME_MANAGER', false);
             throw new Exception('Template not supported', 302);
