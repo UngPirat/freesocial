@@ -10,6 +10,8 @@ class Avatar extends Managed_DataObject
     const STREAM_SIZE  =  96;
     const MINI_SIZE    =  24;
 
+	private static $avatars = array();
+
     public $__table = 'avatar';              // table name
     public $profile_id;                      // int(4)  primary_key not_null
     public $original;                        // tinyint(1)
@@ -95,7 +97,9 @@ class Avatar extends Managed_DataObject
             $height = $width;
         }
 
-        $avatar = null;
+		if ($avatar = self::getCached($profile->id, $width, $height)) {
+			return $avatar;
+		}
 
         if (Event::handle('StartProfileGetAvatar', array($profile, $width, &$avatar))) {
             $avatar = Avatar::pkeyGet(
@@ -115,6 +119,9 @@ class Avatar extends Managed_DataObject
                 common_debug($e->getMessage());
             }
         }
+		if (!empty($avatar)) {
+			self::setCached($avatar, $profile->id, $width, $height);
+		}
 
         return $avatar;
     }
@@ -124,6 +131,16 @@ class Avatar extends Managed_DataObject
 
         return $avatar->fetchAll();
     }
+
+	static function getCached($profile_id, $width, $height) {
+		if (isset(self::$avatars[$profile_id]["{$width}x{$height}"])) {
+			return self::$avatars[$profile_id]["{$width}x{$height}"];
+		}
+		return null;
+	}
+	static function setCached($avatar, $profile_id, $width, $height) {
+		self::$avatars[$profile_id]["{$width}x{$height}"] = $avatar;
+	}
 
     /**
      * Where should the avatar go for this user?
