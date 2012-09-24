@@ -71,13 +71,19 @@ class ThreadedNoticeList extends NoticeList
      */
     function show()
     {
+		$notices = $this->notice->fetchAll();
+		$total = count($notices);
+
+        if (!Event::handle('StartTmConversationList', array($notices, NOTICES_PER_PAGE))) {
+            Event::handle('EndTmConversationList', array($notices, NOTICES_PER_PAGE));
+            return $total;
+        }
+
         $this->out->elementStart('div', array('id' =>'notices_primary'));
         // TRANS: Header for Notices section.
         $this->out->element('h2', null, _m('HEADER','Notices'));
         $this->out->elementStart('ol', array('class' => 'notices threaded-notices xoxo'));
 
-		$notices = $this->notice->fetchAll();
-		$total = count($notices);
 		$notices = array_slice($notices, 0, NOTICES_PER_PAGE);
 		
     	self::prefill(self::_allNotices($notices));

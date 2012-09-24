@@ -83,6 +83,7 @@ class Avatar extends Managed_DataObject
         }
         return $avatar;
     }
+
 	static function getUrlByProfile(Profile $profile, $width=self::PROFILE_SIZE, $height=null, array $args=array()) {
 		if (!isset($args['fallback'])) {
 			$args['fallback'] = true;

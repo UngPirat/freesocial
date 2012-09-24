@@ -993,7 +993,7 @@ class ApiAction extends Action
         $entry['author-name'] = $from->getBestName();
         $entry['author-uri'] = $from->homepage;
 
-        if (!Event::handle('GetAvatar', array(&$avatar, $from, Avatar::STREAM_SIZE)) {
+        if (!Event::handle('GetAvatar', array(&$avatar, $from, Avatar::STREAM_SIZE))) {
             $entry['avatar']      = $avatar->url;
             $entry['avatar-type'] = $avatar->mediatype;
         }

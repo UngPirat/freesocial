@@ -79,15 +79,18 @@ class ProfileMiniListItem extends ProfileListItem
             if (Event::handle('StartProfileListItemAvatar', array($this))) {
                 $aAttrs = $this->linkAttributes();
                 $this->out->elementStart('a', $aAttrs);
-				$profile = $this->profile->_items[$this->profile->_i];
-                $avatarUrl = Avatar::getUrlByProfile($profile, Avatar::MINI_SIZE);
-                $this->out->element('img', array('src' => $avatarUrl,
+				$profile = is_a($this->profile, 'ArrayWrapper')
+							? $this->profile->_items[$this->profile->_i]
+							: $this->profile;
+
+				if (!Event::handle('GetAvatarUrl', array(&$avatarUrl, $profile, Avatar::MINI_SIZE))) {
+                	$this->out->element('img', array('src' => $avatarUrl,
                                                  'width' => Avatar::MINI_SIZE,
                                                  'height' => Avatar::MINI_SIZE,
                                                  'class' => 'avatar photo',
-                                                 'alt' =>  ($this->profile->fullname) ?
-                                                 $this->profile->fullname :
-                                                 $this->profile->nickname));
+                                                 'alt' =>  $this->profile->getBestName()
+												));
+				}
                 $this->out->element('span', 'fn nickname', $this->profile->nickname);
                 $this->out->elementEnd('a');
                 Event::handle('EndProfileListItemAvatar', array($this));

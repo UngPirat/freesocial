@@ -105,12 +105,12 @@ class NoticeListItem extends Widget
         }
 
         $this->showStart();
-        if (Event::handle('StartShowNoticeItem', array($this))) {
-            $this->showNotice();
+   	    if (Event::handle('StartShowNoticeItem', array($this))) {
+       	    $this->showNotice();
             $this->showNoticeAttachments();
-            $this->showNoticeInfo();
-            $this->showNoticeOptions();
-            Event::handle('EndShowNoticeItem', array($this));
+   	        $this->showNoticeInfo();
+       	    $this->showNoticeOptions();
+           	Event::handle('EndShowNoticeItem', array($this));
         }
         $this->showEnd();
     }

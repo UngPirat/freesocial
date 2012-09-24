@@ -80,16 +80,22 @@ class NoticeList extends Widget
      */
     function show()
     {
+        $notices = $this->notice->fetchAll();
+        $total   = count($notices);
+
+        if (!Event::handle('StartTmNoticeList', array($notices, NOTICES_PER_PAGE))) {
+            Event::handle('EndTmNoticeList', array($notices, NOTICES_PER_PAGE));
+            return $total;
+        }
+
+        $notices = array_slice($notices, 0, NOTICES_PER_PAGE);
+
         $this->out->elementStart('div', array('id' =>'notices_primary'));
         $this->out->elementStart('ol', array('class' => 'notices xoxo'));
 
-		$notices = $this->notice->fetchAll();
-		$total   = count($notices);
-		$notices = array_slice($notices, 0, NOTICES_PER_PAGE);
-		
-    	self::prefill($notices);
-    	
-    	foreach ($notices as $notice) {
+        self::prefill($notices);
+        
+        foreach ($notices as $notice) {
 
             try {
                 $item = $this->newListItem($notice);
@@ -134,17 +140,17 @@ class NoticeList extends Widget
             Notice::fillRepeats($notices);
             // Prefill the profiles
             $profiles = Notice::fillProfiles($notices);
-    	
+        
             $p = Profile::current();
-    	
+        
             if (!empty($p)) {
 
                 $ids = array();
-    	
+        
                 foreach ($notices as $notice) {
                     $ids[] = $notice->id;
                 }
-    	
+        
                 Memcached_DataObject::pivotGet('Fave', 'notice_id', $ids, array('user_id' => $p->id));
                 Memcached_DataObject::pivotGet('Notice', 'repeat_of', $ids, array('profile_id' => $p->id));
             }

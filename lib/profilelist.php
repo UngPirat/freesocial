@@ -201,8 +201,12 @@ class ProfileListItem extends Widget
     {
         $aAttrs = $this->linkAttributes();
         $this->out->elementStart('a', $aAttrs);
+		$profile = is_a($this->profile, 'ArrayWrapper')
+					? $this->profile->_items[$this->profile->_i]
+					: $this->profile;
+
         if (!Event::handle('GetAvatarElement', array(
-                                &$element, $this->profile, Avatar::STREAM_SIZE,
+                                &$element, $profile, Avatar::STREAM_SIZE,
                                 array(
 									'width'  => Avatar::STREAM_SIZE,
 									'height' => Avatar::STREAM_SIZE,
