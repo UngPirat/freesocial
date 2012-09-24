@@ -3,6 +3,7 @@
 abstract class ListWidget extends ThemeWidget {
     protected $offset = 0;
     protected $num    = 5;
+    protected $page   = 1;
 
     protected $title  = null;
 
@@ -11,6 +12,7 @@ abstract class ListWidget extends ThemeWidget {
     protected $loopClass;
     protected $loopTag;
 	protected $loopArgs = array();
+	protected $loopType = 'Object';
 
     function show() {
         $this->the_content();
@@ -39,7 +41,7 @@ abstract class ListWidget extends ThemeWidget {
 
     // could be overloaded if you want stuff like prefilling notices etc.
     function get_loop(array $args=array()) {
-		$type = isset($args['type']) ? ucfirst($args['type']).'Loop' : 'ObjectLoop';
+		$type = ucfirst($this->loopType).'Loop';
 		if (!class_exists($type)) {
 			throw new Exception('Bad loop type');
 		}
@@ -65,7 +67,7 @@ abstract class ListWidget extends ThemeWidget {
             $this->the_item($this->loop->current());
             $this->itemTag && $this->out->elementEnd($this->itemTag);
         } while ($this->loop->next());
-           $this->loopTag && $this->out->elementEnd($this->loopTag);
+        $this->loopTag && $this->out->elementEnd($this->loopTag);
     }
 
     function the_content() {

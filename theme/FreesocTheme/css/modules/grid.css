@@ -1,7 +1,7 @@
 #wrapper {
-	margin: 0 auto;
-	width: 96%;
-	max-width: 1200px;
+	margin: 2em auto;
+	position: relative;
+	max-width: 1100px;
 }
 
 #wrapper > * {
@@ -12,22 +12,19 @@
 	clear: both;
 }
 #content {
-	clear: both;
-	float: left;
 }
 .settings-action #content {
 	width: 80%;
 }
 #content.single {
 	width: auto;
+	float: left;
 }
 #content > aside {
 	float: left;
 	width: 30%;
 }
-#content > section {
-}
-#content.single > section {
+body.showprofile-action #content > section {
 	float: right;
 	width: 60%;
 }

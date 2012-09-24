@@ -119,22 +119,23 @@ class ThemeManager extends ThemeSite {
         $loop = new $class($args);
         return $loop;
     }
-    function pagination(array $pages) {
+    static function pagination(array $pages, array $action=array()) {
+		$action = self::getOut();	//TODO: this has to be improved for the action data
         if (!isset($pages['current'])) {
             return;
         }
-        $this->out->elementStart('nav', 'paging');
+        $action->elementStart('nav', 'paging');
         foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
-            $this->out->elementStart('span', $key);
+            $action->elementStart('span', $key);
             if (isset($pages[$key])) {
-                $href = common_local_url($this->action->args['action'], $this->action->args, array('page'=>$pages[$key]));
-                $this->out->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
+                $href = common_local_url($action->args['name'], $action->args, array('page'=>$pages[$key]));
+                $action->element('a', array('class'=>$key, 'href'=>$href, 'rel'=>$key), $trans);
             } else {
-                $this->out->text($trans);
+                $action->text($trans);
             }
-            $this->out->elementEnd('span');
+            $action->elementEnd('span');
         }
-        $this->out->elementEnd('nav');
+        $action->elementEnd('nav');
     }
 
     function menu($name, array $args=array()) {

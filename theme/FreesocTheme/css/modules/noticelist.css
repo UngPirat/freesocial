@@ -1,7 +1,12 @@
+.conversations .conversation {
+	font-size: 0.75em;
+	float: left;
+	width: 44%;
+}
 .notices {
 	display: block;
-	margin: 0 auto;
-	padding: 1ex 8ex;
+	margin: 2%;
+	padding: 1ex 1%;
 }
 
 .conversation .notice {

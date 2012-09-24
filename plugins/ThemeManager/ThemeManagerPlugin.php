@@ -42,6 +42,20 @@ class ThemeManagerPlugin extends Plugin {
         }
         return true;
     }
+	function onStartTmConversationList($list, $num) {
+        if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
+			ConversationListWidget::run(array('list'=>$list, 'num'=>$num));
+			return false;
+		}
+		return true;
+	}
+	function onStartTmNoticeList($list, $num) {
+        if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
+			NoticeListWidget::run(array('list'=>$list, 'num'=>$num));
+			return false;
+		}
+		return true;
+	}
 	function onStartShowNoticeItem($noticeitem) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
             NoticeWidget::run(array('item'=>$noticeitem->notice, 'itemTag'=>'li'));

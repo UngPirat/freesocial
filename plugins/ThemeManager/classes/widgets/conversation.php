@@ -1,10 +1,7 @@
 <?php
 
 class ConversationWidget extends NoticeListWidget {
-    protected $num = -1;
-
     // these values will be set by default or $args-supplied values
-    protected $conversation;
     protected $widgetClass = 'conversation notices';
 
     static function run($args=null) {
@@ -15,15 +12,14 @@ class ConversationWidget extends NoticeListWidget {
 
     // always gets run on __construct, which is also called on ::run()
     protected function validate() {
-        if (!is_array($this->conversation)) {
+        if (!is_array($this->list)) {
             return false;
         }
         return parent::validate();
     }
-
-    function get_list() {
-        return $this->conversation;
-    }
+	function get_list() {
+		return $this->list;
+	}
 
     function the_item($item) {
 		$avatarSize = $this->key()>0 ? Avatar::STREAM_SIZE : Avatar::PROFILE_SIZE;
