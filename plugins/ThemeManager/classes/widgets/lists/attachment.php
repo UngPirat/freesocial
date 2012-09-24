@@ -30,6 +30,7 @@ class AttachmentListWidget extends ListWidget {
             @$f2p->joinAdd(array('file_id', 'file_thumbnail:file_id'));
             $f2p->whereAdd('profile_id = '.$this->profile->id);
             $f2p->whereAdd('mimetype LIKE "image/%"');
+            $f2p->groupBy('post_id');
             $f2p->orderBy('post_id DESC');
             $f2p->limit($this->offset, $this->offset+$this->num+1);
 
