@@ -285,11 +285,8 @@ class TwitterOAuthClient extends OAuthClient
             }
         }
 
-common_debug('TWITTER subscription calling oAuthPost');
-
         $response = $this->oAuthPost($url, $params);
         $status   = json_decode($response);
-common_debug('TWITTER subscription status: '.$status);
         return $status;
     }
 

@@ -383,6 +383,23 @@ function format_status($notice)
     // Start with the plaintext source of this notice...
     $statustxt = $notice->content;
 
+	if (empty($notice->repeat_of) && $reply = Notice::staticGet('id', $notice->reply_to)) {
+		$replyto = Profile::staticGet('id', $reply->profile_id);
+		if ($flink = Foreign_link::getByUserId($replyto->id, TWITTER_SERVICE)) {
+			$localnick = $replyto->nickname;
+			$replyto = Foreign_user::getForeignUser($flink->foreign_id, TWITTER_SERVICE);
+			$statustxt = preg_replace('/(.+\s+|^)\@'.$localnick.'(\s+.+|$)/i',
+										'\\1@'.$replyto->nickname.'\\2',
+										$statustxt);
+		}
+		if (!empty($replyto)) {
+			if (!preg_match('/(.+\s+|^)\@'.$replyto->nickname.'(\s+.+|$)/i', $statustxt)) {
+				// because Twitter is retarded and discards inreplyto if user isn't mentioned
+				$statustxt = "@{$replyto->nickname} " . $statustxt;
+			}
+		}
+	}
+
     // Convert !groups to #hashes
     // XXX: Make this an optional setting?
     $statustxt = preg_replace('/(^|\s)!([A-Za-z0-9]{1,64})/', "\\1#\\2", $statustxt);
