@@ -1,6 +1,6 @@
 <?php
 /**
- * Table Definition for reply
+ * Table Definition for mention
  */
 require_once INSTALLDIR.'/classes/Memcached_DataObject.php';
 
@@ -55,7 +55,7 @@ class Mention extends Managed_DataObject
         $result = parent::insert();
 
         if ($result) {
-            self::blow('reply:stream:%d', $this->profile_id);
+            self::blow('mention:stream:%d', $this->profile_id);
         }
 
         return $result;
