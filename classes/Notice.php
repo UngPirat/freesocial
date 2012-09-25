@@ -1064,8 +1064,8 @@ class Notice extends Managed_DataObject
      *
      * @param array $groups optional list of Group objects;
      *              if left empty, will be loaded from group_inbox records
-     * @param array $recipient optional list of reply profile ids
-     *              if left empty, will be loaded from reply records
+     * @param array $recipient optional list of mentioned profile ids
+     *              if left empty, will be loaded from mention records
      */
     function addToInboxes($groups=null, $recipients=null)
     {
@@ -1325,7 +1325,7 @@ class Notice extends Managed_DataObject
 
         $mentions = common_find_mentions($this->content, $this);
 
-        // store mentioned only for first @ (what user/notice what the reply directed,
+        // store mentioned only for first @ (what user/notice what the mention directed,
         // we assume first @ is it)
 
         foreach ($mentions as $mention) {
