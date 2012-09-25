@@ -199,7 +199,7 @@ class FacebooksettingsAction extends SettingsAction {
         $this->checkbox(
                 'replysync',
                 // TRANS: Checkbox label in Facebook settings.
-                _m('Send "@" replies to Facebook.'),
+                _m('Send "@" mentions to Facebook.'),
                 ($this->flink) ? ($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) : true
         );
 

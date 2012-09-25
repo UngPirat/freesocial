@@ -80,7 +80,7 @@ class AutocompletePlugin extends Plugin
                             'homepage' => 'http://status.net/wiki/Plugin:Autocomplete',
                             'rawdescription' =>
                             // TRANS: Plugin description.
-                            _m('The autocomplete plugin adds autocompletion for @ replies.'));
+                            _m('The autocomplete plugin adds autocompletion for @ mentions.'));
         return true;
     }
 }

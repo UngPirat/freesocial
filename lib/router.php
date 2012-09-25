@@ -819,7 +819,7 @@ class Router
                 $nickname = User::singleUserNickname();
 
                 foreach (array('subscriptions', 'subscribers',
-                               'all', 'foaf', 'replies',
+                               'all', 'foaf', 'mentions',
                                'microsummary') as $a) {
                     $m->connect($a,
                                 array('action' => $a,
@@ -843,7 +843,7 @@ class Router
                                       'nickname' => $nickname));
                 }
 
-                foreach (array('all', 'replies', 'favorites') as $a) {
+                foreach (array('all', 'mentions', 'favorites') as $a) {
                     $m->connect($a.'/rss',
                                 array('action' => $a.'rss',
                                       'nickname' => $nickname));
@@ -938,7 +938,7 @@ class Router
                 $m->connect('rsd.xml', array('action' => 'rsd'));
 
                 foreach (array('subscriptions', 'subscribers',
-                               'all', 'foaf', 'replies',
+                               'all', 'foaf', 'mentions',
                                'inbox', 'outbox', 'microsummary') as $a) {
                     $m->connect(':nickname/'.$a,
                                 array('action' => $a),
@@ -1015,7 +1015,7 @@ class Router
                                 array('nickname' => Nickname::DISPLAY_FMT));
                 }
 
-                foreach (array('all', 'replies', 'favorites') as $a) {
+                foreach (array('all', 'mentions', 'favorites') as $a) {
                     $m->connect(':nickname/'.$a.'/rss',
                                 array('action' => $a.'rss'),
                                 array('nickname' => Nickname::DISPLAY_FMT));

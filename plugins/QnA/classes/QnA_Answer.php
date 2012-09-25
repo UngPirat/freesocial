@@ -301,7 +301,7 @@ class QnA_Answer extends Managed_DataObject
         $rendered = sprintf(_m('answered "%s"'), $link);
 
         $tags    = array();
-        $replies = array();
+        $mentions = array();
 
         $options = array_merge(
             array(
@@ -309,7 +309,7 @@ class QnA_Answer extends Managed_DataObject
                 'content'     => $content,
                 'rendered'    => $rendered,
                 'tags'        => $tags,
-                'replies'     => $replies,
+                'mentions'    => $mentions,
                 'reply_to'    => $question->getNotice()->id,
                 'object_type' => self::OBJECT_TYPE
             ),

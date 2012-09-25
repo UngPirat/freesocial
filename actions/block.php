@@ -139,7 +139,7 @@ class BlockAction extends ProfileFormAction
                        _('Are you sure you want to block this user? '.
                          'Afterwards, they will be unsubscribed from you, '.
                          'unable to subscribe to you in the future, and '.
-                         'you will not be notified of any @-replies from them.'));
+                         'you will not be notified of any @-mentions from them.'));
         $this->element('input', array('id' => 'blockto-' . $id,
                                       'name' => 'profileid',
                                       'type' => 'hidden',

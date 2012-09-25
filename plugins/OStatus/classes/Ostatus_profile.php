@@ -631,7 +631,7 @@ class Ostatus_profile extends Managed_DataObject
                          'url' => $sourceUrl,
                          'uri' => $sourceUri,
                          'rendered' => $rendered,
-                         'replies' => array(),
+                         'mentions' => array(),
                          'groups' => array(),
                          'peopletags' => array(),
                          'tags' => array(),
@@ -647,9 +647,9 @@ class Ostatus_profile extends Managed_DataObject
 
         if ($activity->context) {
             // Any individual or group attn: targets?
-            $replies = $activity->context->attention;
-            $options['groups'] = $this->filterReplies($oprofile, $replies);
-            $options['replies'] = $replies;
+            $mentions = $activity->context->attention;
+            $options['groups'] = $this->filterMentions($oprofile, $mentions);
+            $options['mentions'] = $mentions;
 
             // Maintain direct reply associations
             // @todo FIXME: What about conversation ID?
@@ -803,7 +803,7 @@ class Ostatus_profile extends Managed_DataObject
                         'url' => $sourceUrl,
                         'uri' => $sourceUri,
                         'rendered' => $rendered,
-                        'replies' => array(),
+                        'mentions' => array(),
                         'groups' => array(),
                         'peopletags' => array(),
                         'tags' => array(),
@@ -817,9 +817,9 @@ class Ostatus_profile extends Managed_DataObject
 
         if ($activity->context) {
             // Any individual or group attn: targets?
-            $replies = $activity->context->attention;
-            $options['groups'] = $this->filterReplies($oprofile, $replies);
-            $options['replies'] = $replies;
+            $mentions = $activity->context->attention;
+            $options['groups'] = $this->filterMentions($oprofile, $mentions);
+            $options['mentions'] = $mentions;
 
             // Maintain direct reply associations
             // @todo FIXME: What about conversation ID?
@@ -898,17 +898,17 @@ class Ostatus_profile extends Managed_DataObject
      * @param array in/out &$attention_uris set of URIs, will be pruned on output
      * @return array of group IDs
      */
-    protected function filterReplies($sender, &$attention_uris)
+    protected function filterMentions($sender, &$attention_uris)
     {
-        common_log(LOG_DEBUG, "Original reply recipients: " . implode(', ', $attention_uris));
+        common_log(LOG_DEBUG, "Original mention recipients: " . implode(', ', $attention_uris));
         $groups = array();
-        $replies = array();
+        $mentions = array();
         foreach (array_unique($attention_uris) as $recipient) {
             // Is the recipient a local user?
             $user = User::staticGet('uri', $recipient);
             if ($user) {
                 // @todo FIXME: Sender verification, spam etc?
-                $replies[] = $recipient;
+                $mentions[] = $recipient;
                 continue;
             }
 
@@ -923,11 +923,11 @@ class Ostatus_profile extends Managed_DataObject
                     if ($profile->isMember($group)) {
                         $groups[] = $group->id;
                     } else {
-                        common_log(LOG_DEBUG, "Skipping reply to local group $group->nickname as sender $profile->id is not a member");
+                        common_log(LOG_DEBUG, "Skipping mention to local group $group->nickname as sender $profile->id is not a member");
                     }
                     continue;
                 } else {
-                    common_log(LOG_DEBUG, "Skipping reply to bogus group $recipient");
+                    common_log(LOG_DEBUG, "Skipping mention to bogus group $recipient");
                 }
             }
 
@@ -940,17 +940,17 @@ class Ostatus_profile extends Managed_DataObject
                     $groups[] = $oprofile->group_id;
                 } else {
                     // may be canonicalized or something
-                    $replies[] = $oprofile->uri;
+                    $mentions[] = $oprofile->uri;
                 }
                 continue;
             } catch (Exception $e) {
                 // Neither a recognizable local nor remote user!
-                common_log(LOG_DEBUG, "Skipping reply to unrecognized profile $recipient: " . $e->getMessage());
+                common_log(LOG_DEBUG, "Skipping mention to unrecognized profile $recipient: " . $e->getMessage());
             }
 
         }
-        $attention_uris = $replies;
-        common_log(LOG_DEBUG, "Local reply recipients: " . implode(', ', $replies));
+        $attention_uris = $mentions;
+        common_log(LOG_DEBUG, "Local mention recipients: " . implode(', ', $mentions));
         common_log(LOG_DEBUG, "Local group recipients: " . implode(', ', $groups));
         return $groups;
     }

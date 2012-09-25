@@ -224,7 +224,7 @@ class ActivityImporter extends QueueHandler
         $options = array('is_local' => Notice::LOCAL_PUBLIC,
                          'uri' => $sourceUri,
                          'rendered' => $rendered,
-                         'replies' => array(),
+                         'mentions' => array(),
                          'groups' => array(),
                          'tags' => array(),
                          'urls' => array(),
@@ -239,7 +239,7 @@ class ActivityImporter extends QueueHandler
         if ($activity->context) {
             // Any individual or group attn: targets?
 
-            list($options['groups'], $options['replies']) = $this->filterAttention($activity->context->attention);
+            list($options['groups'], $options['mentions']) = $this->filterAttention($activity->context->attention);
 
             // Maintain direct reply associations
             // @fixme what about conversation ID?
@@ -293,7 +293,7 @@ class ActivityImporter extends QueueHandler
     function filterAttention($attn)
     {
         $groups = array();
-        $replies = array();
+        $mentions = array();
 
         foreach (array_unique($attn) as $recipient) {
 
@@ -303,7 +303,7 @@ class ActivityImporter extends QueueHandler
 
             if ($user) {
                 // @fixme sender verification, spam etc?
-                $replies[] = $recipient;
+                $mentions[] = $recipient;
                 continue;
             }
 
@@ -313,7 +313,7 @@ class ActivityImporter extends QueueHandler
             if ($oprofile) {
                 if (!$oprofile->isGroup()) {
                     // may be canonicalized or something
-                    $replies[] = $oprofile->uri;
+                    $mentions[] = $oprofile->uri;
                 }
                 continue;
             }
@@ -331,16 +331,16 @@ class ActivityImporter extends QueueHandler
                     if ($profile->isMember($group)) {
                         $groups[] = $group->id;
                     } else {
-                        common_log(LOG_INFO, "Skipping reply to local group {$group->nickname} as sender {$profile->id} is not a member");
+                        common_log(LOG_INFO, "Skipping mention to local group {$group->nickname} as sender {$profile->id} is not a member");
                     }
                     continue;
                 } else {
-                    common_log(LOG_INFO, "Skipping reply to bogus group $recipient");
+                    common_log(LOG_INFO, "Skipping mention to bogus group $recipient");
                 }
             }
         }
 
-        return array($groups, $replies);
+        return array($groups, $mentions);
     }
 
 

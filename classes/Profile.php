@@ -868,7 +868,7 @@ class Profile extends Managed_DataObject
 
         // Warning: delete() will run on the batch objects,
         // not on individual objects.
-        $related = array('Reply',
+        $related = array('Mention',
                          'Group_member',
                          );
         Event::handle('ProfileDeleteRelated', array($this, &$related));
@@ -1345,9 +1345,9 @@ class Profile extends Managed_DataObject
         }
 
         if ($notice->scope & Notice::ADDRESSEE_SCOPE) {
-            $replies = $notice->getReplies();
+            $mentions = $notice->getMentions();
 
-            if (!in_array($this->id, $replies)) {
+            if (!in_array($this->id, $mentions)) {
                 $groups = $notice->getGroups();
 
                 $foundOne = false;

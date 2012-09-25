@@ -224,7 +224,7 @@ class Facebookclient
             return false;
         }
 
-        // If it's not a reply, or if the user WANTS to send @-replies,
+        // If it's not a reply, or if the user WANTS to send @-mentions,
 		// or if it's a reply to a Facebook post,
         // then, yeah, it can go to Facebook.
         if (($this->flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) == FOREIGN_NOTICE_SEND_REPLY ||

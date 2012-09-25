@@ -72,7 +72,7 @@ class DistribQueueHandler
         }
 
         try {
-            $notice->sendReplyNotifications();
+            $notice->sendMentionNotifications();
         } catch (Exception $e) {
             $this->logit($notice, $e);
         }

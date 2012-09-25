@@ -399,19 +399,19 @@ class BookmarkPlugin extends MicroAppPlugin
             }
         }
 
-        $replies = $activity->context->attention;
+        $mentions = $activity->context->attention;
 
         $options['groups']  = array();
-        $options['replies'] = array();
+        $options['mentions'] = array();
 
-        foreach ($replies as $replyURI) {
-            $other = Profile::fromURI($replyURI);
+        foreach ($mentions as $mentionURI) {
+            $other = Profile::fromURI($mentionURI);
             if (!empty($other)) {
-                $options['replies'][] = $replyURI;
+                $options['mentions'][] = $mentionURI;
             } else {
-                $group = User_group::staticGet('uri', $replyURI);
+                $group = User_group::staticGet('uri', $mentionURI);
                 if (!empty($group)) {
-                    $options['groups'][] = $replyURI;
+                    $options['groups'][] = $mentionURI;
                 }
             }
         }

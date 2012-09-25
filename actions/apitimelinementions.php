@@ -117,7 +117,7 @@ class ApiTimelineMentionsAction extends ApiBareAuthAction
         $taguribase = TagURI::base();
         $id         = "tag:$taguribase:Mentions:" . $this->user->id;
         $link       = common_local_url(
-            'replies',
+            'mentions',
             array('nickname' => $this->user->nickname)
         );
 
@@ -127,7 +127,7 @@ class ApiTimelineMentionsAction extends ApiBareAuthAction
             // TRANS: Subtitle for timeline of most recent mentions of a user.
             // TRANS: %1$s is the StatusNet sitename, %2$s is a user nickname,
             // TRANS: %3$s is a user's full name.
-            _('%1$s updates that reply to updates from %2$s / %3$s.'),
+            _('%1$s updates that mention %2$s / %3$s.'),
             $sitename, $this->user->nickname, $profile->getBestName()
         );
         $logo = Avatar::getUrlByProfile($profile);
@@ -198,7 +198,7 @@ class ApiTimelineMentionsAction extends ApiBareAuthAction
             $profile = $this->auth_user->getProfile();
         }
 
-        $stream = new ReplyNoticeStream($this->user->id, $profile);
+        $stream = new MentionNoticeStream($this->user->id, $profile);
 
         $notice = $stream->getNotices(($this->page - 1) * $this->count,
                                       $this->count,

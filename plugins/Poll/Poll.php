@@ -240,12 +240,12 @@ class Poll extends Managed_DataObject
         $rendered = sprintf(_m('Poll: %s'), $link);
 
         $tags    = array('poll');
-        $replies = array();
+        $mentions = array();
 
         $options = array_merge(array('urls' => array(),
                                      'rendered' => $rendered,
                                      'tags' => $tags,
-                                     'replies' => $replies,
+                                     'mentions' => $mentions,
                                      'object_type' => PollPlugin::POLL_OBJECT),
                                $options);
 

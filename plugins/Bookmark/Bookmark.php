@@ -235,20 +235,20 @@ class Bookmark extends Managed_DataObject
 
         $nb->insert();
 
-        $tags    = array();
-        $replies = array();
+        $tags     = array();
+        $mentions = array();
 
         // filter "for:nickname" tags
 
         foreach ($rawtags as $tag) {
             if (strtolower(mb_substr($tag, 0, 4)) == 'for:') {
                 // skip if done by caller
-                if (!array_key_exists('replies', $options)) {
+                if (!array_key_exists('mentions', $options)) {
                     $nickname = mb_substr($tag, 4);
                     $other    = common_relative_profile($profile,
                                                         $nickname);
                     if (!empty($other)) {
-                        $replies[] = $other->getUri();
+                        $mentions[] = $other->getUri();
                     }
                 }
             } else {
@@ -304,7 +304,7 @@ class Bookmark extends Managed_DataObject
         $options = array_merge(array('urls' => array($url),
                                      'rendered' => $rendered,
                                      'tags' => $tags,
-                                     'replies' => $replies,
+                                     'mentions' => $mentions,
                                      'object_type' => ActivityObject::BOOKMARK),
                                $options);
 

@@ -311,15 +311,15 @@ class QnA_Question extends Managed_DataObject
         // TRANS: %s a link to the question as link description.
         $rendered = sprintf(_m('Question: %s'), $link);
 
-        $tags    = array('question');
-        $replies = array();
+        $tags     = array('question');
+        $mentions = array();
 
         $options = array_merge(
             array(
                 'urls'        => array(),
                 'rendered'    => $rendered,
                 'tags'        => $tags,
-                'replies'     => $replies,
+                'mentions'    => $mentions,
                 'object_type' => self::OBJECT_TYPE
             ),
             $options

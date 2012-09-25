@@ -50,7 +50,7 @@ class NoticePlaceholderForm extends Widget
 {
     function show()
     {
-        // Similar to that for inline replies, but not quite!
+        // Similar to that for inline mentions, but not quite!
         // TRANS: Field label for notice text.
         $placeholder = _('Update your status...');
         $this->out->elementStart('div', 'form_notice_placeholder');

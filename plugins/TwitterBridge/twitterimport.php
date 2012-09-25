@@ -583,12 +583,12 @@ class TwitterImport
             if (!empty($flink)) {
                 $user = User::staticGet('id', $flink->user_id);
                 if (!empty($user)) {
-                    $reply = new Reply();
-                    $reply->notice_id  = $notice->id;
-                    $reply->profile_id = $user->id;
-                    $reply->modified   = $notice->created;
-                    common_log(LOG_INFO, __METHOD__ . ": saving reply: notice {$notice->id} to profile {$user->id}");
-                    $id = $reply->insert();
+                    $mention = new Mention();
+                    $mention->notice_id  = $notice->id;
+                    $mention->profile_id = $user->id;
+                    $mention->modified   = $notice->created;
+                    common_log(LOG_INFO, __METHOD__ . ": saving mention: notice {$notice->id} to profile {$user->id}");
+                    $id = $mention->insert();
                 }
             }
         }

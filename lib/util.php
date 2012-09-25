@@ -694,7 +694,7 @@ function common_find_mentions($text, $notice)
             if (!empty($originalNotice)) {
                 $originalAuthor = Profile::staticGet('id', $originalNotice->profile_id);
 
-                $ids = $originalNotice->getReplies();
+                $ids = $originalNotice->getMentions();
 
                 foreach ($ids as $id) {
                     $repliedTo = Profile::staticGet('id', $id);

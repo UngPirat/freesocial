@@ -333,9 +333,9 @@ class NewnoticeAction extends Action
     /**
      * // XXX: Should we be showing the notice form with microapps here?
      *
-     * Overload for replies or bad results
+     * Overload for mentions or bad results
      *
-     * We show content in the notice form if there were replies or results.
+     * We show content in the notice form if there were mentions or results.
      *
      * @return void
      */

@@ -535,7 +535,7 @@ function mail_notify_attn($user, $notice)
         // TRANS: %1$s is the sending user's name, $2$s is the StatusNet sitename,
         // TRANS: %3$s is a URL to the notice, %4$s is the notice text,
         // TRANS: %5$s is the text "The full conversation can be read here:" and a URL to the full conversion if it exists (otherwise empty),
-        // TRANS: %6$s is a URL to reply to the notice, %7$s is a URL to all @-replies for the addressed user,
+        // TRANS: %6$s is a URL to reply to the notice, %7$s is a URL to all @-mentions for the addressed user,
         $body = sprintf(_("%1\$s just sent a notice to your attention (an '@-reply') on %2\$s.\n\n".
                       "The notice is here:\n\n".
                       "\t%3\$s\n\n" .
@@ -544,7 +544,7 @@ function mail_notify_attn($user, $notice)
                       "%5\$s" .
                       "You can reply back here:\n\n".
                       "\t%6\$s\n\n" .
-                      "The list of all @-replies for you here:\n\n" .
+                      "The list of all @-mentions for you here:\n\n" .
                       "%7\$s"),
                     $sender->getFancyName(),//%1
                     common_config('site', 'name'),//%2
@@ -554,7 +554,7 @@ function mail_notify_attn($user, $notice)
                     $conversationEmailText,//%5
                     common_local_url('newnotice',
                                      array('replyto' => $sender->nickname, 'inreplyto' => $notice->id)),//%6
-                    common_local_url('replies',
+                    common_local_url('mentions',
                                      array('nickname' => $user->nickname))) . //%7
                 mail_footer_block();
     $headers = _mail_prepare_headers('mention', $user->nickname, $sender->nickname);

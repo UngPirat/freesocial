@@ -460,7 +460,7 @@ class FacebookImport
             }
         }
         common_debug('FBDBG: replying '.$notice->id.' to profiles '.implode(' ', $destinations));
-        $notice->saveKnownReplies($destinations);
+        $notice->saveKnownMentions($destinations);
 
         return true;
     }

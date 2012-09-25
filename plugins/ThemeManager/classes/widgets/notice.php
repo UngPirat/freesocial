@@ -104,7 +104,7 @@ class NoticeWidget extends ThemeWidget {
         return $verb;
     }
     function get_recipients() {
-        return $this->item->getReplyProfiles();
+        return $this->item->getMentionProfiles();
     }
     function get_rendered_content() {
         $notice = $this->get_notice();

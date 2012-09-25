@@ -105,7 +105,7 @@ class ActivityPlugin extends Plugin
                                       ActivityPlugin::SOURCE,
                                       array('rendered' => $rendered,
                                             'urls' => array(),
-                                            'replies' => array($other->getUri()),
+                                            'mentions' => array($other->getUri()),
                                             'verb' => ActivityVerb::FOLLOW,
                                             'object_type' => ActivityObject::PERSON,
                                             'uri' => $sub->uri));
@@ -146,7 +146,7 @@ class ActivityPlugin extends Plugin
                                       ActivityPlugin::SOURCE,
                                       array('rendered' => $rendered,
                                             'urls' => array(),
-                                            'replies' => array($other->getUri()),
+                                            'mentions' => array($other->getUri()),
                                             'uri' => $uri,
                                             'verb' => ActivityVerb::UNFOLLOW,
                                             'object_type' => ActivityObject::PERSON));
@@ -189,7 +189,7 @@ class ActivityPlugin extends Plugin
                                       ActivityPlugin::SOURCE,
                                       array('rendered' => $rendered,
                                             'urls' => array(),
-                                            'replies' => array($author->getUri()),
+                                            'mentions' => array($author->getUri()),
                                             'uri' => $fave->getURI(),
                                             'verb' => ActivityVerb::FAVORITE,
                                             'object_type' => (($notice->verb == ActivityVerb::POST) ?
@@ -233,7 +233,7 @@ class ActivityPlugin extends Plugin
                                       ActivityPlugin::SOURCE,
                                       array('rendered' => $rendered,
                                             'urls' => array(),
-                                            'replies' => array($author->getUri()),
+                                            'mentions' => array($author->getUri()),
                                             'uri' => $uri,
                                             'verb' => ActivityVerb::UNFAVORITE,
                                             'object_type' => (($notice->verb == ActivityVerb::POST) ?

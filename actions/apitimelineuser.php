@@ -404,7 +404,7 @@ class ApiTimelineUserAction extends ApiBareAuthAction
 
         $options = array('is_local' => Notice::LOCAL_PUBLIC,
                          'rendered' => $rendered,
-                         'replies' => array(),
+                         'mentions' => array(),
                          'groups' => array(),
                          'tags' => array(),
                          'urls' => array());
@@ -443,7 +443,7 @@ class ApiTimelineUserAction extends ApiBareAuthAction
                 $profile = Profile::fromURI($uri);
 
                 if (!empty($profile)) {
-                    $options['replies'][] = $uri;
+                    $options['mentions'][] = $uri;
                 } else {
                     $group = User_group::staticGet('uri', $uri);
                     if (!empty($group)) {

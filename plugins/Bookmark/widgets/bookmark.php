@@ -48,16 +48,16 @@ class BookmarkWidget extends NoticeWidget {
                       $nb->title);
         $this->out->elementEnd('h3');
 
-        // Replies look like "for:" tags
-        $replies = $this->item->getReplies();
+        // Mentions look like "for:" tags
+        $mentions = $this->item->getMentions();
         $tags = $this->item->getTags();
 
-        if (!empty($replies) || !empty($tags)) {
+        if (!empty($mentions) || !empty($tags)) {
 
             $this->out->elementStart('ul', array('class' => 'bookmark-tags'));
 
-            foreach ($replies as $reply) {
-                $other = Profile::staticGet('id', $reply);
+            foreach ($mentions as $mention) {
+                $other = Profile::staticGet('id', $mention);
                 if (!empty($other)) {
                     $this->out->elementStart('li');
                     $this->out->element('a', array('rel' => 'tag',

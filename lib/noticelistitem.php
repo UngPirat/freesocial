@@ -287,23 +287,23 @@ class NoticeListItem extends Widget
     {
         $pa = array();
 
-        $replies = $this->getReplyProfiles();
+        $mentions = $this->getMentionProfiles();
 
         $user = common_current_user();
 
-        foreach ($replies as $reply) {
-            $pa[] = array('href' => $reply->profileurl,
-                          'title' => $reply->nickname,
+        foreach ($mentions as $mention) {
+            $pa[] = array('href' => $mention->profileurl,
+                          'title' => $mention->nickname,
                           'class' => 'addressee account',
-                          'text' => $reply->getBestName());
+                          'text' => $mention->getBestName());
         }
 
         return $pa;
     }
 
-    function getReplyProfiles()
+    function getMentionProfiles()
     {
-        return $this->notice->getReplyProfiles();
+        return $this->notice->getMentionProfiles();
     }
 
     /**
@@ -551,7 +551,7 @@ class NoticeListItem extends Widget
      * show link to notice this notice is a reply to
      *
      * If this notice is a reply, show a link to the notice it is replying to. The
-     * heavy lifting for figuring out replies happens at save time.
+     * heavy lifting for figuring out mentions happens at save time.
      *
      * @return void
      */

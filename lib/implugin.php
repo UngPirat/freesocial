@@ -303,12 +303,12 @@ abstract class ImPlugin extends Plugin
     }
 
     /**
-     * broadcast a notice to all subscribers and reply recipients
+     * broadcast a notice to all subscribers and mention recipients
      *
      * This function will send a notice to all subscribers on the local server
      * who have IM addresses, and have IM notification enabled, and
      * have this subscription enabled for IM. It also sends the notice to
-     * all recipients of @-replies who have IM addresses and IM notification
+     * all recipients of @-mentions who have IM addresses and IM notification
      * enabled. This is really the heart of IM distribution in StatusNet.
      *
      * @param Notice $notice The notice to broadcast

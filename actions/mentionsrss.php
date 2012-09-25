@@ -23,7 +23,7 @@ require_once(INSTALLDIR.'/lib/rssaction.php');
 
 // Formatting of RSS handled by Rss10Action
 
-class RepliesrssAction extends Rss10Action
+class MentionsrssAction extends Rss10Action
 {
     var $user = null;
 
@@ -47,7 +47,7 @@ class RepliesrssAction extends Rss10Action
     {
         $user = $this->user;
 
-        $notice = $user->getReplies(0, ($limit == 0) ? 48 : $limit);
+        $notice = $user->getMentions(0, ($limit == 0) ? 48 : $limit);
 
         $notices = array();
 
@@ -61,17 +61,17 @@ class RepliesrssAction extends Rss10Action
     function getChannel()
     {
         $user = $this->user;
-        $c = array('url' => common_local_url('repliesrss',
+        $c = array('url' => common_local_url('mentionsrss',
                                              array('nickname' =>
                                                    $user->nickname)),
-                   // TRANS: RSS reply feed title. %s is a user nickname.
-                   'title' => sprintf(_("Replies to %s"), $user->nickname),
-                   'link' => common_local_url('replies',
+                   // TRANS: RSS mention feed title. %s is a user nickname.
+                   'title' => sprintf(_("Mentions of %s"), $user->nickname),
+                   'link' => common_local_url('mentions',
                                               array('nickname' =>
                                                     $user->nickname)),
-                   // TRANS: RSS reply feed description.
+                   // TRANS: RSS mention feed description.
                    // TRANS: %1$s is a user nickname, %2$s is the StatusNet site name.
-                   'description' => sprintf(_('Replies to %1$s on %2$s.'),
+                   'description' => sprintf(_('Mentions of %1$s on %2$s.'),
                                               $user->nickname, common_config('site', 'name')));
         return $c;
     }

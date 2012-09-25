@@ -95,17 +95,17 @@ class BookmarkListItem extends NoticeListItemAdapter
                       $nb->title);
         $out->elementEnd('h3');
 
-        // Replies look like "for:" tags
+        // Mentions look like "for:" tags
 
-        $replies = $notice->getReplies();
+        $mentions = $notice->getMentions();
         $tags = $notice->getTags();
 
-        if (!empty($replies) || !empty($tags)) {
+        if (!empty($mentions) || !empty($tags)) {
 
             $out->elementStart('ul', array('class' => 'bookmark-tags'));
 
-            foreach ($replies as $reply) {
-                $other = Profile::staticGet('id', $reply);
+            foreach ($mentions as $mention) {
+                $other = Profile::staticGet('id', $mention);
                 if (!empty($other)) {
                     $out->elementStart('li');
                     $out->element('a', array('rel' => 'tag',

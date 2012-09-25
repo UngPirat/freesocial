@@ -84,14 +84,14 @@ class PersonalGroupNav extends Menu
                                  _('Your profile'),
                                  $mine && $action =='showstream',
                                  'nav_profile');
-            $this->out->menuItem(common_local_url('replies', array('nickname' =>
+            $this->out->menuItem(common_local_url('mentions', array('nickname' =>
                                                                    $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.
-                                 _m('MENU','Replies'),
+                                 _m('MENU','Mentions'),
                                  // TRANS: Menu item title in personal group navigation menu.
                                  // TRANS: %s is a username.
-                                 sprintf(_('Replies to %s'), $name),
-                                 $mine && $action =='replies', 'nav_timeline_replies');
+                                 sprintf(_('Mentions of %s'), $name),
+                                 $mine && $action =='mentions', 'nav_timeline_mentions');
             $this->out->menuItem(common_local_url('showfavorites', array('nickname' =>
                                                                          $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.

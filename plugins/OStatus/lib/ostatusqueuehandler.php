@@ -71,7 +71,7 @@ class OStatusQueueHandler extends QueueHandler
             if ($oprofile) {
                 // remote group
                 if ($notice->isLocal()) {
-                    $this->pingReply($oprofile);
+                    $this->pingMention($oprofile);
                 }
             } else {
                 // local group
@@ -82,20 +82,20 @@ class OStatusQueueHandler extends QueueHandler
         if ($notice->isLocal()) {
             // Notices generated on other sites will have already
             // pinged their reply-targets.
-            foreach ($notice->getReplies() as $profile_id) {
+            foreach ($notice->getMentions() as $profile_id) {
                 $oprofile = Ostatus_profile::staticGet('profile_id', $profile_id);
                 if ($oprofile) {
-                    $this->pingReply($oprofile);
+                    $this->pingMention($oprofile);
                 }
             }
 
             if (!empty($this->notice->reply_to)) {
                 $replyTo = Notice::staticGet('id', $this->notice->reply_to);
                 if (!empty($replyTo)) {
-                    foreach($replyTo->getReplies() as $profile_id) {
+                    foreach($replyTo->getMentions() as $profile_id) {
                         $oprofile = Ostatus_profile::staticGet('profile_id', $profile_id);
                         if ($oprofile) {
-                            $this->pingReply($oprofile);
+                            $this->pingMention($oprofile);
                         }
                     }
                 }
@@ -145,7 +145,7 @@ class OStatusQueueHandler extends QueueHandler
         $this->pushFeed($feed, array($this, 'peopletagFeedForNotice'), $ptag);
     }
 
-    function pingReply($oprofile)
+    function pingMention($oprofile)
     {
         if ($this->user) {
             // For local posts, send a Salmon ping to the mentioned

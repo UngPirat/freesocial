@@ -307,8 +307,8 @@ class Notice extends Managed_DataObject
      *              string 'uri' unique ID for notice; defaults to local notice URL
      *              string 'url' permalink to notice; defaults to local notice URL
      *              string 'rendered' rendered HTML version of content
-     *              array 'replies' list of profile URIs for reply delivery in
-     *                              place of extracting @-replies from content.
+     *              array 'mentions' list of profile URIs for mention delivery in
+     *                              place of extracting @-mentions from content.
      *              array 'groups' list of group IDs to deliver to, in place of
      *                              extracting ! tags from content
      *              array 'tags' list of hashtag strings to save with the notice
@@ -412,7 +412,7 @@ class Notice extends Managed_DataObject
         $notice->uri = $uri;
         $notice->url = $url;
 
-        // Get the groups here so we can figure out replies and such
+        // Get the groups here so we can figure out mentions and such
 
         if (!isset($groups)) {
             $groups = self::groupsFromText($notice->content, $profile);
@@ -606,10 +606,10 @@ class Notice extends Managed_DataObject
 
         // Save per-notice metadata...
 
-        if (isset($replies)) {
-            $notice->saveKnownReplies($replies);
+        if (isset($mentions)) {
+            $notice->saveKnownMentions($mentions);
         } else {
-            $notice->saveReplies();
+            $notice->saveMentions();
         }
 
         if (isset($tags)) {
@@ -958,8 +958,8 @@ class Notice extends Managed_DataObject
      *
      * @param array $groups optional list of Group objects;
      *              if left empty, will be loaded from group_inbox records
-     * @param array $recipient optional list of reply profile ids
-     *              if left empty, will be loaded from reply records
+     * @param array $recipient optional list of mention profile ids
+     *              if left empty, will be loaded from mention records
      * @return array associating recipient user IDs with an inbox source constant
      */
     function whoGets($groups=null, $recipients=null)
@@ -978,7 +978,7 @@ class Notice extends Managed_DataObject
         }
 
         if (is_null($recipients)) {
-            $recipients = $this->getReplies();
+            $recipients = $this->getMentions();
         }
 
         $users = $this->getSubscribedUsers();
@@ -1054,7 +1054,7 @@ class Notice extends Managed_DataObject
 
     /**
      * Adds this notice to the inboxes of each local user who should receive
-     * it, based on author subscriptions, group memberships, and @-replies.
+     * it, based on author subscriptions, group memberships, and @-mentions.
      *
      * Warning: running a second time currently will make items appear
      * multiple times in users' inboxes.
@@ -1134,7 +1134,7 @@ class Notice extends Managed_DataObject
      * Overrides the regular parsing of !group markup.
      *
      * @param string $group_ids
-     * @fixme might prefer URIs as identifiers, as for replies?
+     * @fixme might prefer URIs as identifiers, as for mentions?
      *        best with generalizations on user_group to support
      *        remote groups better.
      */
@@ -1244,7 +1244,7 @@ class Notice extends Managed_DataObject
     }
 
     /**
-     * Save reply records indicating that this notice needs to be
+     * Save mention records indicating that this notice needs to be
      * delivered to the local users with the given URIs.
      *
      * Since this is expected to be used when saving foreign-sourced
@@ -1255,7 +1255,7 @@ class Notice extends Managed_DataObject
      *
      * @param array of unique identifier URIs for recipients
      */
-    function saveKnownReplies($uris)
+    function saveKnownMentions($uris)
     {
         if (empty($uris)) {
             return;
@@ -1273,20 +1273,20 @@ class Notice extends Managed_DataObject
             }
 
             if ($profile->hasBlocked($sender)) {
-                common_log(LOG_INFO, "Not saving reply to profile {$profile->id} ($uri) from sender {$sender->id} because of a block.");
+                common_log(LOG_INFO, "Not saving mention of profile {$profile->id} ($uri) from sender {$sender->id} because of a block.");
                 continue;
             }
 
-            $this->saveReply($profile->id);
-            self::blow('reply:stream:%d', $profile->id);
+            $this->saveMention($profile->id);
+            self::blow('mention:stream:%d', $profile->id);
         }
 
         return;
     }
 
     /**
-     * Pull @-replies from this message's content in StatusNet markup format
-     * and save reply records indicating that this message needs to be
+     * Pull @-mentions from this message's content in StatusNet markup format
+     * and save mention records indicating that this message needs to be
      * delivered to those users.
      *
      * Mail notifications to local profiles will be sent later.
@@ -1294,9 +1294,9 @@ class Notice extends Managed_DataObject
      * @return array of integer profile IDs
      */
 
-    function saveReplies()
+    function saveMentions()
     {
-        // Don't save reply data for repeats
+        // Don't save mention data for repeats
 
         if (!empty($this->repeat_of)) {
             return array();
@@ -1304,7 +1304,7 @@ class Notice extends Managed_DataObject
 
         $sender = Profile::staticGet($this->profile_id);
 
-        $replied = array();
+        $mentioned = array();
 
         // If it's a reply, save for the replied-to author
 
@@ -1313,9 +1313,9 @@ class Notice extends Managed_DataObject
             if (!empty($original)) { // that'd be weird
                 $author = $original->getProfile();
                 if (!empty($author)) {
-                    $this->saveReply($author->id);
-                    $replied[$author->id] = 1;
-                    self::blow('reply:stream:%d', $author->id);
+                    $this->saveMention($author->id);
+                    $mentioned[$author->id] = 1;
+                    self::blow('mention:stream:%d', $author->id);
                 }
             }
         }
@@ -1325,89 +1325,89 @@ class Notice extends Managed_DataObject
 
         $mentions = common_find_mentions($this->content, $this);
 
-        // store replied only for first @ (what user/notice what the reply directed,
+        // store mentioned only for first @ (what user/notice what the reply directed,
         // we assume first @ is it)
 
         foreach ($mentions as $mention) {
 
-            foreach ($mention['mentioned'] as $mentioned) {
+            foreach ($mention['mentioned'] as $user) {
 
                 // skip if they're already covered
 
-                if (!empty($replied[$mentioned->id])) {
+                if (!empty($mentioned[$user->id])) {
                     continue;
                 }
 
-                // Don't save replies from blocked profile to local user
+                // Don't save mentions from blocked profile to local user
 
-                $mentioned_user = User::staticGet('id', $mentioned->id);
+                $mentioned_user = User::staticGet('id', $user->id);
                 if (!empty($mentioned_user) && $mentioned_user->hasBlocked($sender)) {
                     continue;
                 }
 
-                $this->saveReply($mentioned->id);
-                $replied[$mentioned->id] = 1;
-                self::blow('reply:stream:%d', $mentioned->id);
+                $this->saveMention($user->id);
+                $mentioned[$user->id] = 1;
+                self::blow('mention:stream:%d', $user->id);
             }
         }
 
-        $recipientIds = array_keys($replied);
+        $recipientIds = array_keys($mentioned);
 
         return $recipientIds;
     }
 
-    function saveReply($profileId)
+    function saveMention($profileId)
     {
-        $reply = new Reply();
+        $mention = new Mention();
 
-        $reply->notice_id  = $this->id;
-        $reply->profile_id = $profileId;
-        $reply->modified   = $this->created;
+        $mention->notice_id  = $this->id;
+        $mention->profile_id = $profileId;
+        $mention->modified   = $this->created;
 
-        $reply->insert();
+        $mention->insert();
 
-        return $reply;
+        return $mention;
     }
 
-    protected $_replies = -1;
+    protected $_mentions = -1;
 
     /**
-     * Pull the complete list of @-reply targets for this notice.
+     * Pull the complete list of @-mention targets for this notice.
      *
      * @return array of integer profile ids
      */
-    function getReplies()
+    function getMentions()
     {
-        if ($this->_replies != -1) {
-            return $this->_replies;
+        if ($this->_mentions != -1) {
+            return $this->_mentions;
         }
 
-        $replyMap = Memcached_DataObject::listGet('Reply', 'notice_id', array($this->id));
+        $mentionMap = Memcached_DataObject::listGet('Mention', 'notice_id', array($this->id));
 
         $ids = array();
 
-        foreach ($replyMap[$this->id] as $reply) {
-            $ids[] = $reply->profile_id;
+        foreach ($mentionMap[$this->id] as $mention) {
+            $ids[] = $mention->profile_id;
         }
 
-        $this->_replies = $ids;
+        $this->_mentions = $ids;
 
         return $ids;
     }
 
-    function _setReplies($replies)
+    function _setMentions($mentions)
     {
-        $this->_replies = $replies;
+        $this->_mentions = $mentions;
     }
 
     /**
-     * Pull the complete list of @-reply targets for this notice.
+     * Pull the complete list of @-mention targets for this notice.
      *
      * @return array of Profiles
      */
-    function getReplyProfiles()
+    function getMentionProfiles()
     {
-        $ids = $this->getReplies();
+        $ids = $this->getMentions();
         
         $profiles = Profile::multiGet('id', $ids);
         
@@ -1415,20 +1415,20 @@ class Notice extends Managed_DataObject
     }
 
     /**
-     * Send e-mail notifications to local @-reply targets.
+     * Send e-mail notifications to local @-mention targets.
      *
-     * Replies must already have been saved; this is expected to be run
+     * Mentions must already have been saved; this is expected to be run
      * from the distrib queue handler.
      */
-    function sendReplyNotifications()
+    function sendMentionNotifications()
     {
-        // Don't send reply notifications for repeats
+        // Don't send mention notifications for repeats
 
         if (!empty($this->repeat_of)) {
             return array();
         }
 
-        $recipientIds = $this->getReplies();
+        $recipientIds = $this->getMentions();
 
         foreach ($recipientIds as $recipientId) {
             $user = User::staticGet('id', $recipientId);
@@ -1568,9 +1568,9 @@ class Notice extends Managed_DataObject
                 }
             }
 
-            $reply_ids = $this->getReplies();
+            $mention_ids = $this->getMentions();
 
-            foreach ($reply_ids as $id) {
+            foreach ($mention_ids as $id) {
                 $rprofile = Profile::staticGet('id', $id);
                 if (!empty($rprofile)) {
                     $ctx->attention[] = $rprofile->getUri();
@@ -1749,8 +1749,8 @@ class Notice extends Managed_DataObject
      *     return ID of last notice by initial @name in content;
      * }
      *
-     * Note that all @nickname instances will still be used to save "reply" records,
-     * so the notice shows up in the mentioned users' "replies" tab.
+     * Note that all @nickname instances will still be used to save "mention" records,
+     * so the notice shows up in the mentioned users' "mentions" tab.
      *
      * @param integer $reply_to   ID passed in by Web or API
      * @param integer $profile_id ID of author
@@ -1989,19 +1989,19 @@ class Notice extends Managed_DataObject
             }
         }
 
-        // Reply records
+        // Mention records
 
-        $reply = new Reply();
-        $reply->notice_id = $this->id;
+        $mention = new Mention();
+        $mention->notice_id = $this->id;
 
-        if ($reply->find()) {
-            while($reply->fetch()) {
-                self::blow('reply:stream:%d', $reply->profile_id);
-                $reply->delete();
+        if ($mention->find()) {
+            while($mention->fetch()) {
+                self::blow('mention:stream:%d', $mention->profile_id);
+                $mention->delete();
             }
         }
 
-        $reply->free();
+        $mention->free();
     }
 
     function clearFiles()
@@ -2420,10 +2420,10 @@ class Notice extends Managed_DataObject
 
             if ($scope & Notice::ADDRESSEE_SCOPE) {
 
-                $repl = Reply::pkeyGet(array('notice_id' => $this->id,
+                $mention = Mention::pkeyGet(array('notice_id' => $this->id,
                                              'profile_id' => $profile->id));
 										 
-                if (empty($repl)) {
+                if (empty($mention)) {
                     return false;
                 }
             }
@@ -2545,7 +2545,7 @@ class Notice extends Managed_DataObject
     function __sleep()
     {
         $vars = parent::__sleep();
-        $skip = array('_original', '_profile', '_groups', '_attachments', '_faves', '_replies', '_repeats');
+        $skip = array('_original', '_profile', '_groups', '_attachments', '_faves', '_mentions', '_repeats');
         return array_diff($vars, $skip);
     }
     
@@ -2701,14 +2701,14 @@ class Notice extends Managed_DataObject
     static function fillReplies(&$notices)
     {
         $ids = self::_idsOf($notices);
-        $replyMap = Memcached_DataObject::listGet('Reply', 'notice_id', $ids);
+        $mentionMap = Memcached_DataObject::listGet('Mention', 'notice_id', $ids);
         foreach ($notices as $notice) {
-            $replies = $replyMap[$notice->id];
+            $mentions = $mentionMap[$notice->id];
             $ids = array();
-            foreach ($replies as $reply) {
-                $ids[] = $reply->profile_id;
+            foreach ($mentions as $mention) {
+                $ids[] = $mention->profile_id;
             }
-            $notice->_setReplies($ids);
+            $notice->_setMentions($ids);
         }
     }
 

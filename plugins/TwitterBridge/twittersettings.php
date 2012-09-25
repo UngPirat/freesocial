@@ -172,7 +172,7 @@ class TwittersettingsAction extends ProfileSettingsAction
             $this->elementStart('li');
             $this->checkbox('replysync',
                             // TRANS: Checkbox label.
-                            _m('Send local "@" replies to Twitter.'),
+                            _m('Send local "@" mentions to Twitter.'),
                             ($flink) ?
                             ($flink->noticesync & FOREIGN_NOTICE_SEND_REPLY) :
                             true);

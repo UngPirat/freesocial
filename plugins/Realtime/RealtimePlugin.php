@@ -212,16 +212,16 @@ class RealtimePlugin extends Plugin
             $paths[] = array('all', $user->nickname, null);
         }
 
-        // Add to the replies timeline
+        // Add to the mentions timeline
 
-        $reply = new Reply();
-        $reply->notice_id = $notice->id;
+        $mention = new Mention();
+        $mention->notice_id = $notice->id;
 
-        if ($reply->find()) {
-            while ($reply->fetch()) {
-                $user = User::staticGet('id', $reply->profile_id);
+        if ($mention->find()) {
+            while ($mention->fetch()) {
+                $user = User::staticGet('id', $mention->profile_id);
                 if (!empty($user)) {
-                    $paths[] = array('replies', $user->nickname, null);
+                    $paths[] = array('mentions', $user->nickname, null);
                 }
             }
         }
@@ -503,7 +503,7 @@ class RealtimePlugin extends Plugin
             break;
          case 'showstream':
          case 'all':
-         case 'replies':
+         case 'mentions':
          case 'showgroup':
             $nickname = common_canonical_nickname($action->trimmed('nickname'));
             if (!empty($nickname)) {

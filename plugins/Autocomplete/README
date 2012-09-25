@@ -1,4 +1,4 @@
-Autocomplete allows users to autocomplete screen names in @ replies and
+Autocomplete allows users to autocomplete screen names in @ mentions and
 ! group references.
 
 When an "@" or "!" is typed into the notice text area, an autocomplete box

@@ -45,15 +45,15 @@ if (!defined('STATUSNET')) {
  * @link      http://status.net/
  */
 
-class ReplyNoticeStream extends ScopingNoticeStream
+class MentionNoticeStream extends ScopingNoticeStream
 {
     function __construct($userId, $profile=-1)
     {
         if (is_int($profile) && $profile == -1) {
             $profile = Profile::current();
         }
-        parent::__construct(new CachingNoticeStream(new RawReplyNoticeStream($userId),
-                                                    'reply:stream:' . $userId),
+        parent::__construct(new CachingNoticeStream(new RawMentionNoticeStream($userId),
+                                                    'mention:stream:' . $userId),
                             $profile);
     }
 }
@@ -69,7 +69,7 @@ class ReplyNoticeStream extends ScopingNoticeStream
  * @link      http://status.net/
  */
 
-class RawReplyNoticeStream extends NoticeStream
+class RawMentionNoticeStream extends NoticeStream
 {
     protected $userId;
 
@@ -80,23 +80,23 @@ class RawReplyNoticeStream extends NoticeStream
 
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
-        $reply = new Reply();
-        $reply->profile_id = $this->userId;
+        $mention = new Mention();
+        $mention->profile_id = $this->userId;
 
-        Notice::addWhereSinceId($reply, $since_id, 'notice_id', 'modified');
-        Notice::addWhereMaxId($reply, $max_id, 'notice_id', 'modified');
+        Notice::addWhereSinceId($mention, $since_id, 'notice_id', 'modified');
+        Notice::addWhereMaxId($mention, $max_id, 'notice_id', 'modified');
 
-        $reply->orderBy('modified DESC, notice_id DESC');
+        $mention->orderBy('modified DESC, notice_id DESC');
 
         if (!is_null($offset)) {
-            $reply->limit($offset, $limit);
+            $mention->limit($offset, $limit);
         }
 
         $ids = array();
 
-        if ($reply->find()) {
-            while ($reply->fetch()) {
-                $ids[] = $reply->notice_id;
+        if ($mention->find()) {
+            while ($mention->fetch()) {
+                $ids[] = $mention->notice_id;
             }
         }
 

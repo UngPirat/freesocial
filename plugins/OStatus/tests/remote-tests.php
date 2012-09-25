@@ -123,7 +123,7 @@ class OStatusTester extends TestBase
         }
         $name = $this->sub->username;
 
-        $post = $this->pub->post("@$base/$name should have this in home and replies");
+        $post = $this->pub->post("@$base/$name should have this in home and mentions");
         $this->sub->assertReceived($post);
     }
 
