@@ -21,11 +21,6 @@ class ThemeManagerPlugin extends Plugin {
             require_once($file);
             return false;
             break;
-        case 'ShowprofileAction':
-            $file = dirname(__FILE__) . '/actions/' . strtolower(substr($cls, 0, -6)) . '.php';
-            require_once($file);
-            return false;
-            break;
         }
 
         if (preg_match('/^(\w+)(Form|List)(Widget)$/', $cls, $type)) {

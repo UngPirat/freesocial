@@ -433,7 +433,7 @@ class OpenIDPlugin extends Plugin
      */
     function onEndShowHeadElements($action)
     {
-        if ($action instanceof ShowprofileAction) {
+        if ($action instanceof ShowstreamAction) {
             $action->element('link', array('rel' => 'openid2.provider',
                                            'href' => common_local_url('openidserver')));
             $action->element('link', array('rel' => 'openid2.local_id',

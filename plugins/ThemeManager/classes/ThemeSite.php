@@ -18,19 +18,19 @@ class ThemeSite {
 
         $this->action = $action;
 
-		$supported = array();
-		if (Event::handle('GetTmSupported', array(&$supported))) {
-			$this->add_supported($supported);
-		}
+        $supported = array();
+        if (Event::handle('GetTmSupported', array(&$supported))) {
+            $this->add_supported($supported);
+        }
 
 if ( isset($this->action->args['tm']))        self::$supported['legacy'] = "{$this->sysdir}/actions/legacy.php";
 if ( isset($this->action->args['notm']))        self::$supported = array();
         $this->set_template($this->action);
     }
-	
-	private function add_supported(array $supported) {
-		self::$supported = array_merge(self::$supported, $supported);
-	}
+    
+    private function add_supported(array $supported) {
+        self::$supported = array_merge(self::$supported, $supported);
+    }
 
     private function set_template($action) {
         $class = get_class($action);
@@ -41,19 +41,19 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
                 $this->template_file = self::$supported[$this->template];
                 break;
             } elseif (isset(self::$supported['legacy']) &&
-						file_exists("{$this->sysdir}/content/{$template}.php")) {
-				$this->template = $template;
-				$this->template_file = "{$this->sysdir}/actions/legacy.php";
-			}
+                        file_exists("{$this->sysdir}/content/{$template}.php")) {
+                $this->template = $template;
+                $this->template_file = "{$this->sysdir}/actions/legacy.php";
+            }
         } while ($class = get_parent_class($class));
 
         if (empty($this->template) && isset(self::$supported['legacy'])) {
             $this->template = 'legacy';
             $this->template_file = self::$supported[$this->template];
         }
-		if (!empty($this->template) && !preg_match('/^\//', $this->template_file)) {
-			$this->template_file = "{$this->sysdir}/actions/{$this->template_file}.php";
-		}
+        if (!empty($this->template) && !preg_match('/^\//', $this->template_file)) {
+            $this->template_file = "{$this->sysdir}/actions/{$this->template_file}.php";
+        }
         if (empty($this->template) || !file_exists($this->template_file)) {
             define('THEME_MANAGER', false);
             throw new Exception('Template not supported', 302);
@@ -88,20 +88,21 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
     }
 
     function is_action($action=null) {
-        if (is_null($action)) {
-			$next = get_class($this->action);
-            $class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))).'-action';
-			while(!empty($next) && 'Action' != ($next = get_parent_class($next))) {
-				// get top-type action
-				$class .= ' '.strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))) . '-action';
-			}
-            return $class;
+        if (!is_null($action)) {
+            return is_a($this->action, ucfirst($action.'Action'));
         }
-        return is_a($this->action, ucfirst($action.'Action'));
+
+        $next = get_class($this->action);
+        $class = strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))).'-action';
+        while(!empty($next) && 'Action' != ($next = get_parent_class($next))) :
+            // get top-type action
+            $class .= ' '.strtolower(basename(preg_replace('/^(\w+)Action$/', '\1', $next))) . '-action';
+        endwhile;
+        return $class;
     }
     function is_single() {
         return (isset($this->action->user) || isset($this->action->profile))
-            || $this->is_action('Showprofile');
+            || $this->is_action('showstream');
     }
 
 

@@ -56,6 +56,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
 class ShowstreamAction extends ProfileAction
 {
     var $notice;
+    var $user;
 	protected $action = 'showstream';
 
     function prepare($args)
