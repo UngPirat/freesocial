@@ -820,6 +820,7 @@ class Router
 
                 foreach (array('subscriptions', 'subscribers',
                                'all', 'foaf', 'mentions',
+                               'favorites', 'repeated', 'repeats', 'replies',
                                'microsummary') as $a) {
                     $m->connect($a,
                                 array('action' => $a,
@@ -848,10 +849,6 @@ class Router
                                 array('action' => $a.'rss',
                                       'nickname' => $nickname));
                 }
-
-                $m->connect('favorites',
-                            array('action' => 'favorites',
-                                  'nickname' => $nickname));
 
                 $m->connect('avatar/:size',
                             array('action' => 'avatarbynickname',
@@ -939,6 +936,7 @@ class Router
 
                 foreach (array('subscriptions', 'subscribers',
                                'all', 'foaf', 'mentions',
+							   'favorites', 'repeated', 'repeats', 'replies',
                                'inbox', 'outbox', 'microsummary') as $a) {
                     $m->connect(':nickname/'.$a,
                                 array('action' => $a),
@@ -1020,10 +1018,6 @@ class Router
                                 array('action' => $a.'rss'),
                                 array('nickname' => Nickname::DISPLAY_FMT));
                 }
-
-                $m->connect(':nickname/favorites',
-                            array('action' => 'favorites'),
-                            array('nickname' => Nickname::DISPLAY_FMT));
 
                 $m->connect(':nickname/avatar/:size',
                             array('action' => 'avatarbynickname'),

@@ -47,13 +47,13 @@ if (!defined('STATUSNET')) {
 
 class RepeatsOfMeNoticeStream extends ScopingNoticeStream
 {
-    function __construct($user, $profile=-1)
+    function __construct($userId, $profile=-1)
     {
         if (is_int($profile) && $profile == -1) {
             $profile = Profile::current();
         }
-        parent::__construct(new CachingNoticeStream(new RawRepeatsOfMeNoticeStream($user),
-                                                    'user:repeats_of_me:'.$user->id),
+        parent::__construct(new CachingNoticeStream(new RawRepeatsOfMeNoticeStream($userId),
+                                                    'user:repeats_of_me:'.$userId),
                             $profile);
     }
 }
@@ -70,44 +70,39 @@ class RepeatsOfMeNoticeStream extends ScopingNoticeStream
  */
 class RawRepeatsOfMeNoticeStream extends NoticeStream
 {
-    protected $user;
+    protected $userId;
 
-    function __construct($user)
+    function __construct($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
-        $qry =
-          'SELECT DISTINCT original.id AS id ' .
-          'FROM notice original JOIN notice rept ON original.id = rept.repeat_of ' .
-          'WHERE original.profile_id = ' . $this->user->id . ' ';
+        $notice = new Notice();
+        $notice->profile_id = $this->userId;
 
-        $since = Notice::whereSinceId($since_id, 'original.id', 'original.created');
-        if ($since) {
-            $qry .= "AND ($since) ";
-        }
+        $notice->selectAdd(); // clears it
+        $notice->selectAdd('notice.id');
 
-        $max = Notice::whereMaxId($max_id, 'original.id', 'original.created');
-        if ($max) {
-            $qry .= "AND ($max) ";
-        }
+		$notice->joinAdd(array('id', 'notice:repeat_of'), array('joinAs'=>'rept'));
 
-        $qry .= 'ORDER BY original.created, original.id DESC ';
+        $notice->whereAdd('rept.repeat_of IS NOT NULL');
+        Notice::addWhereSinceId($notice, $since_id, 'notice.id', 'notice.modified');
+        Notice::addWhereMaxId($notice, $max_id, 'notice.id', 'notice.modified');
+
+        $notice->orderBy('notice.modified DESC, notice.id DESC');
 
         if (!is_null($offset)) {
-            $qry .= "LIMIT $limit OFFSET $offset";
+            $notice->limit($offset, $limit);
         }
 
         $ids = array();
 
-        $notice = new Notice();
-
-        $notice->query($qry);
-
-        while ($notice->fetch()) {
-            $ids[] = $notice->id;
+        if ($notice->find()) {
+            while ($notice->fetch()) {
+                $ids[] = $notice->id;
+            }
         }
 
         $notice->free();

@@ -81,9 +81,6 @@ class ThemeManagerPlugin extends Plugin {
 
     function onStartInitializeRouter($m)
     {
-        $m->connect(':nickname/replies',
-                    array('action' => 'replies'),
-                    array('nickname' => Nickname::DISPLAY_FMT));
         return true;
     }
 

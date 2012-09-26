@@ -47,13 +47,13 @@ if (!defined('STATUSNET')) {
 
 class RepeatedByMeNoticeStream extends ScopingNoticeStream
 {
-    function __construct($user, $profile = -1)
+    function __construct($userId, $profile = -1)
     {
         if (is_int($profile) && $profile == -1) {
             $profile = Profile::current();
         }
-        parent::__construct(new CachingNoticeStream(new RawRepeatedByMeNoticeStream($user),
-                                                    'user:repeated_by_me:'.$user->id),
+        parent::__construct(new CachingNoticeStream(new RawRepeatedByMeNoticeStream($userId),
+                                                    'repeats:stream:'.$userId),
                             $profile);
     }
 }
@@ -71,11 +71,11 @@ class RepeatedByMeNoticeStream extends ScopingNoticeStream
 
 class RawRepeatedByMeNoticeStream extends NoticeStream
 {
-    protected $user;
+    protected $userId;
 
-    function __construct($user)
+    function __construct($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     function getNoticeIds($offset, $limit, $since_id, $max_id)
@@ -85,17 +85,16 @@ class RawRepeatedByMeNoticeStream extends NoticeStream
         $notice->selectAdd(); // clears it
         $notice->selectAdd('id');
 
-        $notice->profile_id = $this->user->id;
+        $notice->profile_id = $this->userId;
         $notice->whereAdd('repeat_of IS NOT NULL');
+        Notice::addWhereSinceId($notice, $since_id, 'id', 'modified');
+        Notice::addWhereMaxId($notice, $max_id, 'id', 'modified');
 
-        $notice->orderBy('created DESC, id DESC');
+        $notice->orderBy('modified DESC, id DESC');
 
         if (!is_null($offset)) {
             $notice->limit($offset, $limit);
         }
-
-        Notice::addWhereSinceId($notice, $since_id);
-        Notice::addWhereMaxId($notice, $max_id);
 
         $ids = array();
 

@@ -824,14 +824,14 @@ class User extends Managed_DataObject
 
     function repeatedByMe($offset=0, $limit=20, $since_id=null, $max_id=null)
     {
-        $stream = new RepeatedByMeNoticeStream($this);
+        $stream = new RepeatedByMeNoticeStream($this->id);
         return $stream->getNotices($offset, $limit, $since_id, $max_id);
     }
 
 
     function repeatsOfMe($offset=0, $limit=20, $since_id=null, $max_id=null)
     {
-        $stream = new RepeatsOfMeNoticeStream($this);
+        $stream = new RepeatsOfMeNoticeStream($this->id);
 
         return $stream->getNotices($offset, $limit, $since_id, $max_id);
     }
