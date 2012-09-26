@@ -56,6 +56,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
 class ShowstreamAction extends ProfileAction
 {
     var $notice;
+	protected $action = 'showstream';
 
     function prepare($args)
     {
@@ -114,9 +115,32 @@ class ShowstreamAction extends ProfileAction
         $this->showPage();
     }
 
+    /**
+     * Show the content
+     *
+     * A stream of notices
+     *
+     * @return void
+     */
     function showContent()
     {
-        $this->showNotices();
+        if (Event::handle('ShowStreamNoticeList', array($this->notice, $this, &$nl))) {
+            $nl = new NoticeList($this->notice, $this);
+        }
+
+        $cnt = $nl->show();
+        if (0 === $cnt) {
+            $this->showEmptyListMessage();
+        }
+
+        $args = array('nickname' => $this->user->nickname);
+        if (!empty($this->tag))
+        {
+            $args['tag'] = $this->tag;
+        }
+
+        $this->pagination($this->page > 1, $cnt > NOTICES_PER_PAGE,
+                          $this->page, $this->action, $args);
     }
 
     function showProfileBlock()
@@ -222,7 +246,7 @@ class ShowstreamAction extends ProfileAction
     function showEmptyListMessage()
     {
         // TRANS: First sentence of empty list message for a timeline. $1%s is a user nickname.
-        $message = sprintf(_('This is the timeline for %1$s, but %1$s hasn\'t posted anything yet.'), $this->user->nickname) . ' ';
+        $message = sprintf(_('This is a stream of %2$s related to the user %1$s, but no activity has yet been seen.'), $this->user->nickname, $this->action) . ' ';
 
         if (common_logged_in()) {
             $current_user = common_current_user();
@@ -244,26 +268,6 @@ class ShowstreamAction extends ProfileAction
         $this->elementStart('div', 'guide');
         $this->raw(common_markup_to_html($message));
         $this->elementEnd('div');
-    }
-
-    function showNotices()
-    {
-        $pnl = null;
-        if (Event::handle('ShowStreamNoticeList', array($this->notice, $this, &$pnl))) {
-            $pnl = new ProfileNoticeList($this->notice, $this);
-        }
-        $cnt = $pnl->show();
-        if (0 == $cnt) {
-            $this->showEmptyListMessage();
-        }
-
-        $args = array('nickname' => $this->user->nickname);
-        if (!empty($this->tag))
-        {
-            $args['tag'] = $this->tag;
-        }
-        $this->pagination($this->page>1, $cnt>NOTICES_PER_PAGE, $this->page,
-                          'showstream', $args);
     }
 
     function showAnonymousMessage()

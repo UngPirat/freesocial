@@ -2,7 +2,7 @@
 /**
  * StatusNet, the distributed open-source microblogging tool
  *
- * List of replies
+ * List of a profile's favorite posts
  *
  * PHP version 5
  *
@@ -36,7 +36,7 @@ require_once INSTALLDIR.'/lib/noticelist.php';
 require_once INSTALLDIR.'/lib/feedlist.php';
 
 /**
- * List of replies
+ * List of a user's favorite posts
  *
  * @category Personal
  * @package  StatusNet
@@ -44,12 +44,13 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class ShowfavoritesAction extends Action
+class FavoritesAction extends ShowstreamAction
 {
     /** User we're getting the faves of */
     var $user = null;
     /** Page of the faves we're on */
     var $page = null;
+    protected $action = 'favorites';
 
     /**
      * Is this a read-only page?
@@ -222,42 +223,8 @@ class ShowfavoritesAction extends Action
         $this->elementEnd('div');
     }
 
-    /**
-     * Show the content
-     *
-     * A list of notices that this user has marked as a favorite
-     *
-     * @return void
-     */
-    function showContent()
-    {
-        $nl = new FavoritesNoticeList($this->notice, $this);
-
-        $cnt = $nl->show();
-        if (0 == $cnt) {
-            $this->showEmptyListMessage();
-        }
-
-        $this->pagination($this->page > 1, $cnt > NOTICES_PER_PAGE,
-                          $this->page, 'showfavorites',
-                          array('nickname' => $this->user->nickname));
-    }
-
     function showPageNotice() {
         // TRANS: Page notice for show favourites page.
         $this->element('p', 'instructions', _('This is a way to share what you like.'));
     }
-}
-
-class FavoritesNoticeList extends NoticeList
-{
-    function newListItem($notice)
-    {
-        return new FavoritesNoticeListItem($notice, $this->out);
-    }
-}
-
-// All handled by superclass
-class FavoritesNoticeListItem extends DoFollowListItem
-{
 }

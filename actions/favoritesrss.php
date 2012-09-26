@@ -109,7 +109,7 @@ class FavoritesrssAction extends Rss10Action
                    // TRANS: Title of RSS feed with favourite notices of a user.
                    // TRANS: %s is a user's nickname.
                    'title' => sprintf(_("%s's favorite notices"), $user->nickname),
-                   'link' => common_local_url('showfavorites',
+                   'link' => common_local_url('favorites',
                                         array('nickname' =>
                                         $user->nickname)),
                    // TRANS: Desciption of RSS feed with favourite notices of a user.

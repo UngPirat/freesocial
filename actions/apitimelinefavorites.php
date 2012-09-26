@@ -126,7 +126,7 @@ class ApiTimelineFavoritesAction extends ApiBareAuthAction
         Event::handle('GetAvatarUrl', array(&$logo, $profile));
 
         $link = common_local_url(
-            'showfavorites',
+            'favorites',
             array('nickname' => $this->user->nickname)
         );
 

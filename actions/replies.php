@@ -2,7 +2,7 @@
 /**
  * StatusNet, the distributed open-source microblogging tool
  *
- * List of mentions
+ * List of replies a profile has made
  *
  * PHP version 5
  *
@@ -36,7 +36,7 @@ require_once INSTALLDIR.'/lib/noticelist.php';
 require_once INSTALLDIR.'/lib/feedlist.php';
 
 /**
- * List of mentions
+ * List of replies a profile has made
  *
  * @category Personal
  * @package  StatusNet
@@ -44,11 +44,11 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class MentionsAction extends ShowstreamAction
+class RepliesAction extends ShowstreamAction
 {
     var $page = null;
     var $notice;
-	protected $action = 'mentions';
+	protected $action = 'replies';
 
     /**
      * Prepare the object
@@ -86,7 +86,7 @@ class MentionsAction extends ShowstreamAction
 
         common_set_returnto($this->selfUrl());
 
-        $stream = new MentionNoticeStream($this->user->id,
+        $stream = new ReplyNoticeStream($this->user->id,
                                         Profile::current());
 
         $this->notice = $stream->getNotices(($this->page-1) * NOTICES_PER_PAGE,
@@ -110,59 +110,16 @@ class MentionsAction extends ShowstreamAction
     function title()
     {
         if ($this->page == 1) {
-            // TRANS: Title for first page of mentions of a user.
+            // TRANS: Title for first page of replies from a user.
             // TRANS: %s is a user nickname.
-            return sprintf(_("Mentions of %s"), $this->user->nickname);
+            return sprintf(_("Replies from %s"), $this->user->nickname);
         } else {
-            // TRANS: Title for all but the first page of mentions of a user.
+            // TRANS: Title for all but the first page of replies from a user.
             // TRANS: %1$s is a user nickname, %2$d is a page number.
-            return sprintf(_('Mentions of %1$s, page %2$d'),
+            return sprintf(_('Replies from %1$s, page %2$d'),
                            $this->user->nickname,
                            $this->page);
         }
-    }
-
-    /**
-     * Feeds for the <head> section
-     *
-     * @return void
-     */
-    function getFeeds()
-    {
-        return array(new Feed(Feed::JSON,
-                              common_local_url('ApiTimelineMentions',
-                                               array(
-                                                    'id' => $this->user->nickname,
-                                                    'format' => 'as')),
-                              // TRANS: Link for feed with mentions of a user.
-                              // TRANS: %s is a user nickname.
-                              sprintf(_('Mention feed for %s (Activity Streams JSON)'),
-                                      $this->user->nickname)),
-                     new Feed(Feed::RSS1,
-                              common_local_url('mentionsrss',
-                                               array('nickname' => $this->user->nickname)),
-                              // TRANS: Link for feed with mentions of a user.
-                              // TRANS: %s is a user nickname.
-                              sprintf(_('Mention feed for %s (RSS 1.0)'),
-                                      $this->user->nickname)),
-                     new Feed(Feed::RSS2,
-                              common_local_url('ApiTimelineMentions',
-                                               array(
-                                                    'id' => $this->user->nickname,
-                                                    'format' => 'rss')),
-                              // TRANS: Link for feed with mentions of a user.
-                              // TRANS: %s is a user nickname.
-                              sprintf(_('Mention feed for %s (RSS 2.0)'),
-                                      $this->user->nickname)),
-                     new Feed(Feed::ATOM,
-                              common_local_url('ApiTimelineMentions',
-                                               array(
-                                                    'id' => $this->user->nickname,
-                                                    'format' => 'atom')),
-                              // TRANS: Link for feed with mentions of a user.
-                              // TRANS: %s is a user nickname.
-                              sprintf(_('Mention feed for %s (Atom)'),
-                                    $this->user->nickname)));
     }
 
     function isReadOnly($args)

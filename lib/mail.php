@@ -472,7 +472,7 @@ function mail_notify_fave($other, $user, $notice)
                     common_local_url('shownotice',
                                      array('notice' => $notice->id)),
                     $notice->content,
-                    common_local_url('showfavorites',
+                    common_local_url('favorites',
                                      array('nickname' => $user->nickname)),
                     common_config('site', 'name'),
                     $user->nickname) .

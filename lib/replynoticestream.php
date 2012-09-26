@@ -3,7 +3,7 @@
  * StatusNet - the distributed open-source microblogging tool
  * Copyright (C) 2011, StatusNet, Inc.
  *
- * Stream of notices repeated by me
+ * Stream of replies the profile has made
  * 
  * PHP version 5
  *
@@ -35,9 +35,9 @@ if (!defined('STATUSNET')) {
 }
 
 /**
- * Stream of notices repeated by me
+ * Stream of replies the profile has made
  *
- * @category  General
+ * @category  Stream
  * @package   StatusNet
  * @author    Evan Prodromou <evan@status.net>
  * @copyright 2011 StatusNet, Inc.
@@ -45,23 +45,23 @@ if (!defined('STATUSNET')) {
  * @link      http://status.net/
  */
 
-class RepeatedByMeNoticeStream extends ScopingNoticeStream
+class ReplyNoticeStream extends ScopingNoticeStream
 {
-    function __construct($user, $profile = -1)
+    function __construct($userId, $profile=-1)
     {
         if (is_int($profile) && $profile == -1) {
             $profile = Profile::current();
         }
-        parent::__construct(new CachingNoticeStream(new RawRepeatedByMeNoticeStream($user),
-                                                    'user:repeated_by_me:'.$user->id),
+        parent::__construct(new CachingNoticeStream(new RawReplyNoticeStream($userId),
+                                                    'reply:stream:' . $userId),
                             $profile);
     }
 }
 
 /**
- * Raw stream of notices repeated by me
+ * Raw stream of replies the profile has made
  *
- * @category  General
+ * @category  Stream
  * @package   StatusNet
  * @author    Evan Prodromou <evan@status.net>
  * @copyright 2011 StatusNet, Inc.
@@ -69,33 +69,29 @@ class RepeatedByMeNoticeStream extends ScopingNoticeStream
  * @link      http://status.net/
  */
 
-class RawRepeatedByMeNoticeStream extends NoticeStream
+class RawReplyNoticeStream extends NoticeStream
 {
-    protected $user;
+    protected $userId;
 
-    function __construct($user)
+    function __construct($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
         $notice = new Notice();
+        $notice->profile_id = $this->userId;
 
-        $notice->selectAdd(); // clears it
-        $notice->selectAdd('id');
+		$notice->whereAdd('reply_to IS NOT NULL');
+        Notice::addWhereSinceId($notice, $since_id, 'id', 'modified');
+        Notice::addWhereMaxId($notice, $max_id, 'id', 'modified');
 
-        $notice->profile_id = $this->user->id;
-        $notice->whereAdd('repeat_of IS NOT NULL');
-
-        $notice->orderBy('created DESC, id DESC');
+        $notice->orderBy('modified DESC, id DESC');
 
         if (!is_null($offset)) {
             $notice->limit($offset, $limit);
         }
-
-        Notice::addWhereSinceId($notice, $since_id);
-        Notice::addWhereMaxId($notice, $max_id);
 
         $ids = array();
 
@@ -104,10 +100,6 @@ class RawRepeatedByMeNoticeStream extends NoticeStream
                 $ids[] = $notice->id;
             }
         }
-
-        $notice->free();
-        $notice = NULL;
-
         return $ids;
     }
 }

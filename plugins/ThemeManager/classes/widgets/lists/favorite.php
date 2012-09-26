@@ -33,7 +33,7 @@ class FavoriteListWidget extends NoticeListWidget {
 
     function the_more() {
         $this->out->elementStart('div', 'list-more');
-        $this->out->element('a', array('href'=>common_local_url('showfavorites', array('nickname'=>$this->profile->nickname))),
+        $this->out->element('a', array('href'=>common_local_url('favorites', array('nickname'=>$this->profile->nickname))),
                             _m('...show all faves.'));
         $this->out->elementEnd('div');
     }

@@ -63,7 +63,7 @@ class DisfavorAction extends Action
         }
         $user = common_current_user();
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-            common_redirect(common_local_url('showfavorites',
+            common_redirect(common_local_url('favorites',
                 array('nickname' => $user->nickname)));
             return;
         }
@@ -103,7 +103,7 @@ class DisfavorAction extends Action
             $this->elementEnd('body');
             $this->elementEnd('html');
         } else {
-            common_redirect(common_local_url('showfavorites',
+            common_redirect(common_local_url('favorites',
                                              array('nickname' => $user->nickname)),
                             303);
         }

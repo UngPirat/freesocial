@@ -74,7 +74,7 @@ class PopularNoticeSection extends NoticeSection
     {
         if (common_config('singleuser', 'enabled')) {
             $user = User::singleUser();
-            common_local_url('showfavorites', array('nickname' =>
+            common_local_url('favorites', array('nickname' =>
                                                     $user->nickname));
         } else {
             return common_local_url('favorited');

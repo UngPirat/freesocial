@@ -8,8 +8,8 @@
     $this->out->element('h2', 'content-title', $this->get_title());
 
     if ($this->is_single()) :
-        if ($this->is_action('showprofile')) {
-            $this->content('showprofile');
+        if ($this->is_action('showstream')) {
+            $this->content('showstream');
     	} elseif ($this->is_action('gallery')) {
 			$this->content('gallery');
         } else {

@@ -107,15 +107,15 @@
 }
 
 
-.showprofile-action #stream .notice {
+.showstream-action #stream .notice {
 	margin: 2em 0;
 }
-.showprofile-action #stream .vcard.author {
+.showstream-action #stream .vcard.author {
 	display: none;
 }
-.showprofile-action #stream .repeat .vcard.author {
+.showstream-action #stream .repeat .vcard.author {
 	display: block;
 }
-.showprofile-action #stream .source {
+.showstream-action #stream .source {
 	display: none;
 }

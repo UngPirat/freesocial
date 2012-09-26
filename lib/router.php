@@ -850,7 +850,7 @@ class Router
                 }
 
                 $m->connect('favorites',
-                            array('action' => 'showfavorites',
+                            array('action' => 'favorites',
                                   'nickname' => $nickname));
 
                 $m->connect('avatar/:size',
@@ -1022,7 +1022,7 @@ class Router
                 }
 
                 $m->connect(':nickname/favorites',
-                            array('action' => 'showfavorites'),
+                            array('action' => 'favorites'),
                             array('nickname' => Nickname::DISPLAY_FMT));
 
                 $m->connect(':nickname/avatar/:size',

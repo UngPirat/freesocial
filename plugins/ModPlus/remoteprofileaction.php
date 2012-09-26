@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-class RemoteProfileAction extends ShowprofileAction
+class RemoteProfileAction extends ShowstreamAction
 {
     function prepare($args)
     {
@@ -61,7 +61,7 @@ class RemoteProfileAction extends ShowprofileAction
     /**
      * Instead of showing notices, link to the original offsite profile.
      */
-    function showNotices()
+    function showContent()
     {
         $url = $this->profile->profileurl;
         $host = parse_url($url, PHP_URL_HOST);
@@ -73,33 +73,9 @@ class RemoteProfileAction extends ShowprofileAction
                 $this->profile->nickname,
                 $host,
                 $url);
-        $html = common_markup_to_html($markdown);
-        $this->raw($html);
+        $this->raw(common_markup_to_html($markdown));
 
-        if ($this->profile->hasRole(Profile_role::SILENCED)) {
-            // TRANS: Message on blocked remote profile page.
-            $markdown = _m('Site moderators have silenced this profile, which prevents delivery of new messages to any users on this site.');
-            $this->raw(common_markup_to_html($markdown));
-        } else {
-
-            $pnl = null;
-            if (Event::handle('ShowStreamNoticeList', array($this->notice, $this, &$pnl))) {
-                $pnl = new ProfileNoticeList($this->notice, $this);
-            }
-            $cnt = $pnl->show();
-            if (0 == $cnt) {
-                $this->showEmptyListMessage();
-            }
-
-            $args = array('id' => $this->profile->id);
-            if (!empty($this->tag))
-            {
-                $args['tag'] = $this->tag;
-            }
-            $this->pagination($this->page>1, $cnt>NOTICES_PER_PAGE, $this->page,
-                              'remoteprofile', $args);
-
-        }
+		parent::showContent();
     }
 
     function getFeeds()

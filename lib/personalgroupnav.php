@@ -92,7 +92,7 @@ class PersonalGroupNav extends Menu
                                  // TRANS: %s is a username.
                                  sprintf(_('Mentions of %s'), $name),
                                  $mine && $action =='mentions', 'nav_timeline_mentions');
-            $this->out->menuItem(common_local_url('showfavorites', array('nickname' =>
+            $this->out->menuItem(common_local_url('favorites', array('nickname' =>
                                                                          $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.
                                  _m('MENU','Favorites'),
@@ -102,7 +102,7 @@ class PersonalGroupNav extends Menu
                                  sprintf(_('%s\'s favorite notices'),
                                          // TRANS: Replaces %s in '%s\'s favorite notices'. (Yes, we know we need to fix this.)
                                          ($user_profile) ? $name : _m('FIXME','User')),
-                                 $mine && $action =='showfavorites', 'nav_timeline_favorites');
+                                 $mine && $action =='favorites', 'nav_timeline_favorites');
 
             Event::handle('EndPersonalGroupNav', array($this));
         }

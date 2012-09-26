@@ -45,7 +45,7 @@ class ThemeManagerPlugin extends Plugin {
 
 	function onGetTmSupported(&$supported) {
 		$supported = array_merge($supported, array(
-				'showprofile' => 'profile',
+				'showstream' => 'profile',
 				));
 	}
 
@@ -81,12 +81,8 @@ class ThemeManagerPlugin extends Plugin {
 
     function onStartInitializeRouter($m)
     {
-        // legacy
-        $m->connect(':nickname',
-                    array('action' => 'showprofile'),
-                    array('nickname' => Nickname::DISPLAY_FMT));
-        $m->connect(':nickname/',
-                    array('action' => 'showprofile'),
+        $m->connect(':nickname/replies',
+                    array('action' => 'replies'),
                     array('nickname' => Nickname::DISPLAY_FMT));
         return true;
     }

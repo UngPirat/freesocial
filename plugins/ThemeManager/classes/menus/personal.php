@@ -26,10 +26,9 @@ class PersonalMenu extends ThemeMenu {
             // list($actionName, $args, $label, $description, $id)
             $items = array_merge($items, array(
                 array('url'=>'all', 'args'=>$args, 'label'=>_m('MENU','Home'), 'description'=>_m('Home timeline')),
-                array('url'=>'showprofile',   'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
+                array('url'=>'showstream',   'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
                 array('url'=>'mentions',       'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
-                array('url'=>'showstream',    'args'=>$args, 'label'=>_m('MENU','Notices'), 'description'=>_m('Your noticestream')),
-                array('url'=>'showfavorites', 'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
+                array('url'=>'favorites', 'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
                 ));
             Event::handle('EndPersonalGroupNav', array($adapter));
         }

@@ -148,7 +148,7 @@ class AtompubfavoritefeedAction extends ApiAuthAction
                                    $this->_profile->getBestName(),
                                    common_config('site', 'name')));
 
-        $feed->addLink(common_local_url('showfavorites',
+        $feed->addLink(common_local_url('favorites',
                                         array('nickname' =>
                                               $this->_profile->nickname)));
 
