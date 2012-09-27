@@ -286,7 +286,7 @@ class PeopletagListItem extends Widget
         if (!Event::handle('GetAvatarElement', array(
                                 &$element, $this->profile, $size,
                                 array(
-									'width' => $size),
+									'width' => $size,
 									'height' => $size,
 									'alt' => $this->profile->getBestName(),
                                 ))
