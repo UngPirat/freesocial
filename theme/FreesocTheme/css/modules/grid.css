@@ -1,7 +1,6 @@
 #wrapper {
-	margin: 2em auto;
+	margin: 1em 2em;
 	position: relative;
-	max-width: 1100px;
 }
 
 #wrapper > * {

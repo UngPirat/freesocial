@@ -30,7 +30,6 @@ define('AVATARS_PER_PAGE', 80);
 // @todo FIXME: Class documentation missing.
 class GalleryAction extends ProfileAction
 {
-
     function isReadOnly($args)
     {
         return true;

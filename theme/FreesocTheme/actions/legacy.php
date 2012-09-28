@@ -12,7 +12,7 @@
 		if (isset($this->action->user)) {
 			$this->action->profile = $this->action->user->getProfile();
 		}
-		$this->content('profile-noticelist');
+		$this->content('gallery');
 	} elseif (isset($this->action->notice) || isset($this->action->notices)) {
 		$this->content('noticelist');
 	} elseif ($this->get_template() != 'legacy') {

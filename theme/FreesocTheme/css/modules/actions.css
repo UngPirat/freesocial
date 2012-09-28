@@ -26,8 +26,8 @@
     border: 0;
 	color: black;
 	cursor:pointer;
-    display: block;
-	float: left;
+    display: inline-block;
+	overflow: hidden;
 	vertical-align: middle;
 	text-align: center;
     outline:none;
@@ -37,14 +37,14 @@
 	font-family: FontAwesome;
 	font-size: 1.25em;
 	line-height: 1.25em;
-	margin: 0.25ex;
+	overflow: hidden;
 	height: 1em;
     width: 1em;
-	overflow: hidden;
 }
 
-#profile .actions input, #profile .actions .action {
+.actions > ul > li {
 	font-size: 2em;
+	margin: 0.25ex;
 }
 .actions .entity_subscribe input {
 	font-family: OpenWeb;

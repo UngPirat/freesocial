@@ -5,8 +5,7 @@
 }
 .notices {
 	display: block;
-	margin: 2%;
-	padding: 1ex 1%;
+	padding: 1ex 0;
 }
 
 .conversation .notice {
@@ -65,22 +64,27 @@
 	top: -1.1em;
 	left: 0;
 }
-.conversation .notice .metadata {
-	display: none;
+.conversation .notice {
+	margin-top: 1em;
 }
 .notice > * {
 	text-align: left;
 }
-.notice > .vcard {
+.vcard.author {
 	display: block;
+}
+.notice .vcard.author {
 	float: left;
 }
-.notice > .vcard .photo {
+.vcard .photo {
 	border-radius: 1ex;
 	display: block;
-	margin: 1ex;
+	margin: 1ex auto
 }
-.notice > .vcard .url {
+.notice .vcard .photo {
+	margin: 0 1ex 1ex 0;
+}
+.vcard.author .url {
 	display: none;
 }
 
@@ -110,9 +114,11 @@
 .showstream-action #stream .notice {
 	margin: 2em 0;
 }
+.shownotice-action #stream .vcard.author,
 .showstream-action #stream .vcard.author {
 	display: none;
 }
+.mentions-action #stream .notice .vcard.author,
 .showstream-action #stream .repeat .vcard.author {
 	display: block;
 }

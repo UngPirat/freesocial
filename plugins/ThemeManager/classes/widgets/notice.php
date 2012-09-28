@@ -179,9 +179,9 @@ class NoticeWidget extends ThemeWidget {
         $this->out->element('a', array('href'=>$this->get_profile_url(), 'class'=>'author'), $this->get_name());
     }
 	function the_context() {
-//		if ($this->item->hasConversation()) {
+		if ($this->item->hasConversation()) {
 	        $this->out->element('a', array('href'=>$this->get_conversation_url(), 'class'=>'context'), _m('in context'));
-//		}
+		}
 	}
     function the_timestamp() {
 		$this->out->elementStart('a', array('href'=>$this->get_permalink(), 'class'=>'permalink timestamp', 'title'=>_m('Permalink')));

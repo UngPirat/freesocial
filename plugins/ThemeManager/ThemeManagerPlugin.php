@@ -40,6 +40,7 @@ class ThemeManagerPlugin extends Plugin {
 
 	function onGetTmSupported(&$supported) {
 		$supported = array_merge($supported, array(
+				'settings' => 'settings',
 				'showstream' => 'profile',
 				));
 	}
