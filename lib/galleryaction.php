@@ -30,53 +30,6 @@ define('AVATARS_PER_PAGE', 80);
 // @todo FIXME: Class documentation missing.
 class GalleryAction extends ProfileAction
 {
-    var $profile = null;
-    var $page = null;
-    var $tag = null;
-
-    function prepare($args)
-    {
-        parent::prepare($args);
-
-        // FIXME very similar code below
-
-        $nickname_arg = $this->arg('nickname');
-        $nickname = common_canonical_nickname($nickname_arg);
-
-        // Permanent redirect on non-canonical nickname
-
-        if ($nickname_arg != $nickname) {
-            $args = array('nickname' => $nickname);
-            if ($this->arg('page') && $this->arg('page') != 1) {
-                $args['page'] = $this->arg['page'];
-            }
-            common_redirect(common_local_url($this->trimmed('action'), $args), 301);
-            return false;
-        }
-
-        $this->user = User::staticGet('nickname', $nickname);
-
-        if (!$this->user) {
-            // TRANS: Client error displayed when trying to perform a gallery action with an unknown user.
-            $this->clientError(_('No such user.'), 404);
-            return false;
-        }
-
-        $this->profile = $this->user->getProfile();
-
-        if (!$this->profile) {
-            // TRANS: Error message displayed when referring to a user without a profile.
-            $this->serverError(_('User has no profile.'));
-            return false;
-        }
-
-        $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
-
-        $this->tag = $this->trimmed('tag');
-        $this->q   = $this->trimmed('q');
-
-        return true;
-    }
 
     function isReadOnly($args)
     {
