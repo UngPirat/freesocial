@@ -311,7 +311,14 @@ class FacebookImport
             $noticeOpts['is_local'] = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
         } else {
             $noticeOpts['is_local'] = Notice::GATEWAY;
-            $noticeOpts['uri']      = $this->makeUpdateURI($update['id'], (!is_null($reply) ? $rprofile->nickname : $profile->nickname));
+			$original_poster = (!is_null($reply) ? $rprofile->id : $profile->id);
+			if ($original_poster_flink = Foreign_link::staticGet('user_id', $original_poster)) {
+				$fuser = Foreign_user::staticGet('id', $original_poster_flink->foreign_id);
+				$nickname = !empty($fuser) ? $nickname = $fuser->nickname : null;
+			} else {
+				$nickname = $original_poster->nickname;
+			}
+            $noticeOpts['uri']      = $this->makeUpdateURI($update['id'], $nickname);
         }
 
         $notice  = Notice::saveNew($noticeOpts['profile_id'], $noticeOpts['content'], $noticeOpts['source'], $noticeOpts);

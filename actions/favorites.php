@@ -145,21 +145,6 @@ class FavoritesAction extends ShowstreamAction
     }
 
     /**
-     * Handle a request
-     *
-     * Just show the page. All args already handled.
-     *
-     * @param array $args $_REQUEST data
-     *
-     * @return void
-     */
-    function handle($args)
-    {
-        parent::handle($args);
-        $this->showPage();
-    }
-
-    /**
      * Feeds for the <head> section
      *
      * @return array Feed objects to show

@@ -122,7 +122,7 @@ class FreeSocialPlugin extends Plugin {
         if ((common_logged_in() || common_config('singleuser', 'enabled'))
 				&& ($domain = parse_url($url, PHP_URL_HOST))) {
 			$profile = $user->getProfile();
-			$avatarUrl = Avatar::getUrlByProfile($profile, 48);
+			$avatarUrl = Avatar::getUrlByProfile($profile, Avatar::STREAM_SIZE);
 
 			$acct = "{$user->nickname}@{$domain}";
 			$out->elementStart('a', array('href' => "$url"));
