@@ -1348,35 +1348,35 @@ function common_date_string($dt)
         return _('a few seconds ago');
     } else if ($diff < 92) {
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return _('about a minute ago');
+        return _('less than a minute ago');
     } else if ($diff < 3300) {
         $minutes = round($diff/60);
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return sprintf( _m('about one minute ago', 'about %d minutes ago', $minutes), $minutes);
+        return sprintf( _m('one minute ago', '%d minutes ago', $minutes), $minutes);
     } else if ($diff < 5400) {
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return _('about an hour ago');
+        return _('less than an hour ago');
     } else if ($diff < 22 * 3600) {
         $hours = round($diff/3600);
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return sprintf( _m('about one hour ago', 'about %d hours ago', $hours), $hours);
+        return sprintf( _m('one hour ago', '%d hours ago', $hours), $hours);
     } else if ($diff < 37 * 3600) {
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return _('about a day ago');
+        return _('less than a day ago');
     } else if ($diff < 24 * 24 * 3600) {
         $days = round($diff/(24*3600));
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return sprintf( _m('about one day ago', 'about %d days ago', $days), $days);
+        return sprintf( _m('one day ago', '%d days ago', $days), $days);
     } else if ($diff < 46 * 24 * 3600) {
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return _('about a month ago');
+        return _('less than a month ago');
     } else if ($diff < 330 * 24 * 3600) {
         $months = round($diff/(30*24*3600));
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return sprintf( _m('about one month ago', 'about %d months ago',$months), $months);
+        return sprintf( _m('one month ago', '%d months ago',$months), $months);
     } else if ($diff < 480 * 24 * 3600) {
         // TRANS: Used in notices to indicate when the notice was made compared to now.
-        return _('about a year ago');
+        return _('less than a year ago');
     } else {
         return common_exact_date($dt);
     }
