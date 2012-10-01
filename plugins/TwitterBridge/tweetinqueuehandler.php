@@ -50,7 +50,7 @@ class TweetInQueueHandler extends QueueHandler
 
         $importer = new TwitterImport();
         $notice = $importer->importStatus($status);
-        if ($notice) {
+        if ($notice && strtotime($notice->created) > time()-3*3600) {	// only 3 hour fresh stuff to Inbox
             $flink = Foreign_link::getByForeignID($receiver, TWITTER_SERVICE);
             if ($flink) {
 				common_log(LOG_DEBUG, "TweetInQueueHandler - Got flink so add notice ".

@@ -44,7 +44,7 @@ if (!defined('STATUSNET')) {
  * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html AGPL 3.0
  * @link      http://status.net/
  */
-class ActivityPlugin extends Plugin
+class ActivityPlugin extends ActivityHandlerPlugin
 {
     const VERSION = '0.1';
     const SOURCE  = 'activity';
@@ -63,6 +63,9 @@ class ActivityPlugin extends Plugin
 
         switch ($cls)
         {
+        case 'ActivityWidget':
+            include_once $dir . '/widgets/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
+            return false;
         case 'JoinListItem':
         case 'LeaveListItem':
         case 'FollowListItem':
@@ -72,6 +75,43 @@ class ActivityPlugin extends Plugin
             return false;
         default:
             return true;
+        }
+    }
+
+    function types()
+    {
+        return array(ActivityObject::PERSON, ActivityObject::GROUP, ActivityObject::ACTIVITY);
+    }
+
+    function verbs()
+    {
+        return array(ActivityVerb::FAVORITE, ActivityVerb::UNFAVORITE, ActivityVerb::JOIN,
+                     ActivityVerb::LEAVE, ActivityVerb::FOLLOW, ActivityVerb::UNFOLLOW);
+    }
+
+    function onStartRunNoticeWidget($args) {
+        if ($this->isMyNotice($args['item'])) {
+            ActivityWidget::run($args);
+            return false;
+        }
+// old stuff
+        switch (ActivityUtils::resolveUri($notice->verb, true)) {
+        case ActivityVerb::FAVORITE:
+        case ActivityVerb::UNFAVORITE:
+            $adapter = new SystemListItem($nli);
+            break;
+        case ActivityVerb::JOIN:
+            $adapter = new JoinListItem($nli);
+            break;
+        case ActivityVerb::LEAVE:
+            $adapter = new JoinListItem($nli);
+            break;
+        case ActivityVerb::FOLLOW:
+            $adapter = new FollowListItem($nli);
+            break;
+        case ActivityVerb::UNFOLLOW:
+            $adapter = new UnfollowListItem($nli);
+            break;
         }
     }
 
@@ -192,8 +232,9 @@ class ActivityPlugin extends Plugin
                                             'mentions' => array($author->getUri()),
                                             'uri' => $fave->getURI(),
                                             'verb' => ActivityVerb::FAVORITE,
-                                            'object_type' => (($notice->verb == ActivityVerb::POST) ?
-                                                             ActivityUtils::resolveUri($notice->object_type, true) : ActivityObject::ACTIVITY)));
+                                            'object_type' => (($notice->verb == ActivityVerb::POST)
+                                                            ? ActivityUtils::resolveUri($notice->object_type, true)
+                                                            : ActivityObject::ACTIVITY)));
         }
         return true;
     }
@@ -327,42 +368,6 @@ class ActivityPlugin extends Plugin
                                         'uri' => $uri,
                                         'verb' => ActivityVerb::LEAVE,
                                         'object_type' => ActivityObject::GROUP));
-        return true;
-    }
-
-    function onStartShowNoticeItem($nli)
-    {
-        $notice = $nli->notice;
-
-        $adapter = null;
-
-        switch (ActivityUtils::resolveUri($notice->verb, true)) {
-        case ActivityVerb::FAVORITE:
-        case ActivityVerb::UNFAVORITE:
-            $adapter = new SystemListItem($nli);
-            break;
-        case ActivityVerb::JOIN:
-            $adapter = new JoinListItem($nli);
-            break;
-        case ActivityVerb::LEAVE:
-            $adapter = new JoinListItem($nli);
-            break;
-        case ActivityVerb::FOLLOW:
-            $adapter = new FollowListItem($nli);
-            break;
-        case ActivityVerb::UNFOLLOW:
-            $adapter = new UnfollowListItem($nli);
-            break;
-        }
-
-        if (!empty($adapter)) {
-            $adapter->showNotice();
-            $adapter->showNoticeAttachments();
-            $adapter->showNoticeInfo();
-            $adapter->showNoticeOptions();
-            return false;
-        }
-
         return true;
     }
 

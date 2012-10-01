@@ -23,6 +23,7 @@ class ProfileWidget extends ThemeWidget {
         $this->the_vcard();
         $this->the_actions();
         $this->the_metadata();
+		$this->the_connections();
     }
 
     function get_name() {
@@ -49,6 +50,10 @@ class ProfileWidget extends ThemeWidget {
     function the_actions() {
         ProfileactionsWidget::run(array('item'=>$this->item, 'scoped'=>$this->scoped));
     }
+	function the_connections() {
+		SubscriptionListWidget::run(array('profile'=>$this->item, 'scoped'=>$this->scoped));
+		SubscriberListWidget::run(array('profile'=>$this->item, 'scoped'=>$this->scoped));
+	}
     function the_vcard() {
         $this->out->elementStart('span', 'vcard author');
         $this->out->elementStart('a', array('href'=>$this->get_profile_url()));

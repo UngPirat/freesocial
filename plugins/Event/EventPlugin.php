@@ -85,6 +85,9 @@ class EventPlugin extends MicroappPlugin
         case 'TimelistAction':
             include_once $dir . '/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
             return false;
+        case 'HappeningWidget':
+            include_once $dir . '/widgets/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
+            return false;
         case 'EventListItem':
         case 'RSVPListItem':
         case 'EventForm':
@@ -101,6 +104,13 @@ class EventPlugin extends MicroappPlugin
             return true;
         }
     }
+
+	function onStartRunNoticeWidget($args) {
+		if ($this->isMyNotice($args['item'])) {
+			HappeningWidget::run($args);
+			return false;
+		}
+	}
 
     /**
      * Map URLs to actions

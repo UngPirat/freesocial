@@ -17,7 +17,7 @@ address {
 
 address img {
 	border-radius: 1ex;
-    float: left;
+	position: absolute;
 	margin-right: 1em;
 }
 
@@ -94,6 +94,7 @@ h6 {font-size: 1em;}
 	font-family: "Liberation Serif", serif;
 	font-size: 2em;
 	font-style: normal;
+	margin-left: 100px;
 }
 #content {
 	width: 54%;

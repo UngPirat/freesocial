@@ -2,6 +2,16 @@
 	width:120px;
 	height: auto;
 }
+#profile > .vcard.author {
+	float: right;
+}
+#profile .actions > ul {
+	float: right;
+	margin-right: 1em;
+}
+.remoteprofile-action #profile > .vcard.author .url {
+	display: block;
+}
 
 .settings.menu-container {
 	background: transparent;

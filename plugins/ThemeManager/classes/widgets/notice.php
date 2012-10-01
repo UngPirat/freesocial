@@ -13,8 +13,8 @@ class NoticeWidget extends ThemeWidget {
             $class = get_class();
             $widget = new $class($args);    // runs validate()
             $widget->show();
-			Event::handle('EndRunNoticeWidget', array($widget));
-		}
+            Event::handle('EndRunNoticeWidget', array($widget));
+        }
     }
 
     // always gets run on __construct, which is also called on ::run()
@@ -41,40 +41,43 @@ class NoticeWidget extends ThemeWidget {
 
     function show() {
         if (!$this->item->inScope($this->scoped)) {
-            return false;
+            return false;	// shouldn't this throw an exception?
         }
-		if (!empty($this->item->repeat_of)) {
-			$this->itemClass .= ' repeat';
-		}
+        if (!empty($this->item->repeat_of)) {
+            $this->itemClass .= ' repeat';
+        }
         if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->item->id)) {
             $this->itemClass .= $score->is_spam ? ' spam' : '';
         }
-		$this->the_item();
+        $this->the_item();
         return true;
-	}
+    }
 
-	function the_item() {
+    function the_item() {
         $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->itemClass));
         $this->the_vcard();
         $this->the_content();
+        if (common_config('attachments', 'show_thumbs')) {
+            $this->the_attachments();
+        }
         $this->the_metadata();
         $this->the_actions();
         $this->itemTag && $this->out->elementEnd($this->itemTag);
     }
 
-	function get_notice() {
+    function get_notice() {
         if (!empty($this->repeated)) {
-			return $this->repeated;
-		}
+            return $this->repeated;
+        }
 
-		return $this->item;
-	}
-	function get_conversation_id() {
-		return $this->get_notice()->conversation;
-	}
-	function get_conversation_url() {
+        return $this->item;
+    }
+    function get_conversation_id() {
+        return $this->get_notice()->conversation;
+    }
+    function get_conversation_url() {
         return common_local_url('conversation', array('id'=>$this->get_conversation_id())).'#notice-'.$this->get_notice_id();
-	}
+    }
     function get_notice_id() {
         return $this->get_notice()->id;
     }
@@ -91,15 +94,15 @@ class NoticeWidget extends ThemeWidget {
                 : $profile->profileurl;
     }
     function get_permalink() {
-		return common_local_url('shownotice', array('notice'=>$this->item->id));
+        return common_local_url('shownotice', array('notice'=>$this->item->id));
     }
     function get_verb() {
         if (!empty($this->repeated)) {
-            $verb = _m('was repeated');
+            $verb = _m('repeated');
         } elseif (!empty($this->item->reply_to)) {
             $verb = _m('replied');
         } else {
-            $verb = _m('posted this');
+            $verb = _m('posted');
         }
         return $verb;
     }
@@ -112,9 +115,16 @@ class NoticeWidget extends ThemeWidget {
                 ? $notice->rendered
                 : common_render_content($notice->content, $notice);
     }
+    function the_attachments() {
+		AttachmentListWidget::run(array(
+									'notice'=>$this->get_notice(),
+									'title'=>_m('Attachments'),
+									'hideEmpty'=>true,
+								));
+    }
     function the_content() {
-		$this->out->flush();	// PHP crashes (memory limit?) if we don't flush once in a while
-        $this->out->elementStart('span', 'notice-content');
+        $this->out->flush();    // PHP crashes (memory limit?) if we don't flush once in a while
+        $this->out->elementStart('span', 'content');
         $this->out->raw($this->get_rendered_content());
         $this->out->elementEnd('span');
     }
@@ -126,7 +136,7 @@ class NoticeWidget extends ThemeWidget {
     }
     function the_metadata() {
         $this->out->elementStart('footer', 'metadata');
-        $this->the_author();
+//        $this->the_author();
         $this->the_verb();
         $this->the_timestamp();
         $this->the_context();
@@ -172,25 +182,25 @@ class NoticeWidget extends ThemeWidget {
     function the_permalink() {
         $this->out->element('a', array('href'=>$this->get_permalink(), 'class'=>'permalink'), _m('Permalink'));
     }
-	function the_verb() {
-		$this->out->element('span', 'verb', $this->get_verb());
-	}
+    function the_verb() {
+        $this->out->element('span', 'verb', $this->get_verb());
+    }
     function the_author() {    // original author if repeated!
         $this->out->element('a', array('href'=>$this->get_profile_url(), 'class'=>'author'), $this->get_name());
     }
-	function the_context() {
-		if ($this->item->hasConversation()) {
-	        $this->out->element('a', array('href'=>$this->get_conversation_url(), 'class'=>'context'), _m('in context'));
-		}
-	}
+    function the_context() {
+        if ($this->item->hasConversation()) {
+            $this->out->element('a', array('href'=>$this->get_conversation_url(), 'class'=>'context'), _m('in context'));
+        }
+    }
     function the_timestamp() {
-		$this->out->elementStart('a', array('href'=>$this->get_permalink(), 'class'=>'permalink timestamp', 'title'=>_m('Permalink')));
+        $this->out->elementStart('a', array('href'=>$this->get_permalink(), 'class'=>'permalink timestamp', 'title'=>_m('Permalink')));
         $this->out->element('time', array('pubdate'=>'pubdate', 'datetime'=>common_date_iso8601($this->item->created)),
                                 common_date_string($this->item->created));
-		$this->out->elementEnd('a');
+        $this->out->elementEnd('a');
     }
     function the_vcard() {
-		VcardWidget::run(array('item'=>$this->profile, 'avatarSize'=>$this->avatarSize));
+        VcardWidget::run(array('item'=>$this->profile, 'avatarSize'=>$this->avatarSize));
     }
 }
 

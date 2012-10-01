@@ -2,6 +2,7 @@
 
 class NoticeListWidget extends ListWidget {
     protected $list = null;
+    protected $pagination = true;
     protected $widgetClass = 'notices';
 
     static function run($args=null) {
@@ -26,8 +27,11 @@ class NoticeListWidget extends ListWidget {
     }
 
     function the_item($item) {
+/*        if ($item->hasConversation()) {
+            ConversationListWidget::run(array('list'=>array($item), 'pagination'=>false));
+        } else {
+            NoticeWidget::run(array('item'=>$item));
+    	}*/
         NoticeWidget::run(array('item'=>$item));
     }
 }
-
-?>

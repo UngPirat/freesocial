@@ -1,0 +1,15 @@
+.notice .attachments {
+	margin: 1em 0;
+}
+.notice .attachments h3 {
+	font-variant: small-caps;
+	display: none;
+}
+
+.link.attachment:before {
+	content: '';
+	font-family: FontAwesome;
+}
+.thumb.attachment {
+	clear: both;
+}

@@ -133,6 +133,7 @@ class RawProfileNoticeStream extends NoticeStream
         $notice->selectAdd();
         $notice->selectAdd('id');
 
+		$notice->whereAdd('object_type NOT IN ("activity", "person", "group")');
 		$notice->whereAdd('reply_to IS NULL');
 		$notice->whereAdd('repeat_of IS NULL');
         Notice::addWhereSinceId($notice, $since_id);

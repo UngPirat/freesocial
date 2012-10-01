@@ -1,23 +1,26 @@
 .conversations .conversation {
 	font-size: 0.8em;
 	float: left;
-	width: 44%;
+	width: 46%;
+	margin: 0 1% 1em;
+	padding: 0 1ex;
+	border-radius: 1em;
+	border-right: 1px solid gray;
 }
 .notices {
 	display: block;
-	padding: 1ex 0;
 }
 
 .conversation .notice {
 	margin-left: 10%;
-	padding: 1ex;
 }
 .conversation,
-.conversation .notice:first-child {
-	background-color: #e0e0e0;
+.conversation .notice:first-child,
+.notice {
+	background-color: #f0f0f0;
 }
 .conversation .notice {
-	background-color: #ececec;
+	background-color: #fff;
 }
 /* WHY U NO MARGIN??? */
 .notice:after {
@@ -28,12 +31,12 @@
     visibility: hidden;
 }
 .conversation .notice:first-child {
+	border: none;
 	font-size: 1em;
 	margin-left: 0;
-	margin-top: 1em;
-	padding-top: 1px;
+	margin-top: 1ex;
 }
-.conversation .repeat .notice-content:before {
+.conversation .notice.repeat .content:before {
 	position: absolute;
 	font-size: 2em;
 	content: '\2672';
@@ -41,7 +44,7 @@
 	right: 100%;
 }
 
-.notice .notice-content {
+.notice .content {
 	display: block;
 	line-height: 1.25em;
 	margin: 1ex 0;
@@ -50,19 +53,23 @@
 
 
 .notice {
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	border-radius: 1em;
 	clear: both;
 	position: relative;
+	margin: 1em 0;
+	padding: 1.5em 1ex 0;
 }
 .notice.spam {
 	border: 2px solid red;
 }
-.conversation .notice:first-child .metadata,
 .notice .metadata {
 	display: block;
 	font-size: 0.75em;
 	position: absolute;
-	top: -1.1em;
-	left: 0;
+	top: 1ex;
+	left: 1ex;
 }
 .conversation .notice {
 	margin-top: 1em;
@@ -75,14 +82,25 @@
 }
 .notice .vcard.author {
 	float: left;
+	margin: 0 1ex 1ex 0;
+	max-width: 30%;
+	position: relative;
 }
 .vcard .photo {
 	border-radius: 1ex;
 	display: block;
-	margin: 1ex auto
+	margin: 1ex auto;
+	max-width: 100%;
+}
+.mini-list .vcard .photo {
+	margin: 0;
 }
 .notice .vcard .photo {
-	margin: 0 1ex 1ex 0;
+}
+.vcard.author .url:before {
+	content: '';
+	font-family: FontAwesome;
+	margin: 0 1ex 0 0;
 }
 .vcard.author .url {
 	display: none;
@@ -112,16 +130,14 @@
 
 
 .showstream-action #stream .notice {
-	margin: 2em 0;
 }
-.shownotice-action #stream .vcard.author,
-.showstream-action #stream .vcard.author {
+.shownotice-action #stream .vcard.author {
 	display: none;
 }
-.mentions-action #stream .notice .vcard.author,
+/*.mentions-action #stream .notice .vcard.author,
 .showstream-action #stream .repeat .vcard.author {
 	display: block;
-}
-.showstream-action #stream .source {
+}*/
+.notice .source.device {
 	display: none;
 }

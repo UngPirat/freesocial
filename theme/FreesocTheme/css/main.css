@@ -7,10 +7,13 @@
 @import url("modules/menu.css");
 @import url("modules/noticelist.css");
 @import url("modules/actions.css");
+@import url("modules/attachments.css");
 @import url("modules/widgets.css");
 @import url("modules/aside.css");
 @import url("modules/forms.css");
 @import url("modules/oldforms.css");
+
+@import url("modules/happening.css");
 
 body {
 	color: black;
@@ -36,8 +39,8 @@ a:hover {
 
 nav.paging {
 	clear: both;
-    margin: 1em auto;
-    padding: 1px;
+    margin: -2em auto 0;
+    padding: 2em 0;
 	text-align: center;
 }
 /* self-clearing bug */

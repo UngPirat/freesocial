@@ -56,10 +56,10 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
 
         $pages = array();
         if ($page > 1) {
-            $pages['next']   = $page - 1;
+            $pages['next'] = $page - 1;
         }
-        if ($this->count() > $this->num) {
-            $pages['prev']   = $page + 1;
+        if ($this->count() >= $this->num) {
+            $pages['prev'] = $page + 1;
         }
         if (isset($pages['next']) || isset($pages['prev'])) {
             $pages['current'] = $page;

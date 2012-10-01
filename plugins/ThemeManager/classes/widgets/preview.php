@@ -31,13 +31,18 @@ class PreviewWidget extends ThemeWidget {
     }
 
     function show() {
+		if (false===$this->show_thumb()) {
+			$this->show_link();
+		}
+    }
+
+	function show_thumb() {
         $thumb = $this->item->getThumbnail(Avatar::PROFILE_SIZE);
         if (empty($thumb)) {
             return false;
         }
-
-        $this->out->elementStart('li', "list-item {$this->itemClass}");
-        $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$this->item->id)), 'class'=>'url'));
+        $this->out->elementStart('li', "thumb {$this->itemClass}");
+        $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$this->item->id)), 'class'=>'url thumb'));
         $this->out->element('img', array('src'=>$thumb->url));
         if (!empty($this->notices)) {
             $this->out->elementStart('div', 'description');
@@ -48,7 +53,15 @@ class PreviewWidget extends ThemeWidget {
         }
         $this->out->elementEnd('a');
         $this->out->elementEnd('li');
-    }
+	}
+
+	function show_link() {
+        $this->out->elementStart('li', " link {$this->itemClass}");
+		$title = !empty($this->item->title) ? $this->item->title : $this->item->url;
+        $this->out->element('a', array('href'=>$this->item->url, 'rel'=>'external', 'class'=>'url link'), $title);
+
+        $this->out->elementEnd('li');
+	}
 }
 
 ?>

@@ -75,7 +75,7 @@ class FlagProfileForm extends ProfileActionForm
     function title()
     {
         // TRANS: Form title for flagging a profile for review.
-        return ' '._m('Flag');
+        return ' '._m('Flag');
     }
 
     /**

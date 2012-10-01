@@ -1,6 +1,6 @@
 .notice .actions {
-	right: 0;
-	top: -1.5em;
+	right: 1ex;
+	top: 0;
 	position: absolute;
 	opacity: 0.4;
 }
@@ -58,16 +58,19 @@
     clear: both;
     visibility: hidden;
 }
-.actions > ul > li {
-	float: left;
-}
 
 /* colors */
+#profile .actions .form_entity_unflag input.submit:hover,
+#profile .actions .form_entity_flag input.submit,
+#profile .actions .form_user_unsubscribe input.submit:hover,
+#profile .actions .form_user_subscribe input.submit,
 .notice .actions .form-train-ham .submit:hover,
 .notice .actions form.form_disfavor input.submit:hover {
 	color: black;
 }
 
+#profile .actions .form_entity_flag input.submit:hover,
+#profile .actions .form_entity_unflag input.submit,
 .notice .actions .form-train-spam .submit:hover,
 .notice .actions .form-train-ham .submit,
 .notice .actions .delete {
@@ -77,6 +80,8 @@
 	color: black;
 }
 
+#profile .actions .form_user_subscribe input.submit:hover,
+#profile .actions .form_user_unsubscribe input.submit,
 .notice .actions form.form_favor input.submit:hover,
 .notice .actions form.form_disfavor input.submit,
 .notice .actions .repeated,

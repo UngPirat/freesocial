@@ -12,7 +12,7 @@ class BookmarkWidget extends NoticeWidget {
     }
 
 	function get_verb() {
-		return _m('bookmarked this');
+		return _m('bookmarked');
 	}
     function the_content() {
 		$this->out->flush();	// PHP crashes (memory limit?) if we don't flush once in a while
@@ -87,7 +87,7 @@ class BookmarkWidget extends NoticeWidget {
 
         if (!empty($nb->description)) {
             $this->out->element('p',
-                          array('class' => 'bookmark-description'),
+                          array('class' => 'bookmark description'),
                           $nb->description);
         }
 

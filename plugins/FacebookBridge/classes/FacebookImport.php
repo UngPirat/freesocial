@@ -135,6 +135,15 @@ class FacebookImport
 					);
         $this->client->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'), $args);
     }
+	protected function getComments($thread_id) {
+		if (!preg_match('/^\d+_\d+/', $thread_id)) {
+			throw new Exception('Bad thread id: '.$thread_id);
+		}
+		$thread_id = preg_replace('/^(\d+_\d+)(_.+)?$/', '\\1', $thread_id);
+		$data = $this->facebook->api("/$thread_id", 'get', $this->getAccessToken());
+		file_put_contents('/tmp/facebook-getComments', print_r($data,true));
+		return $data['comments'];
+	}
 
     public function importThread(array $args)
     {
@@ -158,7 +167,7 @@ class FacebookImport
 							? $this->flink->foreign_id
 							: null;
 
-		$scope = isset($args['scope']) ? $args['scope'] : Notice::PUBLIC_SCOPE;
+		$scope = isset($args['scope']) ? $args['scope'] : Notice::ADDRESSEE_SCOPE|Notice::FOLLOWER_SCOPE;
         if (isset($update['privacy']['value'])) {
 			$scope = self::getPrivacyScope($update['privacy']['value']);
 		}
@@ -194,7 +203,7 @@ class FacebookImport
             if (!empty($comments) && $comments['count']>0) {
                 if (!isset($comments['data'])) { 
                     common_debug('FACEBOOK comment thread empty for '.$update['id'].'. TODO: fetch from API!'); 
-    				return false;
+					$comments = $this->getComments($update['id']);
                 }
 				common_debug('FACEBOOK enqueueing '.count($comments['data']).' comments for '.$update['id'].' #'.$notice->id);
                 foreach ($comments['data'] as $comment) :
@@ -312,9 +321,9 @@ class FacebookImport
         } else {
             $noticeOpts['is_local'] = Notice::GATEWAY;
 			$original_poster = (!is_null($reply) ? $rprofile->id : $profile->id);
-			if ($original_poster_flink = Foreign_link::staticGet('user_id', $original_poster)) {
-				$fuser = Foreign_user::staticGet('id', $original_poster_flink->foreign_id);
-				$nickname = !empty($fuser) ? $nickname = $fuser->nickname : null;
+			if ($original_poster_flink = Foreign_link::getByUserID($original_poster, FACEBOOK_SERVICE)) {
+				$fuser = $original_poster_flink->getForeignUser();
+				$nickname = !empty($fuser) ? $fuser->nickname : null;
 			} else {
 				$nickname = $original_poster->nickname;
 			}
@@ -377,10 +386,9 @@ class FacebookImport
         }
         switch ($update['type']) {
         case 'link':
-            // continue to photo if there's a picture involved
-            if (!isset($update['picture'])) {
-                break;
-            }
+            $file = File::processNew($update['link'], $notice->id);
+			common_debug('FACEBOOK storing link as file: '.$file->id);
+			break;
         case 'video':
             common_debug('FACEBOOK VIDEO: '.print_r($update,true));
             $description = $update['description'];

@@ -43,7 +43,7 @@ require_once INSTALLDIR.'/lib/personalgroupnav.php';
 require_once INSTALLDIR.'/lib/noticelist.php';
 require_once INSTALLDIR.'/lib/feedlist.php';
 
-class AllAction extends ProfileAction
+class AllAction extends ShowstreamAction
 {
     var $notice;
 
@@ -69,19 +69,6 @@ class AllAction extends ProfileAction
         }
 
         return true;
-    }
-
-    function handle($args)
-    {
-        parent::handle($args);
-
-        if (!$this->user) {
-            // TRANS: Client error when user not found for an action.
-            $this->clientError(_('No such user.'));
-            return;
-        }
-
-        $this->showPage();
     }
 
     function title()

@@ -137,6 +137,7 @@ class XMLOutputter
     {
         $this->elementStart($tag, $attrs);
         if (!is_null($content)) {
+			if (is_object($content)) file_put_contents('/tmp/xmlout-object', print_r($content,true));
             $this->xw->text($content);
         }
         $this->elementEnd($tag);

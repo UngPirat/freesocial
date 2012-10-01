@@ -7,11 +7,13 @@
 }
 
 .list.widget .list-item {
-	display: block;
-	float: left;
-	margin: 1ex;
+	display: inline-block;
+	margin: 0.5em;
 	padding: 1ex;
 	position: relative;
+}
+.list.widget.mini-list .list-item {
+	padding: 0;
 }
 #favorites .notice {
 	clear: none;
@@ -24,21 +26,32 @@
     padding: 0 1%;
 	text-align: right;
 }
+.widget.mini-list .vcard .fn,
 .list.widget .url .description,
 .list.widget .notice > .vcard .fn {
 	display: none;
 	position: absolute;
-	font-size: 1ex;
-	left: 0;
-	top: 0;
 	background: white;
 	border: 1px solid;
 	padding: 1ex 1em;
+	white-space: nowrap;
+}
+.widget.mini-list .vcard .fn {
+	left: 24px;
+	font-size: 12px;
+	top: 0;
+}
+.list.widget .url .description,
+.list.widget .notice > .vcard .fn {
+	left: 0;
+	top: 1ex;
 }
 .list.widget .url .description {
 	right: 0;
 }
+.widget.mini-list .vcard:hover .fn,
 .list.widget .url:hover .description,
 .list.widget .notice > .vcard:hover .fn {
     display: block;
+	z-index: 9999;
 }

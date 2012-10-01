@@ -183,64 +183,50 @@ class TwitterBridgePlugin extends Plugin
         return true;
     }
 
-/*	function onStartProfileGetAvatar($profile, $width, $avatar) {
-        $avatar = Avatar::pkeyGet(
-            array(
-                'profile_id' => $profile->id,
-                'width'      => 128,
-                'height'     => 128
-            )
-        );
-		return empty($avatar);
-	}
-*/
-	static function onStartSubscribe($subscriber, $other) {
-			common_debug('TWITTER subscription initializing');
+    static function onStartSubscribe($subscriber, $other) {
         if (!preg_match('/^https?:\/\/(www\.)?twitter\.com\//', $other->profileurl)) {
-            return true;	// not a Twitter subscription, continue ordinary subscribe process
+            return true;    // not a Twitter subscription, continue ordinary subscribe process
         }
 
-			common_debug('TWITTER subscription checking flink');
-		$flink = Foreign_link::getByUserID($subscriber->id, TWITTER_SERVICE);
-		if ( empty($flink) ) {
-			return false;	// no Twitter link, impossible to subscribe
-		}
+        $flink = Foreign_link::getByUserID($subscriber->id, TWITTER_SERVICE);
+        if ( empty($flink) ) {
+            return false;    // no Twitter link, impossible to subscribe
+        }
 
         try {
-			common_debug('TWITTER subscription credentials check');
+            common_debug('TWITTER subscription credentials check');
             $token = TwitterOAuthClient::unpackToken($flink->credentials);
             $client = new TwitterOAuthClient($token->key, $token->secret);
 
-			common_debug('TWITTER subscription calling createFriendship');
-            $client->createFriendship(array('screen_name'=>$other->nickname));	// is nickname always be up to date? user_id?
+            common_debug('TWITTER subscription calling createFriendship');
+            $client->createFriendship(array('screen_name'=>$other->nickname));    // is nickname always be up to date? user_id?
         } catch (Exception $e) {
             common_log(LOG_ERR, "TWITTER subscription error: " . $e->getMessage());
             return false;
         }
-			common_debug('TWITTER subscription returning true');
         return true;
-	}
+    }
 
-	static function onStartUnsubscribe($subscriber, $other) {
+    static function onStartUnsubscribe($subscriber, $other) {
         if (!preg_match('/^https?:\/\/(www\.)?twitter\.com\//', $other->profileurl)) {
-            return true;	// not a Twitter subscription, continue ordinary subscribe process
+            return true;    // not a Twitter subscription, continue ordinary subscribe process
         }
 
-		$flink = Foreign_link::getByUserID($subscriber->id, TWITTER_SERVICE);
-		if ( empty($flink) ) {
-			return true;	// no Twitter link, but let unsubscribe do its magic
-		}
+        $flink = Foreign_link::getByUserID($subscriber->id, TWITTER_SERVICE);
+        if ( empty($flink) ) {
+            return true;    // no Twitter link, but let unsubscribe do its magic
+        }
 
         try {
             $token = TwitterOAuthClient::unpackToken($flink->credentials);
             $client = new TwitterOAuthClient($token->key, $token->secret);
 
-            $client->destroyFriendship(array('screen_name'=>$other->nickname));	// is nickname always be up to date? user_id?
+            $client->destroyFriendship(array('screen_name'=>$other->nickname));    // is nickname always be up to date? user_id?
         } catch (Exception $e) {
             common_log(LOG_ERR, "Error attempting to unsubscribe to user: " . $e->getMessage());
         }
         return true;
-	}
+    }
 
     /**
      * Automatically load the actions and libraries used by the Twitter bridge

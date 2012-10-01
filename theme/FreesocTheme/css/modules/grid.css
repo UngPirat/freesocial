@@ -1,6 +1,8 @@
 #wrapper {
-	margin: 1em 2em;
+	margin: 1em auto;
+	padding: 0 1em;
 	position: relative;
+	max-width: 900px;
 }
 
 #wrapper > * {
@@ -16,7 +18,7 @@
 	width: 70%;
 }
 #content.single {
-	width: auto;
+	width: 100%;
 	float: left;
 }
 #content > aside {

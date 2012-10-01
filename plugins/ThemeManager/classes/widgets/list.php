@@ -6,6 +6,8 @@ abstract class ListWidget extends ThemeWidget {
     protected $page   = 1;
 
     protected $title  = null;
+    protected $pagination = false;
+    protected $hideEmpty = false;
 
     protected $itemClass;
     protected $itemTag;
@@ -29,6 +31,14 @@ abstract class ListWidget extends ThemeWidget {
     protected function initialize() {
         parent::initialize();
 
+		if (isset($_REQUEST['page'])) {
+			$this->page = 0+$_REQUEST['page'];
+		}
+		foreach (array('num', 'offset') as $key) :
+			if (!isset($this->loopArgs[$key])) {
+				$this->loopArgs[$key] = $this->$key;
+			}
+		endforeach;
         $this->loop = $this->get_loop($this->loopArgs);
     }
 
@@ -72,6 +82,9 @@ abstract class ListWidget extends ThemeWidget {
 
     function the_content() {
 		$this->out->flush();	// PHP crashes (memory limit?) if we don't flush once in a while
+		if (!$this->loop->count() && $this->hideEmpty) {
+			return false;
+		}
         $args = array('class'=>"list widget {$this->widgetClass}");
         if (!empty($this->widgetId)) {
             $args['id'] = $this->widgetId;
@@ -81,14 +94,23 @@ abstract class ListWidget extends ThemeWidget {
         if (!empty($this->title)) {
             $this->out->element('h3', 'widget-title', $this->title);
         }
+
+		$pages = array();
+        if ($this->pagination) {
+			try {
+	            $pages = $this->loop->get_paging($this->page);
+    	    } catch (Exception $e) {
+	        }
+		}
+
+		ThemeManager::pagination($pages);
         if ($this->loop->count()) {
             $this->the_loop();
             $this->the_more();
         } else {
             $this->the_empty();
         }
+		ThemeManager::pagination($pages);
         $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 }
-
-?>

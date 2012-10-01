@@ -48,7 +48,7 @@ if (!defined('STATUSNET')) {
  * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html AGPL 3.0
  * @link      http://status.net/
  */
-abstract class MicroAppPlugin extends Plugin
+abstract class MicroAppPlugin extends ActivityHandlerPlugin
 {
     /**
      * Returns a localized string which represents this micro-app,
@@ -69,22 +69,6 @@ abstract class MicroAppPlugin extends Plugin
      * All micro-app classes must override this method.
      */
     abstract function tag();
-
-    /**
-     * Return a list of ActivityStreams object type URIs
-     * which this micro-app handles. Default implementations
-     * of the base class will use this list to check if a
-     * given ActivityStreams object belongs to us, via
-     * $this->isMyNotice() or $this->isMyActivity.
-     *
-     * All micro-app classes must override this method.
-     *
-     * @fixme can we confirm that these types are the same
-     * for Atom and JSON streams? Any limitations or issues?
-     *
-     * @return array of strings
-     */
-    abstract function types();
 
     /**
      * Given a parsed ActivityStreams activity, your plugin
@@ -163,42 +147,6 @@ abstract class MicroAppPlugin extends Plugin
     abstract function deleteRelated($notice);
 
     /**
-     * Check if a given notice object should be handled by this micro-app
-     * plugin.
-     *
-     * The default implementation checks against the activity type list
-     * returned by $this->types(). You can override this method to expand
-     * your checks.
-     *
-     * @param Notice $notice
-     * @return boolean
-     */
-    function isMyNotice($notice) {
-        $types = $this->types();
-        return ActivityUtils::compareObjectTypes($notice->verb, ActivityVerb::POST) && ActivityUtils::compareObjectTypes($notice->object_type, $types);
-    }
-
-    /**
-     * Check if a given ActivityStreams activity should be handled by this
-     * micro-app plugin.
-     *
-     * The default implementation checks against the activity type list
-     * returned by $this->types(), and requires that exactly one matching
-     * object be present. You can override this method to expand
-     * your checks or to compare the activity's verb, etc.
-     *
-     * @param Activity $activity
-     * @return boolean
-     */
-    function isMyActivity($activity) {
-        $types = $this->types();
-        return (count($activity->objects) == 1 &&
-                ($activity->objects[0] instanceof ActivityObject) &&
-                ActivityUtils::compareObjectTypes($activity->verb, ActivityVerb::POST) &&
-                ActivityUtils::compareObjectTypes($activity->objects[0]->type, $types));
-    }
-
-    /**
      * Called when generating Atom XML ActivityStreams output from an
      * ActivityObject belonging to this plugin. Gives the plugin
      * a chance to add custom output.
@@ -253,73 +201,6 @@ abstract class MicroAppPlugin extends Plugin
         return true;
     }
 
-    /**
-     * Output the HTML for this kind of object in a list
-     *
-     * @param NoticeListItem $nli The list item being shown.
-     *
-     * @return boolean hook value
-     *
-     * @fixme WARNING WARNING WARNING this closes a 'div' that is implicitly opened in BookmarkPlugin's showNotice implementation
-     */
-    function onStartShowNoticeItem($nli)
-    {
-        if (!$this->isMyNotice($nli->notice)) {
-            return true;
-        }
-
-        $adapter = $this->adaptNoticeListItem($nli);
-
-        if (!empty($adapter)) {
-            $adapter->showNotice();
-            $adapter->showNoticeAttachments();
-            $adapter->showNoticeInfo();
-            $adapter->showNoticeOptions();
-        } else {
-            $this->oldShowNotice($nli);
-        }
-
-        return false;
-    }
-
-    /**
-     * Given a notice list item, returns an adapter specific
-     * to this plugin.
-     *
-     * @param NoticeListItem $nli item to adapt
-     *
-     * @return NoticeListItemAdapter adapter or null
-     */
-    function adaptNoticeListItem($nli)
-    {
-      return null;
-    }
-
-    function oldShowNotice($nli)
-    {
-        $out = $nli->out;
-        $notice = $nli->notice;
-
-        try {
-            $this->showNotice($notice, $out);
-        } catch (Exception $e) {
-            common_log(LOG_ERR, $e->getMessage());
-            // try to fall back
-            $out->elementStart('div');
-            $nli->showAuthor();
-            $nli->showContent();
-        }
-
-        $nli->showNoticeLink();
-        $nli->showNoticeSource();
-        $nli->showNoticeLocation();
-        $nli->showContext();
-        $nli->showRepeat();
-
-        $out->elementEnd('div');
-
-        $nli->showNoticeOptions();
-    }
 
     /**
      * Render a notice as one of our objects
@@ -548,11 +429,5 @@ abstract class MicroAppPlugin extends Plugin
         }
 
         return true;
-    }
-
-    function showNotice($notice, $out)
-    {
-        // TRANS: Server exception thrown when a micro app plugin developer has not done his job too well.
-        throw new ServerException(_('You must implement either adaptNoticeListItem() or showNotice().'));
     }
 }
