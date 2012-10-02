@@ -1,7 +1,7 @@
 <?php
 
 class ConversationListWidget extends NoticeListWidget {
-	protected $widgetClass = 'conversations';
+	protected $widgetClass = 'list conversations';
 	protected $loopType = 'Conversation';
 	protected $convArgs = array();
 

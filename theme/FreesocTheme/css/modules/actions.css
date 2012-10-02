@@ -50,27 +50,23 @@
 	font-family: OpenWeb;
 }
 
-/* WHY U NO MARGIN??? */
-#profile .actions:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
+#profile .actions,
+.profiles .actions {
+	float: right;
 }
 
 /* colors */
-#profile .actions .form_entity_unflag input.submit:hover,
-#profile .actions .form_entity_flag input.submit,
-#profile .actions .form_user_unsubscribe input.submit:hover,
-#profile .actions .form_user_subscribe input.submit,
+.actions .form_entity_unflag input.submit:hover,
+.actions .form_entity_flag input.submit,
+.actions .form_user_unsubscribe input.submit:hover,
+.actions .form_user_subscribe input.submit,
 .notice .actions .form-train-ham .submit:hover,
 .notice .actions form.form_disfavor input.submit:hover {
 	color: black;
 }
 
-#profile .actions .form_entity_flag input.submit:hover,
-#profile .actions .form_entity_unflag input.submit,
+.actions .form_entity_flag input.submit:hover,
+.actions .form_entity_unflag input.submit,
 .notice .actions .form-train-spam .submit:hover,
 .notice .actions .form-train-ham .submit,
 .notice .actions .delete {
@@ -80,8 +76,8 @@
 	color: black;
 }
 
-#profile .actions .form_user_subscribe input.submit:hover,
-#profile .actions .form_user_unsubscribe input.submit,
+.actions .form_user_subscribe input.submit:hover,
+.actions .form_user_unsubscribe input.submit,
 .notice .actions form.form_favor input.submit:hover,
 .notice .actions form.form_disfavor input.submit,
 .notice .actions .repeated,

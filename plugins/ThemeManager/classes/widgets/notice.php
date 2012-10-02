@@ -200,7 +200,7 @@ class NoticeWidget extends ThemeWidget {
         $this->out->elementEnd('a');
     }
     function the_vcard() {
-        VcardWidget::run(array('item'=>$this->profile, 'avatarSize'=>$this->avatarSize));
+        VcardWidget::run(array('item'=>$this->profile, 'avatarSize'=>$this->avatarSize, 'mini'=>true));
     }
 }
 

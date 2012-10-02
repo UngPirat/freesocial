@@ -5,7 +5,7 @@ class FavoriteListWidget extends NoticeListWidget {
     protected $num    = 2;
 
     protected $itemClass   = 'favorite notice';
-    protected $widgetClass = 'favorites';
+    protected $widgetClass = 'list favorites';
 
     protected $profile;
 

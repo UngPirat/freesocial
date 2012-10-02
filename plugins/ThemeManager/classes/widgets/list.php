@@ -5,9 +5,10 @@ abstract class ListWidget extends ThemeWidget {
     protected $num    = 5;
     protected $page   = 1;
 
-    protected $title  = null;
+    protected $title      = null;
+    protected $titleLink  = null;
     protected $pagination = false;
-    protected $hideEmpty = false;
+    protected $hideEmpty  = false;
 
     protected $itemClass;
     protected $itemTag;
@@ -85,15 +86,13 @@ abstract class ListWidget extends ThemeWidget {
 		if (!$this->loop->count() && $this->hideEmpty) {
 			return false;
 		}
-        $args = array('class'=>"list widget {$this->widgetClass}");
+        $args = array('class'=>"widget {$this->widgetClass}");
         if (!empty($this->widgetId)) {
             $args['id'] = $this->widgetId;
         }
 
         $this->widgetTag && $this->out->elementStart($this->widgetTag, $args);
-        if (!empty($this->title)) {
-            $this->out->element('h3', 'widget-title', $this->title);
-        }
+		$this->the_title();
 
 		$pages = array();
         if ($this->pagination) {
@@ -113,4 +112,14 @@ abstract class ListWidget extends ThemeWidget {
 		ThemeManager::pagination($pages);
         $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
+
+	function the_title() {
+        if (!empty($this->title)) {
+            $this->out->elementStart('h3', 'widget-title');
+			$this->titleLink && $this->out->elementStart('a', array('href'=>$this->titleLink));
+			$this->out->text($this->title);
+			$this->titleLink && $this->out->elementEnd('a');
+			$this->out->elementEnd('h3');
+        }
+	}
 }

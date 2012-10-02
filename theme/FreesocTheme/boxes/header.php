@@ -19,7 +19,7 @@ $this->out->elementStart('div', array('id'=>'wrapper'));
     $this->out->elementStart('div', array('id'=>'login'));
 
     try {
-        $this->widget('Vcard', array('item'=>$this->profile,'avatarSize'=>Avatar::STREAM_SIZE));
+        $this->widget('Vcard', array('item'=>$this->profile, 'avatarSize'=>Avatar::STREAM_SIZE, 'mini'=>true));
     } catch (Exception $e) {
         $this->out->element('p', null, _m('You are not logged in!'));
         $this->out->elementStart('p');

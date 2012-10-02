@@ -6,15 +6,24 @@
     display: none;
 }
 
-.list.widget .list-item {
+.widget > .list-item {
 	display: inline-block;
-	margin: 0.5em;
-	padding: 1ex;
 	position: relative;
 }
-.list.widget.mini-list .list-item {
+.widget.list {
+	position:relative;
+}
+.widget.mini-list .list-item {
 	padding: 0;
 }
+
+.profiles.list .list-item {
+	display: block;
+}
+.profiles.list .vcard .photo {
+	float: right;
+}
+
 #favorites .notice {
 	clear: none;
 	float: left;
@@ -26,9 +35,9 @@
     padding: 0 1%;
 	text-align: right;
 }
-.widget.mini-list .vcard .fn,
-.list.widget .url .description,
-.list.widget .notice > .vcard .fn {
+.vcard.mini .fn,
+.widget.list .url .description,
+.widget.list .notice > .vcard .fn {
 	display: none;
 	position: absolute;
 	background: white;
@@ -36,22 +45,38 @@
 	padding: 1ex 1em;
 	white-space: nowrap;
 }
-.widget.mini-list .vcard .fn {
+.vcard.mini .fn {
 	left: 24px;
 	font-size: 12px;
+	padding: 5px 1em;
 	top: 0;
 }
-.list.widget .url .description,
-.list.widget .notice > .vcard .fn {
+.widget.list .url .description,
+.widget.list .notice > .vcard .fn {
 	left: 0;
 	top: 1ex;
+}
+.profiles.list .vcard:hover .fn {
+	left: 0;
+	top: 0;
 }
 .list.widget .url .description {
 	right: 0;
 }
-.widget.mini-list .vcard:hover .fn,
-.list.widget .url:hover .description,
-.list.widget .notice > .vcard:hover .fn {
+.vcard.mini:hover .fn,
+.widget.list .url:hover .description,
+.widget.list .notice > .vcard:hover .fn {
     display: block;
 	z-index: 9999;
+}
+
+.vcard .metadata {
+	text-align: left;
+}
+.vcard .metadata dt {
+	margin-top: 1ex;
+	font-variant: small-caps;
+}
+.vcard .metadata dd {
+	margin: 1ex 1em;
 }

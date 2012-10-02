@@ -30,6 +30,7 @@
     clear: both;
     visibility: hidden;
 }
+
 .conversation .notice:first-child {
 	border: none;
 	font-size: 1em;
@@ -52,13 +53,16 @@
 }
 
 
-.notice {
+.notice, .profiles.list .list-item {
 	border-left: 1px solid gray;
 	border-right: 1px solid gray;
 	border-radius: 1em;
-	clear: both;
 	position: relative;
 	margin: 1em 0;
+	padding: 1ex 1ex 1em;
+	clear: both;
+}
+.notice {
 	padding: 1.5em 1ex 0;
 }
 .notice.spam {
@@ -77,9 +81,6 @@
 .notice > * {
 	text-align: left;
 }
-.vcard.author {
-	display: block;
-}
 .notice .vcard.author {
 	float: left;
 	margin: 0 1ex 1ex 0;
@@ -93,16 +94,15 @@
 	max-width: 100%;
 }
 .mini-list .vcard .photo {
+	border-radius: 0;
 	margin: 0;
-}
-.notice .vcard .photo {
 }
 .vcard.author .url:before {
 	content: '';
 	font-family: FontAwesome;
 	margin: 0 1ex 0 0;
 }
-.vcard.author .url {
+.notices .vcard.author .url {
 	display: none;
 }
 

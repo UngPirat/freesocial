@@ -2,9 +2,6 @@
 	width:120px;
 	height: auto;
 }
-#profile > .vcard.author {
-	float: right;
-}
 #profile .actions > ul {
 	float: right;
 	margin-right: 1em;

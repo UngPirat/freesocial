@@ -2,7 +2,6 @@
 
 class SubscriberListWidget extends ProfileListWidget {
     protected $itemClass   = 'subscriber';
-    protected $widgetClass = 'subscribers mini-list';
 
     static function run($args=null) {
         $class = get_class();
@@ -10,13 +9,11 @@ class SubscriberListWidget extends ProfileListWidget {
         $widget->show();
     }
 
-	function initialize() {
-		parent::initialize();
-
-		$this->title = _m('Followers');
-	}
-
     function get_list() {
-        return $this->profile->getSubscribers(0, 0+$this->num);
+        return $this->item->getSubscribers(0, 0+$this->num);
     }
+
+	function get_count() {
+		return $this->item->subscriberCount();
+	}
 }

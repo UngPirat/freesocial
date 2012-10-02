@@ -125,7 +125,7 @@ class ThemeManager extends ThemeSite {
             return;
         }
         $action->elementStart('nav', 'paging');
-        foreach(array('prev'=>_m('Older posts'), 'next'=>_m('Newer posts')) as $key=>$trans) {
+        foreach(array('prev'=>_m('Older'), 'next'=>_m('Newer')) as $key=>$trans) {
             $action->elementStart('span', $key);
             if (isset($pages[$key])) {
                 $href = common_local_url($action->args['action'], $action->args, array('page'=>$pages[$key]));

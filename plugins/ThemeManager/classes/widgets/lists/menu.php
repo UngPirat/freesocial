@@ -7,7 +7,7 @@ class MenuListWidget extends ListWidget {
 
     protected $itemClass = 'menu-item';
     protected $loopClass = 'menu';
-    protected $widgetClass = 'menu-container';
+    protected $widgetClass = 'list menu-container';
 
     static function run($args=null) {
         $class = get_class();    // this seems to work as the ThemeWidget class is abstracted!

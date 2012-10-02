@@ -1,8 +1,7 @@
 <?php
 
 class SubscriptionListWidget extends ProfileListWidget {
-    protected $itemClass   = 'subscribed';
-    protected $widgetClass = 'subscriptions mini-list';
+    protected $itemClass   = 'subscription';
 
     static function run($args=null) {
         $class = get_class();
@@ -10,13 +9,11 @@ class SubscriptionListWidget extends ProfileListWidget {
         $widget->show();
     }
 
-	function initialize() {
-		parent::initialize();
-
-		$this->title = _m('Following');
-	}
-
     function get_list() {
-        return $this->profile->getSubscriptions(0, 0+$this->num);
+        return $this->item->getSubscriptions(0, 0+$this->num);
     }
+
+	function get_count() {
+		return $this->item->subscriptionCount();
+	}
 }

@@ -3,7 +3,9 @@
 class ProfileWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
     protected $item;
+
     protected $avatarSize = Avatar::PROFILE_SIZE;
+    protected $mini       = false;
 
     static function run($args=null) {
         $class = get_class();
@@ -20,12 +22,18 @@ class ProfileWidget extends ThemeWidget {
     }
 
     function show() {
+        if (!$this->mini && !$this->is_me()) {
+			$this->the_actions();
+		}
         $this->the_vcard();
-        $this->the_actions();
-        $this->the_metadata();
-		$this->the_connections();
     }
 
+	function is_me() {
+		if (!$this->scoped) {
+			return false;
+		}
+		return $this->item->id === $this->scoped->id;
+	}
     function get_name() {
         return $this->item->getBestName();
     }
@@ -40,6 +48,7 @@ class ProfileWidget extends ThemeWidget {
     }
     function the_metadata() {
         $this->out->elementStart('dl', 'metadata');
+		$this->the_userinfo();
         $this->the_tags();
         $this->out->elementEnd('dl');
     }
@@ -47,24 +56,35 @@ class ProfileWidget extends ThemeWidget {
         $this->out->element('dt', null, _m('Tags'));
         // a bunch of dd with the user's tags
     }
+	function the_userinfo() {
+		$this->out->element('dt', null, _m('Full name'));
+		$this->out->element('dd', 'fn', $this->get_name());
+        $this->out->element('dt', null, _m('Webfinger ID'));
+		$this->out->elementStart('dd', 'webfinger');
+		$this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), $this->get_webfinger());
+		$this->out->elementEnd('dd');
+		$this->out->element('dt', null, _m('Homepage'));
+		$this->out->elementStart('dd');
+		$this->out->element('a', array('href'=>$this->item->homepage, 'rel'=>'nofollow external', 'class' => 'url'), $this->item->homepage);
+		$this->out->elementEnd('dd');
+	}
     function the_actions() {
         ProfileactionsWidget::run(array('item'=>$this->item, 'scoped'=>$this->scoped));
     }
-	function the_connections() {
-		SubscriptionListWidget::run(array('profile'=>$this->item, 'scoped'=>$this->scoped));
-		SubscriberListWidget::run(array('profile'=>$this->item, 'scoped'=>$this->scoped));
-	}
     function the_vcard() {
-        $this->out->elementStart('span', 'vcard author');
+		$class = 'vcard author' . ($this->mini ? ' mini' : '');
+        $this->out->elementStart('span', $class);
         $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
         if (!Event::handle('GetAvatarElement', array(
 								&$element, $this->item, $this->avatarSize
 							))) {
 			$this->out->element($element['tag'], $element['args']);
 		}
-        $this->out->element('span', 'fn', $this->get_name());
+        $this->mini && $this->out->element('span', 'fn', $this->get_name());
         $this->out->elementEnd('a');
-        $this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), _m('Original profile'));
+		if (!$this->mini) {
+			$this->the_metadata();
+		}
         $this->out->elementEnd('span');
     }
 }

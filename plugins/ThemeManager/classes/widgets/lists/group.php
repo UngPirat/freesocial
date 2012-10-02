@@ -1,8 +1,7 @@
 <?php
 
-class GroupListWidget extends ListWidget {
-    protected $num = 5;
-    protected $itemClass   = 'group vcard';
+class GroupListWidget extends ProfileListWidget {
+    protected $itemClass   = 'list-item group';
     protected $widgetClass = 'groups';
 
     protected $profile;

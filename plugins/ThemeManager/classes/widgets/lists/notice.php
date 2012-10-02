@@ -3,7 +3,7 @@
 class NoticeListWidget extends ListWidget {
     protected $list = null;
     protected $pagination = true;
-    protected $widgetClass = 'notices';
+    protected $widgetClass = 'list notices';
 
     static function run($args=null) {
         $class = get_class();
