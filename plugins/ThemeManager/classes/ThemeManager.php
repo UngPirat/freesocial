@@ -73,7 +73,7 @@ class ThemeManager extends ThemeSite {
             }
             if (Event::handle('StartTmHeadScripts', array('action'=>$this->action))) {
                 $this->the_scripts();
-                Event::handle('EndTmFootScripts', array('action'=>$this->action));
+                Event::handle('EndTmHeadScripts', array('action'=>$this->action));
             }
             $this->the_feeds();
             Event::handle('EndShowHeadElements', array($this->action));

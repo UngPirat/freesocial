@@ -30,7 +30,7 @@ class NoticeFormWidget extends FormWidget {
 					: _m('Send a notice');
         $els->legend($legend);
 
-        $els->textarea('status_textarea', array('class'=>'notice_data-text', 'cols'=>35, 'rows'=>4), $this->content);
+        $els->textarea('status_textarea', array('class'=>'notice_data-text', 'cols'=>35, 'rows'=>4, 'id'=>'newnotice'), $this->content);
         $els->span('count', $this->charlimit);
         if (common_config('attachments', 'uploads')) {
             $els->hidden('MAX_FILE_SIZE', common_config('attachments', 'file_quota'));
