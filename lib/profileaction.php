@@ -70,19 +70,34 @@ class ProfileAction extends Action
             return false;
         }
 
-        $this->user = User::staticGet('nickname', $nickname);
+        if ($this->trimmed('action')!='showgroup') {
+			$subject = User::staticGet('nickname', $nickname);
+		} else {
+            $subject = Local_group::staticGet('nickname', $nickname);
+            if (empty($subject)) {
+                $alias = Group_alias::staticGet('alias', $nickname);
+                if ($alias) {
+                    $args = array('id' => $alias->group_id);
+                    if ($this->page != 1) {
+                        $args['page'] = $this->page;
+                    }
+                    common_redirect(common_local_url('groupbyid', $args), 301);
+                    return false;
+                }
+            }
+		}
 
-        if (!$this->user) {
+        if (!$subject) {
             // TRANS: Client error displayed when calling a profile action without specifying a user.
-            $this->clientError(_('No such user.'), 404);
+            $this->clientError(_('No subject found.'), 404);
             return false;
         }
 
-        $this->profile = $this->user->getProfile();
+        $this->profile = $subject->getProfile();
 
         if (!$this->profile) {
             // TRANS: Error message displayed when referring to a user without a profile.
-            $this->serverError(_('User has no profile.'));
+            $this->serverError(_('Subject has no profile.'));
             return false;
         }
 

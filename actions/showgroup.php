@@ -44,7 +44,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class ShowgroupAction extends GroupAction
+class ShowgroupAction extends ProfileAction
 {
     /** page we're viewing. */
     var $page = null;
@@ -68,7 +68,7 @@ class ShowgroupAction extends GroupAction
      */
     function title()
     {
-        $base = $this->group->getFancyName();
+        $base = $this->profile->getFancyName();
 
         if ($this->page == 1) {
             // TRANS: Page title for first group page. %s is a group name.
@@ -99,9 +99,7 @@ class ShowgroupAction extends GroupAction
 
         $this->userProfile = Profile::current();
 
-        $user = common_current_user();
-
-        $stream = new ThreadingGroupNoticeStream($this->group, $this->userProfile);
+        $stream = new ThreadingNoticeStream($this->profile, $this->userProfile);
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                             NOTICES_PER_PAGE + 1);
@@ -163,41 +161,41 @@ class ShowgroupAction extends GroupAction
     {
         $url =
           common_local_url('grouprss',
-                           array('nickname' => $this->group->nickname));
+                           array('nickname' => $this->profile->nickname));
 
         return array(new Feed(Feed::JSON,
                               common_local_url('ApiTimelineGroup',
                                                array('format' => 'as',
-                                                     'id' => $this->group->id)),
+                                                     'id' => $this->profile->id)),
                               // TRANS: Tooltip for feed link. %s is a group nickname.
                               sprintf(_('Notice feed for %s group (Activity Streams JSON)'),
-                                      $this->group->nickname)),
+                                      $this->profile->nickname)),
                     new Feed(Feed::RSS1,
                               common_local_url('grouprss',
-                                               array('nickname' => $this->group->nickname)),
+                                               array('nickname' => $this->profile->nickname)),
                               // TRANS: Tooltip for feed link. %s is a group nickname.
                               sprintf(_('Notice feed for %s group (RSS 1.0)'),
-                                      $this->group->nickname)),
+                                      $this->profile->nickname)),
                      new Feed(Feed::RSS2,
                               common_local_url('ApiTimelineGroup',
                                                array('format' => 'rss',
-                                                     'id' => $this->group->id)),
+                                                     'id' => $this->profile->id)),
                               // TRANS: Tooltip for feed link. %s is a group nickname.
                               sprintf(_('Notice feed for %s group (RSS 2.0)'),
-                                      $this->group->nickname)),
+                                      $this->profile->nickname)),
                      new Feed(Feed::ATOM,
                               common_local_url('ApiTimelineGroup',
                                                array('format' => 'atom',
-                                                     'id' => $this->group->id)),
+                                                     'id' => $this->profile->id)),
                               // TRANS: Tooltip for feed link. %s is a group nickname.
                               sprintf(_('Notice feed for %s group (Atom)'),
-                                      $this->group->nickname)),
+                                      $this->profile->nickname)),
                      new Feed(Feed::FOAF,
                               common_local_url('foafgroup',
-                                               array('nickname' => $this->group->nickname)),
+                                               array('nickname' => $this->profile->nickname)),
                               // TRANS: Tooltip for feed link. %s is a group nickname.
                               sprintf(_('FOAF for %s group'),
-                                       $this->group->nickname)));
+                                       $this->profile->nickname)));
     }
 
     function showAnonymousMessage()
@@ -211,7 +209,7 @@ class ShowgroupAction extends GroupAction
                 'based on the Free Software [StatusNet](http://status.net/) tool. Its members share ' .
                 'short messages about their life and interests. '.
                 '[Join now](%%%%action.register%%%%) to become part of this group and many more! ([Read more](%%%%doc.help%%%%))'),
-                     $this->group->getBestName());
+                     $this->profile->getBestName());
         } else {
             // TRANS: Notice on group pages for anonymous users for StatusNet sites that accept no new registrations.
             // TRANS: %s is the group name, %%%%site.name%%%% is the site name,
@@ -219,7 +217,7 @@ class ShowgroupAction extends GroupAction
             $m = sprintf(_('**%s** is a user group on %%%%site.name%%%%, a [micro-blogging](http://en.wikipedia.org/wiki/Micro-blogging) service ' .
                 'based on the Free Software [StatusNet](http://status.net/) tool. Its members share ' .
                 'short messages about their life and interests.'),
-                     $this->group->getBestName());
+                     $this->profile->getBestName());
         }
         $this->elementStart('div', array('id' => 'anon_notice'));
         $this->raw(common_markup_to_html($m));
@@ -230,7 +228,7 @@ class ShowgroupAction extends GroupAction
     {
         if ($this->page != 1) {
             $this->element('link', array('rel' => 'canonical',
-                                         'href' => $this->group->homeUrl()));
+                                         'href' => $this->profile->homeUrl()));
         }
     }
 }

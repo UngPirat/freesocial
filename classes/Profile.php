@@ -158,6 +158,22 @@ class Profile extends Managed_DataObject
         return $avatar;
     }
 
+    function homeUrl()
+    {
+        $url = null;
+        if (Event::handle('StartProfileHomeUrl', array($this, &$url))) {
+            // normally stored in mainpage, but older ones may be null
+            if (!empty($this->profileurl)) {
+                $url = $this->profileurl;
+            } else {
+                $url = common_local_url('showstream',
+                                        array('nickname' => $this->nickname));
+            }
+        }
+        Event::handle('EndProfileHomeUrl', array($this, &$url));
+        return $url;
+    }
+
     /**
      * Delete attached avatars for this user from the database and filesystem.
      * This should be used instead of a batch delete() to ensure that files

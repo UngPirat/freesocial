@@ -42,27 +42,13 @@ define('MEMBERS_PER_SECTION', 27);
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class GroupAction extends Action
+class GroupAction extends ProfileAction
 {
     protected $group;
 
     function prepare($args)
     {
         parent::prepare($args);
-
-        $nickname_arg = $this->arg('nickname');
-        $nickname = common_canonical_nickname($nickname_arg);
-
-        // Permanent redirect on non-canonical nickname
-
-        if ($nickname_arg != $nickname) {
-            $args = array('nickname' => $nickname);
-            if ($this->page != 1) {
-                $args['page'] = $this->page;
-            }
-            common_redirect(common_local_url('showgroup', $args), 301);
-            return false;
-        }
 
         if (!$nickname) {
             // TRANS: Client error displayed if no nickname argument was given requesting a group page.

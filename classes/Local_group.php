@@ -60,4 +60,21 @@ class Local_group extends Managed_DataObject
 
         return $result;
     }
+
+    protected $_profile = -1;
+
+    /**
+     * @return Profile
+     */
+    function getProfile()
+    {
+        if (is_int($this->_profile) && $this->_profile == -1) { // invalid but distinct from null
+            $this->_profile = Profile::staticGet('id', $this->group_id);
+            if (empty($this->_profile)) {
+                throw new ServerException('No profile found for group');
+            }
+        }
+
+        return $this->_profile;
+    }
 }
