@@ -242,97 +242,106 @@ class MediaFile
         }
     }
 
-    static function fromUpload($param = 'media', $user = null)
+    static function fromUpload($param = 'media', $user = null, array $file=array())
     {
         if (empty($user)) {
             $user = common_current_user();
         }
+		common_debug('MediaFile::fromUpload _FILES: '.print_r($_FILES, true));
+        if (!isset($_FILES[$param]['error'])) {
+			return array();
+		}
+		if (!is_array($_FILES[$param]['error'])) {
+			foreach($_FILES[$param] as $key=>$val) :
+				$_FILES[$param][$key] = array($val);
+			endforeach;
+		}
 
-        if (!isset($_FILES[$param]['error'])){
-            return;
-        }
-
-        switch ($_FILES[$param]['error']) {
-        case UPLOAD_ERR_OK: // success, jump out
-            break;
-        case UPLOAD_ERR_INI_SIZE:
-            // TRANS: Client exception thrown when an uploaded file is larger than set in php.ini.
-            throw new ClientException(_('The uploaded file exceeds the ' .
-                'upload_max_filesize directive in php.ini.'));
-            return;
-        case UPLOAD_ERR_FORM_SIZE:
-            throw new ClientException(
-                // TRANS: Client exception.
-                _('The uploaded file exceeds the MAX_FILE_SIZE directive' .
-                ' that was specified in the HTML form.'));
-            return;
-        case UPLOAD_ERR_PARTIAL:
-            @unlink($_FILES[$param]['tmp_name']);
-            // TRANS: Client exception.
-            throw new ClientException(_('The uploaded file was only' .
-                ' partially uploaded.'));
-            return;
-        case UPLOAD_ERR_NO_FILE:
-            // No file; probably just a non-AJAX submission.
-            return;
-        case UPLOAD_ERR_NO_TMP_DIR:
-            // TRANS: Client exception thrown when a temporary folder is not present to store a file upload.
-            throw new ClientException(_('Missing a temporary folder.'));
-            return;
-        case UPLOAD_ERR_CANT_WRITE:
-            // TRANS: Client exception thrown when writing to disk is not possible during a file upload operation.
-            throw new ClientException(_('Failed to write file to disk.'));
-            return;
-        case UPLOAD_ERR_EXTENSION:
-            // TRANS: Client exception thrown when a file upload operation has been stopped by an extension.
-            throw new ClientException(_('File upload stopped by extension.'));
-            return;
-        default:
-            common_log(LOG_ERR, __METHOD__ . ": Unknown upload error " .
-                $_FILES[$param]['error']);
-            // TRANS: Client exception thrown when a file upload operation has failed with an unknown reason.
-            throw new ClientException(_('System error uploading file.'));
-            return;
-        }
-
-        if (!MediaFile::respectsQuota($user, $_FILES[$param]['size'])) {
-
-            // Should never actually get here
-
-            @unlink($_FILES[$param]['tmp_name']);
-            // TRANS: Client exception thrown when a file upload operation would cause a user to exceed a set quota.
-            throw new ClientException(_('File exceeds user\'s quota.'));
-            return;
-        }
-
-        $mimetype = MediaFile::getUploadedFileType($_FILES[$param]['tmp_name'],
-                                                   $_FILES[$param]['name']);
-
-        $filename = null;
-
-        if (isset($mimetype)) {
-
-            $basename = basename($_FILES[$param]['name']);
-            $filename = File::filename($user->getProfile(), $basename, $mimetype);
-            $filepath = File::path($filename);
-
-            $result = move_uploaded_file($_FILES[$param]['tmp_name'], $filepath);
-
-            if (!$result) {
-                // TRANS: Client exception thrown when a file upload operation fails because the file could
-                // TRANS: not be moved from the temporary folder to the permanent file location.
-                throw new ClientException(_('File could not be moved to destination directory.'));
-                return;
-            }
-
-        } else {
-            // TRANS: Client exception thrown when a file upload operation has been stopped because the MIME
-            // TRANS: type of the uploaded file could not be determined.
-            throw new ClientException(_('Could not determine file\'s MIME type.'));
-            return;
-        }
-
-        return new MediaFile($user->getProfile(), $filename, $mimetype);
+		$files = array();
+		$file = $_FILES[$param];
+		foreach($file['error'] as $key=>$message) {
+			try {
+                switch ($message) {
+                case UPLOAD_ERR_OK: // success, jump out
+                    break;
+                case UPLOAD_ERR_INI_SIZE:
+                    // TRANS: Client exception thrown when an uploaded file is larger than set in php.ini.
+                    throw new ClientException(_('The uploaded file exceeds the ' .
+                        'upload_max_filesize directive in php.ini.'));
+                case UPLOAD_ERR_FORM_SIZE:
+                    throw new ClientException(
+                        // TRANS: Client exception.
+                        _('The uploaded file exceeds the MAX_FILE_SIZE directive' .
+                        ' that was specified in the HTML form.'));
+                case UPLOAD_ERR_PARTIAL:
+                    @unlink($file['tmp_name'][$key]);
+                    // TRANS: Client exception.
+                    throw new ClientException(_('The uploaded file was only' .
+                        ' partially uploaded.'));
+                case UPLOAD_ERR_NO_FILE:
+                    // No file; probably just a non-AJAX submission.
+					return array();
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    // TRANS: Client exception thrown when a temporary folder is not present to store a file upload.
+                    throw new ClientException(_('Missing a temporary folder.'));
+                case UPLOAD_ERR_CANT_WRITE:
+                    // TRANS: Client exception thrown when writing to disk is not possible during a file upload operation.
+                    throw new ClientException(_('Failed to write file to disk.'));
+                case UPLOAD_ERR_EXTENSION:
+                    // TRANS: Client exception thrown when a file upload operation has been stopped by an extension.
+                    throw new ClientException(_('File upload stopped by extension.'));
+                default:
+                    common_log(LOG_ERR, __METHOD__ . ": Unknown upload error " .
+                        $message);
+                    // TRANS: Client exception thrown when a file upload operation has failed with an unknown reason.
+                    throw new ClientException(_('System error uploading file.'));
+                }
+        
+                if (!MediaFile::respectsQuota($user, $file['size'][$key])) {
+        
+                    // Should never actually get here
+        
+                    @unlink($file['tmp_name'][$key]);
+                    // TRANS: Client exception thrown when a file upload operation would cause a user to exceed a set quota.
+                    throw new ClientException(_('File exceeds user\'s quota.'));
+                }
+        
+                $mimetype = MediaFile::getUploadedFileType($file['tmp_name'][$key],
+                                                           $file['name'][$key]);
+        
+                $filename = null;
+        
+                if (isset($mimetype)) {
+        
+                    $basename = basename($file['name'][$key]);
+                    $filename = File::filename($user->getProfile(), $basename, $mimetype);
+                    $filepath = File::path($filename);
+        
+                    $result = move_uploaded_file($file['tmp_name'][$key], $filepath);
+        
+                    if (!$result) {
+                        // TRANS: Client exception thrown when a file upload operation fails because the file could
+                        // TRANS: not be moved from the temporary folder to the permanent file location.
+                        throw new ClientException(_('File could not be moved to destination directory.'));
+                    }
+        
+                } else {
+                    // TRANS: Client exception thrown when a file upload operation has been stopped because the MIME
+                    // TRANS: type of the uploaded file could not be determined.
+                    throw new ClientException(_('Could not determine file\'s MIME type.'));
+                }
+			} catch (ClientException $e) {
+				// cleanup any files that were already finished
+				foreach($files as $file) {
+					$file->delete();
+				}
+				// rethrow exception
+				throw $e;
+			}
+    
+            $files[] = new MediaFile($user->getProfile(), $filename, $mimetype);
+		}
+		return $files;
     }
 
     static function fromFilehandle($fh, $user) {

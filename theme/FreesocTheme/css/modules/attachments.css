@@ -10,6 +10,13 @@
 	content: '';
 	font-family: FontAwesome;
 }
+.thumb.attachment, .link.attachment {
+	margin: 1ex;
+}
 .thumb.attachment {
-	clear: both;
+	float: left;
+}
+.notice .attachments h3 + .thumb.attachment,
+.notice .attachments .thumb.attachment:first-child {
+	clear: left;
 }

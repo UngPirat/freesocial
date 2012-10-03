@@ -22,7 +22,18 @@
 
 
 #post textarea {
-	width: 70%;
+	margin: 1ex 1em 1ex 0;
+	width: 75%;
+	clear: both;
+}
+#post .attachments {
+	clear: left;
+	display: block;
+}
+textarea + .count {
+	clear: both;
+	float: right;
+	margin-right: 25%;
 }
 #post input.submit {
 	font-size:2em;

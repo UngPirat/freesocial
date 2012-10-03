@@ -88,14 +88,14 @@ class ApiMediaUploadAction extends ApiAuthAction
         $upload = null;
 
         try {
-            $upload = MediaFile::fromUpload('media', $this->auth_user);
+            $uploads = MediaFile::fromUpload('media', $this->auth_user);
         } catch (Exception $e) {
             $this->clientError($e->getMessage(), $e->getCode());
             return;
         }
 
-        if (isset($upload)) {
-            $this->showResponse($upload);
+        if (isset($uploads)) {
+            $this->showResponse($uploads);
         } else {
             // TRANS: Client error displayed when uploading a media file has failed.
             $this->clientError(_('Upload failed.'));
@@ -111,12 +111,17 @@ class ApiMediaUploadAction extends ApiAuthAction
      *
      * @return void
      */
-    function showResponse($upload)
+    function showResponse($uploads)
     {
+        if (!is_array($uploads)) {
+            $uploads = array($uploads);
+        }
         $this->initDocument();
         $this->elementStart('rsp', array('stat' => 'ok'));
-        $this->element('mediaid', null, $upload->fileRecord->id);
-        $this->element('mediaurl', null, $upload->shortUrl());
+        foreach ($uploads as $upload) {	// ...this won't work with multi-uploads yet, right?
+            $this->element('mediaid', null, $upload->fileRecord->id);
+            $this->element('mediaurl', null, $upload->shortUrl());
+        }
         $this->elementEnd('rsp');
         $this->endDocument();
     }

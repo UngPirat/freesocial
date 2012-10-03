@@ -27,7 +27,7 @@ define('LACONICA_VERSION', STATUSNET_VERSION); // compatibility
 
 define('STATUSNET_CODENAME', 'Don\'t Play No Game That I Can\'t Win');
 
-define('NOTICES_PER_PAGE', 10);
+define('NOTICES_PER_PAGE', 15);
 define('PROFILES_PER_PAGE', 20);
 define('MESSAGES_PER_PAGE', 20);
 define('GROUPS_PER_PAGE', 20);

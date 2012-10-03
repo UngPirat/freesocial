@@ -46,8 +46,6 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  */
 class RepliesAction extends ShowstreamAction
 {
-    var $page = null;
-    var $notice;
 	protected $action = 'replies';
 
     /**

@@ -292,17 +292,20 @@ class ApiStatusesUpdateAction extends ApiAuthAction
             $upload = null;
 
             try {
-                $upload = MediaFile::fromUpload('media', $this->auth_user);
+                $uploads = MediaFile::fromUpload('media', $this->auth_user);
             } catch (Exception $e) {
                 $this->clientError($e->getMessage(), $e->getCode(), $this->format);
                 return;
             }
 
-            if (isset($upload)) {
-                $status_shortened .= ' ' . $upload->shortUrl();
-
+            if (isset($uploads)) {
+				foreach ($uploads as $upload) {
+	                $status_shortened .= ' ' . $upload->shortUrl();
+				}
                 if (Notice::contentTooLong($status_shortened)) {
-                    $upload->delete();
+					foreach ($uploads as $upload) {
+	                    $upload->delete();
+					}
                     // TRANS: Client error displayed exceeding the maximum notice length.
                     // TRANS: %d is the maximum lenth for a notice.
                     $msg = _m('Maximum notice size is %d character, including attachment URL.',
@@ -343,8 +346,10 @@ class ApiStatusesUpdateAction extends ApiAuthAction
                 return;
             }
 
-            if (isset($upload)) {
-                $upload->attachToNotice($this->notice);
+            if (isset($uploads)) {
+				foreach ($uploads as $upload) {
+	                $upload->attachToNotice($this->notice);
+				}
             }
         }
 

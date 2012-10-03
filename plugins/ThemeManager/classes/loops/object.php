@@ -25,7 +25,7 @@ class ObjectLoop extends ThemeExtension {    // might extend Iterator in the fut
 
 		$first = $this->saveFirst ? array_shift($this->list) : null;
 		$childCount = count($this->list);
-		if ($this->num >= $childCount) {
+		if ($this->num > $childCount) {
 			// list is less than desired num
 		} elseif ($this->num>=0 && !$this->saveFirst) {
 			$this->list = array_slice($this->list, $this->offset, $this->num);

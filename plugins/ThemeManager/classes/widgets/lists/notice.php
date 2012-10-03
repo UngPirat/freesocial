@@ -2,6 +2,7 @@
 
 class NoticeListWidget extends ListWidget {
     protected $list = null;
+	protected $num = NOTICES_PER_PAGE;
     protected $pagination = true;
     protected $widgetClass = 'list notices';
 

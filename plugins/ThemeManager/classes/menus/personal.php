@@ -25,10 +25,11 @@ class PersonalMenu extends ThemeMenu {
             $args = array('nickname'=>$this->profile->nickname);
             // list($actionName, $args, $label, $description, $id)
             $items = array_merge($items, array(
-                array('url'=>'all', 'args'=>$args, 'label'=>_m('MENU','Home'), 'description'=>_m('Home timeline')),
-                array('url'=>'showstream',   'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
-                array('url'=>'mentions',       'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
-                array('url'=>'favorites', 'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
+                array('url'=>'all',        'args'=>$args, 'label'=>_m('MENU','Home'), 'description'=>_m('Home timeline')),
+                array('url'=>'showstream', 'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
+                array('url'=>'mentions',   'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
+                array('url'=>'replies',    'args'=>$args, 'label'=>_m('MENU','Replies'), 'description'=>_m('Your replies to others')),
+                array('url'=>'favorites',  'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
                 ));
             Event::handle('EndPersonalGroupNav', array($adapter));
         }

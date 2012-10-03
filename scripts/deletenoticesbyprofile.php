@@ -63,6 +63,6 @@ if (!$notice->find()) {
     exit (0);
 }
 while($notice->fetch()) {
-    print "{$notice->id}: {$notice->content}";
+    echo "{$notice->id}: {$notice->content}\n";
     $notice->delete();
 }

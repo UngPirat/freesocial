@@ -13,6 +13,7 @@ class ThemeManagerPlugin extends Plugin {
         $file = null;
         switch($cls) {
         case 'ThemeExtension':
+        case 'ThemeForm':
         case 'ThemeManager':
         case 'ThemeMenu':
         case 'ThemeSite':
@@ -23,10 +24,10 @@ class ThemeManagerPlugin extends Plugin {
             break;
         }
 
-        if (preg_match('/^(\w+)(Form|List)(Widget)$/', $cls, $type)) {
+        if (preg_match('/^(\w+)(List)(Widget)$/', $cls, $type)) {
             $type = array_map('strtolower', array_map('basename', $type));
             $file = dirname(__FILE__) . "/classes/{$type[3]}s/{$type[2]}s/{$type[1]}.php";
-        } elseif (preg_match('/^(\w+)(Loop|Menu|Widget)$/', $cls, $type)) {
+        } elseif (preg_match('/^(\w+)(Form|Loop|Menu|Widget)$/', $cls, $type)) {
             $type = array_map('strtolower', array_map('basename', $type));
             $file = dirname(__FILE__) . "/classes/{$type[2]}s/{$type[1]}.php";
         }
@@ -38,42 +39,43 @@ class ThemeManagerPlugin extends Plugin {
         return true;
     }
 
-	function onGetTmSupported(&$supported) {
-		$supported = array_merge($supported, array(
-				'settings' => 'settings',
-				'showstream' => 'profile',
-				));
-	}
+    function onGetTmSupported(&$supported) {
+        $supported = array_merge($supported, array(
+                'newnotice' => 'newnotice',
+                'settings' => 'settings',
+                'showstream' => 'profile',
+                ));
+    }
 
 
-	function onStartTmConversationList($list, $num) {
+    function onStartTmConversationList($list, $num) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
-			ConversationListWidget::run(array('list'=>$list, 'num'=>$num));
-			return false;
-		}
-		return true;
-	}
-	function onStartTmNoticeList($list, $num) {
+            ConversationListWidget::run(array('list'=>$list, 'num'=>$num));
+            return false;
+        }
+        return true;
+    }
+    function onStartTmNoticeList($list, $num) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
-			NoticeListWidget::run(array('list'=>$list, 'num'=>$num));
-			return false;
-		}
-		return true;
-	}
-	function onStartShowNoticeItem($noticeitem) {
+            NoticeListWidget::run(array('list'=>$list, 'num'=>$num));
+            return false;
+        }
+        return true;
+    }
+    function onStartShowNoticeItem($noticeitem) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
             NoticeWidget::run(array('item'=>$noticeitem->notice, 'itemTag'=>'li'));
-			return false;
+            return false;
         }
-		return true;
-	}
-	function onStartOpenNoticeListItemElement($noticeitem) {
-		return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
-	}
+        return true;
+    }
+    function onStartOpenNoticeListItemElement($noticeitem) {
+        return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
+    }
 
-	function onStartCloseNoticeListItemElement($noticeitem) {
-		return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
-	}
+    function onStartCloseNoticeListItemElement($noticeitem) {
+        return !(defined('THEME_MANAGER') && THEME_MANAGER===true);
+    }
 
     function onStartInitializeRouter($m)
     {

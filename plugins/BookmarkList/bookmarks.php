@@ -42,10 +42,11 @@ require_once 'bookmarksnoticestream.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl.html AGPLv3
  * @link     https://github.com/chimo/BookmarkList
  */
-class BookmarksAction extends Action
+class BookmarksAction extends ShowstreamAction
 {
     var $user = null;
     var $gc   = null;
+	protected $action = 'bookmarks';
 
     /**
      * Take arguments for running
@@ -87,33 +88,17 @@ class BookmarksAction extends Action
 
         $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
 
+		common_set_returnto($this->selfUrl());
+
         $stream = new BookmarksNoticeStream($this->user->id, true);
-        $this->notices = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
+        $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                                 NOTICES_PER_PAGE + 1); 
 
-        if($this->page > 1 && $this->notices->N == 0) {
+        if($this->page > 1 && $this->notice->N == 0) {
             throw new ClientException(_('No such page.'), 404);
         }
 
         return true;
-    }
-
-    /**
-     * Handle request
-     *
-     * This is the main method for handling a request. Note that
-     * most preparation should be done in the prepare() method;
-     * by the time handle() is called the action should be
-     * more or less ready to go.
-     *
-     * @param array $args $_REQUEST args; handled in prepare()
-     *
-     * @return void
-     */
-    function handle($args)
-    {
-        parent::handle($args);
-        $this->showPage();
     }
 
     /**
@@ -126,13 +111,8 @@ class BookmarksAction extends Action
     function title()
     {
 
-        if (empty($this->user)) {
-            // TRANS: Page title for sample plugin.
-            return _m('Log in');
-        } else {
-            // TRANS: Page title for sample plugin. %s is a user nickname.
-            return sprintf(_m('%s\'s bookmarks'), $this->user->nickname);
-        }
+        // TRANS: Page title for the Bookmark. %s is a user nickname.
+        return sprintf(_m('%s\'s bookmarks'), $this->user->nickname);
     }
 
     /**
@@ -189,7 +169,7 @@ class BookmarksAction extends Action
     function showContent()
     {
 
-        $nl = new NoticeList($this->notices, $this);
+        $nl = new NoticeList($this->notice, $this);
 
         $cnt = $nl->show();
 

@@ -141,19 +141,6 @@ class NewnoticeAction extends Action
             return;
         }
 
-        $inter = new CommandInterpreter();
-
-        $cmd = $inter->handle_command($user, $content);
-
-        if ($cmd) {
-            if ($this->boolean('ajax')) {
-                $cmd->execute(new AjaxWebChannel($this));
-            } else {
-                $cmd->execute(new WebChannel($this));
-            }
-            return;
-        }
-
         $content_shortened = $user->shortenLinks($content);
         if (Notice::contentTooLong($content_shortened)) {
             // TRANS: Client error displayed when the parameter "status" is missing.
@@ -169,10 +156,10 @@ class NewnoticeAction extends Action
             $options['reply_to'] = $replyto;
         }
 
-        $upload = null;
-        $upload = MediaFile::fromUpload('attach');
+        $uploads = array();
+        $uploads = MediaFile::fromUpload('attach');
 
-        if (isset($upload)) {
+        if (isset($uploads)) : foreach($uploads as $upload) {
 
             if (Event::handle('StartSaveNewNoticeAppendAttachment', array($this, $upload, &$content_shortened, &$options))) {
                 $content_shortened .= ' ' . $upload->shortUrl();
@@ -180,7 +167,9 @@ class NewnoticeAction extends Action
             Event::handle('EndSaveNewNoticeAppendAttachment', array($this, $upload, &$content_shortened, &$options));
 
             if (Notice::contentTooLong($content_shortened)) {
-                $upload->delete();
+                foreach ($uploads as $upload) {	// yo dawg, I heard you like loops...
+					$upload->delete();
+				}
                 // TRANS: Client error displayed exceeding the maximum notice length.
                 // TRANS: %d is the maximum length for a notice.
                 $this->clientError(sprintf(_m('Maximum notice size is %d character, including attachment URL.',
@@ -188,7 +177,7 @@ class NewnoticeAction extends Action
                                               Notice::maxContent()),
                                            Notice::maxContent()));
             }
-        }
+        } endif;
 
         if ($user->shareLocation()) {
             // use browser data if checked; otherwise profile data
@@ -220,9 +209,9 @@ class NewnoticeAction extends Action
 
             $notice = Notice::saveNew($user->id, $content_shortened, 'web', $options);
 
-            if (isset($upload)) {
+            if (isset($uploads)) : foreach ($uploads as $upload) {
                 $upload->attachToNotice($notice);
-            }
+            } endif;
 
             Event::handle('EndNoticeSaveWeb', array($this, $notice));
         }

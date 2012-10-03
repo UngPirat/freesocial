@@ -1,11 +1,13 @@
 $(document).ready(function() {
-	$("#newnotice").bind('input', function(event) {
-	    var currentString = $("#newnotice").val()
-		$("#newnotice + .count").html(currentString.length);
+	$(".notice_data-text").bind("input", function(event) {
+		$(this).next(".count").html($(this).val().length);
 	});
-	$("#newnotice").bind('keyup', function(event) {
-	    var currentString = $("#newnotice").val()
-		$("#newnotice + .count").html(currentString.length);
+	$(".notice_data-text").bind("keyup", function(event) {
+		$(this).next(".count").html($(this).val().length);
 	});
-	$("#newnotice").focus();
+//	$("#newnotice").focus();
+	
+	$("header.slidecontrol").click(function(event) {
+		$(this).next("section").slideToggle(600);
+	});
 });
