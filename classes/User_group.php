@@ -88,8 +88,14 @@ class User_group extends Managed_DataObject
 
     function homeUrl()
     {
-		$profile = $this->getProfile();
-		return $profile->homeUrl();
+		try {
+			$profile = $this->getProfile();
+		} catch (UserNoProfileException $e) {
+		}
+		if (!empty($profile) && $profile->isGroup) {
+			return $profile->homeUrl();
+		}
+		return null;
     }
 
     protected $_profile = -1;
