@@ -14,11 +14,25 @@ class RemoteProfileAction extends ShowstreamAction
         $this->user = false;
         $this->profile = Profile::staticGet('id', $id);
 
+        $this->tag = $this->trimmed('tag');
+        $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
+
         if (!$this->profile) {
             // TRANS: Error message displayed when referring to a user without a profile.
             $this->serverError(_m('User has no profile.'));
             return false;
         }
+
+		// redirect to groups that are accidentally accessed this way
+		switch ($this->profile->type) {
+		case Profile::GROUP:
+			$args = array('id'=>$this->profile->id);
+            if ($this->page != 1) {
+                $args['page'] = $this->page;
+            }
+			common_redirect(common_local_url('groupbyid', $args), 301);
+			break;
+		}
 
         $user = User::staticGet('id', $this->profile->id);
         if ($user) {
@@ -28,8 +42,6 @@ class RemoteProfileAction extends ShowstreamAction
             return false;
         }
 
-        $this->tag = $this->trimmed('tag');
-        $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
         common_set_returnto($this->selfUrl());
 
         $p = Profile::current();

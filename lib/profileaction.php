@@ -70,7 +70,7 @@ class ProfileAction extends Action
             return false;
         }
 
-        if ($this->trimmed('action')!='showgroup') {
+        if (!is_a($this, 'ShowgroupAction')) {
 			$subject = User::staticGet('nickname', $nickname);
 		} else {
             $subject = Local_group::staticGet('nickname', $nickname);
