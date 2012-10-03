@@ -139,3 +139,11 @@ class RawGroupNoticeStream extends NoticeStream
         return $ids;
     }
 }
+
+class ThreadingGroupNoticeStream extends ThreadingNoticeStream
+{
+    function __construct($group, $profile)
+    {
+        parent::__construct(new GroupNoticeStream($group, $profile));
+    }
+}

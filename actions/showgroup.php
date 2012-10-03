@@ -32,6 +32,7 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
     exit(1);
 }
 
+require_once INSTALLDIR.'/lib/groupnoticestream.php';
 require_once INSTALLDIR.'/lib/noticelist.php';
 require_once INSTALLDIR.'/lib/feedlist.php';
 
@@ -44,7 +45,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class ShowgroupAction extends ProfileAction
+class ShowgroupAction extends ShowstreamAction
 {
     /** page we're viewing. */
     var $page = null;
@@ -99,7 +100,7 @@ class ShowgroupAction extends ProfileAction
 
         $this->userProfile = Profile::current();
 
-        $stream = new ThreadingNoticeStream($this->profile, $this->userProfile);
+        $stream = new ThreadingGroupNoticeStream($this->profile, $this->userProfile);
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                             NOTICES_PER_PAGE + 1);

@@ -46,44 +46,6 @@ class GroupAction extends ProfileAction
 {
     protected $group;
 
-    function prepare($args)
-    {
-        parent::prepare($args);
-
-        if (!$nickname) {
-            // TRANS: Client error displayed if no nickname argument was given requesting a group page.
-            $this->clientError(_('No nickname.'), 404);
-            return false;
-        }
-
-        $local = Local_group::staticGet('nickname', $nickname);
-
-        if (!$local) {
-            $alias = Group_alias::staticGet('alias', $nickname);
-            if ($alias) {
-                $args = array('id' => $alias->group_id);
-                if ($this->page != 1) {
-                    $args['page'] = $this->page;
-                }
-                common_redirect(common_local_url('groupbyid', $args), 301);
-                return false;
-            } else {
-                common_log(LOG_NOTICE, "Couldn't find local group for nickname '$nickname'");
-                // TRANS: Client error displayed if no remote group with a given name was found requesting group page.
-                $this->clientError(_('No such group.'), 404);
-                return false;
-            }
-        }
-
-        $this->group = User_group::staticGet('id', $local->group_id);
-
-        if (!$this->group) {
-            // TRANS: Client error displayed if no local group with a given name was found requesting group page.
-            $this->clientError(_('No such group.'), 404);
-            return false;
-        }
-    }
-
     function showProfileBlock()
     {
         $block = new GroupProfileBlock($this, $this->group);
