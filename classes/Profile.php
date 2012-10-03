@@ -26,9 +26,9 @@ require_once INSTALLDIR.'/classes/Memcached_DataObject.php';
 
 class Profile extends Managed_DataObject
 {
-	const USER  = 0;
-	const GROUP = 1;
-	const PAGE  = 2;
+	const USER  = 1;
+	const GROUP = 2;
+	const PAGE  = 4;
 
     ###START_AUTOCODE
     /* the code below is auto generated do not remove the above tag */
@@ -64,7 +64,7 @@ class Profile extends Managed_DataObject
             'description' => 'local and remote users have profiles',
             'fields' => array(
                 'id' => array('type' => 'serial', 'not null' => true, 'description' => 'unique identifier'),
-                'type' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'description' => '0=user, 1=group, 2=page'),
+                'type' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'description' => '1=user, 2=group, 4=page'),
                 'nickname' => array('type' => 'varchar', 'length' => 64, 'not null' => true, 'description' => 'nickname or username', 'collate' => 'utf8_general_ci'),
                 'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name', 'collate' => 'utf8_general_ci'),
                 'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universal identifier'),
