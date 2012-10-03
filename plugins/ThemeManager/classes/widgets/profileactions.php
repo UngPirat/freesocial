@@ -23,6 +23,9 @@ class ProfileactionsWidget extends ThemeWidget {
     // only gets called for with in users
     function get_actions() {
         $actions = array();
+		if ($this->item->isGroup()) {
+			return $actions;
+		}
         if ($this->scoped->isSubscribed($this->item)) {
             $actions['subscribe'] = new UnsubscribeForm($this->out, $this->item);
         } else if ($this->scoped->hasPendingSubscription($this->item)) {

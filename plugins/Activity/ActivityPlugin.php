@@ -95,7 +95,7 @@ class ActivityPlugin extends ActivityHandlerPlugin
             return false;
         }
 // old stuff
-        switch (ActivityUtils::resolveUri($notice->verb, true)) {
+        switch (ActivityUtils::resolveUri($args['item']->verb, true)) {
         case ActivityVerb::FAVORITE:
         case ActivityVerb::UNFAVORITE:
             $adapter = new SystemListItem($nli);

@@ -10,6 +10,7 @@ class ProfileListWidget extends ListWidget {
 	protected $showCount   = true;
     protected $mini        = false;
     protected $item        = null;
+    protected $list        = null;
 
     static function run($args=null) {
         $class = get_class();

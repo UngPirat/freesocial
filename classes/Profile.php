@@ -107,16 +107,43 @@ class Profile extends Managed_DataObject
     /* the code above is auto generated do not remove the tag below */
     ###END_AUTOCODE
 
-    protected $_user = -1;  // Uninitialized value distinct from null
+    protected $_subject = -1;  // Uninitialized value distinct from null
 
+	function getSubject()
+	{
+        if (is_int($this->_subject) && $this->_subject == -1) {
+			foreach(array('User', 'Group') as $type) {
+            	if ($this->{"get$type"}() != -1) {
+					return $this->_subject;
+				}
+        	}
+		}
+		throw new Exception('No profile subject found');
+	}
     function getUser()
     {
-        if (is_int($this->_user) && $this->_user == -1) {
-            $this->_user = User::staticGet('id', $this->id);
+        if (is_int($this->_subject) && $this->_subject == -1) {
+            $this->_subject = User::staticGet('id', $this->id);
         }
-
-        return $this->_user;
+        return $this->_subject;
     }
+	function getGroup()
+	{
+		if (is_int($this->_subject) && $this->_subject == -1) {
+			$this->_subject = User_group::staticGet('id', $this->id);
+		}
+        return $this->_subject;
+	}
+
+	function isGroup() {
+		return $this->type & self::GROUP;
+	}
+	function isPage() {
+		return $this->type & self::PAGE;
+	}
+	function isUser() {
+		return $this->type & self::USER;
+	}
 
     function getAvatar($width, $height=null)
     {
@@ -625,6 +652,26 @@ class Profile extends Managed_DataObject
 
         return new ArrayWrapper($profiles);
     }
+	function getMembers($offset=0, $limit=null) {
+		$subject = $this->trySubject('Group');
+		return $subject->getMembers($offset, $limit);
+	}
+	function getMemberIDs($offset=0, $limit=null) {
+		$subject = $this->trySubject('Group');
+		return $subject->getMemberIDs($offset, $limit);
+	}
+	function memberCount() {
+		$subject = $this->trySubject('Group');
+		return $subject->getMemberCount();
+	}
+
+	protected function trySubject($type) {
+		$type = ucfirst(basename($type));
+		if (!$this->{"is$type"}()) {
+			throw new ServerException('Subject does not support this function');
+		}
+		return $this->{"get$type"}();
+	}
 
     function getTaggedSubscribers($tag)
     {
