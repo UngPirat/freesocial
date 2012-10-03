@@ -44,7 +44,6 @@ require_once 'bookmarksnoticestream.php';
  */
 class BookmarksAction extends ShowstreamAction
 {
-    var $user = null;
     var $gc   = null;
 	protected $action = 'bookmarks';
 
@@ -78,9 +77,9 @@ class BookmarksAction extends ShowstreamAction
             $nickname = $nickname[1]['nickname'];
         }
         
-        $this->user = User::staticGet('nickname', $nickname);
+        $this->subject = User::staticGet('nickname', $nickname);
 
-        if (!$this->user) {
+        if (!$this->subject) {
             // TRANS: Client error displayed when trying to display bookmarks for a non-existing user.
             $this->clientError(_('No such user.'));
             return false;
@@ -90,7 +89,7 @@ class BookmarksAction extends ShowstreamAction
 
 		common_set_returnto($this->selfUrl());
 
-        $stream = new BookmarksNoticeStream($this->user->id, true);
+        $stream = new BookmarksNoticeStream($this->subject->id, true);
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                                 NOTICES_PER_PAGE + 1); 
 
@@ -112,7 +111,7 @@ class BookmarksAction extends ShowstreamAction
     {
 
         // TRANS: Page title for the Bookmark. %s is a user nickname.
-        return sprintf(_m('%s\'s bookmarks'), $this->user->nickname);
+        return sprintf(_m('%s\'s bookmarks'), $this->subject->nickname);
     }
 
     /**
@@ -125,33 +124,33 @@ class BookmarksAction extends ShowstreamAction
         return array(new Feed(Feed::JSON,
                               common_local_url('ApiTimelineBookmarks',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'as')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (Activity Streams JSON)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS1,
                               common_local_url('bookmarksrss',
-                                               array('nickname' => $this->user->nickname)),
+                                               array('nickname' => $this->subject->nickname)),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (RSS 1.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS2,
                               common_local_url('ApiTimelineBookmarks',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'rss')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (RSS 2.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::ATOM,
                               common_local_url('ApiTimelineBookmarks',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'atom')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (Atom)'),
-                                      $this->user->nickname)));
+                                      $this->subject->nickname)));
     }
 
     /**
@@ -180,11 +179,11 @@ class BookmarksAction extends ShowstreamAction
         $this->pagination($this->page > 1,
                 $cnt > NOTICES_PER_PAGE,
                 $this->page, 'bookmarks',
-                array('nickname' => $this->user->nickname));
+                array('nickname' => $this->subject->nickname));
     }
 
     function showEmptyList() {
-        $message = sprintf(_('This is %1$s\'s bookmark stream, but %1$s hasn\'t bookmarked anything yet.'), $this->user->nickname) . ' ';
+        $message = sprintf(_('This is %1$s\'s bookmark stream, but %1$s hasn\'t bookmarked anything yet.'), $this->subject->nickname) . ' ';
 
         $this->elementStart('div', 'guide');
         $this->raw(common_markup_to_html($message));

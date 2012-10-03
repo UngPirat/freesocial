@@ -48,6 +48,7 @@ require_once INSTALLDIR.'/lib/groupminilist.php';
  */
 class ProfileAction extends Action
 {
+    var $subject = null;
     var $page    = null;
     var $profile = null;
     var $tag     = null;
@@ -71,10 +72,10 @@ class ProfileAction extends Action
         }
 
         if (!is_a($this, 'ShowgroupAction')) {
-			$subject = User::staticGet('nickname', $nickname);
+			$this->subject = User::staticGet('nickname', $nickname);
 		} else {
-            $subject = Local_group::staticGet('nickname', $nickname);
-            if (empty($subject)) {
+            $this->subject = Local_group::staticGet('nickname', $nickname);
+            if (empty($this->subject)) {
                 $alias = Group_alias::staticGet('alias', $nickname);
                 if ($alias) {
                     $args = array('id' => $alias->group_id);
@@ -87,13 +88,13 @@ class ProfileAction extends Action
             }
 		}
 
-        if (!$subject) {
+        if (!$this->subject) {
             // TRANS: Client error displayed when calling a profile action without specifying a user.
             $this->clientError(_('No subject found.'), 404);
             return false;
         }
 
-        $this->profile = $subject->getProfile();
+        $this->profile = $this->subject->getProfile();
 
         if (!$this->profile) {
             // TRANS: Error message displayed when referring to a user without a profile.

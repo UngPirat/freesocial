@@ -11,7 +11,7 @@ class RemoteProfileAction extends ShowstreamAction
         Action::prepare($args); // skip the ProfileAction code and replace it...
 
         $id = $this->arg('id');
-        $this->user = false;
+        $this->subject = false;
         $this->profile = Profile::staticGet('id', $id);
 
         $this->tag = $this->trimmed('tag');

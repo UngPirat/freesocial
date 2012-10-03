@@ -74,12 +74,12 @@ class FavoritesAction extends ShowstreamAction
         if ($this->page == 1) {
             // TRANS: Title for first page of favourite notices of a user.
             // TRANS: %s is the user for whom the favourite notices are displayed.
-            return sprintf(_('%s\'s favorite notices'), $this->user->nickname);
+            return sprintf(_('%s\'s favorite notices'), $this->subject->nickname);
         } else {
             // TRANS: Title for all but the first page of favourite notices of a user.
             // TRANS: %1$s is the user for whom the favourite notices are displayed, %2$d is the page number.
             return sprintf(_('%1$s\'s favorite notices, page %2$d'),
-                           $this->user->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -100,9 +100,9 @@ class FavoritesAction extends ShowstreamAction
 
         $nickname = common_canonical_nickname($this->arg('nickname'));
 
-        $this->user = User::staticGet('nickname', $nickname);
+        $this->subject = User::staticGet('nickname', $nickname);
 
-        if (!$this->user) {
+        if (!$this->subject) {
             // TRANS: Client error displayed when trying to display favourite notices for a non-existing user.
             $this->clientError(_('No such user.'));
             return false;
@@ -118,15 +118,15 @@ class FavoritesAction extends ShowstreamAction
 
         $cur = common_current_user();
 
-        if (!empty($cur) && $cur->id == $this->user->id) {
+        if (!empty($cur) && $cur->id == $this->subject->id) {
 
             // Show imported/gateway notices as well as local if
             // the user is looking at their own favorites
 
-            $this->notice = $this->user->favoriteNotices(true, ($this->page-1)*NOTICES_PER_PAGE,
+            $this->notice = $this->subject->favoriteNotices(true, ($this->page-1)*NOTICES_PER_PAGE,
                                                    NOTICES_PER_PAGE + 1);
         } else {
-            $this->notice = $this->user->favoriteNotices(false, ($this->page-1)*NOTICES_PER_PAGE,
+            $this->notice = $this->subject->favoriteNotices(false, ($this->page-1)*NOTICES_PER_PAGE,
                                                    NOTICES_PER_PAGE + 1);
         }
 
@@ -154,53 +154,53 @@ class FavoritesAction extends ShowstreamAction
         return array(new Feed(Feed::JSON,
                               common_local_url('ApiTimelineFavorites',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'as')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (Activity Streams JSON)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS1,
                               common_local_url('favoritesrss',
-                                               array('nickname' => $this->user->nickname)),
+                                               array('nickname' => $this->subject->nickname)),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (RSS 1.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS2,
                               common_local_url('ApiTimelineFavorites',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'rss')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (RSS 2.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::ATOM,
                               common_local_url('ApiTimelineFavorites',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'atom')),
                               // TRANS: Feed link text. %s is a username.
                               sprintf(_('Feed for favorites of %s (Atom)'),
-                                      $this->user->nickname)));
+                                      $this->subject->nickname)));
     }
 
     function showEmptyListMessage()
     {
         if (common_logged_in()) {
             $current_user = common_current_user();
-            if ($this->user->id === $current_user->id) {
+            if ($this->subject->id === $current_user->id) {
                 // TRANS: Text displayed instead of favourite notices for the current logged in user that has no favourites.
                 $message = _('You haven\'t chosen any favorite notices yet. Click the fave button on notices you like to bookmark them for later or shed a spotlight on them.');
             } else {
                 // TRANS: Text displayed instead of favourite notices for a user that has no favourites while logged in.
                 // TRANS: %s is a username.
-                $message = sprintf(_('%s hasn\'t added any favorite notices yet. Post something interesting they would add to their favorites :)'), $this->user->nickname);
+                $message = sprintf(_('%s hasn\'t added any favorite notices yet. Post something interesting they would add to their favorites :)'), $this->subject->nickname);
             }
         }
         else {
                 // TRANS: Text displayed instead of favourite notices for a user that has no favourites while not logged in.
                 // TRANS: %s is a username, %%%%action.register%%%% is a link to the user registration page.
                 // TRANS: (link text)[link] is a Mark Down link.
-            $message = sprintf(_('%s hasn\'t added any favorite notices yet. Why not [register an account](%%%%action.register%%%%) and then post something interesting they would add to their favorites :)'), $this->user->nickname);
+            $message = sprintf(_('%s hasn\'t added any favorite notices yet. Why not [register an account](%%%%action.register%%%%) and then post something interesting they would add to their favorites :)'), $this->subject->nickname);
         }
 
         $this->elementStart('div', 'guide');

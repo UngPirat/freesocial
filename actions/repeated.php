@@ -66,15 +66,15 @@ class RepeatedAction extends ShowstreamAction
 
         $nickname = common_canonical_nickname($this->arg('nickname'));
 
-        $this->user = User::staticGet('nickname', $nickname);
+        $this->subject = User::staticGet('nickname', $nickname);
 
-        if (!$this->user) {
+        if (!$this->subject) {
             // TRANS: Client error displayed when trying to reply to a non-exsting user.
             $this->clientError(_('No such user.'));
             return false;
         }
 
-        $profile = $this->user->getProfile();
+        $profile = $this->subject->getProfile();
 
         if (!$profile) {
             // TRANS: Error message displayed when referring to a user without a profile.
@@ -86,7 +86,7 @@ class RepeatedAction extends ShowstreamAction
 
         common_set_returnto($this->selfUrl());
 
-        $stream = new RepeatsOfMeNoticeStream($this->user->id,
+        $stream = new RepeatsOfMeNoticeStream($this->subject->id,
                                         Profile::current());
 
         $this->notice = $stream->getNotices(($this->page-1) * NOTICES_PER_PAGE,
@@ -112,12 +112,12 @@ class RepeatedAction extends ShowstreamAction
         if ($this->page == 1) {
             // TRANS: Title for first page of repeats of a user.
             // TRANS: %s is a user nickname.
-            return sprintf(_("Repeats of %s"), $this->user->nickname);
+            return sprintf(_("Repeats of %s"), $this->subject->nickname);
         } else {
             // TRANS: Title for all but the first page of repeats of a user.
             // TRANS: %1$s is a user nickname, %2$d is a page number.
             return sprintf(_('Repeats of %1$s, page %2$d'),
-                           $this->user->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }

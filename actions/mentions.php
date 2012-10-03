@@ -66,15 +66,15 @@ class MentionsAction extends ShowstreamAction
 
         $nickname = common_canonical_nickname($this->arg('nickname'));
 
-        $this->user = User::staticGet('nickname', $nickname);
+        $this->subject = User::staticGet('nickname', $nickname);
 
-        if (!$this->user) {
+        if (!$this->subject) {
             // TRANS: Client error displayed when trying to reply to a non-exsting user.
             $this->clientError(_('No such user.'));
             return false;
         }
 
-        $profile = $this->user->getProfile();
+        $profile = $this->subject->getProfile();
 
         if (!$profile) {
             // TRANS: Error message displayed when referring to a user without a profile.
@@ -86,7 +86,7 @@ class MentionsAction extends ShowstreamAction
 
         common_set_returnto($this->selfUrl());
 
-        $stream = new MentionNoticeStream($this->user->id,
+        $stream = new MentionNoticeStream($this->subject->id,
                                         Profile::current());
 
         $this->notice = $stream->getNotices(($this->page-1) * NOTICES_PER_PAGE,
@@ -112,12 +112,12 @@ class MentionsAction extends ShowstreamAction
         if ($this->page == 1) {
             // TRANS: Title for first page of mentions of a user.
             // TRANS: %s is a user nickname.
-            return sprintf(_("Mentions of %s"), $this->user->nickname);
+            return sprintf(_("Mentions of %s"), $this->subject->nickname);
         } else {
             // TRANS: Title for all but the first page of mentions of a user.
             // TRANS: %1$s is a user nickname, %2$d is a page number.
             return sprintf(_('Mentions of %1$s, page %2$d'),
-                           $this->user->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -132,37 +132,37 @@ class MentionsAction extends ShowstreamAction
         return array(new Feed(Feed::JSON,
                               common_local_url('ApiTimelineMentions',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'as')),
                               // TRANS: Link for feed with mentions of a user.
                               // TRANS: %s is a user nickname.
                               sprintf(_('Mention feed for %s (Activity Streams JSON)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS1,
                               common_local_url('mentionsrss',
-                                               array('nickname' => $this->user->nickname)),
+                                               array('nickname' => $this->subject->nickname)),
                               // TRANS: Link for feed with mentions of a user.
                               // TRANS: %s is a user nickname.
                               sprintf(_('Mention feed for %s (RSS 1.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::RSS2,
                               common_local_url('ApiTimelineMentions',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'rss')),
                               // TRANS: Link for feed with mentions of a user.
                               // TRANS: %s is a user nickname.
                               sprintf(_('Mention feed for %s (RSS 2.0)'),
-                                      $this->user->nickname)),
+                                      $this->subject->nickname)),
                      new Feed(Feed::ATOM,
                               common_local_url('ApiTimelineMentions',
                                                array(
-                                                    'id' => $this->user->nickname,
+                                                    'id' => $this->subject->nickname,
                                                     'format' => 'atom')),
                               // TRANS: Link for feed with mentions of a user.
                               // TRANS: %s is a user nickname.
                               sprintf(_('Mention feed for %s (Atom)'),
-                                    $this->user->nickname)));
+                                    $this->subject->nickname)));
     }
 
     function isReadOnly($args)

@@ -88,18 +88,25 @@ class User_group extends Managed_DataObject
 
     function homeUrl()
     {
-        $url = null;
-        if (Event::handle('StartUserGroupHomeUrl', array($this, &$url))) {
-            // normally stored in mainpage, but older ones may be null
-            if (!empty($this->mainpage)) {
-                $url = $this->mainpage;
-            } else {
-                $url = common_local_url('showgroup',
-                                        array('nickname' => $this->nickname));
+		$profile = $this->getProfile();
+		return $profile->homeUrl();
+    }
+
+    protected $_profile = -1;
+
+    /**
+     * @return Profile
+     */
+    function getProfile()
+    {
+        if (is_int($this->_profile) && $this->_profile == -1) { // invalid but distinct from null
+            $this->_profile = Profile::staticGet('id', $this->id);
+            if (empty($this->_profile)) {
+                throw new UserNoProfileException($this);
             }
         }
-        Event::handle('EndUserGroupHomeUrl', array($this, &$url));
-        return $url;
+
+        return $this->_profile;
     }
 
     function getUri()

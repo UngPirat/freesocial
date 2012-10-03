@@ -38,7 +38,6 @@ class Profile extends Managed_DataObject
     public $type;                            // tinyint(1)  not_null
     public $nickname;                        // varchar(64)  multiple_key not_null
     public $fullname;                        // varchar(255)  multiple_key
-    public $uri;                             // varchar(255)  unique_key
     public $profileurl;                      // varchar(255)
     public $homepage;                        // varchar(255)  multiple_key
     public $bio;                             // text()  multiple_key
@@ -49,9 +48,6 @@ class Profile extends Managed_DataObject
     public $location_ns;                     // int(4)
     public $created;                         // datetime()   not_null
     public $modified;                        // timestamp()   not_null default_CURRENT_TIMESTAMP
-	// group profile stuff, makes no sense for ordinary users
-    public $join_policy;                     // tinyint(4)
-    public $force_scope;                     // tinyint(4)
 
     /* Static get */
     function staticGet($k,$v=NULL) {
@@ -67,7 +63,6 @@ class Profile extends Managed_DataObject
                 'type' => array('type' => 'int', 'size' => 'tiny', 'not null' => true, 'description' => '1=user, 2=group, 4=page'),
                 'nickname' => array('type' => 'varchar', 'length' => 64, 'not null' => true, 'description' => 'nickname or username', 'collate' => 'utf8_general_ci'),
                 'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name', 'collate' => 'utf8_general_ci'),
-                'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universal identifier'),
                 'profileurl' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL, cached so we dont regenerate'),
                 'homepage' => array('type' => 'varchar', 'length' => 255, 'description' => 'identifying URL', 'collate' => 'utf8_general_ci'),
                 'bio' => array('type' => 'text', 'description' => 'descriptive biography', 'collate' => 'utf8_general_ci'),
@@ -76,9 +71,6 @@ class Profile extends Managed_DataObject
                 'lon' => array('type' => 'numeric', 'precision' => 10, 'scale' => 7, 'description' => 'longitude'),
                 'location_id' => array('type' => 'int', 'description' => 'location id if possible'),
                 'location_ns' => array('type' => 'int', 'description' => 'namespace for location'),
-
-                'join_policy' => array('type' => 'int', 'size' => 'tiny', 'description' => 'group join policy'),
-                'force_scope' => array('type' => 'int', 'size' => 'tiny', 'description' => 'group scope forcing'),
 
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
