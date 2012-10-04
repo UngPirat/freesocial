@@ -134,7 +134,7 @@ class NewgroupAction extends Action
             $private     = $this->boolean('private');
             $aliasstring = $this->trimmed('aliases');
 
-            if ($this->nicknameExists($nickname)) {
+            if (Nickname::exists($nickname)) {
                 // TRANS: Group create form validation error.
                 $this->showForm(_('Nickname already in use. Try another one.'));
                 return;
@@ -190,7 +190,7 @@ class NewgroupAction extends Action
                     $this->showForm(sprintf(_('Invalid alias: "%s"'), $alias));
                     return;
                 }
-                if ($this->nicknameExists($alias)) {
+                if (Nickname::exists($alias)) {
                     // TRANS: Group create form validation error. %s is the already used alias.
                     $this->showForm(sprintf(_('Alias "%s" already in use. Try another one.'),
                                             $alias));
@@ -240,22 +240,5 @@ class NewgroupAction extends Action
 
             common_redirect($group->homeUrl(), 303);
         }
-    }
-
-    function nicknameExists($nickname)
-    {
-        $local = Local_group::staticGet('nickname', $nickname);
-
-        if (!empty($local)) {
-            return true;
-        }
-
-        $alias = Group_alias::staticGet('alias', $nickname);
-
-        if (!empty($alias)) {
-            return true;
-        }
-
-        return false;
     }
 }

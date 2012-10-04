@@ -122,6 +122,25 @@ class Nickname
         return $str;
     }
 
+	public static function exists($nickname, $id=null) {
+        $obj = Local_group::staticGet('nickname', $nickname);
+        if (!empty($obj) && (is_null($id) || $obj->group_id != $id)) {
+            return true;
+        }
+
+		$obj = User::staticGet('nickname', $nickname);
+        if (!empty($obj) && (is_null($id) || $obj->id != $id)) {
+            return true;
+        }
+
+        $obj = Group_alias::staticGet('alias', $nickname);
+        if (!empty($obj) && (is_null($id) || $obj->group_id != $id)) {
+            return true;
+        }
+
+        return false;
+	}
+
     /**
      * Is the given string a valid canonical nickname form?
      *

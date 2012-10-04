@@ -44,11 +44,9 @@ define('MEMBERS_PER_SECTION', 27);
  */
 class GroupAction extends ProfileAction
 {
-    protected $group;
-
     function showProfileBlock()
     {
-        $block = new GroupProfileBlock($this, $this->group);
+        $block = new GroupProfileBlock($this, $this->subject);
         $block->show();
     }
 
@@ -61,7 +59,7 @@ class GroupAction extends ProfileAction
     {
         $this->showMembers();
         $cur = common_current_user();
-        if ($cur && $cur->isAdmin($this->group)) {
+        if ($cur && $cur->isAdmin($this->subject)) {
             $this->showPending();
             $this->showBlocked();
         }
@@ -69,7 +67,7 @@ class GroupAction extends ProfileAction
         $this->showAdmins();
 
         if (!common_config('performance', 'high')) {
-            $cloud = new GroupTagCloudSection($this, $this->group);
+            $cloud = new GroupTagCloudSection($this, $this->subject);
             $cloud->show();
         }
     }
@@ -81,7 +79,7 @@ class GroupAction extends ProfileAction
      */
     function showMembers()
     {
-        $member = $this->group->getMembers(0, MEMBERS_PER_SECTION);
+        $member = $this->subject->getMembers(0, MEMBERS_PER_SECTION, true);
 
         if (!$member) {
             return;
@@ -94,13 +92,13 @@ class GroupAction extends ProfileAction
             $this->elementStart('h2');
 
             $this->element('a', array('href' => common_local_url('groupmembers', array('nickname' =>
-                                                                                       $this->group->nickname))),
+                                                                                       $this->subject->nickname))),
                            // TRANS: Header for mini list of group members on a group page (h2).
                            _('Members'));
 
             $this->text(' ');
 
-            $this->text($this->group->getMemberCount());
+            $this->text($this->subject->getMemberCount());
 
             $this->elementEnd('h2');
 
@@ -115,7 +113,7 @@ class GroupAction extends ProfileAction
             //              for example http://identi.ca/group/statusnet. Broken?
             if ($cnt > MEMBERS_PER_SECTION) {
                 $this->element('a', array('href' => common_local_url('groupmembers',
-                                                                     array('nickname' => $this->group->nickname))),
+                                                                     array('nickname' => $this->subject->nickname))),
                                // TRANS: Link to all group members from mini list of group members if group has more than n members.
                                _('All members'));
             }
@@ -128,17 +126,17 @@ class GroupAction extends ProfileAction
 
     function showPending()
     {
-        if ($this->group->join_policy != User_group::JOIN_POLICY_MODERATE) {
+        if ($this->subject->join_policy != User_group::JOIN_POLICY_MODERATE) {
             return;
         }
 
-        $pending = $this->group->getQueueCount();
+        $pending = $this->subject->getQueueCount();
 
         if (!$pending) {
             return;
         }
 
-        $request = $this->group->getRequests(0, MEMBERS_PER_SECTION);
+        $request = $this->subject->getRequests(0, MEMBERS_PER_SECTION);
 
         if (!$request) {
             return;
@@ -152,7 +150,7 @@ class GroupAction extends ProfileAction
             $this->elementStart('h2');
 
             $this->element('a', array('href' => common_local_url('groupqueue', array('nickname' =>
-                                                                                     $this->group->nickname))),
+                                                                                     $this->subject->nickname))),
                            // TRANS: Header for mini list of users with a pending membership request on a group page (h2).
                            _('Pending'));
 
@@ -173,7 +171,7 @@ class GroupAction extends ProfileAction
 
     function showBlocked()
     {
-        $blocked = $this->group->getBlocked(0, MEMBERS_PER_SECTION);
+        $blocked = $this->subject->getBlocked(0, MEMBERS_PER_SECTION);
 
         if (!$blocked) {
             return;
@@ -187,13 +185,13 @@ class GroupAction extends ProfileAction
             $this->elementStart('h2');
 
             $this->element('a', array('href' => common_local_url('blockedfromgroup', array('nickname' =>
-                                                                                           $this->group->nickname))),
+                                                                                           $this->subject->nickname))),
                            // TRANS: Header for mini list of users that are blocked in a group page (h2).
                            _('Blocked'));
 
             $this->text(' ');
 
-            $this->text($this->group->getBlockedCount());
+            $this->text($this->subject->getBlockedCount());
 
             $this->elementEnd('h2');
 
@@ -208,7 +206,7 @@ class GroupAction extends ProfileAction
             //              for example http://identi.ca/group/statusnet. Broken?
             if ($cnt > MEMBERS_PER_SECTION) {
                 $this->element('a', array('href' => common_local_url('blockedfromgroup',
-                                                                     array('nickname' => $this->group->nickname))),
+                                                                     array('nickname' => $this->subject->nickname))),
                                // TRANS: Link to all group members from mini list of group members if group has more than n members.
                                _('All members'));
             }
@@ -226,7 +224,7 @@ class GroupAction extends ProfileAction
      */
     function showAdmins()
     {
-        $adminSection = new GroupAdminSection($this, $this->group);
+        $adminSection = new GroupAdminSection($this, $this->subject);
         $adminSection->show();
     }
 
@@ -235,8 +233,9 @@ class GroupAction extends ProfileAction
         $options = parent::noticeFormOptions();
         $cur = common_current_user();
 
-        if (!empty($cur) && $cur->isMember($this->group)) {
-            $options['to_group'] =  $this->group;
+		$group = $this->subject->getGroup();
+        if (!empty($cur) && $cur->isMember($group)) {
+            $options['to_group'] =  $group;
         }
 
         return $options;

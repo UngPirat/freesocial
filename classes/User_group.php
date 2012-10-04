@@ -157,52 +157,46 @@ class User_group extends Managed_DataObject
         return !in_array($nickname, $blacklist);
     }
 
-    function getMembers($offset=0, $limit=null) {
-        $ids = null;
-        if (is_null($limit) || $offset + $limit > User_group::CACHE_WINDOW) {
-            $ids = $this->getMemberIDs($offset,
-                                       $limit);
-        } else {
-            $key = sprintf('group:member_ids:%d', $this->id);
-            $window = self::cacheGet($key);
-            if ($window === false) {
-                $window = $this->getMemberIDs(0,
-                                              User_group::CACHE_WINDOW);
-                self::cacheSet($key, $window);
-            }
-
-            $ids = array_slice($window,
-                               $offset,
-                               $limit);
-        }
-
-        return Profile::multiGet('id', $ids);
-    }
-
-    function getMemberIDs($offset=0, $limit=null)
+    function getMemberIDs($offset=0, $limit=null, $desc=false)
     {
-        $gm = new Group_member();
-
-        $gm->selectAdd();
-        $gm->selectAdd('profile_id');
-
-        $gm->group_id = $this->id;
-
-        $gm->orderBy('created DESC');
-
-        if (!is_null($limit)) {
-            $gm->limit($offset, $limit);
-        }
-
         $ids = array();
+        $keypart = sprintf('group:member_ids:%d', $this->id);
+        $idstring = self::cacheGet($keypart);
 
-        if ($gm->find()) {
-            while ($gm->fetch()) {
-                $ids[] = $gm->profile_id;
+        if ($idstring !== false) {
+			$ids = explode(',', $idstring);
+		} else {
+            $gm = new Group_member();
+    
+            $gm->selectAdd();
+            $gm->selectAdd('profile_id');
+    
+            $gm->group_id = $this->id;
+            $gm->orderBy('created ASC');
+
+            if ($gm->find()) {
+                while ($gm->fetch()) {
+                    $ids[] = $gm->profile_id;
+                }
             }
+            
+            self::cacheSet($keypart, implode(',', $ids));
         }
+
+        if ($desc==true) {
+            $ids = array_reverse($ids);
+        }
+
+		if (!is_null($offset) && !is_null($limit)) {
+	        $ids = array_slice($ids, $offset, $limit);
+		}
 
         return $ids;
+    }
+
+    function getMembers($offset=0, $limit=null, $desc=false) {
+        $ids = $this->getMemberIDs($offset, $limit, $desc);
+        return Profile::multiGet('id', $ids);
     }
 
     /**
@@ -605,7 +599,10 @@ class User_group extends Managed_DataObject
         $fields['nickname'] = common_canonical_nickname($fields['nickname']);
 		if (!User::allowed_nickname($fields['nickname'])) {
 			common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname), __FILE__);
-			throw new Exception('Nickname not allowed');
+			throw new Exception(_m('Nickname not allowed'));
+		}
+		if (Nickname::exists($fields['nickname'])) {
+			throw new Exception(_m('Nickname already in use'));
 		}
 
         $defaults = array('nickname' => null,

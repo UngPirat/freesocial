@@ -242,6 +242,7 @@ class ProfilesettingsAction extends SettingsAction
                               'Try again, please.'));
             return;
         }
+		$cur = common_current_user();
 
         if (Event::handle('StartProfileSaveForm', array($this))) {
 
@@ -252,7 +253,9 @@ class ProfilesettingsAction extends SettingsAction
                     $this->showForm($e->getMessage());
                     return;
                 }
-            }
+            } else {
+				$nickname = $cur->nickname;
+			}
 
             $fullname = $this->trimmed('fullname');
             $homepage = $this->trimmed('homepage');
@@ -266,7 +269,7 @@ class ProfilesettingsAction extends SettingsAction
             $tagstring = $this->trimmed('tags');
 
             // Some validation
-            if (common_config('profile', 'changenick') == true && !User::allowed_nickname($nickname)) {
+            if (!User::allowed_nickname($nickname)) {
                 // TRANS: Validation error in form for profile settings.
                 $this->showForm(_('Not a valid nickname.'));
                 return;
@@ -296,7 +299,7 @@ class ProfilesettingsAction extends SettingsAction
                 // TRANS: Validation error in form for profile settings.
                 $this->showForm(_('Timezone not selected.'));
                 return;
-            } else if ($this->nicknameExists($nickname)) {
+            } else if (Nickname::exists($nickname, $cur->id)) {
                 // TRANS: Validation error in form for profile settings.
                 $this->showForm(_('Nickname already in use. Try another one.'));
                 return;
@@ -475,17 +478,6 @@ class ProfilesettingsAction extends SettingsAction
             // TRANS: Confirmation shown when user profile settings are saved.
             $this->showForm(_('Settings saved.'), true);
 
-        }
-    }
-
-    function nicknameExists($nickname)
-    {
-        $user = common_current_user();
-        $other = User::staticGet('nickname', $nickname);
-        if (!$other) {
-            return false;
-        } else {
-            return $other->id != $user->id;
         }
     }
 

@@ -42,8 +42,6 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
  */
 class BlockedfromgroupAction extends GroupAction
 {
-    var $page = null;
-
     function isReadOnly($args)
     {
         return true;
@@ -52,33 +50,11 @@ class BlockedfromgroupAction extends GroupAction
     function prepare($args)
     {
         parent::prepare($args);
-        $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
-
-        $nickname_arg = $this->arg('nickname');
-        $nickname = common_canonical_nickname($nickname_arg);
-
-        // Permanent redirect on non-canonical nickname
-
-        if ($nickname_arg != $nickname) {
-            $args = array('nickname' => $nickname);
-            if ($this->page != 1) {
-                $args['page'] = $this->page;
-            }
-            common_redirect(common_local_url('blockedfromgroup', $args), 301);
-            return false;
-        }
-
-        if (!$nickname) {
-            // TRANS: Client error displayed when requesting a list of blocked users for a group without providing a group nickname.
-            $this->clientError(_('No nickname.'), 404);
-            return false;
-        }
-
-        $local = Local_group::staticGet('nickname', $nickname);
+        $local = Local_group::staticGet('nickname', $this->subject->nickname);
 
         if (!$local) {
             // TRANS: Client error displayed when requesting a list of blocked users for a non-local group.
-            $this->clientError(_('No such group.'), 404);
+            $this->clientError(_('No such local group.'), 404);
             return false;
         }
 
@@ -99,12 +75,12 @@ class BlockedfromgroupAction extends GroupAction
             // TRANS: Title for first page with list of users blocked from a group.
             // TRANS: %s is a group nickname.
             return sprintf(_('%s blocked profiles'),
-                           $this->group->nickname);
+                           $this->subject->nickname);
         } else {
             // TRANS: Title for any but the first page with list of users blocked from a group.
             // TRANS: %1$s is a group nickname, %2$d is a page number.
             return sprintf(_('%1$s blocked profiles, page %2$d'),
-                           $this->group->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -129,7 +105,7 @@ class BlockedfromgroupAction extends GroupAction
 
         $cnt = 0;
 
-        $blocked = $this->group->getBlocked($offset, $limit);
+        $blocked = $this->subject->getBlocked($offset, $limit);
 
         if ($blocked) {
             $blocked_list = new GroupBlockList($blocked, $this->group, $this);

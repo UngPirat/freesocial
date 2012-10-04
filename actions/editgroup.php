@@ -52,7 +52,7 @@ class EditgroupAction extends GroupAction
     function title()
     {
         // TRANS: Title for form to edit a group. %s is a group nickname.
-        return sprintf(_('Edit %s group'), $this->group->nickname);
+        return sprintf(_('Edit %s group'), $this->subject->nickname);
     }
 
     /**
@@ -69,29 +69,12 @@ class EditgroupAction extends GroupAction
             return false;
         }
 
-        $nickname_arg = $this->trimmed('nickname');
-        $nickname = common_canonical_nickname($nickname_arg);
-
-        // Permanent redirect on non-canonical nickname
-
-        if ($nickname_arg != $nickname) {
-            $args = array('nickname' => $nickname);
-            common_redirect(common_local_url('editgroup', $args), 301);
-            return false;
-        }
-
-        if (!$nickname) {
-            // TRANS: Client error displayed trying to edit a group while not proving a nickname for the group to edit.
-            $this->clientError(_('No nickname.'), 404);
-            return false;
-        }
-
         $groupid = $this->trimmed('groupid');
 
         if ($groupid) {
             $this->group = User_group::staticGet('id', $groupid);
         } else {
-            $local = Local_group::staticGet('nickname', $nickname);
+            $local = Local_group::staticGet('nickname', $this->subject->nickname);
             if ($local) {
                 $this->group = User_group::staticGet('id', $local->group_id);
             }
@@ -189,7 +172,7 @@ class EditgroupAction extends GroupAction
                 $join_policy = User_group::JOIN_POLICY_OPEN;
             }
 
-            if ($this->nicknameExists($nickname)) {
+            if (Nickname::exists($nickname, $this->subject->id)) {
                 // TRANS: Group edit form validation error.
                 $this->showForm(_('Nickname already in use. Try another one.'));
                 return;
@@ -244,7 +227,7 @@ class EditgroupAction extends GroupAction
                     $this->showForm(sprintf(_('Invalid alias: "%s"'), $alias));
                     return;
                 }
-                if ($this->nicknameExists($alias)) {
+                if (Nickname::exists($alias, $this->subject->id)) {
                     // TRANS: Group edit form validation error.
                     $this->showForm(sprintf(_('Alias "%s" already in use. Try another one.'),
                                             $alias));
@@ -290,6 +273,8 @@ class EditgroupAction extends GroupAction
                 common_log(LOG_INFO, "Saving local group info.");
                 $local = Local_group::staticGet('group_id', $this->group->id);
                 $local->setNickname($nickname);
+
+				$gprofile = Profile::staticGet('id', $this->group->id);
             }
 
             $this->group->query('COMMIT');
@@ -305,24 +290,5 @@ class EditgroupAction extends GroupAction
             // TRANS: Group edit form success message.
             $this->showForm(_('Options saved.'));
         }
-    }
-
-    function nicknameExists($nickname)
-    {
-        $group = Local_group::staticGet('nickname', $nickname);
-
-        if (!empty($group) &&
-            $group->group_id != $this->group->id) {
-            return true;
-        }
-
-        $alias = Group_alias::staticGet('alias', $nickname);
-
-        if (!empty($alias) &&
-            $alias->group_id != $this->group->id) {
-            return true;
-        }
-
-        return false;
     }
 }

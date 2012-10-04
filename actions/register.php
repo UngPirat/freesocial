@@ -205,7 +205,7 @@ class RegisterAction extends Action
             } else if ($email && !Validate::email($email, common_config('email', 'check_domain'))) {
                 // TRANS: Form validation error displayed when trying to register without a valid e-mail address.
                 $this->showForm(_('Not a valid email address.'));
-            } else if ($this->nicknameExists($nickname)) {
+            } else if (Nickname::exists($nickname)) {
                 // TRANS: Form validation error displayed when trying to register with an existing nickname.
                 $this->showForm(_('Nickname already in use. Try another one.'));
             } else if (!User::allowed_nickname($nickname)) {
@@ -281,21 +281,6 @@ class RegisterAction extends Action
                 $this->showForm(_('Invalid username or password.'));
             }
         }
-    }
-
-    /**
-     * Does the given nickname already exist?
-     *
-     * Checks a canonical nickname against the database.
-     *
-     * @param string $nickname nickname to check
-     *
-     * @return boolean true if the nickname already exists
-     */
-    function nicknameExists($nickname)
-    {
-        $user = User::staticGet('nickname', $nickname);
-        return is_object($user);
     }
 
     /**

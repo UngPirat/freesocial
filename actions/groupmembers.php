@@ -67,12 +67,12 @@ class GroupmembersAction extends GroupAction
             // TRANS: Title of the page showing group members.
             // TRANS: %s is the name of the group.
             return sprintf(_('%s group members'),
-                           $this->group->nickname);
+                           $this->subject->nickname);
         } else {
             // TRANS: Title of the page showing group members.
             // TRANS: %1$s is the name of the group, %2$d is the page number of the members list.
             return sprintf(_('%1$s group members, page %2$d'),
-                           $this->group->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -97,15 +97,15 @@ class GroupmembersAction extends GroupAction
 
         $cnt = 0;
 
-        $members = $this->group->getMembers($offset, $limit);
+        $members = $this->subject->getMembers($offset, $limit, true);
 
         if ($members) {
-            $member_list = new GroupMemberList($members, $this->group, $this);
+            $member_list = new GroupMemberList($members, $this->subject, $this);
             $cnt = $member_list->show();
         }
 
         $this->pagination($this->page > 1, $cnt > PROFILES_PER_PAGE,
                           $this->page, 'groupmembers',
-                          array('nickname' => $this->group->nickname));
+                          array('nickname' => $this->subject->nickname));
     }
 }

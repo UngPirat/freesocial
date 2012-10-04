@@ -247,21 +247,24 @@ class User extends Managed_DataObject
 
         extract($fields);
 
-        $profile = new Profile();
-
         if(!empty($email))
         {
             $email = common_canonical_email($email);
         }
 
         $nickname = common_canonical_nickname($nickname);
-        $profile->nickname = $nickname;
-        $profile->type = Profile::USER;
-        if(! User::allowed_nickname($nickname)){
-            common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname),
+        if (!User::allowed_nickname($nickname)){
+            common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $nickname),
                        __FILE__);
             return false;
         }
+		if (Nickname::exists($nickname)) {
+			throw new Exception(_m('Nickname already in use'));
+		}
+
+        $profile = new Profile();
+        $profile->nickname = $nickname;
+        $profile->type = Profile::USER;
         $profile->profileurl = common_profile_url($nickname);
 
         if (!empty($fullname)) {

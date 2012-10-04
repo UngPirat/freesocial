@@ -58,6 +58,11 @@ class Local_group extends Managed_DataObject
             throw new ServerException(_('Could not update local group.'));
         }
 
+		$profile = $this->getProfile();
+		$original = clone($profile);
+		$profile->nickname = $this->nickname;
+		$profile->update($original);
+
         return $result;
     }
 

@@ -277,7 +277,7 @@ class Profile extends Managed_DataObject
         return $stream->getNotices($offset, $limit, $since_id, $max_id);
     }
 
-    function isMember($group)
+    function isMember(User_group $group)
     {
     	$groups = $this->getGroups(0, null);
     	$gs = $groups->fetchAll();
@@ -289,32 +289,33 @@ class Profile extends Managed_DataObject
     	return false;
     }
 
-    function isAdmin($group)
+    function isAdmin(User_group $group)
     {
         $gm = Group_member::pkeyGet(array('profile_id' => $this->id,
                                           'group_id' => $group->id));
         return (!empty($gm) && $gm->is_admin);
     }
 
-    function isPendingMember($group)
+    function isPendingMember(User_group $group)
     {
         $request = Group_join_queue::pkeyGet(array('profile_id' => $this->id,
                                                    'group_id' => $group->id));
         return !empty($request);
     }
 
-    function getGroups($offset=0, $limit=PROFILES_PER_PAGE, $desc=false)
+    function getGroupIDs($offset=0, $limit=PROFILES_PER_PAGE, $desc=false)
     {
         $ids = array();
-
         $keypart = sprintf('profile:groups:%d', $this->id);
-
         $idstring = self::cacheGet($keypart);
 
         if ($idstring !== false) {
             $ids = explode(',', $idstring);
         } else {
             $gm = new Group_member();
+
+			$gm->selectAdd();
+			$gm->selectAdd('group_id');
 
             $gm->profile_id = $this->id;
             $gm->orderBy('group_id ASC');
@@ -327,6 +328,7 @@ class Profile extends Managed_DataObject
 
             self::cacheSet($keypart, implode(',', $ids));
         }
+
         if ($desc==true) {
             $ids = array_reverse($ids);
         }
@@ -335,6 +337,11 @@ class Profile extends Managed_DataObject
             $ids = array_slice($ids, $offset, $limit);
         }
 
+		return $ids;
+	}
+
+	function getGroups($offset=0, $limit=PROFILES_PER_PAGE, $desc=false) {
+		$ids = $this->getGroupIDs($offset, $limit, $desc);
         return User_group::multiGet('id', $ids);
     }
 
@@ -644,13 +651,21 @@ class Profile extends Managed_DataObject
 
         return new ArrayWrapper($profiles);
     }
-	function getMembers($offset=0, $limit=null) {
+	function getAdmins($offset=0, $limit=null) {
 		$subject = $this->trySubject('Group');
-		return $subject->getMembers($offset, $limit);
+		return $subject->getAdmins($offset, $limit);
 	}
-	function getMemberIDs($offset=0, $limit=null) {
+	function getBlocked($offset=0, $limit=null) {
 		$subject = $this->trySubject('Group');
-		return $subject->getMemberIDs($offset, $limit);
+		return $subject->getBlocked($offset, $limit);
+	}
+	function getMembers($offset=0, $limit=null, $desc=false) {
+		$subject = $this->trySubject('Group');
+		return $subject->getMembers($offset, $limit, $desc);
+	}
+	function getMemberIDs($offset=0, $limit=null, $desc=false) {
+		$subject = $this->trySubject('Group');
+		return $subject->getMemberIDs($offset, $limit, $desc);
 	}
 	function memberCount() {
 		$subject = $this->trySubject('Group');

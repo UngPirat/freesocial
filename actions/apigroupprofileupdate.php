@@ -218,25 +218,6 @@ class ApiGroupProfileUpdateAction extends ApiAuthAction
         }
     }
 
-    function nicknameExists($nickname)
-    {
-        $group = Local_group::staticGet('nickname', $nickname);
-
-        if (!empty($group) &&
-            $group->group_id != $this->group->id) {
-            return true;
-        }
-
-        $alias = Group_alias::staticGet('alias', $nickname);
-
-        if (!empty($alias) &&
-            $alias->group_id != $this->group->id) {
-            return true;
-        }
-
-        return false;
-    }
-
     function validateNickname()
     {
         if (!Validate::string(
@@ -251,7 +232,7 @@ class ApiGroupProfileUpdateAction extends ApiAuthAction
                 // TRANS: API validation exception thrown when nickname does not validate.
                 _('Nickname must have only lowercase letters and numbers and no spaces.')
             );
-        } else if ($this->nicknameExists($this->nickname)) {
+        } else if (Nickname::exists($this->nickname, $this->group->id)) {
             throw new ApiValidationException(
                 // TRANS: API validation exception thrown when nickname is already used.
                 _('Nickname already in use. Try another one.')
@@ -353,7 +334,7 @@ class ApiGroupProfileUpdateAction extends ApiAuthAction
                 );
             }
 
-            if ($this->nicknameExists($alias)) {
+            if (Nickname::exists($alias, $this->group->id)) {
                 throw new ApiValidationException(
                     sprintf(
                         // TRANS: API validation exception thrown when aliases is already used.
