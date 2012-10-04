@@ -47,33 +47,35 @@ class User_group extends Managed_DataObject
     {
         return array(
             'fields' => array(
-                'id' => array('type' => 'serial', 'not null' => true, 'description' => 'unique identifier'),
-
+                'id' => array('type' => 'int', 'not null' => true, 'description' => 'foreign key to profile table'),
                 'nickname' => array('type' => 'varchar', 'length' => 64, 'description' => 'nickname for addressing'),
-                'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name'),
-                'homepage' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL, cached so we dont regenerate'),
-                'description' => array('type' => 'text', 'description' => 'group description'),
-                'location' => array('type' => 'varchar', 'length' => 255, 'description' => 'related physical location, if any'),
-
-                'original_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'original size logo'),
-                'homepage_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'homepage (profile) size logo'),
-                'stream_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'stream-sized logo'),
-                'mini_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'mini logo'),
 
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
 
                 'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universal identifier'),
-                'mainpage' => array('type' => 'varchar', 'length' => 255, 'description' => 'page for group info to link to'),
                 'join_policy' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=open; 1=requires admin approval'),      
                 'force_scope' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=never,1=sometimes,-1=always'),
+				//remove the following
+                'mainpage' => array('type' => 'varchar', 'length' => 255, 'description' => 'page for group info to link to'),
+                'original_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'original size logo'),
+                'homepage_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'homepage (profile) size logo'),
+                'stream_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'stream-sized logo'),
+                'mini_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'mini logo'),
+                'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name'),
+                'homepage' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL, cached so we dont regenerate'),
+                'description' => array('type' => 'text', 'description' => 'group description'),
+                'location' => array('type' => 'varchar', 'length' => 255, 'description' => 'related physical location, if any'),
             ),
             'primary key' => array('id'),
             'unique keys' => array(
-                'user_group_uri_key' => array('uri'),
+                'group_uri_key' => array('uri'),
             ),
-            'indexes' => array(
-                'user_group_nickname_idx' => array('nickname'),
+			'indexes' => array(
+                'group_nickname_key' => array('nickname'),
+			),
+            'foreign keys' => array(
+                'group_id_idx' => array('profile', array('id' => 'id')),
             ),
         );
     }
@@ -591,16 +593,20 @@ class User_group extends Managed_DataObject
     // Throws an Exception if something is bad
     static function register($fields) {
         if (!empty($fields['userid'])) {
-            $profile = Profile::staticGet('id', $fields['userid']);
-            if ($profile && !$profile->hasRight(Right::CREATEGROUP)) {
-                common_log(LOG_WARNING, "Attempted group creation from banned user: " . $profile->nickname);
+            $scoped = Profile::staticGet('id', $fields['userid']);
+            if ($scoped && !$scoped->hasRight(Right::CREATEGROUP)) {
+                common_log(LOG_WARNING, "Attempted group creation from banned user: " . $scoped->nickname);
 
                 // TRANS: Client exception thrown when a user tries to create a group while banned.
                 throw new ClientException(_('You are not allowed to create groups on this site.'), 403);
             }
         }
 
-        $fields['nickname'] = Nickname::normalize($fields['nickname']);
+        $fields['nickname'] = common_canonical_nickname($fields['nickname']);
+		if (!User::allowed_nickname($fields['nickname'])) {
+			common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname), __FILE__);
+			throw new Exception('Nickname not allowed');
+		}
 
         $defaults = array('nickname' => null,
                           'fullname' => null,
@@ -613,10 +619,10 @@ class User_group extends Managed_DataObject
         // load values into $fields, overwriting as we go
         $fields = array_merge($defaults, $fields);
 
-        $group = new Profile();
+        $profile = new Profile();
 
-        $group->query('BEGIN');
-		$group->type = Profile::GROUP;
+        $profile->query('BEGIN');
+		$profile->type = Profile::GROUP;
 
         if (empty($fields['mainpage'])) {
             $fields['mainpage'] = common_local_url('showgroup', array('nickname' => $fields['nickname']));
@@ -624,41 +630,56 @@ class User_group extends Managed_DataObject
 
         // $default contains the Profile keys-to-be-set, $fields has the submitted values
         foreach(array_keys($defaults) as $key) {
-            $group->{$key}    = $fields[$key];
+            $profile->{$key}    = $fields[$key];
         }
-        $group->created     = common_sql_now();
+        $profile->created     = common_sql_now();
 
-        if (isset($fields['join_policy'])) {
-            $group->join_policy = intval($fields['join_policy']);
-        } else {
-            $group->join_policy = 0;
+		$result = $profile->insert();
+		if (!$result) {
+            common_log_db_error($group, 'INSERT', __FILE__);
+            // TRANS: Server exception thrown when creating a group failed.
+            throw new ServerException(_m('Could not create group.'));
+		}
+
+            
+        if ($fields['local']) {
+            $local_group = new Local_group();
+
+            $local_group->group_id = $profile->id;
+            $local_group->nickname = $profile->nickname;
+            $local_group->created  = $profile->created;
+
+            $result = $local_group->insert();
+
+            if (!$result) {
+                common_log_db_error($local_group, 'INSERT', __FILE__);
+                // TRANS: Server exception thrown when saving local group information failed.
+                throw new ServerException(_('Local group already exists.'));
+            }
         }
 
-        if (isset($fields['force_scope'])) {
-            $group->force_scope = intval($fields['force_scope']);
-        } else {
-            $group->force_scope = 0;
+		$group = new User_group();
+		$group->id = $profile->id;
+		$group->nickname = $profile->nickname;
+
+        if (empty($fields['uri'])) {
+            $group->uri = common_local_url('groupbyid', array('id' => $profile->id));
         }
+
+        $group->join_policy = isset($fields['join_policy'])
+							? intval($fields['join_policy'])
+							: 0;
+        $group->force_scope = isset($fields['force_scope'])
+							? intval($fields['force_scope'])
+							: 0;
 
         if (Event::handle('StartGroupSave', array(&$group))) {
-
             $result = $group->insert();
 
             if (!$result) {
                 common_log_db_error($group, 'INSERT', __FILE__);
                 // TRANS: Server exception thrown when creating a group failed.
-                throw new ServerException(_('Could not create group.'));
-            }
-
-            if (empty($fields['uri'])) {
-                $orig = clone($group);
-                $group->uri = common_local_url('groupbyid', array('id' => $group->id));
-                $result = $group->update($orig);
-                if (!$result) {
-                    common_log_db_error($group, 'UPDATE', __FILE__);
-                    // TRANS: Server exception thrown when updating a group URI failed.
-                    throw new ServerException(_('Could not set group URI.'));
-                }
+                throw new ServerException(_m('Could not create group.'));
             }
 
             $result = $group->setAliases((array)$fields['aliases']);
@@ -670,10 +691,10 @@ class User_group extends Managed_DataObject
 
             $member = new Group_member();
 
-            $member->group_id   = $group->id;
+            $member->group_id   = $profile->id;
             $member->profile_id = $fields['userid'];
             $member->is_admin   = 1;
-            $member->created    = $group->created;
+            $member->created    = $profile->created;
 
             $result = $member->insert();
 
@@ -684,24 +705,8 @@ class User_group extends Managed_DataObject
             }
 
             self::blow('profile:groups:%d', $fields['userid']);
-            
-            if ($fields['local']) {
-                $local_group = new Local_group();
 
-                $local_group->group_id = $group->id;
-                $local_group->nickname = $group->nickname;
-                $local_group->created  = $group->created;
-
-                $result = $local_group->insert();
-
-                if (!$result) {
-                    common_log_db_error($local_group, 'INSERT', __FILE__);
-                    // TRANS: Server exception thrown when saving local group information failed.
-                    throw new ServerException(_('Could not save local group info.'));
-                }
-            }
-
-            $group->query('COMMIT');
+            $profile->query('COMMIT');	// finalize everything and write to db
 
             Event::handle('EndGroupSave', array($group));
         }
@@ -746,6 +751,11 @@ class User_group extends Managed_DataObject
             // And related groups in the other direction...
             $inst = new Related_group();
             $inst->related_group_id = $this->id;
+            $inst->delete();
+
+			// and the group's profile
+            $inst = new Profile();
+            $inst->id = $this->id;
             $inst->delete();
 
             // Aliases and the local_group entry need to be cleared explicitly
