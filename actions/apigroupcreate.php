@@ -150,7 +150,7 @@ class ApiGroupCreateAction extends ApiAuthAction
      */
     function validateParams()
     {
-        if ($this->groupNicknameExists($this->nickname)) {
+        if (Nickname::exists($this->nickname)) {
             $this->clientError(
                 // TRANS: Client error trying to create a group with a nickname this is already in use.
                 _('Nickname already in use. Try another one.'),
@@ -256,7 +256,7 @@ class ApiGroupCreateAction extends ApiAuthAction
                 );
                 return false;
             }
-            if ($this->groupNicknameExists($alias)) {
+            if (Nickname::exists($alias)) {
                 $this->clientError(
                     sprintf(
                         // TRANS: Client error displayed when trying to use an alias during group creation that is already in use.
@@ -286,29 +286,5 @@ class ApiGroupCreateAction extends ApiAuthAction
         // Everything looks OK
 
         return true;
-    }
-
-    /**
-     * Check to see whether a nickname is already in use by a group
-     *
-     * @param String $nickname The nickname in question
-     *
-     * @return boolean true or false
-     */
-    function groupNicknameExists($nickname)
-    {
-        $local = Local_group::staticGet('nickname', $nickname);
-
-        if (!empty($local)) {
-            return true;
-        }
-
-        $alias = Group_alias::staticGet('alias', $nickname);
-
-        if (!empty($alias)) {
-            return true;
-        }
-
-        return false;
     }
 }

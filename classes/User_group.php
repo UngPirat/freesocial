@@ -26,7 +26,7 @@ class User_group extends Managed_DataObject
     public $created;                         // datetime   not_null default_0000-00-00%2000%3A00%3A00
     public $modified;                        // timestamp   not_null default_CURRENT_TIMESTAMP
     public $uri;                             // varchar(255)  unique_key
-    public $mainpage;                        // varchar(255)
+    public $profileurl;                        // varchar(255)
     public $join_policy;                     // tinyint
     public $force_scope;                     // tinyint
 
@@ -57,7 +57,7 @@ class User_group extends Managed_DataObject
                 'join_policy' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=open; 1=requires admin approval'),      
                 'force_scope' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=never,1=sometimes,-1=always'),
 				//remove the following
-                'mainpage' => array('type' => 'varchar', 'length' => 255, 'description' => 'page for group info to link to'),
+                'profileurl' => array('type' => 'varchar', 'length' => 255, 'description' => 'page for group info to link to'),
                 'original_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'original size logo'),
                 'homepage_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'homepage (profile) size logo'),
                 'stream_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'stream-sized logo'),
@@ -94,10 +94,10 @@ class User_group extends Managed_DataObject
 			$profile = $this->getProfile();
 		} catch (UserNoProfileException $e) {
 		}
-		if (!empty($profile) && $profile->isGroup) {
+		if (!empty($profile) && $profile->isGroup()) {
 			return $profile->homeUrl();
 		}
-		return null;
+		return $this->profileurl;
     }
 
     protected $_profile = -1;
@@ -611,7 +611,7 @@ class User_group extends Managed_DataObject
                           'description' => null,
                           'location' => null,
                           'uri' => null,
-                          'mainpage' => null);
+                          'profileurl' => null);
 
         // load values into $fields, overwriting as we go
         $fields = array_merge($defaults, $fields);
@@ -621,8 +621,8 @@ class User_group extends Managed_DataObject
         $profile->query('BEGIN');
 		$profile->type = Profile::GROUP;
 
-        if (empty($fields['mainpage'])) {
-            $fields['mainpage'] = common_local_url('showgroup', array('nickname' => $fields['nickname']));
+        if (empty($fields['profileurl'])) {
+            $fields['profileurl'] = common_local_url('showstream', array('nickname' => $fields['nickname']));
         }
 
         // $default contains the Profile keys-to-be-set, $fields has the submitted values
@@ -658,6 +658,7 @@ class User_group extends Managed_DataObject
 		$group = new User_group();
 		$group->id = $profile->id;
 		$group->nickname = $profile->nickname;
+		$group->profileurl = $profile->profileurl;
 
         if (empty($fields['uri'])) {
             $group->uri = common_local_url('groupbyid', array('id' => $profile->id));

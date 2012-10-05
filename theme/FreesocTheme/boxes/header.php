@@ -3,9 +3,9 @@
     $this->out->elementStart('html', array('lang'=>$this->get_lang()));
     $this->out->elementStart('head');
     $this->title = $this->get_title();
-        if (isset($args['page']) && $args['page'] >= 2) {
-            $this->title .= ' - ' . sprintf( _m('Page %s'), $args['page']);
-        }
+    if (isset($args['page']) && $args['page'] >= 2) {
+        $this->title .= ' - ' . sprintf( _m('Page %s'), $args['page']);
+    }
     $this->title .= ' | ';
     $this->title .= $this->get_siteinfo('name');
     $this->out->element('title', null, $this->title);

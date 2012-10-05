@@ -106,8 +106,7 @@ class ApiTimelineGroupAction extends ApiPrivateAuthAction
 
         $self = $this->getSelfUri();
 
-        $link = common_local_url('showgroup',
-                                 array('nickname' => $this->group->nickname));
+        $link = common_local_url('showstream', array('nickname' => $this->group->nickname));
 
         switch($this->format) {
         case 'xml':

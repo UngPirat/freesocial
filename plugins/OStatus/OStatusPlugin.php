@@ -143,7 +143,7 @@ class OStatusPlugin extends Plugin
     function onStartShowHTML($action)
     {
         if ($action instanceof ShowstreamAction) {
-            $acct = 'acct:'. $action->profile->nickname .'@'. common_config('site', 'server');
+            $acct = 'acct:'. $action->subject->nickname .'@'. common_config('site', 'server');
             $url = common_local_url('userxrd');
             $url.= '?uri='. $acct;
 
@@ -1184,7 +1184,7 @@ class OStatusPlugin extends Plugin
     function showEntityRemoteSubscribe($action, $target='ostatussub')
     {
         $user = common_current_user();
-        if ($user && ($user->id == $action->profile->id)) {
+        if ($user && ($user->id == $action->subject->id)) {
             $action->elementStart('div', 'entity_actions');
             $action->elementStart('p', array('id' => 'entity_remote_subscribe',
                                              'class' => 'entity_subscribe'));

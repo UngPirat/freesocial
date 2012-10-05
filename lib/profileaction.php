@@ -73,22 +73,26 @@ class ProfileAction extends Action
 
         if (!is_a($this, 'ShowgroupAction')) {
 			$this->subject = User::staticGet('nickname', $nickname);
-		} else {
-            $this->subject = Local_group::staticGet('nickname', $nickname);
-            if (empty($this->subject)) {
-                $alias = Group_alias::staticGet('alias', $nickname);
-                if ($alias) {
-                    $args = array('id' => $alias->group_id);
+		}
+		if (empty($this->subject)) {
+            $group = Local_group::staticGet('nickname', $nickname);
+            if (!empty($group) && !is_a($this, 'ShowgroupAction')) {
+				$args = array('nickname'=>$nickname);
+                common_redirect(common_local_url('showgroup', $args), 301);
+			} elseif (empty($group)) {
+                $group = Group_alias::staticGet('alias', $nickname);
+                if ($group && !is_a($this, 'ShowgroupAction')) {
+                    $args = array('id' => $group->group_id);
                     if ($this->page != 1) {
                         $args['page'] = $this->page;
                     }
                     common_redirect(common_local_url('groupbyid', $args), 301);
-                    return false;
                 }
             }
+			$this->subject = User_group::staticGet('id', $group->group_id);
 		}
 
-        if (!$this->subject) {
+        if (empty($this->subject)) {
             // TRANS: Client error displayed when calling a profile action without specifying a user.
             $this->clientError(_('No subject found.'), 404);
             return false;

@@ -80,7 +80,7 @@ class groupRssAction extends Rss10Action
 
         if ($nickname_arg != $nickname) {
             $args = array('nickname' => $nickname);
-            common_redirect(common_local_url('showgroup', $args), 301);
+            common_redirect(common_local_url('showstream', $args), 301);
             return false;
         }
 
@@ -136,7 +136,7 @@ class groupRssAction extends Rss10Action
                                                    $group->nickname)),
                    // TRANS: Message is used as link title. %s is a user nickname.
                    'title' => sprintf(_('%s timeline'), $group->nickname),
-                   'link' => common_local_url('showgroup', array('nickname' => $group->nickname)),
+                   'link' => common_local_url('showstream', array('nickname' => $group->nickname)),
                    // TRANS: Message is used as link description. %1$s is a group name, %2$s is a site name.
                    'description' => sprintf(_('Updates from members of %1$s on %2$s!'),
                                             $group->nickname, common_config('site', 'name')));

@@ -24,8 +24,8 @@ $shortoptions = 'i::n::y';
 $longoptions = array('id=', 'nickname=', 'yes');
 
 $helptext = <<<END_OF_DELETEUSER_HELP
-deletenoticesbyprofile.php [options]
-deletes all notices by a profile from the database
+groupprofiletakeover.php [options]
+deletes a profile's notices AND the profile itself after which a group's data is copied in its place.
 
   -i --id       ID of the profile
   -y --yes      do not wait for confirmation
@@ -38,31 +38,54 @@ if (have_option('i', 'id')) {
     $id = get_option_value('i', 'id');
     $profile = Profile::staticGet('id', $id);
     if (empty($profile)) {
-        print "Can't find profile with ID $id\n";
+        echo "Can't find profile with ID $id\n";
         exit(1);
     }
+	$group = User_group::staticGet('id', $id);
+	if (empty($group)) {
+		echo "Can't find group with ID $id\n";
+		exit(1);
+	}
 } else {
-    print "You must provide a profile id\n";
+    echo "You must provide a profile id\n";
     exit(1);
 }
 
 if (!have_option('y', 'yes')) {
-    print "About to PERMANENTLY delete notices from profile '{$profile->nickname}' ({$profile->id}). Are you sure? [y/N] ";
+    echo "About to PERMANENTLY delete notices from profile AND profile itself '{$profile->nickname}' ({$profile->id}) to replace it with data from group {$group->nickname}. Are you sure? [y/N] ";
     $response = fgets(STDIN);
     if (strtolower(trim($response)) != 'y') {
-        print "Aborting.\n";
+        echo "Aborting.\n";
         exit(0);
     }
 }
 
-print "Deleting...";
+echo "Deleting notices...\n";
 $notice = new Notice;
 $notice->profile_id = $profile->id;
 if (!$notice->find()) {
-    print "no notices found";
-    exit (0);
+    echo "no notices found\n";
+} else {
+	while($notice->fetch()) {
+    	echo "{$notice->id}: {$notice->content}\n";
+	    $notice->delete();
+	}
 }
-while($notice->fetch()) {
-    echo "{$notice->id}: {$notice->content}\n";
-    $notice->delete();
+echo "Deleting profile\n";
+$profile->delete();
+
+echo "Copying group data\n";
+$profile = new Profile();
+$profile->type = 2;
+$p2gmap = array('nickname'=>'nickname', 'fullname'=>'fullname', 'profileurl'=>'profileurl', 'homepage'=>'homepage', 'bio'=>'description', 'location'=>'location', 'created'=>'created', 'modified'=>'modified');
+foreach ($p2gmap as $pkey=>$gkey) {
+	$profile->$pkey = $group->$gkey;
 }
+echo "Inserting profile for {$group->nickname}\n";
+$id = $profile->insert();
+if (empty($id)) {
+	echo "ERROR inserting profile\n";
+	exit(1);
+}
+$profile->query('UPDATE profile SET id="'.$group->id.'" WHERE id="'.$id.'"');
+echo "done";

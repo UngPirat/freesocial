@@ -150,7 +150,7 @@ class ModLogPlugin extends Plugin
             return true;
         }
 
-        $profile = $action->profile;
+        $profile = $action->subject;
 
         $ml = new ModLog();
 

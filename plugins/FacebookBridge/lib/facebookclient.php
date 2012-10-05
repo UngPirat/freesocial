@@ -809,7 +809,7 @@ class Facebookclient
                     )
                 );
 
-                if (!empty($result) && result == true) {
+                if (!empty($result) && $result == true) {
                     common_log(
                       LOG_INFO,
                         sprintf(

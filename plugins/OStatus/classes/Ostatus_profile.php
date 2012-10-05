@@ -1528,7 +1528,18 @@ class Ostatus_profile extends Managed_DataObject
             $group->created = common_sql_now();
             self::updateGroup($group, $object, $hints);
 
-            $oprofile->group_id = $group->insert();
+			// TODO: All this gpro stuff have to be normalized together with other activityobject types
+			$gpro = new Profile();
+			$gpro->query('BEGIN');
+			foreach(array('nickname', 'fullname', 'homepage', 'description', 'profileurl', 'location') as $key) {
+				$gpro->$key = $group->$key;
+			}
+			$group->id = $gpro->insert();
+			$group->insert();
+
+            $oprofile->group_id = $group->id;
+			$gpro->query('COMMIT');
+
             if (!$oprofile->group_id) {
                 // TRANS: Server exception.
                 throw new ServerException(_m('Cannot save local profile.'));
@@ -1669,9 +1680,9 @@ class Ostatus_profile extends Managed_DataObject
         $group->fullname = $object->title;
 
         if (!empty($object->link)) {
-            $group->mainpage = $object->link;
+            $group->profileurl = $object->link;
         } else if (array_key_exists('profileurl', $hints)) {
-            $group->mainpage = $hints['profileurl'];
+            $group->profileurl = $hints['profileurl'];
         }
 
         // @todo tags from categories

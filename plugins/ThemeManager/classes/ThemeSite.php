@@ -101,7 +101,7 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
         return $class;
     }
     function is_single() {
-        return (isset($this->action->user) || isset($this->action->profile))
+        return (isset($this->action->user) || isset($this->action->subject))
             || $this->is_action('showstream');
     }
 

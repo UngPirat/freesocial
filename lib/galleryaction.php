@@ -76,7 +76,7 @@ class GalleryAction extends ProfileAction
                            array('href' =>
                                  common_local_url($this->trimmed('action'),
                                                   array('nickname' =>
-                                                        $this->user->nickname))),
+                                                        $this->subject->nickname))),
                            // TRANS: List element on gallery action page to show all tags.
                            _m('TAGS','All'));
             $this->elementEnd('li');
@@ -92,7 +92,7 @@ class GalleryAction extends ProfileAction
             $this->dropdown('tag', _('Tag'), $content,
                             // TRANS: Dropdown field title on gallery action page for a list containing tags.
                             _('Choose a tag to narrow list.'), false, $tag);
-            $this->hidden('nickname', $this->user->nickname);
+            $this->hidden('nickname', $this->subject->nickname);
             // TRANS: Submit button text on gallery action page.
             $this->submit('submit', _m('BUTTON','Go'));
             $this->elementEnd('fieldset');

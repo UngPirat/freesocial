@@ -568,10 +568,10 @@ abstract class ImPlugin extends Plugin
         } else if ($aname == 'showstream') {
 
             $user_im_prefs = new User_im_prefs();
-            $user_im_prefs->user_id = $action->user->id;
+            $user_im_prefs->user_id = $action->subject->id;
             $user_im_prefs->transport = $this->transport;
 
-            if ($user_im_prefs->find() && $user_im_prefs->fetch() && $user_im_prefs->microid && $action->profile->profileurl) {
+            if ($user_im_prefs->find() && $user_im_prefs->fetch() && $user_im_prefs->microid && $action->profile->homeUrl()) {
                 $id = new Microid($this->microiduri($user_im_prefs->screenname),
                                   $action->selfUrl());
                 $action->element('meta', array('name' => 'microid',

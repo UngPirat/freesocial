@@ -1,7 +1,7 @@
 <?php
     $this->out->elementStart('aside', array('id'=>'profile'));
 
-	$profile = $this->action->profile;
+	$profile = $this->action->subject->getProfile();
     $this->widget('Profile', array('item'=>$profile));
 	$minilistargs = array('avatarSize'=>Avatar::MINI_SIZE, 'mini'=>true, 'item'=>$profile, 'pagination'=>false);
 	if ($profile->isUser()) {

@@ -8,9 +8,9 @@
     $this->out->element('h2', 'content-title', $this->get_title());
 
 	if (isset($this->action->notice) &&
-			(isset($this->action->user) || isset($this->action->profile))) {
+			(isset($this->action->user) || isset($this->action->subject))) {
 		if (isset($this->action->user)) {
-			$this->action->profile = $this->action->user->getProfile();
+			$this->action->subject = $this->action->user->getProfile();
 		}
 		$this->content('gallery');
 	} elseif (isset($this->action->notice) || isset($this->action->notices)) {

@@ -277,7 +277,7 @@ class Profile extends Managed_DataObject
         return $stream->getNotices($offset, $limit, $since_id, $max_id);
     }
 
-    function isMember(User_group $group)
+    function isMember($group)
     {
     	$groups = $this->getGroups(0, null);
     	$gs = $groups->fetchAll();

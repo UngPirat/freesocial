@@ -65,11 +65,15 @@ class ShowstreamAction extends ProfileAction
 
         $p = Profile::current();
 
-        if (empty($this->tag)) {
-            $stream = new ProfileNoticeStream($this->profile, $p);
-        } else {
-            $stream = new TaggedProfileNoticeStream($this->profile, $this->tag, $p);
-        }
+		if ($this->profile->isUser()) {
+	        if (empty($this->tag)) {
+    	        $stream = new ProfileNoticeStream($this->profile, $p);
+	        } else {
+        	    $stream = new TaggedProfileNoticeStream($this->profile, $this->tag, $p);
+    	    }
+		} elseif ($this->profile->isGroup()) {
+        	$stream = new ThreadingGroupNoticeStream($this->subject, $this->userProfile);
+		}
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE, NOTICES_PER_PAGE + 1);
 
@@ -212,12 +216,12 @@ class ShowstreamAction extends ProfileAction
 
     function extraHead()
     {
-        if ($this->profile->bio) {
+        if ($this->subject->bio) {
             $this->element('meta', array('name' => 'description',
-                                         'content' => $this->profile->bio));
+                                         'content' => $this->subject->bio));
         }
 
-        if ($this->subject->emailmicroid && $this->subject->email && $this->profile->profileurl) {
+        if ($this->subject->emailmicroid && $this->subject->email && $this->subject->profileurl) {
             $id = new Microid('mailto:'.$this->subject->email,
                               $this->selfUrl());
             $this->element('meta', array('name' => 'microid',
@@ -228,10 +232,10 @@ class ShowstreamAction extends ProfileAction
 
         $this->element('link', array('rel' => 'microsummary',
                                      'href' => common_local_url('microsummary',
-                                                                array('nickname' => $this->profile->nickname))));
+                                                                array('nickname' => $this->subject->nickname))));
 
         $rsd = common_local_url('rsd',
-                                array('nickname' => $this->profile->nickname));
+                                array('nickname' => $this->subject->nickname));
 
         // RSD, http://tales.phrasewise.com/rfc/rsd
         $this->element('link', array('rel' => 'EditURI',
@@ -240,7 +244,7 @@ class ShowstreamAction extends ProfileAction
 
         if ($this->page != 1) {
             $this->element('link', array('rel' => 'canonical',
-                                         'href' => $this->profile->profileurl));
+                                         'href' => $this->subject->profileurl));
         }
     }
 
@@ -306,8 +310,8 @@ class ShowstreamAction extends ProfileAction
         $options = parent::noticeFormOptions();
         $cur = common_current_user();
 
-        if (empty($cur) || $cur->id != $this->profile->id) {
-            $options['to_profile'] =  $this->profile;
+        if (empty($cur) || $cur->id != $this->subject->id) {
+            $options['to_profile'] =  $this->subject;
         }
 
         return $options;
@@ -349,16 +353,16 @@ class ProfileNoticeListItem extends DoFollowListItem
 
             // FIXME: this code is almost identical to default; need to refactor
 
-            $attrs = array('href' => $this->profile->profileurl,
+            $attrs = array('href' => $this->subject->profileurl,
                            'class' => 'url');
 
-            if (!empty($this->profile->fullname)) {
-                $attrs['title'] = $this->profile->getFancyName();
+            if (!empty($this->subject->fullname)) {
+                $attrs['title'] = $this->subject->getFancyName();
             }
 
             $this->out->elementStart('span', 'repeat');
 
-            $text_link = XMLStringer::estring('a', $attrs, $this->profile->nickname);
+            $text_link = XMLStringer::estring('a', $attrs, $this->subject->nickname);
 
             // TRANS: Link to the author of a repeated notice. %s is a linked nickname.
             $this->out->raw(sprintf(_('Repeat of %s'), $text_link));

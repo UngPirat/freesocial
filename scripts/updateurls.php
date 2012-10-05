@@ -123,7 +123,7 @@ function updateGroupUrls()
                 $localUri = common_local_url('groupbyid',
                                              array('id' => $group->id));
                 if ($group->getUri() != $localUri) {
-                    $group->mainpage = common_local_url('showgroup',
+                    $group->profileurl = common_local_url('showstream',
                                                         array('nickname' => $group->nickname));
                 }
                 $group->update($orig);

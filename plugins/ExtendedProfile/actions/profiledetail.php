@@ -31,7 +31,7 @@ class ProfileDetailAction extends ShowstreamAction
 
     function title()
     {
-        return $this->profile->getFancyName();
+        return $this->subject->getFancyName();
     }
 
     function showStylesheets() {
@@ -43,7 +43,7 @@ class ProfileDetailAction extends ShowstreamAction
     function showContent()
     {
         $cur = common_current_user();
-        if ($cur && $cur->id == $this->profile->id) { // your own page
+        if ($cur && $cur->id == $this->subject->id) { // your own page
             $this->elementStart('div', 'entity_actions');
             $this->elementStart('ul');
             $this->elementStart('li', 'entity_edit');
@@ -57,7 +57,7 @@ class ProfileDetailAction extends ShowstreamAction
             $this->elementEnd('div');
         }
 
-        $widget = new ExtendedProfileWidget($this, $this->profile);
+        $widget = new ExtendedProfileWidget($this, $this->subject);
         $widget->show();
     }
 }

@@ -235,7 +235,7 @@ class RealtimePlugin extends Plugin
         if ($gi->find()) {
             while ($gi->fetch()) {
                 $ug = User_group::staticGet('id', $gi->group_id);
-                $paths[] = array('showgroup', $ug->nickname, null);
+                $paths[] = array('showstream', $ug->nickname, null);
             }
         }
 
@@ -504,7 +504,6 @@ class RealtimePlugin extends Plugin
          case 'showstream':
          case 'all':
          case 'mentions':
-         case 'showgroup':
             $nickname = common_canonical_nickname($action->trimmed('nickname'));
             if (!empty($nickname)) {
                 $arg1 = $nickname;

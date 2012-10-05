@@ -105,36 +105,6 @@ class FacebookServicePlugin extends Plugin
 
         return true;
 	}
-
-    function onStartShowSections($action) {
-        if (!isset($action->args['action'])) {
-            return true;
-        }
-        switch ($action->args['action']) {
-        case 'showgroup':
-            $this->groupSyncBlock($action);
-            break;
-        }
-        return true;
-    }
-
-    function groupSyncBlock($action) {
-        $local = Local_group::staticGet('nickname', $action->args['nickname']);
-        if (empty($local)) {
-            return false;
-        }
-        $action->elementStart('div', array('id' => 'foreign_sync', 'class' => 'section'));
-        $action->element('h2', null, _('Foreign sync'));
-        try {
-            $foreign_id = Foreign_group::getForeignID($local->group_id, FACEBOOK_SERVICE);
-            $action->element('p', null, _('This group is synced with a foreign service'));
-            
-        } catch (Exception $e) {
-            // offer to sync with foreign group
-            $action->element('p', null, _('This group is not synced with a foreign service'));
-        }
-        $action->elementEnd('div');
-    }
 }
 
 class FacebookService extends ForeignServiceClient {

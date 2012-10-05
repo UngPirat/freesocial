@@ -73,7 +73,7 @@ class GroupsNav extends MoreMenu
         while ($this->groups->fetch()) {
             $items[] = array('placeholder',
                              array('nickname' => $this->groups->nickname,
-                                   'mainpage' => $this->groups->homeUrl()),
+                                   'profileurl' => $this->groups->homeUrl()),
                              $this->groups->getBestName(),
                              $this->groups->getBestName()
                             );
@@ -98,10 +98,10 @@ class GroupsNav extends MoreMenu
         }
 
         if (empty($id)) {
-            $id = $this->menuItemID('showgroup', array('nickname' => $args['nickname']));
+            $id = $this->menuItemID('showstream', array('nickname' => $args['nickname']));
         }
 
-        $url = $args['mainpage'];
+        $url = $args['profileurl'];
 
         $this->out->menuItem($url,
                              $label,

@@ -129,8 +129,8 @@ class ApiGroupProfileUpdateAction extends ApiAuthAction
             if (!empty($this->nickname)) {
                 if ($this->validateNickname()) {
                     $this->group->nickname = $this->nickname;
-                    $this->group->mainpage = common_local_url(
-                        'showgroup',
+                    $this->group->profileurl = common_local_url(
+                        'showstream',
                         array('nickname' => $this->nickname)
                     );
                 }
