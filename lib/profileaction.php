@@ -79,7 +79,9 @@ class ProfileAction extends Action
             if (!empty($group) && !is_a($this, 'ShowgroupAction')) {
 				$args = array('nickname'=>$nickname);
                 common_redirect(common_local_url('showgroup', $args), 301);
-			} elseif (empty($group)) {
+			} elseif (!empty($group)) {
+				$this->subject = User_group::staticGet('id', $group->group_id);
+			} else {
                 $group = Group_alias::staticGet('alias', $nickname);
                 if ($group && !is_a($this, 'ShowgroupAction')) {
                     $args = array('id' => $group->group_id);
@@ -89,7 +91,6 @@ class ProfileAction extends Action
                     common_redirect(common_local_url('groupbyid', $args), 301);
                 }
             }
-			$this->subject = User_group::staticGet('id', $group->group_id);
 		}
 
         if (empty($this->subject)) {
