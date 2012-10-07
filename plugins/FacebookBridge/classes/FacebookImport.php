@@ -195,6 +195,9 @@ class FacebookImport
 			}
 			//}
 			$conversation = Conversation::staticGet('id', $notice->conversation);
+			if (empty($conversation)) {
+				throw new Exception('Conversation could not be fetched');
+			}
 			if (strtotime($update['updated_time']) < strtotime($conversation->modified)) {
 				return false;
 			}
