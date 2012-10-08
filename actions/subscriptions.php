@@ -48,12 +48,12 @@ class SubscriptionsAction extends GalleryAction
         if ($this->page == 1) {
             // TRANS: Header for subscriptions overview for a user (first page).
             // TRANS: %s is a user nickname.
-            return sprintf(_('%s subscriptions'), $this->user->nickname);
+            return sprintf(_('%s subscriptions'), $this->subject->nickname);
         } else {
             // TRANS: Header for subscriptions overview for a user (not first page).
             // TRANS: %1$s is a user nickname, %2$d is the page number.
             return sprintf(_('%1$s subscriptions, page %2$d'),
-                           $this->user->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -93,13 +93,13 @@ class SubscriptionsAction extends GalleryAction
             $cnt = 0;
 
             if ($this->tag) {
-                $subscriptions = $this->user->getTaggedSubscriptions($this->tag, $offset, $limit);
+                $subscriptions = $this->subject->getTaggedSubscriptions($this->tag, $offset, $limit);
             } else {
-                $subscriptions = $this->user->getSubscriptions($offset, $limit);
+                $subscriptions = $this->subject->getSubscriptions($offset, $limit);
             }
 
             if ($subscriptions) {
-                $subscriptions_list = new SubscriptionsList($subscriptions, $this->user, $this);
+                $subscriptions_list = new SubscriptionsList($subscriptions, $this->subject, $this);
                 $cnt = $subscriptions_list->show();
                 if (0 == $cnt) {
                     $this->showEmptyListMessage();
@@ -108,7 +108,7 @@ class SubscriptionsAction extends GalleryAction
 
             $this->pagination($this->page > 1, $cnt > PROFILES_PER_PAGE,
                               $this->page, 'subscriptions',
-                              array('nickname' => $this->user->nickname));
+                              array('nickname' => $this->subject->nickname));
 
 
             Event::handle('EndShowSubscriptionsContent', array($this));
@@ -125,7 +125,7 @@ class SubscriptionsAction extends GalleryAction
     {
         if (common_logged_in()) {
             $current_user = common_current_user();
-            if ($this->user->id === $current_user->id) {
+            if ($this->subject->id === $current_user->id) {
                 // TRANS: Subscription list text when the logged in user has no subscriptions.
                 // TRANS: This message contains Markdown URLs. The link description is between
                 // TRANS: square brackets, and the link between parentheses. Do not separate "]("
@@ -136,13 +136,13 @@ class SubscriptionsAction extends GalleryAction
             } else {
                 // TRANS: Subscription list text when looking at the subscriptions for a of a user other
                 // TRANS: than the logged in user that has no subscriptions. %s is the user nickname.
-                $message = sprintf(_('%s is not listening to anyone.'), $this->user->nickname);
+                $message = sprintf(_('%s is not listening to anyone.'), $this->subject->nickname);
             }
         }
         else {
             // TRANS: Subscription list text when looking at the subscriptions for a of a user that has none
             // TRANS: as an anonymous user. %s is the user nickname.
-            $message = sprintf(_('%s is not listening to anyone.'), $this->user->nickname);
+            $message = sprintf(_('%s is not listening to anyone.'), $this->subject->nickname);
         }
 
         $this->elementStart('div', 'guide');

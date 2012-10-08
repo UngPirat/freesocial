@@ -48,12 +48,12 @@ class SubscribersAction extends GalleryAction
         if ($this->page == 1) {
             // TRANS: Header for list of subscribers for a user (first page).
             // TRANS: %s is the user's nickname.
-            return sprintf(_('%s subscribers'), $this->user->nickname);
+            return sprintf(_('%s subscribers'), $this->subject->nickname);
         } else {
             // TRANS: Header for list of subscribers for a user (not first page).
             // TRANS: %1$s is the user's nickname, $2$d is the page number.
             return sprintf(_('%1$s subscribers, page %2$d'),
-                           $this->user->nickname,
+                           $this->subject->nickname,
                            $this->page);
         }
     }
@@ -87,13 +87,13 @@ class SubscribersAction extends GalleryAction
         $cnt = 0;
 
         if ($this->tag) {
-            $subscribers = $this->user->getTaggedSubscribers($this->tag, $offset, $limit);
+            $subscribers = $this->subject->getTaggedSubscribers($this->tag, $offset, $limit);
         } else {
-            $subscribers = $this->user->getSubscribers($offset, $limit);
+            $subscribers = $this->subject->getSubscribers($offset, $limit);
         }
 
         if ($subscribers) {
-            $subscribers_list = new SubscribersList($subscribers, $this->user, $this);
+            $subscribers_list = new SubscribersList($subscribers, $this->subject, $this);
             $cnt = $subscribers_list->show();
             if (0 == $cnt) {
                 $this->showEmptyListMessage();
@@ -102,20 +102,20 @@ class SubscribersAction extends GalleryAction
 
         $this->pagination($this->page > 1, $cnt > PROFILES_PER_PAGE,
                           $this->page, 'subscribers',
-                          array('nickname' => $this->user->nickname));
+                          array('nickname' => $this->subject->nickname));
     }
 
     function showEmptyListMessage()
     {
         if (common_logged_in()) {
             $current_user = common_current_user();
-            if ($this->user->id === $current_user->id) {
+            if ($this->subject->id === $current_user->id) {
                 // TRANS: Subscriber list text when the logged in user has no subscribers.
                 $message = _('You have no subscribers. Try subscribing to people you know and they might return the favor.');
             } else {
                 // TRANS: Subscriber list text when looking at the subscribers for a of a user other
                 // TRANS: than the logged in user that has no subscribers. %s is the user nickname.
-                $message = sprintf(_('%s has no subscribers. Want to be the first?'), $this->user->nickname);
+                $message = sprintf(_('%s has no subscribers. Want to be the first?'), $this->subject->nickname);
             }
         }
         else {
@@ -124,7 +124,7 @@ class SubscribersAction extends GalleryAction
             // TRANS: This message contains a Markdown URL. The link description is between
             // TRANS: square brackets, and the link between parentheses. Do not separate "]("
             // TRANS: and do not change the URL part.
-            $message = sprintf(_('%s has no subscribers. Why not [register an account](%%%%action.register%%%%) and be the first?'), $this->user->nickname);
+            $message = sprintf(_('%s has no subscribers. Why not [register an account](%%%%action.register%%%%) and be the first?'), $this->subject->nickname);
         }
 
         $this->elementStart('div', 'guide');
