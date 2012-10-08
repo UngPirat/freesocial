@@ -50,7 +50,7 @@ function getProcessorCount()
         break;
     }
     if ($cpus) {
-        return $cpus*3;
+        return $cpus*2;
     }
     return 1;
 }

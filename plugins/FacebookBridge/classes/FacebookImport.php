@@ -323,8 +323,8 @@ class FacebookImport
             $noticeOpts['is_local'] = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
         } else {
             $noticeOpts['is_local'] = Notice::GATEWAY;
-			$original_poster = (!is_null($reply) ? $rprofile->id : $profile->id);
-			if ($original_poster_flink = Foreign_link::getByUserID($original_poster, FACEBOOK_SERVICE)) {
+			$original_poster = (!is_null($reply) ? $rprofile : $profile);
+			if ($original_poster_flink = Foreign_link::getByUserID($original_poster->id, FACEBOOK_SERVICE)) {
 				$fuser = $original_poster_flink->getForeignUser();
 				$nickname = !empty($fuser) ? $fuser->nickname : null;
 			} else {
@@ -335,6 +335,14 @@ class FacebookImport
 
         $notice  = Notice::saveNew($noticeOpts['profile_id'], $noticeOpts['content'], $noticeOpts['source'], $noticeOpts);
         Foreign_notice_map::saveNew($notice->id, $update['id'], FACEBOOK_SERVICE);
+        if (empty($notice->conversation)) {
+            $conv = Conversation::create($notice->id);
+			$original = clone($notice);
+            $notice->conversation = $notice->id;
+			$notice->update($original);
+        } else {
+			Conversation::append($notice->conversation, $notice->id);
+		}
 		
         if (!isset($update['type'])) {
             $update['type'] = 'status';

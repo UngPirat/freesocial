@@ -65,6 +65,15 @@ class DistribQueueHandler
      */
     function handle($notice)
     {
+		if (!is_object($notice)) {
+			$notice = json_decode($notice);
+			$notice = Notice::staticGet('id', $notice->id);
+			if (empty($notice)) {
+				common_log(LOG_ERR, 'Notice not found for distribution');
+				return true;
+			}
+		}
+
         try {
             $notice->addToInboxes();
         } catch (Exception $e) {

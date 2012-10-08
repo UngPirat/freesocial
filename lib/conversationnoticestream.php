@@ -85,6 +85,10 @@ class RawConversationNoticeStream extends NoticeStream
         // FIXME: handle since and max
         $wanted = array_slice($notices, $offset, $limit);
         return new ArrayWrapper($wanted);
+		// proposed
+		$ids = $this->getNoticeIds($offset, $limit, $sinceId, $maxId);
+		$notices = Notice::multiGet('id', $ids);
+		return $notices;
     }
 
     function getNoticeIds($offset, $limit, $since_id, $max_id)
@@ -92,6 +96,12 @@ class RawConversationNoticeStream extends NoticeStream
         $notice = $this->getNotices($offset, $limit, $since_id, $max_id);
         $ids = $notice->fetchAll('id');
         return $ids;
+		// proposed:
+		$conv = new Conversation();
+		$conv->id = $this->id;
+		$conv->orderBy('created ASC');
+		$ids = $conv->fetchAll('id');
+		return array_slice($ids, $offset, $limit);
     }
 
     function _reverseChron($a, $b)

@@ -2129,8 +2129,10 @@ class Notice extends Managed_DataObject
             // If there's a failure, we want to _force_
             // distribution at this point.
             try {
+				// pack it up for later queue handling
+				$json = json_encode(array('id'=>$this->id));
                 $qm = QueueManager::get();
-                $qm->enqueue($this, 'distrib');
+                $qm->enqueue($json, 'distrib');
             } catch (Exception $e) {
                 // If the exception isn't transient, this
                 // may throw more exceptions as DQH does

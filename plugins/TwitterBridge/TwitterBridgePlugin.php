@@ -440,17 +440,20 @@ class TwitterBridgePlugin extends Plugin
      */
     function onStartDeleteOwnNotice(User $user, Notice $notice)
     {
+		if ($user->id != $notice->profile_id) {	// don't call Twitter if someone else is deleting
+			// this means foreign_notice_map is maybe still mapped
+			return true;
+		}
         try {
             $foreign_id = twitter_status_id($notice);
         } catch (Exception $e) {
             common_debug('TwitterBridge got exception: '.$e->getMessage());
-            $foreign_id = null;
+			return true;
         }
 
         if (!empty($foreign_id)) {
 
-            $flink = Foreign_link::getByUserID($notice->profile_id,
-                                               TWITTER_SERVICE); // twitter service
+            $flink = Foreign_link::getByUserID($user->id);
 
             if (empty($flink)) {
                 return true;

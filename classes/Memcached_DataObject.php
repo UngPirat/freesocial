@@ -267,7 +267,7 @@ class Memcached_DataObject extends Safe_DataObject
         return $pkey;
     }
 
-    function listGet($cls, $keyCol, $keyVals)
+    static function listGet($cls, $keyCol, array $keyVals)
     {
         $pkeyMap = array_fill_keys($keyVals, array());
         $result = array_fill_keys($keyVals, array());

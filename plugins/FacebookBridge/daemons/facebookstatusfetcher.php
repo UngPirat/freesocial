@@ -21,7 +21,7 @@
 define('INSTALLDIR', realpath(dirname(__FILE__) . '/../../..'));
 
 define('MAXCHILDREN', 1);
-define('POLL_INTERVAL', 60); // in seconds
+define('POLL_INTERVAL', 300); // in seconds
 
 $shortoptions = 'di::';
 $longoptions = array('id::', 'debug');
