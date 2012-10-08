@@ -106,7 +106,7 @@ class Conversation extends Managed_DataObject
 		// find a root, i.e. where conv_id==$notice_id
 		$conv = self::pkeyGet(array('id'=>$conv_id, 'notice_id'=>$conv_id));
 		if (empty($conv)) {
-			return self::create($conv_id);	// should it really do this?
+			//return self::create($conv_id);	// should it really do this?
 			throw new Exception('Conversation root not found');	// maybe this should be done instead
 		}
 		file_put_contents('/tmp/convobj', print_r($conv,true));
