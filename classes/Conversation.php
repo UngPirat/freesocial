@@ -37,11 +37,19 @@ class Conversation extends Managed_DataObject
     public $__table = 'conversation';                    // table name
     public $id;                              // int(4)  primary_key not_null
     public $uri;                             // varchar(225)  unique_key
+    public $notice_id;                       // int(4)  primary_key not_null
     public $created;                         // datetime   not_null
     public $modified;                        // timestamp   not_null default_CURRENT_TIMESTAMP
 
     /* Static get */
-    function staticGet($k,$v=NULL) { return Memcached_DataObject::staticGet('conversation',$k,$v); }
+    function staticGet($k,$v=NULL) {
+		return Memcached_DataObject::staticGet('Conversation',$k,$v);
+	}
+
+    function pkeyGet($kv)
+	    {  
+	        return Memcached_DataObject::pkeyGet('Conversation', $kv);
+	    }
 
     /* the code above is auto generated do not remove the tag below */
     ###END_AUTOCODE
@@ -50,63 +58,85 @@ class Conversation extends Managed_DataObject
     {
         return array(
             'fields' => array(
-                'id' => array('type' => 'serial', 'not null' => true, 'description' => 'unique identifier'),
-                'uri' => array('type' => 'varchar', 'length' => 225, 'description' => 'URI of the conversation'),
+                'id' => array('type' => 'int', 'not null' => true, 'description' => 'from conversation root notice'),
+                'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'URI of the conversation'),
+                'notice_id' => array('type' => 'int', 'not null' => true, 'description' => 'this notice'),
                 'created' => array('type' => 'datetime', 'not null' => true, 'description' => 'date this record was created'),
                 'modified' => array('type' => 'timestamp', 'not null' => true, 'description' => 'date this record was modified'),
             ),
-            'primary key' => array('id'),
+            'primary key' => array('id', 'notice_id'),
             'unique keys' => array(
                 'conversation_uri_key' => array('uri'),
             ),
+            'foreign keys' => array(
+                'conversation_notice_id_fkey' => array('notice', array('notice_id' => 'id')),
+			),
+			'indexes' => array(
+				'conversation_notice_id_idx' => array('notice_id'),
+			),
         );
     }
 
     /**
      * Factory method for creating a new conversation
+	 *
+	 * @param notice_id int notice_id that started the conversation
      *
      * @return Conversation the new conversation DO
      */
-    static function create()
+    static function create($notice_id)
     {
         $conv = new Conversation();
         $conv->created = common_sql_now();
-        $id = $conv->insert();
+		$conv->id = $notice_id;
+		$conv->notice_id = $notice_id;
+        $conv->uri = common_local_url('conversation', array('id' => $notice_id), null, null, false);
+        $result = $conv->insert();
 
-        if (empty($id)) {
+        if (empty($result)) {
             common_log_db_error($conv, 'INSERT', __FILE__);
             return null;
         }
 
-        $orig = clone($conv);
-        $orig->uri = common_local_url('conversation', array('id' => $id),
-                                      null, null, false);
-        $result = $orig->update($conv);
-
-        if (empty($result)) {
-            common_log_db_error($conv, 'UPDATE', __FILE__);
-            return null;
-        }
-
+		self::blow();
         return $conv;
     }
+	static function append($conv_id, $notice_id)
+	{
+		// find a root, i.e. where conv_id==$notice_id
+		$conv = self::pkeyGet(array('id'=>$conv_id, 'notice_id'=>$conv_id));
+		if (empty($conv)) {
+			return self::create($conv_id);	// should it really do this?
+			throw new Exception('Conversation root not found');	// maybe this should be done instead
+		}
+		file_put_contents('/tmp/convobj', print_r($conv,true));
+		$conv->query('BEGIN');
+
+		// update modified value for root
+		$original = clone($conv);
+		$conv->modified = common_sql_now();
+		$conv->update($original);
+
+		// append by insert with new notice_id. uri value is a hack for now.
+		$conv->uri .= '#notice-'.$notice_id;
+		$conv->notice_id = $notice_id;
+		$conv->created = $conv->modified;
+		$result = $conv->insert();
+
+        if (empty($result)) {
+            common_log_db_error($conv, 'INSERT', __FILE__);
+            throw new Exception('Could not append to conversation');
+        }
+
+		// finalize transaction
+		$conv->query('COMMIT');
+
+        self::blow('conversation:length:%d', $conv->id);
+		return $conv;
+	}
 
     static function noticeCount($id)
     {
-        $keypart = sprintf('conversation:notice_count:%d', $id);
-
-        $cnt = self::cacheGet($keypart);
-
-        if ($cnt !== false) {
-            return $cnt;
-        }
-
-        $notice               = new Notice();
-        $notice->conversation = $id;
-        $cnt                  = $notice->count();
-
-        self::cacheSet($keypart, $cnt);
-
-        return $cnt;
-    }
+		return Notice::conversationLength($id);
+	}
 }

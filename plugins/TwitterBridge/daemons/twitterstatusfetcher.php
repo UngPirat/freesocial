@@ -135,6 +135,9 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         $conn = &$flink->getDatabaseConnection();
 
         $profile = Profile::staticGet('id', $flink->user_id);
+		if (is_a($profile, 'Profile_role')) {
+			common_debug("profile was a Profile_role for flink: {$flink->user_id}/{$flink->foreign_id}".print_r($profile, true));
+		}
         if (empty($profile)) {
             common_debug('TWITTER user does not have a profile: '.$flink->user_id);
         } elseif ($profile->isSilenced()) {

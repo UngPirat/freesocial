@@ -176,21 +176,25 @@ class TwitterImport
             $notice->is_local    = Notice::GATEWAY;
             $notice->uri        = $statusUri;
 
-            if (empty($notice->conversation)) {
-                $conv = Conversation::create();
-                $notice->conversation = $conv->id;
-            }
-
             if (Event::handle('StartNoticeSave', array(&$notice))) {
     
                 $id = $notice->insert();
     
                 if (!$id) {
                     common_log_db_error($notice, 'INSERT', __FILE__);
-                    common_log(LOG_ERR, $this->name() .
-                        ' - Problem saving notice.');
+                    common_log(LOG_ERR, $this->name() . ' - Problem saving notice.');
+					throw new Exception('Could not save notice');
                 } else {
                     Foreign_notice_map::saveNew($notice->id, $statusId, TWITTER_SERVICE);
+
+                    if (empty($notice->conversation)) {
+                        $conv = Conversation::create($id);
+						$original = clone($notice);
+                        $notice->conversation = $id;
+						$notice->update($original);
+                    } else {
+						Conversation::append($notice->conversation, $id);
+					}
                 }
                 Event::handle('EndNoticeSave', array($notice));
             }

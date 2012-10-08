@@ -199,11 +199,13 @@ class FacebookBridgePlugin extends Plugin
     function onGetValidDaemons($daemons)
     {
         if (common_config('facebookimport', 'enabled')) {
-            array_push(
-                $daemons,
-                INSTALLDIR
-                . '/plugins/FacebookBridge/daemons/facebookgroupfetcher.php'
-                );
+            if (common_config('facebookimportgroups', 'enabled')) {
+                array_push(
+                    $daemons,
+                    INSTALLDIR
+                    . '/plugins/FacebookBridge/daemons/facebookgroupfetcher.php'
+                    );
+    		}
             array_push(
                 $daemons,
                 INSTALLDIR

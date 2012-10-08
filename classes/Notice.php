@@ -584,10 +584,17 @@ class Notice extends Managed_DataObject
             // the beginning of a new conversation.
 
             if (empty($notice->conversation)) {
-                $conv = Conversation::create();
-                $notice->conversation = $conv->id;
+                $conv = Conversation::create($id);
+                $notice->conversation = $id;	// this should be the same as notice id here
                 $changed = true;
-            }
+            } else {
+				$conv = Conversation::append($notice->conversation, $notice->id);
+			}
+			if (empty($conv)) {
+				common_debug(LOG_ERR, 'Conversation could not be created for notice id: '.$id);
+				$notice->delete();
+				throw new Exception('Conversation could not be created');
+			}
 
             if ($changed) {
                 if (!$notice->update($orig)) {
@@ -647,7 +654,7 @@ class Notice extends Managed_DataObject
         }
 
         self::blow('notice:list-ids:conversation:%s', $this->conversation);
-        self::blow('conversation:notice_count:%d', $this->conversation);
+        self::blow('conversation:length:%d', $this->conversation);
 
         if (!empty($this->repeat_of)) {
             // XXX: we should probably only use one of these
@@ -886,6 +893,26 @@ class Notice extends Managed_DataObject
         }
         return false;
     }
+
+	/**
+	 * Count notices in conversation
+	 */
+	 static function conversationLength($id)
+	 {
+		 $keypart = sprintf('conversation:length:%d', $id);
+		 $cnt = self::cacheGet($keypart);
+
+		 if ($cnt !== false) {
+			 return $cnt;
+		 }
+
+		 $notice = new Notice();
+		 $notice->conversation = $id;
+		 $cnt = $notice->count();
+
+		 self::cacheSet($keypart, $cnt);
+		 return $cnt;
+	 }
 
     /**
      * Grab the earliest notice from this conversation.
