@@ -234,7 +234,7 @@ class EventPlugin extends MicroappPlugin
     {
         $happening = null;
 
-        switch ($notice->object_type) {
+        switch (ActivityUtils::resolveUri($notice->object_type, true)) {
         case Happening::OBJECT_TYPE:
             $happening = Happening::fromNotice($notice);
             break;
@@ -242,6 +242,9 @@ class EventPlugin extends MicroappPlugin
         case RSVP::NEGATIVE:
         case RSVP::POSSIBLE:
             $rsvp  = RSVP::fromNotice($notice);
+			if (empty($rsvp)) {
+				throw new Exception(_m('Could not find RSVP'));
+			}
             $happening = $rsvp->getEvent();
             break;
         }
@@ -292,7 +295,7 @@ class EventPlugin extends MicroappPlugin
      * @return ActivityObject
      */
     function onEndNoticeAsActivity($notice, &$act) {
-        switch ($notice->object_type) {
+        switch (ActivityUtils::resolveUri($notice->object_type,true)) {
         case RSVP::POSITIVE:
         case RSVP::NEGATIVE:
         case RSVP::POSSIBLE:
@@ -306,7 +309,7 @@ class EventPlugin extends MicroappPlugin
     {
         $notice = $nli->notice;
 
-        switch ($notice->object_type) {
+        switch (ActivityUtils::resolveUri($notice->object_type,true)) {
         case Happening::OBJECT_TYPE:
             return new EventListItem($nli);
             break;
@@ -338,7 +341,7 @@ class EventPlugin extends MicroappPlugin
      */
     function deleteRelated($notice)
     {
-        switch ($notice->object_type) {
+        switch (ActivityUtils::resolveUri($notice->object_type, true)) {
         case Happening::OBJECT_TYPE:
             common_log(LOG_DEBUG, "Deleting event from notice...");
             $happening = Happening::fromNotice($notice);
@@ -372,7 +375,7 @@ class EventPlugin extends MicroappPlugin
     {
         // Filter out any poll responses
         if (($parent->object_type == Happening::OBJECT_TYPE) &&
-            in_array($child->object_type, array(RSVP::POSITIVE, RSVP::NEGATIVE, RSVP::POSSIBLE))) {
+            ActivityUtils::compareObjectTypes($child->object_type, array(RSVP::POSITIVE, RSVP::NEGATIVE, RSVP::POSSIBLE))) {
             return false;
         }
         return true;

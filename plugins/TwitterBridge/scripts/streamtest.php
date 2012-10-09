@@ -169,13 +169,13 @@ $stream->hookEvent('status', function($data, $context) {
     if (have_option('import')) {
         $importer = new TwitterImport();
         printf("\timporting...");
-        $notice = $importer->importStatus($data);
-        if ($notice) {
+        try {
+			$notice = $importer->importStatus($data);
             global $myuser;
             Inbox::insertNotice($myuser->id, $notice->id);
             printf(" %s\n", $notice->id);
-        } else {
-            printf(" FAIL\n");
+        } catch (Exception $e) {
+            printf(" FAIL: {$e->getMessage()}\n");
         }
     }
 });

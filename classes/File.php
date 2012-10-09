@@ -153,6 +153,7 @@ class File extends Managed_DataObject
      * @throws ServerException on some errors
      */
     static function processNew($given_url, $notice_id=null, $followRedirects=true) {
+		common_debug('Processing given url: '.$given_url.(!is_null($notice_id) ? ' for notice_id='.$notice_id : ''));
         if (empty($given_url)) return -1;   // error, no url to process
         $given_url = File_redirection::_canonUrl($given_url);
         if (empty($given_url)) return -1;   // error, no url to process

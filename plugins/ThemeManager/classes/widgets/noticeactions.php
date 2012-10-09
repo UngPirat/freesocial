@@ -36,7 +36,7 @@ class NoticeactionsWidget extends ThemeWidget {
                     $items['repeat'] = array('element' => 'span',
                                                 'args'   => array('class'=>'action final repeated',
                                                                 'title'=>_m('You repeated this')),
-                                                'content'=> ' Repeated', // '',
+                                                'content'=> ' ' . _m('BUTTON', 'Repeated'), // '',
                                                 );
                 } else {
                     $items['repeat'] = new RepeatForm($this->out, $this->item);

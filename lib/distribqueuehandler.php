@@ -66,6 +66,7 @@ class DistribQueueHandler
     function handle($notice)
     {
 		if (!is_object($notice)) {
+			common_debug('Handling notice as json encoded: '.$notice);
 			$notice = json_decode($notice);
 			$notice = Notice::staticGet('id', $notice->id);
 			if (empty($notice)) {

@@ -213,24 +213,10 @@ class ShownoticeAction extends Action
 
         if ($this->boolean('ajax')) {
             $this->showAjax();
-        } else {
-            if ($this->notice->is_local == Notice::REMOTE) {
-                if (!empty($this->notice->url)) {
-                    $target = $this->notice->url;
-                } else if (!empty($this->notice->uri) && preg_match('/^https?:/', $this->notice->uri)) {
-                    // Old OMB posts saved the remote URL only into the URI field.
-                    $target = $this->notice->uri;
-                } else {
-                    // Shouldn't happen.
-                    $target = false;
-                }
-                if ($target && $target != $this->selfUrl()) {
-                    common_redirect($target, 301);
-                    return false;
-                }
-            }
-            $this->showPage();
+			return;
         }
+
+        $this->showPage();
     }
 
     /**

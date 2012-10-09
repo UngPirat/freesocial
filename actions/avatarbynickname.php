@@ -86,7 +86,7 @@ class AvatarbynicknameAction extends Action
             return;
         }
         if ($size == 'original') {
-            $avatar = $profile->getOriginal();
+            $avatar = Avatar::getOriginal($profile->id);
         } else {
             $avatar = Avatar::getByProfile($profile, $size+0);
         }

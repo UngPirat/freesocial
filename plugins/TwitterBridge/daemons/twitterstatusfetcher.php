@@ -143,8 +143,17 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         } elseif ($profile->isSilenced()) {
             common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
         } else {
-            $this->getTimeline($flink, 'home_timeline');
-            $this->getTimeline($flink, 'mentions');
+			try {
+	            $this->getTimeline($flink, 'home_timeline');
+            	$this->getTimeline($flink, 'mentions');
+	        } catch (Exception $e) {
+	            common_log(LOG_ERR, $this->name() . ' - Unable to get ' . $timelineUri . ' timeline for user ' . $flink->user_id . ' - code: ' . $e->getCode() . 'msg: ' . $e->getMessage());
+				switch ($e->getCode()) {
+				case 32:
+					common_debug('Should we delete flink->user_id='.$flink->user_id.'?');
+					break;
+				}
+        	}
 
             $flink->last_noticesync = common_sql_now();
             $flink->update();
@@ -187,16 +196,8 @@ class TwitterStatusFetcher extends ParallelizingDaemon
         common_log(LOG_DEBUG, "Got lastId value '" . $lastId . "' for foreign id '" .
                    $flink->foreign_id . "' and timeline " . $timelineUri);
 
-        try {
-            if (!is_object($client)) {
-                common_debug('TWITTER BUG on client: '.print_r($client, true));
-            }
-            $timeline = $client->statusesTimeline($lastId, $timelineUri);
-        } catch (Exception $e) {
-            common_log(LOG_ERR, $this->name() .
-                       ' - Unable to get ' . $timelineUri . ' timeline for user ' . $flink->user_id .
-                       ' - code: ' . $e->getCode() . 'msg: ' . $e->getMessage());
-        }
+		// throws exception on error
+        $timeline = $client->statusesTimeline($lastId, $timelineUri);
 
         if (empty($timeline)) {
             common_log(LOG_WARNING, $this->name() .  " - Empty '" . $timelineUri . "' timeline.");
@@ -210,6 +211,17 @@ class TwitterStatusFetcher extends ParallelizingDaemon
 
             // Reverse to preserve order
             foreach (array_reverse($timeline) as $status) {
+                $tweeter = Foreign_link::getByForeignID($status->user->id, TWITTER_SERVICE);
+                if (!empty($tweeter) && ($tweeter->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
+                    $tweeter = Profile::staticGet('id', $tweeter->user_id);
+                } else {
+                    $tweeter = TwitterImport::ensureProfile($status->user);
+                }
+        
+                if (empty($tweeter) || $tweeter->isSilenced()) {
+					continue;
+                }
+
                 $data = array(
                     'status' => $status,
                     'for_user' => $flink->foreign_id,

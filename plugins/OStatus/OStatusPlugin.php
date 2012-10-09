@@ -247,7 +247,7 @@ class OStatusPlugin extends Plugin
             $url = common_local_url('ostatusinit',
                                     array('group' => $group->nickname));
             $widget->out->element('a', array('href' => $url,
-                                             'class' => 'entity_remote_subscribe'),
+                                             'class' => 'entity_remote_subscribe action'),
                                 // TRANS: Link to subscribe to a remote entity.
                                 _m('Subscribe'));
 
@@ -268,7 +268,7 @@ class OStatusPlugin extends Plugin
             $url = common_local_url('ostatusinit',
                                     array('tagger' => $profile->nickname, 'peopletag' => $peopletag->tag));
             $output->element('a', array('href' => $url,
-                                        'class' => 'entity_remote_subscribe'),
+                                        'class' => 'entity_remote_subscribe action'),
                                 // TRANS: Link to subscribe to a remote entity.
                                 _m('Subscribe'));
 
@@ -1267,18 +1267,18 @@ class OStatusPlugin extends Plugin
                 $url = common_local_url('ostatusinit',
                                         array('nickname' => $profileUser->nickname));
                 $output->element('a', array('href' => $url,
-                                            'class' => 'entity_remote_subscribe'),
+                                            'class' => 'entity_remote_subscribe action'),
                                   // TRANS: Link text for a user to subscribe to an OStatus user.
-                                 _m('Subscribe'));
+                                 ' '._m('Subscribe'));
                 $output->elementEnd('li');
 
                 $output->elementStart('li', 'entity_tag');
                 $url = common_local_url('ostatustag',
                                         array('nickname' => $profileUser->nickname));
                 $output->element('a', array('href' => $url,
-                                            'class' => 'entity_remote_tag'),
+                                            'class' => 'entity_remote_tag action'),
                                   // TRANS: Link text for a user to list an OStatus user.
-                                 _m('List'));
+                                 ' '._m('List'));
                 $output->elementEnd('li');
             }
         }

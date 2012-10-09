@@ -335,13 +335,13 @@ class FacebookImport
 
         $notice  = Notice::saveNew($noticeOpts['profile_id'], $noticeOpts['content'], $noticeOpts['source'], $noticeOpts);
         Foreign_notice_map::saveNew($notice->id, $update['id'], FACEBOOK_SERVICE);
-        if (empty($notice->conversation)) {
+        if (!empty($notice->conversation)) {
+			Conversation::append($notice->conversation, $notice->id);
+        } else {
             $conv = Conversation::create($notice->id);
 			$original = clone($notice);
             $notice->conversation = $notice->id;
 			$notice->update($original);
-        } else {
-			Conversation::append($notice->conversation, $notice->id);
 		}
 		
         if (!isset($update['type'])) {
@@ -694,6 +694,8 @@ class FacebookImport
     static function fetchRemoteUrl($url, $filename)
     {
         $request = HTTPClient::start();
+        $request->setConfig('connect_timeout', 5);
+        $request->setConfig('timeout', 10);
         $response = $request->get($url);
         if ($response->isOk()) {
             $ok = file_put_contents($filename, $response->getBody());

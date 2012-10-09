@@ -67,11 +67,8 @@ class TwitterImport
             return null;
         }
 
-        try {
-            $notice = $this->saveStatus($status);
-        } catch (Exception $e) {
-            return null;    // import failed, maybe because the user was silenced
-        }
+		// saveStatus throws an exception if it fails
+        $notice = $this->saveStatus($status);
 
         return $notice;
     }
@@ -121,37 +118,37 @@ class TwitterImport
         // If it's a retweet, save it as a repeat!
         if (!empty($status->retweeted_status)) {
             common_log(LOG_INFO, "TWITTER REPEAT Status {$statusId} is a retweet of " . twitter_id($status->retweeted_status) . ".");
-            $original = $this->saveStatus($status->retweeted_status);
-            if (!is_object($original)) {
-                return null;
-            } else {
-                $author = $original->getProfile();
-                // TRANS: Message used to repeat a notice. RT is the abbreviation of 'retweet'.
-                // TRANS: %1$s is the repeated user's name, %2$s is the repeated notice.
-                $content = sprintf(_m('♲  @%1$s %2$s'),
-                                   $author->nickname,
-                                   $original->content);
 
-                if (Notice::contentTooLong($content)) {
-                    $contentlimit = Notice::maxContent();
-                    $content = mb_substr($content, 0, $contentlimit - 4) . ' ...';
-                }
+			// if we can't save the retweeted status, this will throw an exception
+	        $original = $this->saveStatus($status->retweeted_status);
 
-                try {
-                    $repeat = Notice::saveNew($profile->id,
-                                      $original->content,
-                                      'twitter',
-                                      array('repeat_of' => $original->id,
-                                            'uri' => $statusUri,
-                                            'is_local' => Notice::GATEWAY));
-                    Foreign_notice_map::saveNew($repeat->id, $statusId, TWITTER_SERVICE);
-                } catch (Exception $e) {
-                    common_log(LOG_DEBUG, $this->name() . " could not save $statusId as a repeat of {$original->id}");
-                    return null;
-                }
-                common_log(LOG_INFO, $this->name() . " saved {$repeat->id} as a repeat of {$original->id}");
-                return $repeat;
+			$author = $original->getProfile();
+            // TRANS: Message used to repeat a notice. RT is the abbreviation of 'retweet'.
+            // TRANS: %1$s is the repeated user's name, %2$s is the repeated notice.
+            $content = sprintf(_m('♲  @%1$s %2$s'),
+                               $author->nickname,
+                               $original->content);
+
+            if (Notice::contentTooLong($content)) {
+                $contentlimit = Notice::maxContent();
+                $content = mb_substr($content, 0, $contentlimit - 4) . ' ...';
             }
+
+            $repeat = Notice::saveNew($profile->id,
+                                  $original->content,
+                                  'twitter',
+                                  array('repeat_of' => $original->id,
+                                        'uri' => $statusUri,
+                                        'is_local' => Notice::GATEWAY));
+            try {
+				Foreign_notice_map::saveNew($repeat->id, $statusId, TWITTER_SERVICE);
+			} catch (Exception $e) {
+				$repeat->delete();
+				throw $e;
+			}
+
+            common_log(LOG_INFO, $this->name() . " saved {$repeat->id} as a repeat of {$original->id}");
+            return $repeat;
         }
 
         $replyToId = twitter_id($status, 'in_reply_to_status_id');
@@ -233,10 +230,10 @@ class TwitterImport
      *
      * @return mixed value the first Profile with that url, or null
      */
-    function getProfileByUrl($profileurl)
+    static function getProfileByUrl($profileurl)
     {
         $profile = new Profile();
-        $profile->profileurl = $profileurl;
+        $profile->profileurl = strtolower($profileurl);
         $profile->limit(1);
 
         if ($profile->find()) {
@@ -247,22 +244,19 @@ class TwitterImport
         return null;
     }
 
-    function ensureProfile($user)
+    static function ensureProfile($user)
     {
         // check to see if there's already a profile for this user
         $profileurl = 'https://twitter.com/' . $user->screen_name;
-        $profile = $this->getProfileByUrl($profileurl);
+        $profile = self::getProfileByUrl($profileurl);
 
         if (!empty($profile)) {
-            common_debug($this->name() . " - Profile for $profile->nickname found.");
-
             // Check to see if the user's Avatar has changed
-            $this->checkProfile($user, $profile);
-            $this->checkAvatar($user, $profile->id);
+            self::checkProfile($user, $profile);
+            self::checkAvatar($user, $profile->id);
             return $profile;
-
         } else {
-            common_debug($this->name() . " - Adding profile and remote profile for Twitter user: $profileurl.");
+            common_debug("Adding profile and remote profile for Twitter user: $profileurl.");
 
             $profile = new Profile();
             $profile->query("BEGIN");
@@ -272,13 +266,13 @@ class TwitterImport
             $profile->homepage = $user->url;
             $profile->bio = $user->description;
             $profile->location = $user->location;
-            $profile->profileurl = $profileurl;
+            $profile->profileurl = strtolower($profileurl);
             $profile->created = common_sql_now();
 
             try {
                 $id = $profile->insert();
             } catch(Exception $e) {
-                common_log(LOG_WARNING, $this->name() . ' Couldn\'t insert profile - ' . $e->getMessage());
+                common_log(LOG_WARNING, "Couldn't insert profile: " . $e->getMessage());
                 common_log_db_error($profile, 'INSERT', __FILE__);
                 $profile->query("ROLLBACK");
                 return false;
@@ -286,13 +280,13 @@ class TwitterImport
 
             $profile->query("COMMIT");
 
-            $this->updateAvatar($user, $id);
+            self::updateAvatar($user, $id);
 
             return $profile;
         }
     }
 
-    function checkProfile($user, $profile) {
+    static function checkProfile($user, Profile $profile) {
         $original = clone($profile);
         $checks = array('screen_name'=>'nickname', 'name'=>'fullname', 'url'=>'homepage', 'description'=>'bio', 'location'=>'location');
         foreach ( $checks as $tw=>$sn ) {
@@ -302,7 +296,7 @@ class TwitterImport
         }
         $profile->update($original);
     }
-    function checkAvatar($user, $profile_id)
+    static function checkAvatar($user, $profile_id)
     {
         $path_parts = pathinfo($user->profile_image_url);
         $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');    // some lack extension
@@ -317,43 +311,35 @@ class TwitterImport
             $oldname = null;
         }
 
-        if ($newname != $oldname) {
-            common_debug($this->name() . ' - Avatar for Twitter user ' .
-                         "$profile_id has changed.");
-            common_debug($this->name() . " - old: $oldname new: $newname");
-
-            $this->updateAvatar($user, $profile_id);
-        }
-
-        if ($this->missingAvatarFile($profile_id)) {
-            common_debug($this->name() . ' - Twitter user ' .
-                         $profile_id .
-                         ' is missing one or more local avatars.');
-            common_debug($this->name() ." - old: $oldname new: $newname");
-
-            $this->updateAvatar($user, $profile_id);
+        if ($newname != $oldname || self::missingAvatarFile($profile_id)) {
+            common_debug("Avatar for Twitter user $profile_id has changed. Old: $oldname New: $newname");
+            self::updateAvatar($user, $profile_id);
         }
     }
 
-    function updateAvatar($user, $profile_id) {
+    static function updateAvatar($user, $profile_id) {
         $path_parts = pathinfo($user->profile_image_url);
         $ext = (isset($path_parts['extension']) ? '.'.$path_parts['extension'] : '');    // some lack extension
         $img_root = basename($path_parts['basename'], '_normal' . $ext);
         $url = $path_parts['dirname'] . "/{$img_root}_reasonably_small" . $ext;
         $filename = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
-        if ($this->fetchAvatar($url, $filename)) {
-            try {
-                Avatar::deleteFromProfile($profile_id);
-            } catch (Exception $e) {
-                common_debug('no avatars to delete');
-            }
-
-            $this->newAvatar($profile_id, $this->getMediatype(substr($ext, 1)), $filename);
+        try {
+            Avatar::deleteFromProfile($profile_id);
+        } catch (Exception $e) {
+            common_debug('no avatars to delete');
         }
+
+		try {
+		    self::newAvatar($profile_id, $url, $filename, self::getMediatype(substr($ext, 1)));
+		} catch (Exception $e) {
+			if (file_exists(Avatar::path($filename))) {
+				unlink(Avatar::path($filename));
+			}
+		}
     }
 
-    function missingAvatarFile($profile_id) {
+    static function missingAvatarFile($profile_id) {
         try {
             $avatar = Avatar::getOriginal($profile_id);
         } catch (Exception $e) {
@@ -362,7 +348,7 @@ class TwitterImport
         return !file_exists(Avatar::path($avatar->filename));
     }
 
-    function getMediatype($ext)
+    static function getMediatype($ext)
     {
         $mediatype = null;
 
@@ -381,8 +367,11 @@ class TwitterImport
         return $mediatype;
     }
 
-    function newAvatar($profile_id, $mediatype, $filename)
+    static function newAvatar($profile_id, $url, $filename, $mediatype)
     {
+		//throws exception if unable to fetch
+		self::fetchRemoteUrl($url, Avatar::path($filename));
+
         $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
         $avatar->original = true; // we pretend this is the original
@@ -397,48 +386,25 @@ class TwitterImport
         try {
             $avatar->insert();
         } catch (Exception $e) {
-            common_log(LOG_WARNING, $this->name() . ' Couldn\'t insert avatar - ' . $e->getMessage());
             common_log_db_error($avatar, 'INSERT', __FILE__);
-            return false;
+            throw $e;
         }
-
-        return true;
     }
 
     /**
-     * Fetch a remote avatar image and save to local storage.
+     * Fetch a remote file and save to local storage.
      *
      * @param string $url avatar source URL
-     * @param string $filename bare local filename for download
-     * @return bool true on success, false on failure
+     * @param string $filename full local save path
+     * @return bool true on success, exception on failure
      */
-    function fetchAvatar($url, $filename)
-    {
-        common_debug($this->name() . " - Fetching Twitter avatar: $url");
-        try {
-            $request = HTTPClient::start();
-            $response = $request->get($url);
-            if ($response->isOk()) {
-                $avatarfile = Avatar::path($filename);
-                $ok = file_put_contents($avatarfile, $response->getBody());
-                if (!$ok) {
-                    common_log(LOG_WARNING, $this->name() .
-                               " - Couldn't open file $filename");
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } catch (Exception $e) {
-            return false;
-        }
-        return true;
-    }
 
-    function fetchRemoteUrl($url, $filename)
+    static function fetchRemoteUrl($url, $filename)
     {
         common_debug("Twitter fetchRemoteUrl - Fetching Twitter url: $url");
         $request = HTTPClient::start();
+        $request->setConfig('connect_timeout', 5);
+        $request->setConfig('timeout', 10);
         $response = $request->get($url);
         if ($response->isOk()) {
             $ok = file_put_contents($filename, $response->getBody());

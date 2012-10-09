@@ -49,8 +49,14 @@ class TweetInQueueHandler extends QueueHandler
         $receiver = $data['for_user'];
 
         $importer = new TwitterImport();
-        $notice = $importer->importStatus($status);
-        if ($notice && strtotime($notice->created) > time()-3*3600) {	// only 3 hour fresh stuff to Inbox
+        try {
+			$notice = $importer->importStatus($status);
+		} catch (Exception $e) {
+			// we could chekc here if the error code suggests trying again
+			common_debug('TweetInQueueHandler had an exception: '.$e->getMessage());
+			return true;
+		}
+        if (!is_null($notice) && strtotime($notice->created) > time()-3*3600) {	// only 3 hour fresh stuff to Inbox
             $flink = Foreign_link::getByForeignID($receiver, TWITTER_SERVICE);
             if ($flink) {
 				common_log(LOG_DEBUG, "TweetInQueueHandler - Got flink so add notice ".

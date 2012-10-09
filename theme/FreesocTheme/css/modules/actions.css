@@ -46,7 +46,8 @@
 	font-size: 2em;
 	margin: 0.25ex;
 }
-.actions .entity_subscribe input {
+.actions .entity_subscribe input,
+.actions .entity_subscribe a {
 	font-family: OpenWeb;
 }
 
