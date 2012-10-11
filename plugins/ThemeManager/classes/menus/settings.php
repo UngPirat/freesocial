@@ -1,6 +1,8 @@
 <?php
 
 class SettingsMenu extends ThemeMenu {
+	protected $itemClass = 'settings';
+
     protected function validate() {
         if (!common_logged_in()) {
             return false;
@@ -18,14 +20,14 @@ class SettingsMenu extends ThemeMenu {
     }
 
     function get_list() {
-        $items = array();
-        // opens up a reference to $items and will replace an Action in events below
-        $adapter = new ThemeManagerAdapter($items, $this->action);
+        $list = array();
+        // opens up a reference to $list and will replace an Action in events below
+        $adapter = new ThemeManagerAdapter($list, $this->action);
 
         if (Event::handle('StartAccountSettingsNav', array($adapter))) {
             // list($actionName, $args, $label, $description, $current)
             $args = array();
-            $items = array_merge($items, array(
+            $list = array_merge($list, array(
                     array('url'=>'profilesettings',
                          'label'=>_m('MENU','Profile'), 'description'=>_m('Change your profile settings')),
                     array('url'=>'avatarsettings',
@@ -44,12 +46,12 @@ class SettingsMenu extends ThemeMenu {
             $haveImPlugin = false;
             Event::handle('HaveImPlugin', array(&$haveImPlugin));
             if ($haveImPlugin) {
-                $items[] = array('url'=>'imsettings', 'label'=>_m('MENU','Messaging'), 'description'=>'Instant messengers');
+                $list[] = array('url'=>'imsettings', 'label'=>_m('MENU','Messaging'), 'description'=>'Instant messengers');
             }
         }
 
         unset($adapter);
 
-        return $items;
+        return $list;
     }
 }

@@ -6,11 +6,12 @@ abstract class ListWidget extends ThemeWidget {
     protected $page   = 1;
 
     protected $title      = null;
+	protected $titleClass = 'widget-title';
     protected $titleLink  = null;
     protected $pagination = false;
     protected $hideEmpty  = false;
 
-    protected $itemClass;
+    protected $itemClass = 'list-item';
     protected $itemTag;
     protected $loopClass;
     protected $loopTag;
@@ -74,7 +75,7 @@ abstract class ListWidget extends ThemeWidget {
     function the_loop() {
         $this->loopTag && $this->out->elementStart($this->loopTag, $this->loopClass);
         do {
-            $this->itemTag && $this->out->elementStart($this->itemTag, "list-item {$this->itemClass}");
+            $this->itemTag && $this->out->elementStart($this->itemTag, $this->itemClass);
             $this->the_item($this->loop->current());
             $this->itemTag && $this->out->elementEnd($this->itemTag);
         } while ($this->loop->next());
@@ -115,7 +116,7 @@ abstract class ListWidget extends ThemeWidget {
 
 	function the_title() {
         if (!empty($this->title)) {
-            $this->out->elementStart('h3', 'widget-title');
+            $this->out->elementStart('h3', $this->titleClass);
 			$this->titleLink && $this->out->elementStart('a', array('href'=>$this->titleLink));
 			$this->out->text($this->title);
 			$this->titleLink && $this->out->elementEnd('a');

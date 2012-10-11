@@ -18,9 +18,10 @@ $this->out->elementStart('div', array('id'=>'wrapper'));
     $this->box('site-title');
     $this->out->elementStart('div', array('id'=>'login'));
 
-    try {
+	if ($this->loggedIn()) {
+		$this->out->element('span', 'context', sprintf(_m('Logged in as %s'), $this->profile->nickname));
         $this->widget('Vcard', array('item'=>$this->profile, 'avatarSize'=>Avatar::STREAM_SIZE, 'mini'=>true));
-    } catch (Exception $e) {
+    } else {
         $this->out->element('p', null, _m('You are not logged in!'));
         $this->out->elementStart('p');
         $this->out->element('a', array('href'=>common_local_url('login')), _m('Log in'));

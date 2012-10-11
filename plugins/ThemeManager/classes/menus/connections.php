@@ -18,11 +18,11 @@ class ConnectionsMenu extends ThemeMenu {
     }
 
     function get_list() {
-        $items = array();
-        // opens up a reference to $items and will replace an Action in events below
-        $adapter = new ThemeManagerAdapter($items, $this->action);
+        $list = array();
+        // opens up a reference to $list and will replace an Action in events below
+        $adapter = new ThemeManagerAdapter($list, $this->action);
 
-           $items[] = array(
+           $list[] = array(
                         'url'=>'oauthconnectionssettings',
                         'label'=>_m('MENU','Connected apps'),
                         'description'=>_m('Authorized connected apps'));
@@ -31,6 +31,6 @@ class ConnectionsMenu extends ThemeMenu {
 
         unset($adapter);
 
-        return $items;
+        return $list;
     }
 }

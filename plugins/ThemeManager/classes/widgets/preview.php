@@ -8,7 +8,7 @@ class PreviewWidget extends ThemeWidget {
     protected $itemClass   = 'attachment preview';
     protected $widgetClass = 'previews';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();
@@ -42,6 +42,7 @@ class PreviewWidget extends ThemeWidget {
             return false;
         }
         $this->out->elementStart('li', "thumb {$this->itemClass}");
+//        $this->out->elementStart('a', array('href'=>$this->item->url, 'class'=>'fancybox'));
         $this->out->elementStart('a', array('href'=>common_local_url('attachment', array('attachment'=>$this->item->id)), 'class'=>'url thumb'));
         $this->out->element('img', array('src'=>$thumb->url));
         if (!empty($this->notices)) {

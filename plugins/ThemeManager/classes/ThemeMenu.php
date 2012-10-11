@@ -1,27 +1,28 @@
 <?php
 
 class ThemeMenu extends ListWidget {
-    protected $items  = array();
+    protected $list  = array();
     protected $action = null;
+    protected $offset = 0;
+    protected $num    = -1;
 
-    protected $menuClass  = 'sub-menu';
-    protected $itemClass  = 'menu-item';
-    protected $itemTag    = 'li';
-    protected $loopClass  = 'sub-menu';
-    protected $loopMenu   = 'menu';
-    protected $loopTag    = 'ul';
-    protected $titleClass = 'menu-title';
-    protected $widgetClass  = 'menu-item';
-    protected $widgetTag  = 'li';
+    protected $menuClass   = 'sub-menu';
+    protected $itemClass   = 'menu-item';
+    protected $itemTag     = 'li';
+    protected $loopClass   = 'menu';
+    protected $loopTag     = 'ul';
+    protected $titleClass  = 'menu-title';
+    protected $widgetClass = 'horizontal-menu';
+    protected $widgetTag   = 'nav';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();    // this seems to work as the ThemeWidget class is abstracted!
         $widget = new $class($args);
         $widget->show();
     }
 
     function get_list() {    // set stuff that shouldn't be set by $args
-        return $this->items;
+        return $this->list;
     }
     function the_loop() {
         $this->out->elementStart('ul', $this->loopClass);
@@ -32,9 +33,14 @@ class ThemeMenu extends ListWidget {
     }
     function the_item($item) {
         $menu = null;
-        if (is_subclass_of($item, 'ThemeMenu')) {
+        if (isset($item['menu']) && is_subclass_of($item['menu'], 'ThemeMenu')) {
             try {
-                $menu = new $item(array('action'=>$this->action));
+				$class = $item['menu'];
+				$args = isset($item['args']) ? $item['args'] : array();
+				foreach(array('action', 'loopClass', 'widgetTag') as $key) {
+					$args[$key] = $this->$key;
+				}
+                $menu = new $class($args);
             } catch (Exception $e) {
                 return false;
             }
@@ -47,9 +53,9 @@ class ThemeMenu extends ListWidget {
             return $menu->show();
         }
 
-        self::menuItem($item, $this->out, $this->action);
+        $this->menu_item($item, $this->out, $this->action);
     }
-    static function menuItem($item, $out, $action=null) {
+    function menu_item($item, $out, $action=null) {
         foreach(array('url', 'args', 'label', 'description', 'current') as $arg) {
             $$arg = isset($item[$arg]) ? $item[$arg] : null;
         }
@@ -61,7 +67,7 @@ class ThemeMenu extends ListWidget {
                     ? common_local_url($url, (array)$args)
                     : $url);
 
-        $out->elementStart('li', "menu-item$currentItem");
+        $out->elementStart('li', $this->itemClass.$currentItem);
         $out->element('a', array('href'=>$url, 'title'=>$description), $label);
         $out->elementEnd('li');
     }
@@ -74,9 +80,7 @@ class ThemeMenu extends ListWidget {
 
         if ($this->loop->count()) {
             $this->widgetTag && $this->out->elementStart($this->widgetTag, $args);
-            if (!empty($this->title)) {
-                $this->out->element('h3', 'menu-title', $this->title);
-            }
+			$this->the_title();
             $this->the_loop();
             $this->the_more();
         } else {

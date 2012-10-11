@@ -31,6 +31,10 @@ class ThemeManager extends ThemeSite {
         return self::$htmloutputter;
     }
 
+	function loggedIn() {
+		return isset($this->profile) && !empty($this->profile);
+	}
+
     function run() {
         if (empty($type)) {
             $httpaccept = isset($_SERVER['HTTP_ACCEPT']) ?
@@ -156,6 +160,7 @@ class ThemeManager extends ThemeSite {
     function menus(array $list, array $args=array()) {
         $this->out->elementStart('nav', 'menu-container'.(isset($args['navClass'])?" {$args['navClass']}":''));
             $this->out->elementStart('ul', 'menu');
+		$args = array_merge($args, array('loopClass'=>'sub-menu', 'widgetClass'=>'menu-item', 'widgetTag'=>'li'));
         foreach ($list as $menu) :
             try {
                 $this->menu($menu, $args);    // no args allowed in multi-call... for now at least

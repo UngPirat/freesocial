@@ -4,7 +4,7 @@ class ConversationWidget extends NoticeListWidget {
     // these values will be set by default or $args-supplied values
     protected $widgetClass = 'conversation notices';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

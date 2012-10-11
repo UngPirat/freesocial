@@ -4,7 +4,7 @@ class ActivityWidget extends NoticeWidget {
     protected $itemClass = 'notice activity';
     protected $itemTag = 'article';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

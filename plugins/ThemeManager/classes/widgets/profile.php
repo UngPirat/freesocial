@@ -7,7 +7,7 @@ class ProfileWidget extends ThemeWidget {
     protected $avatarSize = Avatar::PROFILE_SIZE;
     protected $mini       = false;
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

@@ -6,7 +6,7 @@ class NoticeListWidget extends ListWidget {
     protected $pagination = true;
     protected $widgetClass = 'list notices';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

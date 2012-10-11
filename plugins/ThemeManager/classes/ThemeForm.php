@@ -117,6 +117,11 @@ class FormElements {
         $args['type'] = 'hidden';
         $this->input($name, $args, $value);
     }
+	function password($name, $args, $label) {
+        $args = $this->make_arg_to_array($args, 'id');
+		$args['type'] = 'password';
+		$this->input($name, $args, null, $label);
+	}
     function submit($id, $args, $value) {
         $args = $this->make_arg_to_array($args);
         $args['id'] = $id;

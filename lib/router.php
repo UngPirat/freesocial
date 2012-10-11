@@ -220,6 +220,10 @@ class Router
                         array('action' => 'attachment'),
                         array('attachment' => '[0-9]+'));
 
+            $m->connect('attachment/:attachment/file',
+                        array('action' => 'attachment_file'),
+                        array('attachment' => '[0-9]+'));
+
             $m->connect('attachment/:attachment/ajax',
                         array('action' => 'attachment_ajax'),
                         array('attachment' => '[0-9]+'));

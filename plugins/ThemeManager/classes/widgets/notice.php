@@ -8,7 +8,7 @@ class NoticeWidget extends ThemeWidget {
     protected $itemClass = 'notice';
     protected $itemTag = 'article';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         if (Event::handle('StartRunNoticeWidget', array($args))) {
             $class = get_class();
             $widget = new $class($args);    // runs validate()

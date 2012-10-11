@@ -542,6 +542,9 @@ ENDOFSCRIPT;
      */
     function onStartDeleteOwnNotice(User $user, Notice $notice)
     {
+		if ($user->id != $notice->profile_id) {
+			return true;
+		}
         $client = new Facebookclient($notice);
         $client->streamRemove();
 

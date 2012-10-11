@@ -4,7 +4,7 @@ class WelcomeWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
     protected $image = null;
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         return $widget->show();

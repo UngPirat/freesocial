@@ -100,23 +100,6 @@ class BookmarkListPlugin extends Plugin
         return true;
     }
 
-    /**
-     * Modify the default menu to link to our custom action
-     *
-     * Using event handlers, it's possible to modify the default UI for pages
-     * almost without limit. In this method, we add a menu item to the default
-     * primary menu for the interface to link to our action.
-     *
-     * The Action class provides a rich set of events to hook, as well as output
-     * methods.
-     *
-     * @param Action $action The current action handler. Use this to
-     *                       do any output.
-     *
-     * @return boolean hook value; true means continue processing, false means stop.
-     *
-     * @see Action
-     */
     function onEndPersonalGroupNav($action)
     {
         $this->user = common_current_user();

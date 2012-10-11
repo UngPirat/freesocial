@@ -18,21 +18,19 @@ class PersonalMenu extends ThemeMenu {
     }
 
     function get_list() {
-        $items = array();
-        // opens up a reference to $items and will replace an Action in events below
-        $adapter = new ThemeManagerAdapter($items, $this->action);
+        $list = array();
+        // opens up a reference to $list and will replace an Action in events below
+        $adapter = new ThemeManagerAdapter($list, $this->action);
         if (Event::handle('StartPersonalGroupNav', array($adapter))) {
             $args = array('nickname'=>$this->profile->nickname);
             // list($actionName, $args, $label, $description, $id)
-            $items = array_merge($items, array(
-                array('url'=>'all',        'args'=>$args, 'label'=>_m('MENU','Home'), 'description'=>_m('Home timeline')),
-                array('url'=>'showstream', 'args'=>$args, 'label'=>_m('MENU','Profile'), 'description'=>_m('Your profile')),
-                array('url'=>'mentions',   'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
-                array('url'=>'replies',    'args'=>$args, 'label'=>_m('MENU','Replies'), 'description'=>_m('Your replies to others')),
-                array('url'=>'favorites',  'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),
+            $list = array_merge($list, array(
+				array('menu'=>'ProfileMenu',  'args'=>array('profile'=>$this->profile)),
+                array('url'=>'subscriptions', 'args'=>$args, 'label'=>_m('MENU','Subscriptions'), 'description'=>_m('Streams you subscribe to')),
+                array('url'=>'subscribers',   'args'=>$args, 'label'=>_m('MENU','Subscribers'), 'description'=>_m('Accounts that subscribe to you')),
                 ));
             Event::handle('EndPersonalGroupNav', array($adapter));
         }
-        return $items;
+        return $list;
     }
 }

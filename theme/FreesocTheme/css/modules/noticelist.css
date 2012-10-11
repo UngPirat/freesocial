@@ -18,6 +18,12 @@
 .conversation .notice:first-child,
 .notice {
 	background-color: #f0f0f0;
+	background: -moz-linear-gradient(#ffffff, #f0f0f0);
+	background: -o-linear-gradient(#ffffff, #f0f0f0);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#252525), to(#0a0a0a)); /* older webkit syntax */
+	background: -webkit-linear-gradient(#252525, #0a0a0a);
+	-webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
+	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
 }
 .conversation .notice {
 	background-color: #fff;

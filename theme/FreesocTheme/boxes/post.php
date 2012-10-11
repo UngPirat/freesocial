@@ -2,7 +2,7 @@
     $this->out->elementStart('aside', array('id'=>'post'));
 
 	if (common_logged_in()) :
-		$this->out->element('header', 'slidecontrol', _m("Tell the world what's happening"));
+		$this->out->element('header', array('accesskey'=>'n', 'class'=>'slidecontrol'), _m("Post »"));
 		NewnoticeForm::run($this->action->args);
     else :
 		WelcomeWidget::run(array('image'=>$this->url('img/catfish-welcome.png')));

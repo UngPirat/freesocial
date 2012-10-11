@@ -8,7 +8,7 @@ class AttachmentListWidget extends ListWidget {
 	protected $widgetTag = 'ul';
 	protected $widgetClass = 'list attachments';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

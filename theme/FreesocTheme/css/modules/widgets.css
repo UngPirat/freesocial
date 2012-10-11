@@ -35,7 +35,7 @@
     padding: 0 1%;
 	text-align: right;
 }
-.vcard.mini .fn,
+#content .vcard.mini .fn,
 .widget.list .url .description,
 .widget.list .notice > .vcard .fn {
 	display: none;
@@ -63,7 +63,7 @@
 .list.widget .url .description {
 	right: 0;
 }
-.vcard.mini:hover .fn,
+#content .vcard.mini:hover .fn,
 .widget.list .url:hover .description,
 .widget.list .notice > .vcard:hover .fn {
     display: block;

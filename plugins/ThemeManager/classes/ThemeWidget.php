@@ -7,7 +7,7 @@ abstract class ThemeWidget extends ThemeExtension {
     protected $widgetTag = 'section';
     protected $widgetId;
 
-    abstract static function run($args=null);
+    abstract static function run(array $args=array());
 
     protected function validate() {    // make sure we don't have garbage
         if (!empty($this->out) && !is_a($this->out, 'HTMLOutputter')) {

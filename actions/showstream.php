@@ -216,12 +216,12 @@ class ShowstreamAction extends ProfileAction
 
     function extraHead()
     {
-        if ($this->subject->bio) {
+        if ($this->profile->bio) {
             $this->element('meta', array('name' => 'description',
-                                         'content' => $this->subject->bio));
+                                         'content' => $this->profile->bio));
         }
 
-        if ($this->subject->emailmicroid && $this->subject->email && $this->subject->profileurl) {
+        if ($this->subject->emailmicroid && $this->subject->email && $this->profile->profileurl) {
             $id = new Microid('mailto:'.$this->subject->email,
                               $this->selfUrl());
             $this->element('meta', array('name' => 'microid',

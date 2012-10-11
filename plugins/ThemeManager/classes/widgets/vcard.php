@@ -1,7 +1,7 @@
 <?php
 
 class VcardWidget extends ProfileWidget {
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();

@@ -26,7 +26,7 @@ class ProfileSettings extends ThemeSettings {
 				'bio'      => 'textarea',
 				'location' => 'input',
 				'sharelocation' => 'checkbox',
-			));
+			);
 
 		if (common_config('profile', 'changenick') == true) {
 			$items['nickname'] = 'input';
