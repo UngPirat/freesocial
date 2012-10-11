@@ -225,7 +225,7 @@ class User extends Managed_DataObject
      * If a new-user welcome message is configured, this will be sent.
      *
      * @param array $fields associative array of optional properties
-     *              string 'bio'
+     *              string 'description'
      *              string 'email'
      *              bool 'email_confirmed' pass true to mark email as pre-confirmed
      *              string 'fullname'
@@ -273,8 +273,8 @@ class User extends Managed_DataObject
         if (!empty($homepage)) {
             $profile->homepage = $homepage;
         }
-        if (!empty($bio)) {
-            $profile->bio = $bio;
+        if (!empty($description)) {
+            $profile->description = $description;
         }
         if (!empty($location)) {
             $profile->location = $location;

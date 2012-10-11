@@ -332,7 +332,7 @@ function mail_profile_block($profile)
 {
     // TRANS: Layout for
     // TRANS: %1$s is the subscriber's profile URL, %2$s is the subscriber's location (or empty)
-    // TRANS: %3$s is the subscriber's homepage URL (or empty), %4%s is the subscriber's bio (or empty)
+    // TRANS: %3$s is the subscriber's homepage URL (or empty), %4%s is the subscriber's description (or empty)
     $out = array();
     $out[] = "";
     $out[] = "";
@@ -349,10 +349,10 @@ function mail_profile_block($profile)
         // TRANS: %s is a homepage.
         $out[] = sprintf(_("Homepage: %s"), $profile->homepage);
     }
-    if ($profile->bio) {
+    if ($profile->description) {
         // TRANS: Profile info line in notification e-mail.
-        // TRANS: %s is biographical information.
-        $out[] = sprintf(_("Bio: %s"), $profile->bio);
+        // TRANS: %s is a user description.
+        $out[] = sprintf(_("Description: %s"), $profile->description);
     }
 
     $blocklink = common_local_url('block', array('profileid' => $profile->id));

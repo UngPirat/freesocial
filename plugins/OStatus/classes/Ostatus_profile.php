@@ -1637,10 +1637,10 @@ class Ostatus_profile extends Managed_DataObject
             $profile->profileurl = $object->id;
         }
 
-        $bio = self::getActivityObjectBio($object, $hints);
+        $description = self::getActivityObjectDescription($object, $hints);
 
-        if (!empty($bio)) {
-            $profile->bio = $bio;
+        if (!empty($description)) {
+            $profile->description = $description;
         }
 
         $location = self::getActivityObjectLocation($object, $hints);
@@ -1686,7 +1686,7 @@ class Ostatus_profile extends Managed_DataObject
         }
 
         // @todo tags from categories
-        $group->description = self::getActivityObjectBio($object, $hints);
+        $group->description = self::getActivityObjectDescription($object, $hints);
         $group->location = self::getActivityObjectLocation($object, $hints);
         $group->homepage = self::getActivityObjectHomepage($object, $hints);
 
@@ -1756,28 +1756,30 @@ class Ostatus_profile extends Managed_DataObject
         return $location;
     }
 
-    protected static function getActivityObjectBio($object, $hints=array())
+    protected static function getActivityObjectDescription($object, $hints=array())
     {
-        $bio  = null;
+        $description  = null;
 
         if (!empty($object->poco)) {
             $note = $object->poco->note;
         } else if (array_key_exists('bio', $hints)) {
             $note = $hints['bio'];
+        } else if (array_key_exists('description', $hints)) {
+            $note = $hints['description'];
         }
 
         if (!empty($note)) {
-            if (Profile::bioTooLong($note)) {
+            if (Profile::descriptionTooLong($note)) {
                 // XXX: truncate ok?
-                $bio = mb_substr($note, 0, Profile::maxBio() - 3) . ' … ';
+                $description = mb_substr($note, 0, Profile::maxDescription() - 3) . ' … ';
             } else {
-                $bio = $note;
+                $description = $note;
             }
         }
 
         // @todo Try to get bio info some other way?
 
-        return $bio;
+        return $description;
     }
 
     public static function getActivityObjectNickname($object, $hints=array())

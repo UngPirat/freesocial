@@ -123,7 +123,7 @@ class ApiAccountUpdateProfileAction extends ApiAuthAction
         }
 
         if (!empty($this->description)) {
-            $profile->bio = $this->description;
+            $profile->description = $this->description;
         }
 
         if (!empty($this->location)) {

@@ -148,7 +148,7 @@ class PoCo
         $poco->preferredUsername = $profile->nickname;
         $poco->displayName       = $profile->getBestName();
 
-        $poco->note = $profile->bio;
+        $poco->note = $profile->description;
 
         $paddy = new PoCoAddress();
         $paddy->formatted = $profile->location;

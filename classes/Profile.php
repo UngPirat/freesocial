@@ -40,7 +40,7 @@ class Profile extends Managed_DataObject
     public $fullname;                        // varchar(255)  multiple_key
     public $profileurl;                      // varchar(255)
     public $homepage;                        // varchar(255)  multiple_key
-    public $bio;                             // text()  multiple_key
+    public $description;                     // text()  multiple_key
     public $location;                        // varchar(255)  multiple_key
     public $lat;                             // decimal(10,7)
     public $lon;                             // decimal(10,7)
@@ -65,7 +65,7 @@ class Profile extends Managed_DataObject
                 'fullname' => array('type' => 'varchar', 'length' => 255, 'description' => 'display name', 'collate' => 'utf8_general_ci'),
                 'profileurl' => array('type' => 'varchar', 'length' => 255, 'description' => 'URL, cached so we dont regenerate'),
                 'homepage' => array('type' => 'varchar', 'length' => 255, 'description' => 'identifying URL', 'collate' => 'utf8_general_ci'),
-                'bio' => array('type' => 'text', 'description' => 'descriptive biography', 'collate' => 'utf8_general_ci'),
+                'description' => array('type' => 'text', 'description' => 'user description', 'collate' => 'utf8_general_ci'),
                 'location' => array('type' => 'varchar', 'length' => 255, 'description' => 'physical location', 'collate' => 'utf8_general_ci'),
                 'lat' => array('type' => 'numeric', 'precision' => 10, 'scale' => 7, 'description' => 'latitude'),
                 'lon' => array('type' => 'numeric', 'precision' => 10, 'scale' => 7, 'description' => 'longitude'),
@@ -77,7 +77,7 @@ class Profile extends Managed_DataObject
             ),
             'primary key' => array('id'),
             'indexes' => array(
-                'profile_uri_idx' => array('uri'),
+                'profile_profileurl_idx' => array('profileurl'),
                 'profile_nickname_idx' => array('nickname'),
             )
         );
@@ -85,7 +85,7 @@ class Profile extends Managed_DataObject
         // Add a fulltext index
 
         if (common_config('search', 'type') == 'fulltext') {
-            $def['fulltext indexes'] = array('nickname' => array('nickname', 'fullname', 'location', 'bio', 'homepage'));
+            $def['fulltext indexes'] = array('nickname' => array('nickname', 'fullname', 'location', 'description', 'homepage'));
         }
 
         return $def;
@@ -141,7 +141,6 @@ class Profile extends Managed_DataObject
     {
 		return Avatar::getByProfile($this, $width, $height);
     }
-
     function setOriginal($filename)
     {
         $imagefile = new ImageFile($this->id, Avatar::path($filename));
@@ -175,6 +174,10 @@ class Profile extends Managed_DataObject
         }
 
         return $avatar;
+    }
+
+    function getWebfinger() {
+        return $this->nickname . '@' . parse_url($this->profileurl, PHP_URL_HOST);
     }
 
     function homeUrl()
@@ -912,20 +915,20 @@ class Profile extends Managed_DataObject
         }
     }
 
-    static function maxBio()
+    static function maxDescription()
     {
-        $biolimit = common_config('profile', 'biolimit');
+        $descrlimit = common_config('profile', 'descriptionlimit');
         // null => use global limit (distinct from 0!)
-        if (is_null($biolimit)) {
-            $biolimit = common_config('site', 'textlimit');
+        if (is_null($descrlimit)) {
+            $descrlimit = common_config('site', 'textlimit');
         }
-        return $biolimit;
+        return $descrlimit;
     }
 
-    static function bioTooLong($bio)
+    static function descriptionTooLong($description)
     {
-        $biolimit = self::maxBio();
-        return ($biolimit > 0 && !empty($bio) && (mb_strlen($bio) > $biolimit));
+        $descriptionlimit = self::maxDescription();
+        return ($descriptionlimit > 0 && !empty($description) && (mb_strlen($description) > $descriptionlimit));
     }
 
     function delete()

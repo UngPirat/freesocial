@@ -6,6 +6,7 @@ class ProfileWidget extends ThemeWidget {
 
     protected $avatarSize = Avatar::PROFILE_SIZE;
     protected $mini       = false;
+//    protected $webfinger  = false;
 
     static function run(array $args=array()) {
         $class = get_class();
@@ -43,9 +44,6 @@ class ProfileWidget extends ThemeWidget {
                 ? common_local_url('remoteprofile', array('id'=>$profile->id))
                 : $profile->profileurl;
     }
-    function get_webfinger() {
-        return $this->item->nickname . '@' . parse_url($this->item->profileurl, PHP_URL_HOST);
-    }
     function the_metadata() {
         $this->out->elementStart('dl', 'metadata');
 		$this->the_userinfo();
@@ -61,7 +59,7 @@ class ProfileWidget extends ThemeWidget {
 		$this->out->element('dd', 'fn', $this->get_name());
         $this->out->element('dt', null, _m('Webfinger ID'));
 		$this->out->elementStart('dd', 'webfinger');
-		$this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), $this->get_webfinger());
+		$this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), $this->item->getWebfinger());
 		$this->out->elementEnd('dd');
 		$this->out->element('dt', null, _m('Homepage'));
 		$this->out->elementStart('dd');
@@ -82,6 +80,7 @@ class ProfileWidget extends ThemeWidget {
 		}
         $this->mini && $this->out->element('span', 'fn', $this->get_name());
         $this->out->elementEnd('a');
+//        $this->webfinger && $this->out->element('a', array('rel'=>'webfinger','href'=>'acct:'.$this->item->getWebfinger()), $this->item->getWebfinger());
 		if (!$this->mini) {
 			$this->the_metadata();
 		}

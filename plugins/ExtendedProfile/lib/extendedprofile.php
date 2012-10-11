@@ -87,7 +87,7 @@ class ExtendedProfile
     function getTextValue($name)
     {
         $key           = strtolower($name);
-        $profileFields = array('fullname', 'location', 'bio');
+        $profileFields = array('fullname', 'location', 'description');
 
         if (in_array($key, $profileFields)) {
             return $this->profile->$name;
@@ -310,11 +310,11 @@ class ExtendedProfile
                         'label' => _m('Location'),
                         'profile' => 'location'
                     ),
-                    'bio' => array(
+                    'description' => array(
                         // TRANS: Field label for extended profile properties.
-                        'label' => _m('Bio'),
+                        'label' => _m('Description'),
                         'type' => 'textarea',
-                        'profile' => 'bio',
+                        'profile' => 'description',
                     ),
                     'tags' => array(
                         // TRANS: Field label for extended profile properties.

@@ -1,7 +1,7 @@
 <?php
 
 class SettingsMenu extends ThemeMenu {
-	protected $itemClass = 'settings';
+	protected $widgetClass = 'settings';
 
     protected function validate() {
         if (!common_logged_in()) {

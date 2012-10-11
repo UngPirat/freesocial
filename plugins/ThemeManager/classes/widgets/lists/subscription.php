@@ -1,7 +1,8 @@
 <?php
 
 class SubscriptionListWidget extends ProfileListWidget {
-    protected $itemClass   = 'subscription';
+    protected $itemClass = 'subscription';
+	protected $itemTag = null;
 
     static function run(array $args=array()) {
         $class = get_class();

@@ -151,6 +151,7 @@ class ThemeManager extends ThemeSite {
         } elseif (is_subclass_of($name, 'Menu')) {
             $menu = new $name($this->action);    // getting rid of this in the future
         } else {
+			$args['action'] = $this->action;
             $menu = new $name($args);    // new style menus
         }
         $menu->show();
@@ -160,7 +161,7 @@ class ThemeManager extends ThemeSite {
     function menus(array $list, array $args=array()) {
         $this->out->elementStart('nav', 'menu-container'.(isset($args['navClass'])?" {$args['navClass']}":''));
             $this->out->elementStart('ul', 'menu');
-		$args = array_merge($args, array('loopClass'=>'sub-menu', 'widgetClass'=>'menu-item', 'widgetTag'=>'li'));
+		$args = array_merge($args, array('loopClass'=>'sub-menu', 'widgetTag'=>'li'));
         foreach ($list as $menu) :
             try {
                 $this->menu($menu, $args);    // no args allowed in multi-call... for now at least

@@ -95,7 +95,6 @@
 }
 .vcard .photo {
 	border-radius: 1ex;
-	display: block;
 	margin: 1ex auto;
 	max-width: 100%;
 }

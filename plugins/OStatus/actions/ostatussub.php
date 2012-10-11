@@ -150,7 +150,7 @@ class OStatusSubAction extends Action
         $this->showEntity($profile,
                           $profile->profileurl,
                           $avatarUrl,
-                          $profile->bio);
+                          $profile->description);
         return $ok;
     }
 

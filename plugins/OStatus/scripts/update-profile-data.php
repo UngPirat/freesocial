@@ -26,7 +26,7 @@ $helptext = <<<END_OF_HELP
 update-profile-data.php [options] [http://example.com/profile/url]
 
 Rerun profile discovery for the given OStatus remote profile, and save the
-updated profile data (nickname, avatar, bio, etc). Doesn't touch feed state.
+updated profile data (nickname, avatar, description, etc). Doesn't touch feed state.
 Can be used to clean up after breakages.
 
 Options:
@@ -43,7 +43,7 @@ function showProfileInfo($oprofile) {
         echo "group\n";
     } else {
         $profile = $oprofile->localProfile();
-        foreach (array('nickname', 'bio', 'homepage', 'location') as $field) {
+        foreach (array('nickname', 'description', 'homepage', 'location') as $field) {
             print "  $field: {$profile->$field}\n";
         }
     }

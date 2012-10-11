@@ -78,10 +78,10 @@ class MySQLSearch extends SearchEngine
     function query($q)
     {
         if ('profile' === $this->table) {
-            $this->target->whereAdd('MATCH(nickname, fullname, location, bio, homepage) ' .
+            $this->target->whereAdd('MATCH(nickname, fullname, location, description, homepage) ' .
                                     'AGAINST (\''.$this->target->escape($q).'\' IN BOOLEAN MODE)');
             if (strtolower($q) != $q) {
-                $this->target->whereAdd('MATCH(nickname, fullname, location, bio, homepage) ' .
+                $this->target->whereAdd('MATCH(nickname, fullname, location, description, homepage) ' .
                                         'AGAINST (\''.$this->target->escape(strtolower($q)).'\' IN BOOLEAN MODE)', 'OR');
             }
             return true;
@@ -115,7 +115,7 @@ class MySQLLikeSearch extends SearchEngine
             $qry = sprintf('(nickname LIKE "%%%1$s%%" OR '.
                            ' fullname LIKE "%%%1$s%%" OR '.
                            ' location LIKE "%%%1$s%%" OR '.
-                           ' bio      LIKE "%%%1$s%%" OR '.
+                           ' description LIKE "%%%1$s%%" OR '.
                            ' homepage LIKE "%%%1$s%%")', $this->target->escape($q, true));
         } else if ('notice' === $this->table) {
             $qry = sprintf('content LIKE "%%%1$s%%"', $this->target->escape($q, true));

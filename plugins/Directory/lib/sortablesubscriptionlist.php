@@ -256,22 +256,22 @@ class SortableSubscriptionListItem extends SubscriptionListItem
     }
 
     /**
-     * Overrided to truncate the bio if it's real long, because it
+     * Overrided to truncate the user description if it's real long, because it
      * looks better that way in the SortableSubscriptionList's table
      */
-    function showBio()
+    function showDescription()
     {
-        if (!empty($this->profile->bio)) {
+        if (!empty($this->profile->description)) {
             $cutoff = 140; // XXX Should this be configurable?
-            $bio    = htmlspecialchars($this->profile->bio);
+            $description    = htmlspecialchars($this->profile->description);
 
-            if (mb_strlen($bio) > $cutoff) {
-                $bio = mb_substr($bio, 0, $cutoff - 1)
+            if (mb_strlen($description) > $cutoff) {
+                $description = mb_substr($description, 0, $cutoff - 1)
                     .'<a href="' . $this->profile->profileurl .'">…</a>';
             }
 
             $this->out->elementStart('p', 'note');
-            $this->out->raw($bio);
+            $this->out->raw($description);
             $this->out->elementEnd('p');
         }
     }

@@ -125,24 +125,24 @@ class ProfilesettingsAction extends SettingsAction
                          _('URL of your homepage, blog, or profile on another site.'));
             $this->elementEnd('li');
             $this->elementStart('li');
-            $maxBio = Profile::maxBio();
-            if ($maxBio > 0) {
+            $maxDescription = Profile::maxDescription();
+            if ($maxDescription > 0) {
                 // TRANS: Tooltip for field label in form for profile settings. Plural
                 // TRANS: is decided by the number of characters available for the
-                // TRANS: biography (%d).
-                $bioInstr = sprintf(_m('Describe yourself and your interests in %d character.',
+                // TRANS: user description (%d).
+                $descrInstr = sprintf(_m('Describe yourself and your interests in %d character.',
                                        'Describe yourself and your interests in %d characters.',
-                                       $maxBio),
-                                    $maxBio);
+                                       $maxDescription),
+                                    $maxDescription);
             } else {
                 // TRANS: Tooltip for field label in form for profile settings.
-                $bioInstr = _('Describe yourself and your interests.');
+                $descrInstr = _('Describe yourself and your interests.');
             }
             // TRANS: Text area label in form for profile settings where users can provide
-            // TRANS: their biography.
-            $this->textarea('bio', _('Bio'),
-                            ($this->arg('bio')) ? $this->arg('bio') : $profile->bio,
-                            $bioInstr);
+            // TRANS: their user description.
+            $this->textarea('description', _('Description'),
+                            ($this->arg('description')) ? $this->arg('description') : $profile->description,
+                            $descrInstr);
             $this->elementEnd('li');
             $this->elementStart('li');
             // TRANS: Field label in form for profile settings.
@@ -259,7 +259,7 @@ class ProfilesettingsAction extends SettingsAction
 
             $fullname = $this->trimmed('fullname');
             $homepage = $this->trimmed('homepage');
-            $bio = $this->trimmed('bio');
+            $description = $this->trimmed('description');
             $location = $this->trimmed('location');
             $autosubscribe = $this->boolean('autosubscribe');
             $subscribe_policy = $this->trimmed('subscribe_policy');
@@ -282,14 +282,14 @@ class ProfilesettingsAction extends SettingsAction
                 // TRANS: Validation error in form for profile settings.
                 $this->showForm(_('Full name is too long (maximum 255 characters).'));
                 return;
-            } else if (Profile::bioTooLong($bio)) {
+            } else if (Profile::descriptionTooLong($description)) {
                 // TRANS: Validation error in form for profile settings.
                 // TRANS: Plural form is used based on the maximum number of allowed
-                // TRANS: characters for the biography (%d).
-                $this->showForm(sprintf(_m('Bio is too long (maximum %d character).',
-                                           'Bio is too long (maximum %d characters).',
-                                           Profile::maxBio()),
-                                        Profile::maxBio()));
+                // TRANS: characters for the user description (%d).
+                $this->showForm(sprintf(_m('Description is too long (maximum %d character).',
+                                           'Description is too long (maximum %d characters).',
+                                           Profile::maxDescription()),
+                                        Profile::maxDescription()));
                 return;
             } else if (!is_null($location) && mb_strlen($location) > 255) {
                 // TRANS: Validation error in form for profile settings.
@@ -399,7 +399,7 @@ class ProfilesettingsAction extends SettingsAction
             $profile->nickname = $user->nickname;
             $profile->fullname = $fullname;
             $profile->homepage = $homepage;
-            $profile->bio = $bio;
+            $profile->description = $description;
             $profile->location = $location;
 
             $loc = Location::fromName($location);

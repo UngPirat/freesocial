@@ -3,7 +3,9 @@
 class ProfileListWidget extends ListWidget {
     protected $num = 15;
     protected $itemClass   = 'profile';
+	protected $itemTag     = 'li';
     protected $widgetClass = 'profiles';
+	protected $widgetTag   = 'ul';
 
     protected $avatarSize  = Avatar::PROFILE_SIZE;
     protected $pagination  = true;
@@ -41,9 +43,9 @@ class ProfileListWidget extends ListWidget {
     }
 
     function the_item($item) {
-        $this->out->elementStart('li', "list-item {$this->itemClass}");
-		ProfileWidget::run(array('item'=>$item, 'avatarSize'=>$this->avatarSize, 'mini'=>$this->mini));
-        $this->out->elementEnd('li');
+        $this->itemTag && $this->out->elementStart($this->itemTag, $this->itemClass);
+		VcardWidget::run(array('item'=>$item, 'avatarSize'=>$this->avatarSize, 'mini'=>$this->mini));
+        $this->itemTag && $this->out->elementEnd($this->itemTag);
     }
 
 	function get_count() {
@@ -51,14 +53,14 @@ class ProfileListWidget extends ListWidget {
 	}
 	function the_title() {
         if (!empty($this->title)) {
-            $this->out->elementStart('h3', 'widget-title');
+            $this->out->elementStart($this->titleTag, 'widget-title');
 			$this->titleLink && $this->out->elementStart('a', array('href'=>$this->titleLink));
 			$this->out->text($this->title);
 			$this->titleLink && $this->out->elementEnd('a');
 			if ($this->showCount && $this->get_count()!==false) {
 				$this->out->element('span', 'count', sprintf('(%d)', $this->get_count()));
 			}
-			$this->out->elementEnd('h3');
+			$this->out->elementEnd($this->titleTag);
         }
 	}
 }

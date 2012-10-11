@@ -88,7 +88,7 @@ class AccountProfileBlock extends ProfileBlock
 
     function description()
     {
-        return $this->profile->bio;
+        return $this->profile->description;
     }
 
     function otherProfiles()

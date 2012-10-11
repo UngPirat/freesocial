@@ -185,7 +185,7 @@ class SubscriptionsListItem extends SubscriptionListItem
         $this->showFullName();
         $this->showLocation();
         $this->showHomepage();
-        $this->showBio();
+        $this->showDescription();
         $this->showTags();
         // Relevant portion!
         $cur = common_current_user();

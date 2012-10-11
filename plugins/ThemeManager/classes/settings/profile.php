@@ -23,7 +23,7 @@ class ProfileSettings extends ThemeSettings {
 				'nickname' => 'readonly',
 				'fullname' => 'input',
 				'homepage' => 'input',
-				'bio'      => 'textarea',
+				'description' => 'textarea',
 				'location' => 'input',
 				'sharelocation' => 'checkbox',
 			);

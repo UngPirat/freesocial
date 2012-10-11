@@ -77,7 +77,7 @@ $profile->delete();
 echo "Copying group data\n";
 $profile = new Profile();
 $profile->type = 2;
-$p2gmap = array('nickname'=>'nickname', 'fullname'=>'fullname', 'profileurl'=>'profileurl', 'homepage'=>'homepage', 'bio'=>'description', 'location'=>'location', 'created'=>'created', 'modified'=>'modified');
+$p2gmap = array('nickname'=>'nickname', 'fullname'=>'fullname', 'profileurl'=>'profileurl', 'homepage'=>'homepage', 'description'=>'description', 'location'=>'location', 'created'=>'created', 'modified'=>'modified');
 foreach ($p2gmap as $pkey=>$gkey) {
 	$profile->$pkey = $group->$gkey;
 }

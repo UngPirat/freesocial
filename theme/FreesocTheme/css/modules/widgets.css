@@ -6,15 +6,15 @@
     display: none;
 }
 
-.widget > .list-item {
-	display: inline-block;
-	position: relative;
-}
 .widget.list {
 	position:relative;
 }
 .widget.mini-list .list-item {
 	padding: 0;
+}
+.profiles.mini-list > .vcard {
+	display: inline-block;
+	position: relative;
 }
 
 .profiles.list .list-item {
@@ -35,7 +35,10 @@
     padding: 0 1%;
 	text-align: right;
 }
-#content .vcard.mini .fn,
+.vcard.mini .webfinger {
+	float: right;
+}
+.vcard.mini .fn,
 .widget.list .url .description,
 .widget.list .notice > .vcard .fn {
 	display: none;

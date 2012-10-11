@@ -179,9 +179,9 @@ class ProfileListItem extends Widget
                 $this->showHomepage();
                 Event::handle('EndProfileListItemHomepage', array($this));
             }
-            if (Event::handle('StartProfileListItemBio', array($this))) {
-                $this->showBio();
-                Event::handle('EndProfileListItemBio', array($this));
+            if (Event::handle('StartProfileListItemDescription', array($this))) {
+                $this->showDescription();
+                Event::handle('EndProfileListItemDescription', array($this));
             }
             if (Event::handle('StartProfileListItemTags', array($this))) {
                 $this->showTags();
@@ -253,11 +253,11 @@ class ProfileListItem extends Widget
         }
     }
 
-    function showBio()
+    function showDescription()
     {
-        if (!empty($this->profile->bio)) {
+        if (!empty($this->profile->description)) {
             $this->out->elementStart('p', 'note');
-            $this->out->raw($this->highlight($this->profile->bio));
+            $this->out->raw($this->highlight($this->profile->description));
             $this->out->elementEnd('p');
         }
     }

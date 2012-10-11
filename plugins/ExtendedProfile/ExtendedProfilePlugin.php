@@ -22,7 +22,7 @@ if (!defined('STATUSNET')) {
 }
 
 /**
- * Extra profile bio-like fields
+ * Extra profile description fields
  *
  * @package ExtendedProfilePlugin
  * @maintainer Brion Vibber <brion@status.net>

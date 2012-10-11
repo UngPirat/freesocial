@@ -134,8 +134,8 @@ class TagprofileAction extends Action
                                $this->profile->homepage);
             }
 
-            if ($this->profile->bio) {
-                $this->element('div', 'note entity_note', $this->profile->bio);
+            if ($this->profile->description) {
+                $this->element('div', 'note entity_note', $this->profile->description);
             }
 
             $this->elementEnd('div');

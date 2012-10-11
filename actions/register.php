@@ -170,7 +170,7 @@ class RegisterAction extends Action
             $email    = $this->trimmed('email');
             $fullname = $this->trimmed('fullname');
             $homepage = $this->trimmed('homepage');
-            $bio      = $this->trimmed('bio');
+            $description      = $this->trimmed('description');
             $location = $this->trimmed('location');
 
             // We don't trim these... whitespace is OK in a password!
@@ -225,13 +225,13 @@ class RegisterAction extends Action
                 // TRANS: Form validation error displayed when trying to register with a too long full name.
                 $this->showForm(_('Full name is too long (maximum 255 characters).'));
                 return;
-            } else if (Profile::bioTooLong($bio)) {
-                // TRANS: Form validation error on registration page when providing too long a bio text.
-                // TRANS: %d is the maximum number of characters for bio; used for plural.
-                $this->showForm(sprintf(_m('Bio is too long (maximum %d character).',
-                                           'Bio is too long (maximum %d characters).',
-                                           Profile::maxBio()),
-                                        Profile::maxBio()));
+            } else if (Profile::descriptionTooLong($description)) {
+                // TRANS: Form validation error on registration page when providing too long a user description text.
+                // TRANS: %d is the maximum number of characters for user description; used for plural.
+                $this->showForm(sprintf(_m('Description is too long (maximum %d character).',
+                                           'Description is too long (maximum %d characters).',
+                                           Profile::maxDescription()),
+                                        Profile::maxDescription()));
                 return;
             } else if (!is_null($location) && mb_strlen($location) > 255) {
                 // TRANS: Form validation error displayed when trying to register with a too long location.
@@ -249,7 +249,7 @@ class RegisterAction extends Action
                                                     'email' => $email,
                                                     'fullname' => $fullname,
                                                     'homepage' => $homepage,
-                                                    'bio' => $bio,
+                                                    'description' => $description,
                                                     'location' => $location,
                                                     'code' => $code))) {
                 if (!$user) {
@@ -467,23 +467,23 @@ class RegisterAction extends Action
                            'or profile on another site.'));
             $this->elementEnd('li');
             $this->elementStart('li');
-            $maxBio = Profile::maxBio();
-            if ($maxBio > 0) {
+            $maxDescription = Profile::maxDescription();
+            if ($maxDescription > 0) {
                 // TRANS: Text area title in form for account registration. Plural
                 // TRANS: is decided by the number of characters available for the
-                // TRANS: biography (%d).
-                $bioInstr = sprintf(_m('Describe yourself and your interests in %d character.',
+                // TRANS: user description (%d).
+                $descrInstr = sprintf(_m('Describe yourself and your interests in %d character.',
                                        'Describe yourself and your interests in %d characters.',
-                                       $maxBio),
-                                    $maxBio);
+                                       $maxDescription),
+                                    $maxDescription);
             } else {
                 // TRANS: Text area title on account registration page.
-                $bioInstr = _('Describe yourself and your interests.');
+                $descrInstr = _('Describe yourself and your interests.');
             }
             // TRANS: Text area label on account registration page.
-            $this->textarea('bio', _('Bio'),
-                            $this->trimmed('bio'),
-                            $bioInstr);
+            $this->textarea('description', _('Description'),
+                            $this->trimmed('description'),
+                            $descrInstr);
             $this->elementEnd('li');
             $this->elementStart('li');
             // TRANS: Field label on account registration page.

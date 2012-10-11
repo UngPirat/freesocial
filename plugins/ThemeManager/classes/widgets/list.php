@@ -8,6 +8,7 @@ abstract class ListWidget extends ThemeWidget {
     protected $title      = null;
 	protected $titleClass = 'widget-title';
     protected $titleLink  = null;
+    protected $titleTag   = 'h3';
     protected $pagination = false;
     protected $hideEmpty  = false;
 
@@ -116,11 +117,11 @@ abstract class ListWidget extends ThemeWidget {
 
 	function the_title() {
         if (!empty($this->title)) {
-            $this->out->elementStart('h3', $this->titleClass);
+            $this->out->elementStart($this->titleTag, $this->titleClass);
 			$this->titleLink && $this->out->elementStart('a', array('href'=>$this->titleLink));
 			$this->out->text($this->title);
 			$this->titleLink && $this->out->elementEnd('a');
-			$this->out->elementEnd('h3');
+			$this->out->elementEnd($this->titleTag);
         }
 	}
 }

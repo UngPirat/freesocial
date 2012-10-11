@@ -2,17 +2,17 @@
 
 class ThemeMenu extends ListWidget {
     protected $list  = array();
-    protected $action = null;
+	protected $action = null;
     protected $offset = 0;
     protected $num    = -1;
 
     protected $menuClass   = 'sub-menu';
-    protected $itemClass   = 'menu-item';
+    protected $itemClass   = null;
     protected $itemTag     = 'li';
     protected $loopClass   = 'menu';
     protected $loopTag     = 'ul';
     protected $titleClass  = 'menu-title';
-    protected $widgetClass = 'horizontal-menu';
+    protected $widgetClass = null;
     protected $widgetTag   = 'nav';
 
     static function run(array $args=array()) {
@@ -38,7 +38,9 @@ class ThemeMenu extends ListWidget {
 				$class = $item['menu'];
 				$args = isset($item['args']) ? $item['args'] : array();
 				foreach(array('action', 'loopClass', 'widgetTag') as $key) {
-					$args[$key] = $this->$key;
+					if (!isset($args[$key])) {
+						$args[$key] = $this->$key;
+					}
 				}
                 $menu = new $class($args);
             } catch (Exception $e) {
@@ -60,20 +62,22 @@ class ThemeMenu extends ListWidget {
             $$arg = isset($item[$arg]) ? $item[$arg] : null;
         }
         
-        $currentItem = (!empty($current) || $url == $action->trimmed('action'))
-                        ? ' current-menu-item'
-                        : '';
+        $itemClass = (!empty($current) || $url == $action->trimmed('action'))
+                        ? "{$this->itemClass} current-menu-item"
+                        : $this->itemClass;
         $url = (null===parse_url($url, PHP_URL_SCHEME)
                     ? common_local_url($url, (array)$args)
                     : $url);
 
-        $out->elementStart('li', $this->itemClass.$currentItem);
+        $out->elementStart('li', $itemClass ? $itemClass : null);
         $out->element('a', array('href'=>$url, 'title'=>$description), $label);
         $out->elementEnd('li');
     }
     
     function the_content() {
-        $args = array('class'=>$this->widgetClass);
+        $args = !empty($this->widgetClass)
+				? array('class'=>$this->widgetClass)
+				: array();
         if (!empty($this->widgetId)) {
             $args['id'] = $this->widgetId;
         }
@@ -83,9 +87,9 @@ class ThemeMenu extends ListWidget {
 			$this->the_title();
             $this->the_loop();
             $this->the_more();
+        	$this->widgetTag && $this->out->elementEnd($this->widgetTag);
         } else {
             $this->the_empty();
         }
-        $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 }

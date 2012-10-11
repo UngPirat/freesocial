@@ -565,7 +565,7 @@ class ProfileDetailSettingsAction extends ProfileSettingsAction
         $fullname  = $this->trimmed('extprofile-fullname');
         $location  = $this->trimmed('extprofile-location');
         $tagstring = $this->trimmed('extprofile-tags');
-        $bio       = $this->trimmed('extprofile-bio');
+        $description = $this->trimmed('extprofile-description');
 
         if ($tagstring) {
             $tags = array_map(
@@ -592,13 +592,13 @@ class ProfileDetailSettingsAction extends ProfileSettingsAction
         if ($fullname    != $profile->fullname
             || $location != $profile->location
             || !empty($newTags)
-            || $bio      != $profile->bio) {
+            || $description != $profile->description) {
 
             $orig = clone($profile);
 
             $profile->nickname = $user->nickname;
             $profile->fullname = $fullname;
-            $profile->bio      = $bio;
+            $profile->description = $description;
             $profile->location = $location;
 
             $loc = Location::fromName($location);

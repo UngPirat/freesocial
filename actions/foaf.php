@@ -111,8 +111,8 @@ class FoafAction extends Action
         if ($this->profile->profileurl) {
             $this->element('weblog', array('rdf:resource' => $this->profile->profileurl));
         }
-        if ($this->profile->bio) {
-            $this->element('bio:olb', null, $this->profile->bio);
+        if ($this->profile->description) {
+            $this->element('bio:olb', null, $this->profile->description);
         }
 
         $location = $this->profile->getLocation();

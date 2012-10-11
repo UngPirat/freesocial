@@ -90,7 +90,7 @@ class DiscoveryHints {
         }
 
         if (array_key_exists('note', $hcard)) {
-            $hints['bio'] = $hcard['note'];
+            $hints['description'] = $hcard['note'];
         }
 
         if (array_key_exists('adr', $hcard)) {

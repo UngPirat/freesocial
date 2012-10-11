@@ -264,7 +264,7 @@ class TwitterImport
             $profile->nickname = $user->screen_name;
             $profile->fullname = $user->name;
             $profile->homepage = $user->url;
-            $profile->bio = $user->description;
+            $profile->description = $user->description;
             $profile->location = $user->location;
             $profile->profileurl = strtolower($profileurl);
             $profile->created = common_sql_now();
@@ -288,7 +288,7 @@ class TwitterImport
 
     static function checkProfile($user, Profile $profile) {
         $original = clone($profile);
-        $checks = array('screen_name'=>'nickname', 'name'=>'fullname', 'url'=>'homepage', 'description'=>'bio', 'location'=>'location');
+        $checks = array('screen_name'=>'nickname', 'name'=>'fullname', 'url'=>'homepage', 'description'=>'description', 'location'=>'location');
         foreach ( $checks as $tw=>$sn ) {
             if ( $user->{$tw} != $profile->{$sn} ) {
                 $profile->{$sn} = $user->{$tw};

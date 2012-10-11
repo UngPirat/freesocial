@@ -80,7 +80,7 @@ class SubscriptionListItem extends ProfileListItem
         $this->showFullName();
         $this->showLocation();
         $this->showHomepage();
-        $this->showBio();
+        $this->showDescription();
         // Relevant portion!
         $this->showTags();
         $this->endProfile();

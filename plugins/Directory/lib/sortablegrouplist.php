@@ -223,6 +223,16 @@ class SortableGroupListItem extends SortableSubscriptionListItem
         }
     }
 
+    function showActions()
+    {
+        $this->startActions();
+        if (Event::handle('StartGroupListItemActionElements', array($this))) {
+            $this->showJoinButton();
+            Event::handle('EndGroupListItemActionElements', array($this));
+        }
+        $this->endActions();
+    }
+
     function showProfile()
     {
         $this->startProfile();
@@ -234,16 +244,6 @@ class SortableGroupListItem extends SortableSubscriptionListItem
         // Relevant portion!
         $this->showTags();
         $this->endProfile();
-    }
-
-    function showActions()
-    {
-        $this->startActions();
-        if (Event::handle('StartGroupListItemActionElements', array($this))) {
-            $this->showJoinButton();
-            Event::handle('EndGroupListItemActionElements', array($this));
-        }
-        $this->endActions();
     }
 
     function showJoinButton()

@@ -1997,7 +1997,7 @@ function common_user_property($property)
     case 'nickname':
     case 'fullname':
     case 'location':
-    case 'bio':
+    case 'description':
         return $profile->$property;
         break;
     case 'avatar':

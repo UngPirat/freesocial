@@ -54,7 +54,7 @@ class ApiStatusnetConfigAction extends ApiAction
                         'inviteonly', 'private', 'textlimit', 'ssl', 'sslserver', 'shorturllength'),
         'license' => array('type', 'owner', 'url', 'title', 'image'),
         'nickname' => array('featured'),
-        'profile' => array('biolimit'),
+        'profile' => array('descriptionlimit'),
         'group' => array('desclimit'),
         'notice' => array('contentlimit'),
         'throttle' => array('enabled', 'count', 'timespan'),

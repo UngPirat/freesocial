@@ -89,7 +89,7 @@ class UseradminpanelAction extends AdminPanelAction
     function saveSettings()
     {
         static $settings = array(
-                'profile' => array('biolimit'),
+                'profile' => array('descriptionlimit'),
                 'newuser' => array('welcome', 'default')
         );
 
@@ -140,11 +140,11 @@ class UseradminpanelAction extends AdminPanelAction
 
     function validate(&$values)
     {
-        // Validate biolimit
+        // Validate descriptionlimit
 
-        if (!Validate::number($values['profile']['biolimit'])) {
+        if (!Validate::number($values['profile']['descriptionlimit'])) {
             // TRANS: Form validation error in user admin panel when a non-numeric character limit was set.
-            $this->clientError(_('Invalid bio limit. Must be numeric.'));
+            $this->clientError(_('Invalid description limit. Must be numeric.'));
         }
 
         // Validate welcome text
@@ -218,10 +218,10 @@ class UserAdminPanelForm extends AdminForm
         $this->out->elementStart('ul', 'form_data');
 
         $this->li();
-        // TRANS: Field label in user admin panel for setting the character limit for the bio field.
-        $this->input('biolimit', _('Bio Limit'),
-                     // TRANS: Tooltip in user admin panel for setting the character limit for the bio field.
-                     _('Maximum length of a profile bio in characters.'),
+        // TRANS: Field label in user admin panel for setting the character limit for the user description field.
+        $this->input('descriptionlimit', _('Description Limit'),
+                     // TRANS: Tooltip in user admin panel for setting the character limit for the user description field.
+                     _('Maximum length of a profile description in characters.'),
                      'profile');
         $this->unli();
 

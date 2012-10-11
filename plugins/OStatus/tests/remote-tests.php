@@ -211,7 +211,7 @@ class SNTestClient extends TestBase
 
         $this->fullname = ucfirst($username) . ' Smith';
         $this->homepage = 'http://example.org/' . $username;
-        $this->bio = 'Stub account for OStatus tests.';
+        $this->description = 'Stub account for OStatus tests.';
         $this->location = 'Montreal, QC';
     }
 
@@ -377,7 +377,7 @@ class SNTestClient extends TestBase
                   'confirm' => $this->password,
                   'fullname' => $this->fullname,
                   'homepage' => $this->homepage,
-                  'bio' => $this->bio,
+                  'description' => $this->description,
                   'license' => 1,
                   'submit' => 'Register'));
     }
@@ -413,7 +413,7 @@ class SNTestClient extends TestBase
         $this->assertEqual($this->username, $data['screen_name']);
         $this->assertEqual($this->fullname, $data['name']);
         $this->assertEqual($this->homepage, $data['url']);
-        $this->assertEqual($this->bio, $data['description']);
+        $this->assertEqual($this->description, $data['description']);
         $this->log("  looks good!");
     }
 

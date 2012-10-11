@@ -174,7 +174,7 @@ class UTF8FixerUpper
         $sth = $this->dbu->prepare("UPDATE profile SET ".
                                    "fullname = UNHEX(?),".
                                    "location = UNHEX(?), ".
-                                   "bio = UNHEX(?) ".
+                                   "description = UNHEX(?) ".
                                    "WHERE id = ?");
 
         if (PEAR::isError($sth)) {
@@ -182,10 +182,10 @@ class UTF8FixerUpper
             return;
         }
 
-        $sql = 'SELECT id, fullname, location, bio FROM profile ' .
+        $sql = 'SELECT id, fullname, location, description FROM profile ' .
           'WHERE (LENGTH(fullname) != CHAR_LENGTH(fullname) '.
           'OR LENGTH(location) != CHAR_LENGTH(location) '.
-          'OR LENGTH(bio) != CHAR_LENGTH(bio)) '.
+          'OR LENGTH(description) != CHAR_LENGTH(description)) '.
           'AND modified < "'.$this->max_date.'" '.
           ' ORDER BY modified DESC';
 
@@ -205,11 +205,11 @@ class UTF8FixerUpper
             $id = ($profile[0])+0;
             $fullname = bin2hex($profile[1]);
             $location = bin2hex($profile[2]);
-            $bio = bin2hex($profile[3]);
+            $description = bin2hex($profile[3]);
 
             echo "$id...";
 
-            $result = $this->dbu->execute($sth, array($fullname, $location, $bio, $id));
+            $result = $this->dbu->execute($sth, array($fullname, $location, $description, $id));
 
             if (PEAR::isError($result)) {
                 echo "ERROR: " . $result->getMessage() . "\n";

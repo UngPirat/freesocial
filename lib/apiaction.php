@@ -208,7 +208,7 @@ class ApiAction extends Action
         $twitter_user['name'] = $profile->getBestName();
         $twitter_user['screen_name'] = $profile->nickname;
         $twitter_user['location'] = ($profile->location) ? $profile->location : null;
-        $twitter_user['description'] = ($profile->bio) ? $profile->bio : null;
+        $twitter_user['description'] = ($profile->description) ? $profile->description : null;
 
 		$avatarUrl = null;
         Event::handle('GetAvatarUrl', array(&$avatarUrl, $profile, Avatar::STREAM_SIZE));

@@ -535,9 +535,9 @@ class WhoisCommand extends Command
             // TRANS: Whois output. %s is the homepage of the queried user.
             $whois .= "\n" . sprintf(_('Homepage: %s'), $recipient->homepage);
         }
-        if ($recipient->bio) {
-            // TRANS: Whois output. %s is the bio information of the queried user.
-            $whois .= "\n" . sprintf(_('About: %s'), $recipient->bio);
+        if ($recipient->description) {
+            // TRANS: Whois output. %s is the user description of the queried user.
+            $whois .= "\n" . sprintf(_('About: %s'), $recipient->description);
         }
         $channel->output($this->user, $whois);
     }
