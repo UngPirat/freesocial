@@ -57,7 +57,7 @@ class AuthCryptPlugin extends AuthenticationPlugin
         $user = User::staticGet('nickname', common_canonical_nickname($username));
 
         // crypt cuts the second parameter to its appropriate length based on hash scheme
-        if (!empty($user) && $user->password === crypt($password, $user->password)) {
+        if (!empty($user) && ($user->password === crypt($password, $user->password))) {
             return $user;
         }
         // if we're hostile, check the password against old-style hashing
@@ -107,10 +107,12 @@ class AuthCryptPlugin extends AuthenticationPlugin
     }
 
     function onStartChangePassword($user, $oldpassword, $newpassword) {
-		if (!$this->checkPassword($user->nickname, $oldpassword)) {
-            // if we ARE in overwrite mode, test password with common_check_user
+		// if empty $oldpassword we don't have to check it, as user is already authenticated
+		if (!empty($oldpassword) && !$this->checkPassword($user->nickname, $oldpassword)) {
+            // if we aren't in overwrite mode OR if password fails common_check_user
             if (!$this->overwrite || !common_check_user($user->nickname, $oldpassword)) {
-                // either we're not in overwrite mode, or the password was incorrect
+                // if we're authoritative, we can say false (password failed).
+				// if we're NOT authoritative, we should let other handlers take their shot
                 return !$this->authoritative;
             }
             // oldpassword was apparently ok
