@@ -45,9 +45,9 @@ if (!defined('STATUSNET')) {
  */
 class AuthCryptPlugin extends AuthenticationPlugin
 {
-    public $hash;	// defaults to SHA512, i.e. '$6$', in onInitializePlugin()
-    public $hostile;	// if true, password login means change password to crypt() hash
-    public $overwrite;	// if true, password change means always store crypt() hash
+    public $hash;    // defaults to SHA512, i.e. '$6$', in onInitializePlugin()
+    public $hostile;    // if true, password login means change password to crypt() hash
+    public $overwrite;    // if true, password change means always store crypt() hash
 
     /*
      * FUNCTIONALITY
@@ -93,38 +93,38 @@ class AuthCryptPlugin extends AuthenticationPlugin
      */
 
     function onInitializePlugin() {
-        $this->provider_name = 'crypt';	// we don't actually use the provider_name
+        $this->provider_name = 'crypt';    // we don't actually use the provider_name
 
         if (!isset($this->hash)) {
-            $this->hash = '$6$';	// SHA512 supported on all systems since PHP 5.3.2
+            $this->hash = '$6$';    // SHA512 supported on all systems since PHP 5.3.2
         }
         if (!isset($this->hostile)) {
-            $this->hostile = false;	// overwrite old style password hashes?
+            $this->hostile = false;    // overwrite old style password hashes?
         }
         if (!isset($this->overwrite)) {
-            $this->overwrite = true;	// overwrite old style password hashes?
+            $this->overwrite = true;    // overwrite old style password hashes?
         }
     }
 
     function onStartChangePassword($user, $oldpassword, $newpassword) {
-		// if empty $oldpassword we don't have to check it, as user is already authenticated
-		if (!empty($oldpassword) && !$this->checkPassword($user->nickname, $oldpassword)) {
+        // if empty $oldpassword we don't have to check it, as user is already authenticated
+        if (!empty($oldpassword) && !$this->checkPassword($user->nickname, $oldpassword)) {
             // if we aren't in overwrite mode OR if password fails common_check_user
             if (!$this->overwrite || !common_check_user($user->nickname, $oldpassword)) {
                 // if we're authoritative, we can say false (password failed).
-				// if we're NOT authoritative, we should let other handlers take their shot
+                // if we're NOT authoritative, we should let other handlers take their shot
                 return !$this->authoritative;
             }
             // oldpassword was apparently ok
         }
         $changed = $this->changePassword($user->nickname, $oldpassword, $newpassword);
 
-		return (!$changed && empty($this->authoritative));
+        return (!$changed && empty($this->authoritative));
     }
 
     function onStartCheckPassword($nickname, $password, &$authenticatedUser) {
         $authenticatedUser = $this->checkPassword($nickname, $password);
-		return (empty($authenticatedUser) && empty($this->authoritative));
+        return (empty($authenticatedUser) && empty($this->authoritative));
     }
 
     function onCheckSchema() {
