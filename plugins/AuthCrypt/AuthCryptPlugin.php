@@ -57,7 +57,7 @@ class AuthCryptPlugin extends AuthenticationPlugin
         $user = User::staticGet('nickname', common_canonical_nickname($username));
 
         // crypt cuts the second parameter to its appropriate length based on hash scheme
-        if (!empty($user) && ($user->password === crypt($password, $user->password))) {
+        if (!empty($user) && $user->password === crypt($password, $user->password)) {
             return $user;
         }
         // if we're hostile, check the password against old-style hashing
