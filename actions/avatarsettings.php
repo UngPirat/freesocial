@@ -123,7 +123,7 @@ class AvatarsettingsAction extends SettingsAction
         if (Event::handle('StartAvatarFormData', array($this))) {
             $this->elementStart('ul', 'form_data');
             try {
-                $original = Avatar::getOriginal($profile->id);
+                $original = Avatar::getUploaded($profile->id);
 
                 $this->elementStart('li', array('id' => 'avatar_original',
                                                 'class' => 'avatar_view'));

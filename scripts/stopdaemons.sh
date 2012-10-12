@@ -22,6 +22,7 @@
 
 SDIR=`dirname $0`
 DIR=`php $SDIR/getpiddir.php`
+COUNT=10
 
 for f in pinghandler queuedaemon \
 	 twitterhandler facebookhandler facebookstatusfetcher imdaemon \
@@ -38,7 +39,7 @@ for f in pinghandler queuedaemon \
 				while kill -0 $PID 2>/dev/null ;  do
 					sleep 1
 					count=$(($count + 1))
-					if [ $count -gt 5 ]; then break; fi
+					if [ $count -gt $COUNT ]; then break; fi
 				done
 				if kill -9 $PID 2>/dev/null ; then
 					echo "FORCIBLY TERMINATED"

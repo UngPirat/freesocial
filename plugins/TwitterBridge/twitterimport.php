@@ -304,7 +304,7 @@ class TwitterImport
         $newname = "Twitter_{$user->id}-original-" . $img_root . $ext;
 
         try {
-            $avatar = Avatar::getOriginal($profile_id);
+            $avatar = Avatar::getUploaded($profile_id);
             $oldname = $avatar->filename;
             unset($avatar);
         } catch (Exception $e) {
@@ -341,7 +341,7 @@ class TwitterImport
 
     static function missingAvatarFile($profile_id) {
         try {
-            $avatar = Avatar::getOriginal($profile_id);
+            $avatar = Avatar::getUploaded($profile_id);
         } catch (Exception $e) {
             return false;
         }

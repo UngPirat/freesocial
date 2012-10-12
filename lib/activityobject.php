@@ -457,7 +457,7 @@ class ActivityObject
 
             if (class_exists('Avatar')) {    //TODO: do this as an Event
                 try {
-                    $orig = Avatar::getOriginal($profile->id);
+                    $orig = Avatar::getUploaded($profile->id);
                     $object->avatarLinks[] = AvatarLink::fromAvatar($orig);
                 } catch (Exception $e) {
                     //common_debug($e->getMessage());

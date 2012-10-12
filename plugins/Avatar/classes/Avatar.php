@@ -73,7 +73,7 @@ class Avatar extends Managed_DataObject
         return Memcached_DataObject::pkeyGet('Avatar', $kv);
     }
 
-    static function getOriginal($profile_id)
+    static function getUploaded($profile_id)
     {
         $avatar = new Avatar();
         $avatar->profile_id = $profile_id;
@@ -240,7 +240,7 @@ class Avatar extends Managed_DataObject
             throw new Exception('Bad avatar size: '.$size);
         }
 
-        $original = Avatar::getOriginal($profile_id);
+        $original = Avatar::getUploaded($profile_id);
 
         $imagefile = new ImageFile($profile_id, Avatar::path($original->filename));
         $filename = $imagefile->resize($safesize);

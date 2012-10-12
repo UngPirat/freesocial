@@ -625,7 +625,7 @@ class FacebookImport
         $filename = "Facebook_{$foreign_id}-original-{$img_root}{$ext}";
 
         try {
-            $avatar = Avatar::getOriginal($profile_id);
+            $avatar = Avatar::getUploaded($profile_id);
             $oldname = $avatar->filename;
         } catch (Exception $e) {
             $oldname = null;

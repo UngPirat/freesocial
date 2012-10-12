@@ -172,7 +172,6 @@ class PasswordsettingsAction extends SettingsAction
         if ($user->password) {
             $oldpassword = $this->arg('oldpassword');
 
-common_debug('Auth checking old pass');
             if (!common_check_user($user->nickname, $oldpassword)) {
                 // TRANS: Form validation error on page where to change password.
                 $this->showForm(_('Incorrect old password.'));
