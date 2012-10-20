@@ -226,7 +226,7 @@ class ThemeManagerAdapter {
     function trimmed($action) {
         return $this->action->trimmed($action);
     }
-    function menuItem($url, $label, $description, $current) {
+    function menuItem($url, $label, $description, $current=false) {
         $item = array();
         foreach(array('url', 'label', 'description', 'current') as $arg) {
             $item[$arg]  = $$arg;

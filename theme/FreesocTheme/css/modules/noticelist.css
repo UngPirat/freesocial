@@ -1,9 +1,10 @@
 .conversations .conversation {
 	font-size: 0.8em;
-	float: left;
+	display: inline-block;
 	width: 46%;
 	margin: 0 1% 1em;
-	padding: 0 1ex;
+	padding: 0;
+	position: relative;
 	border-radius: 1em;
 	border-right: 1px solid gray;
 }
@@ -22,7 +23,6 @@
 	background: -o-linear-gradient(#ffffff, #f0f0f0);
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#252525), to(#0a0a0a)); /* older webkit syntax */
 	background: -webkit-linear-gradient(#252525, #0a0a0a);
-	-webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
 	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
 }
 .conversation .notice {
@@ -38,7 +38,9 @@
 }
 
 .conversation .notice:first-child {
+	background: transparent;
 	border: none;
+	box-shadow: none;
 	font-size: 1em;
 	margin-left: 0;
 	margin-top: 1ex;

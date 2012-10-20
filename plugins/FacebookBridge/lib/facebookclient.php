@@ -414,20 +414,17 @@ class Facebookclient
             return true;
             break;
          default:
-            $msg = 'Facebook returned an error we don\'t know how to deal with '
-                 . 'when posting notice %d. Error code: %d, error message: "%s"'
-                 . ' Notice details: [nickname=%s, user id=%d, fbuid=%d, '
-                 . 'notice content="%s"]. Dequeing.';
+            $msg = 'Facebook returned an error we don\'t know how to deal with. '
+                 . 'Error code: %d, error message: "%s"'
+                 . ' Notice details: [nickname=%s, user id=%d, fbuid=%d. Dequeueing.';
             common_log(
                 LOG_ERR, sprintf(
                     $msg,
-                    $this->notice->id,
                     $code,
                     $errmsg,
                     $this->user->nickname,
                     $this->user->id,
-                    $fbuid,
-                    $this->notice->content
+                    $fbuid
                 ),
                 __FILE__
             );

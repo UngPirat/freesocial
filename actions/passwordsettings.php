@@ -177,11 +177,10 @@ class PasswordsettingsAction extends SettingsAction
                 $this->showForm(_('Incorrect old password.'));
                 return;
             }
-        }else{
+        } else {
             $oldpassword = null;
         }
 
-        $success = false;
         if(Event::handle('StartChangePassword', array($user, $oldpassword, $newpassword))){
             //no handler changed the password, so change the password internally
             $original = clone($user);
