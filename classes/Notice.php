@@ -137,11 +137,11 @@ class Notice extends Managed_DataObject
         return $def;
     }
     
-	function multiGet($kc, $kvs, $skipNulls=true)
-	{
-		return Memcached_DataObject::multiGet('Notice', $kc, $kvs, $skipNulls);
-	}
-	
+    function multiGet($kc, $kvs, $skipNulls=true)
+    {
+        return Memcached_DataObject::multiGet('Notice', $kc, $kvs, $skipNulls);
+    }
+    
     /* Notice types */
     const LOCAL_PUBLIC    =  1;
     const REMOTE          =  0;
@@ -514,14 +514,14 @@ class Notice extends Managed_DataObject
         } else {
             $notice->verb = $verb;
         }
-		$notice->verb = ActivityUtils::resolveUri($notice->verb, true);	// store a maybe shorter version
+        $notice->verb = ActivityUtils::resolveUri($notice->verb, true);    // store a maybe shorter version
 
         if (empty($object_type)) {
             $notice->object_type = (empty($notice->reply_to)) ? ActivityObject::NOTE : ActivityObject::COMMENT;
         } else {
             $notice->object_type = $object_type;
         }
-		$notice->object_type = ActivityUtils::resolveUri($notice->object_type, true);	// store a maybe shorter version
+        $notice->object_type = ActivityUtils::resolveUri($notice->object_type, true);    // store a maybe shorter version
 
         if (is_null($scope)) { // 0 is a valid value
             if (!empty($reply)) {
@@ -585,16 +585,16 @@ class Notice extends Managed_DataObject
 
             if (empty($notice->conversation)) {
                 $conv = Conversation::create($id);
-                $notice->conversation = $id;	// this should be the same as notice id here
+                $notice->conversation = $id;    // this should be the same as notice id here
                 $changed = true;
             } else {
-				$conv = Conversation::append($notice->conversation, $notice->id);
-			}
-			if (empty($conv)) {
-				common_debug(LOG_ERR, 'Conversation could not be created for notice id: '.$id);
-				$notice->delete();
-				throw new Exception('Conversation could not be created');
-			}
+                $conv = Conversation::append($notice->conversation, $notice->id);
+            }
+            if (empty($conv)) {
+                common_debug(LOG_ERR, 'Conversation could not be created for notice id: '.$id);
+                $notice->delete();
+                throw new Exception('Conversation could not be created');
+            }
 
             if ($changed) {
                 if (!$notice->update($orig)) {
@@ -830,33 +830,33 @@ class Notice extends Managed_DataObject
         return true;
     }
 
-	protected $_attachments = -1;
-	
+    protected $_attachments = -1;
+    
     function attachments() {
 
-		if ($this->_attachments != -1)  {
+        if ($this->_attachments != -1)  {
             return $this->_attachments;
         }
-		
-		$f2ps = Memcached_DataObject::listGet('File_to_post', 'post_id', array($this->id));
-		
-		$ids = array();
-		
-		foreach ($f2ps[$this->id] as $f2p) {
+        
+        $f2ps = Memcached_DataObject::listGet('File_to_post', 'post_id', array($this->id));
+        
+        $ids = array();
+        
+        foreach ($f2ps[$this->id] as $f2p) {
             $ids[] = $f2p->file_id;    
         }
-		
-		$files = Memcached_DataObject::multiGet('File', 'id', $ids);
+        
+        $files = Memcached_DataObject::multiGet('File', 'id', $ids);
 
-		$this->_attachments = $files->fetchAll();
-		
+        $this->_attachments = $files->fetchAll();
+        
         return $this->_attachments;
     }
 
-	function _setAttachments($attachments)
-	{
-	    $this->_attachments = $attachments;
-	}
+    function _setAttachments($attachments)
+    {
+        $this->_attachments = $attachments;
+    }
 
     function publicStream($offset=0, $limit=20, $since_id=0, $max_id=0)
     {
@@ -894,25 +894,25 @@ class Notice extends Managed_DataObject
         return false;
     }
 
-	/**
-	 * Count notices in conversation
-	 */
-	 static function conversationLength($id)
-	 {
-		 $keypart = sprintf('conversation:length:%d', $id);
-		 $cnt = self::cacheGet($keypart);
+    /**
+     * Count notices in conversation
+     */
+     static function conversationLength($id)
+     {
+         $keypart = sprintf('conversation:length:%d', $id);
+         $cnt = self::cacheGet($keypart);
 
-		 if ($cnt !== false) {
-			 return $cnt;
-		 }
+         if ($cnt !== false) {
+             return $cnt;
+         }
 
-		 $notice = new Notice();
-		 $notice->conversation = $id;
-		 $cnt = $notice->count();
+         $notice = new Notice();
+         $notice->conversation = $id;
+         $cnt = $notice->count();
 
-		 self::cacheSet($keypart, $cnt);
-		 return $cnt;
-	 }
+         self::cacheSet($keypart, $cnt);
+         return $cnt;
+     }
 
     /**
      * Grab the earliest notice from this conversation.
@@ -961,16 +961,15 @@ class Notice extends Managed_DataObject
         } else {
             $last = $this;
 
-            do {
-                $parent = $last->getOriginal();
-                if (!empty($parent) && $parent->inScope($profile)) {
-                    $last = $parent;
-                    continue;
-                } else {
-                    $root = $last;
-                    break;
+            try {
+                while ($parent = $last->getParent()) {
+                    if ($parent->inScope($profile)) {
+	                    $last = $parent;
+					}
                 }
-            } while (!empty($parent));
+            } catch (Exception $e) {
+            }
+            $root = $last;
 
             self::cacheSet($keypart, $root);
         }
@@ -1335,16 +1334,19 @@ class Notice extends Managed_DataObject
 
         // If it's a reply, save for the replied-to author
 
-        if (!empty($this->reply_to)) {
-            $original = $this->getOriginal();
-            if (!empty($original)) { // that'd be weird
-                $author = $original->getProfile();
-                if (!empty($author)) {
+        try {
+            $parent = $this->getParent();
+            do {
+                if ($this->profile_id != $parent->profile_id) {
+                    $author = $parent->getProfile();
                     $this->saveMention($author->id);
                     $mentioned[$author->id] = 1;
                     self::blow('mention:stream:%d', $author->id);
+                    break;
                 }
-            }
+            } while ($parent = $parent->getParent());
+        } catch (Exception $e) {
+            // clear out the bad reply_to or profile_id?
         }
 
         // @todo ideally this parser information would only
@@ -1378,9 +1380,7 @@ class Notice extends Managed_DataObject
             }
         }
 
-        $recipientIds = array_keys($mentioned);
-
-        return $recipientIds;
+        return array_keys($mentioned);
     }
 
     function saveMention($profileId)
@@ -1491,16 +1491,16 @@ class Notice extends Managed_DataObject
 
         $ids = array();
 
-		foreach ($gis[$this->id] as $gi)
-		{
-		    $ids[] = $gi->group_id;
-		}
-		
-		$groups = User_group::multiGet('id', $ids);
-		
-		$this->_groups = $groups->fetchAll();
-		
-		return $this->_groups;
+        foreach ($gis[$this->id] as $gi)
+        {
+            $ids[] = $gi->group_id;
+        }
+        
+        $groups = User_group::multiGet('id', $ids);
+        
+        $this->_groups = $groups->fetchAll();
+        
+        return $this->_groups;
     }
     
     function _setGroups($groups)
@@ -1925,11 +1925,11 @@ class Notice extends Managed_DataObject
         } else {
             $idstr = $cache->get(Cache::key('notice:repeats:'.$this->id));
             if ($idstr !== false) {
-            	if (empty($idstr)) {
-            		$ids = array();
-            	} else {
-                	$ids = explode(',', $idstr);
-            	}
+                if (empty($idstr)) {
+                    $ids = array();
+                } else {
+                    $ids = explode(',', $idstr);
+                }
             } else {
                 $ids = $this->_repeatStreamDirect(100);
                 $cache->set(Cache::key('notice:repeats:'.$this->id), implode(',', $ids));
@@ -2129,8 +2129,8 @@ class Notice extends Managed_DataObject
             // If there's a failure, we want to _force_
             // distribution at this point.
             try {
-				// pack it up for later queue handling
-				$json = json_encode(array('id'=>$this->id));
+                // pack it up for later queue handling
+                $json = json_encode(array('id'=>$this->id));
                 $qm = QueueManager::get();
                 $qm->enqueue($json, 'distrib');
             } catch (Exception $e) {
@@ -2451,7 +2451,7 @@ class Notice extends Managed_DataObject
 
                 $mention = Mention::pkeyGet(array('notice_id' => $this->id,
                                              'profile_id' => $profile->id));
-										 
+                                         
                 if (empty($mention)) {
                     return false;
                 }
@@ -2547,18 +2547,21 @@ class Notice extends Managed_DataObject
         return $groups;
     }
 
-    protected $_original = -1;
+    protected $_parent = -1;
 
-    function getOriginal()
+    function getParent()
     {
-        if (is_int($this->_original) && $this->_original == -1) {
+        if (is_int($this->_parent) && $this->_parent == -1) {
             if (empty($this->reply_to)) {
-                $this->_original = null;
+                $this->_parent = null;
             } else {
-                $this->_original = Notice::staticGet('id', $this->reply_to);
+                $this->_parent = Notice::staticGet('id', $this->reply_to);
             }
         }
-        return $this->_original;
+        if (empty($this->_parent)) {
+            throw new Exception('No parent notice found');
+        }
+        return $this->_parent;
     }
 
     /**
@@ -2574,86 +2577,86 @@ class Notice extends Managed_DataObject
     function __sleep()
     {
         $vars = parent::__sleep();
-        $skip = array('_original', '_profile', '_groups', '_attachments', '_faves', '_mentions', '_repeats');
+        $skip = array('_parent', '_profile', '_groups', '_attachments', '_faves', '_mentions', '_repeats');
         return array_diff($vars, $skip);
     }
     
     static function defaultScope()
     {
-    	$scope = common_config('notice', 'defaultscope');
-    	if (is_null($scope)) {
-    		if (common_config('site', 'private')) {
-    			$scope = 1;
-    		} else {
-    			$scope = 0;
-    		}
-    	}
-    	return $scope;
+        $scope = common_config('notice', 'defaultscope');
+        if (is_null($scope)) {
+            if (common_config('site', 'private')) {
+                $scope = 1;
+            } else {
+                $scope = 0;
+            }
+        }
+        return $scope;
     }
 
-	static function fillProfiles($notices)
-	{
-		$map = self::getProfiles($notices);
-		
-		foreach ($notices as $notice) {
-			if (array_key_exists($notice->profile_id, $map)) {
-				$notice->_setProfile($map[$notice->profile_id]);    
-			}
-		}
-		
-		return array_values($map);
-	}
-	
-	static function getProfiles(&$notices)
-	{
-		$ids = array();
-		foreach ($notices as $notice) {
-			$ids[] = $notice->profile_id;
-		}
-		
-		$ids = array_unique($ids);
-		
-		return Memcached_DataObject::pivotGet('Profile', 'id', $ids); 
-	}
-	
-	static function fillGroups(&$notices)
-	{
+    static function fillProfiles($notices)
+    {
+        $map = self::getProfiles($notices);
+        
+        foreach ($notices as $notice) {
+            if (array_key_exists($notice->profile_id, $map)) {
+                $notice->_setProfile($map[$notice->profile_id]);    
+            }
+        }
+        
+        return array_values($map);
+    }
+    
+    static function getProfiles(&$notices)
+    {
+        $ids = array();
+        foreach ($notices as $notice) {
+            $ids[] = $notice->profile_id;
+        }
+        
+        $ids = array_unique($ids);
+        
+        return Memcached_DataObject::pivotGet('Profile', 'id', $ids); 
+    }
+    
+    static function fillGroups(&$notices)
+    {
         $ids = self::_idsOf($notices);
-		
-		$gis = Memcached_DataObject::listGet('Group_inbox', 'notice_id', $ids);
-		
+        
+        $gis = Memcached_DataObject::listGet('Group_inbox', 'notice_id', $ids);
+        
         $gids = array();
 
-		foreach ($gis as $id => $gi)
-		{
-		    foreach ($gi as $g)
-		    {
-		        $gids[] = $g->group_id;
-		    }
-		}
-		
-		$gids = array_unique($gids);
-		
-		$group = Memcached_DataObject::pivotGet('User_group', 'id', $gids);
-		
-		foreach ($notices as $notice)
-		{
-			$grps = array();
-			$gi = $gis[$notice->id];
-			foreach ($gi as $g) {
-			    $grps[] = $group[$g->group_id];
-			}
-		    $notice->_setGroups($grps);
-		}
-	}
+        foreach ($gis as $id => $gi)
+        {
+            foreach ($gi as $g)
+            {
+                $gids[] = $g->group_id;
+            }
+        }
+        
+        $gids = array_unique($gids);
+        
+        $group = Memcached_DataObject::pivotGet('User_group', 'id', $gids);
+        
+        foreach ($notices as $notice)
+        {
+            $grps = array();
+            $gi = $gis[$notice->id];
+            foreach ($gi as $g) {
+                $grps[] = $group[$g->group_id];
+            }
+            $notice->_setGroups($grps);
+        }
+    }
 
     static function _idsOf(&$notices)
     {
-		$ids = array();
-		foreach ($notices as $notice) {
-			$ids[] = $notice->id;
-		}
-		$ids = array_unique($ids);
+        $ids = array();
+        foreach ($notices as $notice) {
+            $ids[] = $notice->id;
+        }
+        $ids = array_unique($ids);
         return $ids;
     }
 
@@ -2661,11 +2664,11 @@ class Notice extends Managed_DataObject
     {
         $ids = self::_idsOf($notices);
 
-		$f2pMap = Memcached_DataObject::listGet('File_to_post', 'post_id', $ids);
-		
-		$fileIds = array();
-		
-		foreach ($f2pMap as $noticeId => $f2ps) {
+        $f2pMap = Memcached_DataObject::listGet('File_to_post', 'post_id', $ids);
+        
+        $fileIds = array();
+        
+        foreach ($f2pMap as $noticeId => $f2ps) {
             foreach ($f2ps as $f2p) {
                 $fileIds[] = $f2p->file_id;    
             }
@@ -2673,17 +2676,17 @@ class Notice extends Managed_DataObject
 
         $fileIds = array_unique($fileIds);
 
-		$fileMap = Memcached_DataObject::pivotGet('File', 'id', $fileIds);
+        $fileMap = Memcached_DataObject::pivotGet('File', 'id', $fileIds);
 
-		foreach ($notices as $notice)
-		{
-			$files = array();
-			$f2ps = $f2pMap[$notice->id];
-			foreach ($f2ps as $f2p) {
-			    $files[] = $fileMap[$f2p->file_id];
-			}
-		    $notice->_setAttachments($files);
-		}
+        foreach ($notices as $notice)
+        {
+            $files = array();
+            $f2ps = $f2pMap[$notice->id];
+            foreach ($f2ps as $f2p) {
+                $files[] = $fileMap[$f2p->file_id];
+            }
+            $notice->_setAttachments($files);
+        }
     }
 
     protected $_faves;
@@ -2722,7 +2725,7 @@ class Notice extends Managed_DataObject
             }
         }
         foreach ($notices as $notice) {
-        	$faves = $faveMap[$notice->id];
+            $faves = $faveMap[$notice->id];
             $notice->_setFaves($faves);
         }
     }
@@ -2763,7 +2766,7 @@ class Notice extends Managed_DataObject
         $ids = self::_idsOf($notices);
         $repeatMap = Memcached_DataObject::listGet('Notice', 'repeat_of', $ids);
         foreach ($notices as $notice) {
-        	$repeats = $repeatMap[$notice->id];
+            $repeats = $repeatMap[$notice->id];
             $notice->_setRepeats($repeats);
         }
     }
