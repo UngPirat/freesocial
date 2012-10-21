@@ -9,7 +9,7 @@
 
 	if (isset($this->action->notice) &&
 			(isset($this->action->user) || isset($this->action->subject))) {
-		if (isset($this->action->user)) {
+		if (!isset($this->action->subject)) {
 			$this->action->subject = $this->action->user->getProfile();
 		}
 		$this->content('gallery');
