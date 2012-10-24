@@ -80,6 +80,7 @@ class ThemeManager extends ThemeSite {
                 Event::handle('EndTmHeadScripts', array('action'=>$this->action));
             }
             $this->the_feeds();
+			$this->action->extraHead();
             Event::handle('EndShowHeadElements', array($this->action));
         }
         $this->out->flush();

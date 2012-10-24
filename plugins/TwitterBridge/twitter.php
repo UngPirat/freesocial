@@ -383,20 +383,22 @@ function format_status($notice)
     // Start with the plaintext source of this notice...
     $statustxt = $notice->content;
 
-	if (empty($notice->repeat_of) && $reply = Notice::staticGet('id', $notice->reply_to)) {
-		$replyto = Profile::staticGet('id', $reply->profile_id);
-		if ($flink = Foreign_link::getByUserId($replyto->id, TWITTER_SERVICE)) {
+	if (empty($notice->repeat_of) && $replyto = $notice->getParent()) {
+		// the reply has a notice and we want to profile of its author
+		$replyto = $replyto->getProfile();
+		if ($flink = Foreign_link::getByUserId($replyto->profile_id, TWITTER_SERVICE)) {
+			// let's store the profile author's local nickname for later
 			$localnick = $replyto->nickname;
+			// and get the foreign user which has the remote nickname
 			$replyto = Foreign_user::getForeignUser($flink->foreign_id, TWITTER_SERVICE);
+			// and replace the possible local nickname with the remote nickname
 			$statustxt = preg_replace('/(.+\s+|^)\@'.$localnick.'(\s+.+|$)/i',
 										'\\1@'.$replyto->nickname.'\\2',
 										$statustxt);
 		}
-		if (!empty($replyto)) {
-			if (!preg_match('/(.+\s+|^)\@'.$replyto->nickname.'(\s+.+|$)/i', $statustxt)) {
-				// because Twitter is retarded and discards inreplyto if user isn't mentioned
-				$statustxt = "@{$replyto->nickname} " . $statustxt;
-			}
+    	if (!empty($replyto) && !preg_match('/(.+\s+|^)\@'.$replyto->nickname.'(\s+.+|$)/i', $statustxt)) {
+			// the profile was not a local user with a foreign link, add remote nick if necessary
+			$statustxt = "@{$replyto->nickname} " . $statustxt;
 		}
 	}
 

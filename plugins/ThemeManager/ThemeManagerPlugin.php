@@ -42,7 +42,7 @@ class ThemeManagerPlugin extends Plugin {
     function onGetTmSupported(&$supported) {
         $supported = array_merge($supported, array(
                 'newnotice' => 'newnotice',
-//                'public' => 'public',
+                'public' => 'public',
                 'settings' => 'settings',
                 'showstream' => 'profile',
                 ));

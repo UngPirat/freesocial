@@ -81,7 +81,7 @@ class RawConversationNoticeStream extends NoticeStream
         $all = Memcached_DataObject::listGet('Notice', 'conversation', array($this->id));
         $notices = $all[$this->id];
         // Re-order in reverse-chron
-        //usort($notices, array('RawConversationNoticeStream', '_reverseChron'));
+        usort($notices, array('RawConversationNoticeStream', '_reverseChron'));
         // FIXME: handle since and max
         $wanted = array_slice($notices, $offset, $limit);
         return new ArrayWrapper($wanted);

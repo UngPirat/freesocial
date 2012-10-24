@@ -229,6 +229,7 @@ class ThreadedNoticeListItem extends NoticeListItem
                     Event::handle('EndAddNoticeReply', array($this, $this->notice, $notice));
                 }
             }
+			$notices = array_reverse($notices);
 
             if (Event::handle('StartShowThreadedNoticeTail', array($this, $this->notice, &$notices))) {
                 $this->out->elementStart('ul', 'notices threaded-replies xoxo');
