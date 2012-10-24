@@ -94,7 +94,7 @@ class NoticeWidget extends ThemeWidget {
                 : $profile->profileurl;
     }
     function get_permalink() {
-        return common_local_url('shownotice', array('notice'=>$this->item->id));
+        return common_local_url('shownotice', array('notice'=>$this->get_notice()->id));
     }
     function get_verb() {
         if (!empty($this->repeated)) {

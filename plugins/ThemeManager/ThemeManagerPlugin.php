@@ -44,6 +44,7 @@ class ThemeManagerPlugin extends Plugin {
                 'newnotice' => 'newnotice',
                 'public' => 'public',
                 'settings' => 'settings',
+                'shownotice' => 'legacy',
                 'showstream' => 'profile',
                 ));
     }
