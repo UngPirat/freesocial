@@ -228,12 +228,6 @@ class ShowstreamAction extends ProfileAction
                                          'content' => $id->toString()));
         }
 
-        // See https://wiki.mozilla.org/Microsummaries
-
-        $this->element('link', array('rel' => 'microsummary',
-                                     'href' => common_local_url('microsummary',
-                                                                array('nickname' => $this->subject->nickname))));
-
         $rsd = common_local_url('rsd',
                                 array('nickname' => $this->subject->nickname));
 

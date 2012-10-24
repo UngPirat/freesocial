@@ -824,8 +824,7 @@ class Router
 
                 foreach (array('subscriptions', 'subscribers',
                                'all', 'foaf', 'mentions',
-                               'favorites', 'repeated', 'repeats', 'replies',
-                               'microsummary') as $a) {
+                               'favorites', 'repeated', 'repeats', 'replies') as $a) {
                     $m->connect($a,
                                 array('action' => $a,
                                       'nickname' => $nickname));
@@ -940,8 +939,7 @@ class Router
 
                 foreach (array('subscriptions', 'subscribers',
                                'all', 'foaf', 'mentions',
-							   'favorites', 'repeated', 'repeats', 'replies',
-                               'inbox', 'outbox', 'microsummary') as $a) {
+							   'favorites', 'repeated', 'repeats', 'replies') as $a) {
                     $m->connect(':nickname/'.$a,
                                 array('action' => $a),
                                 array('nickname' => Nickname::DISPLAY_FMT));
