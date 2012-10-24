@@ -245,7 +245,7 @@ class ThreadedNoticeListItem extends NoticeListItem
                         $item = new ThreadedNoticeListMoreItem($moreCutoff, $this->out, count($notices));
                         $item->show();
                     }
-                    foreach (array_reverse($notices) as $notice) {
+                    foreach ($notices as $notice) {
                         if (Event::handle('StartShowThreadedNoticeSub', array($this, $this->notice, $notice))) {
                             $item = new ThreadedNoticeListSubItem($notice, $this->notice, $this->out);
                             $item->show();

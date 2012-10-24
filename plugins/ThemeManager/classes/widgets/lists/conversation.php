@@ -2,8 +2,11 @@
 
 class ConversationListWidget extends NoticeListWidget {
 	protected $widgetClass = 'list conversations';
-	protected $loopType = 'Conversation';
-	protected $convArgs = array();
+	protected $num         = -1;
+	protected $pagination  = false;
+	protected $loopType    = 'Conversation';
+
+	protected $convArgs    = array();
 
     static function run(array $args=array()) {
         $class = get_class();
@@ -13,7 +16,7 @@ class ConversationListWidget extends NoticeListWidget {
 	
     function the_item($item) {
 		// $item here is an array of all the Notice objects in the conversation
-        ConversationWidget::run(array('list'=>$item, 'loopArgs'=>$this->convArgs, 'pagination'=>false));
+        ConversationWidget::run(array('list'=>$item, 'loopArgs'=>$this->convArgs, 'pagination'=>$this->pagination));
     }
 }
 

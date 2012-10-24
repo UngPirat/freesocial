@@ -65,14 +65,14 @@ class FacebookImport
 
     function __construct($foreign_id=null) {
         $this->groups = array();
-		if (!is_null($foreign_id)) {
-			$this->flink = Foreign_link::getByForeignID($foreign_id, FACEBOOK_SERVICE);
-			if (empty($this->flink) || empty($this->flink->credentials)) {
-				throw new Exception('Empty or invalid Foreign_link');
-			}
-		}
-		$profile = (!is_null($this->flink)) ? Profile::staticGet('id', $this->flink->user_id) : null;
-		$this->client   = new Facebookclient(null, $profile);
+        if (!is_null($foreign_id)) {
+            $this->flink = Foreign_link::getByForeignID($foreign_id, FACEBOOK_SERVICE);
+            if (empty($this->flink) || empty($this->flink->credentials)) {
+                throw new Exception('Empty or invalid Foreign_link');
+            }
+        }
+        $profile = (!is_null($this->flink)) ? Profile::staticGet('id', $this->flink->user_id) : null;
+        $this->client   = new Facebookclient(null, $profile);
         $this->facebook = Facebookclient::getFacebook();
     }
 
@@ -97,12 +97,12 @@ class FacebookImport
         }
 
         // Iterate the loop backwards <=7 pages
-		$args = array();
+        $args = array();
         $args['feed'] = $this->flink->foreign_id."/$field";
-        $args['max_loops'] = 7;
-		$args['api'] = $apiArgs;
+        $args['max_loops'] = 2;
+        $args['api'] = $apiArgs;
         $args['api']['access_token'] = $this->flink->credentials;
-		common_debug('FBDBG importing updates for '.$this->flink->foreign_id);
+        common_debug('FBDBG importing updates for '.$this->flink->foreign_id);
         $this->client->apiLoop('/me/'.urlencode($field), array($this, 'importThread'), $args);
 
         // Okay, record the time we synced with Facebook for posterity
@@ -126,114 +126,114 @@ class FacebookImport
     {
         common_debug('FBDBG: getting foreign group '.$group->foreign_id.' because it is local group '.$group->group_id);
         // get this group's feed
-		$args = array(
-					'callback'=>array(
-						'group'=>$group->foreign_id,
-						'scope'=>Notice::PUBLIC_SCOPE,
-						),
-					'api'=>array('limit'=>$limit),
-					);
+        $args = array(
+                    'callback'=>array(
+                        'group'=>$group->foreign_id,
+                        'scope'=>Notice::PUBLIC_SCOPE,
+                        ),
+                    'api'=>array('limit'=>$limit),
+                    );
         $this->client->apiLoop(sprintf('/%s/feed', $group->foreign_id), array($this, 'importThread'), $args);
     }
-	protected function getComments($thread_id) {
-		if (!preg_match('/^\d+_\d+/', $thread_id)) {
-			throw new Exception('Bad thread id: '.$thread_id);
-		}
-		$thread_id = preg_replace('/^(\d+_\d+)(_.+)?$/', '\\1', $thread_id);
-		$data = $this->facebook->api("/$thread_id", 'get', $this->getAccessToken());
-		file_put_contents('/tmp/facebook-getComments', print_r($data,true));
-		return $data['comments'];
-	}
+    protected function getComments($thread_id) {
+        if (!preg_match('/^\d+_\d+/', $thread_id)) {
+            throw new Exception('Bad thread id: '.$thread_id);
+        }
+        $thread_id = preg_replace('/^(\d+_\d+)(_.+)?$/', '\\1', $thread_id);
+        $data = $this->facebook->api("/$thread_id", 'get', $this->getAccessToken());
+        file_put_contents('/tmp/facebook-getComments', print_r($data,true));
+        return $data['comments'];
+    }
 
     public function importThread(array $args)
     {
         $update = $args['entry'];
         if (!isset($update['message'])) {
-		    return false;
-		}
-		try {
-			// see if profile disallows importing etc.
-			self::checkNoticeImport($update);
-		} catch (Exception $e) {
-			return false;
-		}
+            return false;
+        }
+        try {
+            // see if profile disallows importing etc.
+            self::checkNoticeImport($update);
+        } catch (Exception $e) {
+            return false;
+        }
 
-		// GAAAHHHH, Facebook can reference posts by group OR user_id in the first part of the post ID
-		if (isset($args['group'])) {
-			common_debug('FACEBOOK fetching from group, replacing '.$update['id'].' with '.preg_replace("/^{$args['group']}_/", $update['from']['id'].'_', $update['id']));
-			$update['id'] = preg_replace("/^{$args['group']}_/", $update['from']['id'].'_', $update['id']);
-		}
-		$foreign_id = (!is_null($this->flink))
-							? $this->flink->foreign_id
-							: null;
+        // GAAAHHHH, Facebook can reference posts by group OR user_id in the first part of the post ID
+        if (isset($args['group'])) {
+            common_debug('FACEBOOK fetching from group, replacing '.$update['id'].' with '.preg_replace("/^{$args['group']}_/", $update['from']['id'].'_', $update['id']));
+            $update['id'] = preg_replace("/^{$args['group']}_/", $update['from']['id'].'_', $update['id']);
+        }
+        $foreign_id = (!is_null($this->flink))
+                            ? $this->flink->foreign_id
+                            : null;
 
-		$scope = isset($args['scope']) ? $args['scope'] : Notice::ADDRESSEE_SCOPE|Notice::FOLLOWER_SCOPE;
         if (isset($update['privacy']['value'])) {
-			$scope = self::getPrivacyScope($update['privacy']['value']);
-		}
+            $scope = self::getPrivacyScope($update['privacy']['value']);
+        } elseif (isset($args['scope'])) {
+            $scope = $args['scope'];
+        } else {
+            $scope = Notice::ADDRESSEE_SCOPE|Notice::FOLLOWER_SCOPE;
+        }
+        if (($scope & Notice::PUBLIC_SCOPE) != Notice::PUBLIC_SCOPE) {
+			common_debug('ditching a non-public post: '.$update['id']);
+            return false;
+        }
 
-        $qm = QueueManager::get();
         // Add more as we understand them
         switch ($update['type']) {
         case 'status':
         case 'link':
         case 'photo':
         case 'video':
-			$comments = array();
-			if (isset($update['comments'])) {
-				$comments = $update['comments'];
-				unset($update['comments']); // ...if we were to enqueue $update
-			}
-			// We should already have the notice in our foreign_notice_map, so it won't be imported if that's the case.
-			// If we don't want it - delete it at both places!
-	        //$source = mb_strtolower(common_config('integration', 'source'));
-    	    //if (!isset($update['application']) || !preg_match("/$source/", mb_strtolower($update['application']['name']))) {
-			$notice = $this->saveUpdate($update, $scope);
-			if (empty($notice)) {	// this shouldn't happen, saveUpdate should always throw an exception if failed
-				common_debug('FBDBG: saveUpdate did not return a Notice but did not throw exception!');
-				return false;
-			}
-			//}
-			$conversation = Conversation::staticGet('id', $notice->conversation);
-			if (empty($conversation)) {
-				throw new Exception('Conversation could not be fetched');
-			}
-			if (strtotime($update['updated_time']) < strtotime($conversation->modified)) {
-				return false;
-			}
+            $comments = array();
+            if (isset($update['comments'])) {
+                $comments = $update['comments'];
+                unset($update['comments']); // ...if we were to enqueue $update
+            }
+            // We should already have the notice in our foreign_notice_map, so it won't be imported if that's the case.
+            // If we don't want it - delete it at both places!
+            $notice = $this->saveUpdate($update, $scope);    // throws exceptino on error
+            $conversation = Conversation::staticGet('id', $notice->conversation);
+            if (empty($conversation)) {
+                throw new Exception('Conversation could not be fetched');
+            }
+            if (strtotime($update['updated_time']) < strtotime($conversation->modified)) {
+                return false;
+            }
 
-			// Enqueue the comments
+            // Enqueue the comments
             if (!empty($comments) && $comments['count']>0) {
                 if (!isset($comments['data'])) { 
                     common_debug('FACEBOOK comment thread empty for '.$update['id'].'. TODO: fetch from API!'); 
-					$comments = $this->getComments($update['id']);
+                    $comments = $this->getComments($update['id']);
                 }
-				common_debug('FACEBOOK enqueueing '.count($comments['data']).' comments for '.$update['id'].' #'.$notice->id);
+                common_debug('FACEBOOK enqueueing '.count($comments['data']).' comments for '.$update['id'].' #'.$notice->id);
+                $qm = QueueManager::get();
                 foreach ($comments['data'] as $comment) :
-    				try {
-    					// see if profile disallows importing etc.
-    					self::checkNoticeImport($comment);
-    				} catch (Exception $e) {
-    					continue;
-    				}
-    				try {
-    					// see if notice is already imported
-    					Foreign_notice_map::get_notice_id($comment['id'], FACEBOOK_SERVICE);
-    					continue;
-    				} catch (Exception $e) {
-    					$data = array(
-       	                'receiver' => $foreign_id,
-           	            'scope'    => $scope,
-               	        'update'   => $comment,
-                   	    );
-    					$qm->enqueue($data, 'facebookin');
-    				}
+                    try {
+                        // see if profile disallows importing etc.
+                        self::checkNoticeImport($comment);
+                    } catch (Exception $e) {
+                        continue;
+                    }
+                    try {
+                        // see if notice is already imported
+                        Foreign_notice_map::get_notice_id($comment['id'], FACEBOOK_SERVICE);
+                        continue;
+                    } catch (Exception $e) {
+                        $data = array(
+                           'receiver' => $foreign_id,
+                           'scope'    => $scope,
+                           'update'   => $comment,
+                           );
+                        $qm->enqueue($data, 'facebookin');
+                    }
                 endforeach;
-    		}
-			$original = clone($conversation);
-			$conversation->modified = common_sql_now();
-			$conversation->update($original);
-			return true;
+            }
+            $original = clone($conversation);
+            $conversation->modified = common_sql_now();
+            $conversation->update($original);
+            return true;
             break;
         default:
             common_debug('FACEBOOK unknown update type: '.$update['type'].' for '.$update['id']);
@@ -274,16 +274,18 @@ class FacebookImport
 
     function saveUpdate($update, $scope=0)
     {
-        $profile = self::checkNoticeImport($update);    // possibly set $profile to local profile
-        $local   = !empty($profile);
-
+        // if it is already stored in our foreign notice map, we return it
         try {
             $notice = Foreign_notice_map::get_foreign_notice($update['id'], FACEBOOK_SERVICE);
+            common_debug('FACEBOOK has already stored update id: '.$update['id']);
             return $notice;
         } catch (Exception $e) {
-			common_debug('FACEBOOK could not find foreign notice map for: '.$update['id']);
+            common_debug('FACEBOOK could not find foreign notice map for: '.$update['id']);
             $noticeOpts = array();
         }
+
+        $profile = self::checkNoticeImport($update);    // possibly set $profile to local profile
+        $local   = !empty($profile);
 
         if (empty($profile)) {
             $profile = $this->ensureProfile($update['from']['id']);
@@ -323,27 +325,27 @@ class FacebookImport
             $noticeOpts['is_local'] = ($scope == Notice::PUBLIC_SCOPE ? Notice::LOCAL_PUBLIC : Notice::LOCAL_NONPUBLIC);
         } else {
             $noticeOpts['is_local'] = Notice::GATEWAY;
-			$original_poster = (!is_null($reply) ? $rprofile : $profile);
-			if ($original_poster_flink = Foreign_link::getByUserID($original_poster->id, FACEBOOK_SERVICE)) {
-				$fuser = $original_poster_flink->getForeignUser();
-				$nickname = !empty($fuser) ? $fuser->nickname : null;
-			} else {
-				$nickname = $original_poster->nickname;
-			}
+            $original_poster = (!is_null($reply) ? $rprofile : $profile);
+            if ($original_poster_flink = Foreign_link::getByUserID($original_poster->id, FACEBOOK_SERVICE)) {
+                $fuser = $original_poster_flink->getForeignUser();
+                $nickname = !empty($fuser) ? $fuser->nickname : null;
+            } else {
+                $nickname = $original_poster->nickname;
+            }
             $noticeOpts['uri']      = $this->makeUpdateURI($update['id'], $nickname);
         }
 
         $notice  = Notice::saveNew($noticeOpts['profile_id'], $noticeOpts['content'], $noticeOpts['source'], $noticeOpts);
         Foreign_notice_map::saveNew($notice->id, $update['id'], FACEBOOK_SERVICE);
         if (!empty($notice->conversation)) {
-			Conversation::append($notice->conversation, $notice->id);
+            Conversation::append($notice->conversation, $notice->id);
         } else {
             $conv = Conversation::create($notice->id);
-			$original = clone($notice);
+            $original = clone($notice);
             $notice->conversation = $notice->id;
-			$notice->update($original);
-		}
-		
+            $notice->update($original);
+        }
+        
         if (!isset($update['type'])) {
             $update['type'] = 'status';
         }
@@ -398,8 +400,8 @@ class FacebookImport
         switch ($update['type']) {
         case 'link':
             $file = File::processNew($update['link'], $notice->id);
-			common_debug('FACEBOOK storing link as file: '.$file->id);
-			break;
+            common_debug('FACEBOOK storing link as file: '.$file->id);
+            break;
         case 'video':
             common_debug('FACEBOOK VIDEO: '.print_r($update,true));
             $description = $update['description'];
@@ -585,7 +587,7 @@ class FacebookImport
         $profile->query("BEGIN");
 
         $profile->nickname = $foreign_user->nickname;
-           $profile->fullname = $user['name'];
+        $profile->fullname = $user['name'];
         $profile->profileurl = $foreign_user->uri;
         $profile->created = common_sql_now();
 

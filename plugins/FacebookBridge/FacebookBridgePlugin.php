@@ -122,11 +122,11 @@ class FacebookBridgePlugin extends Plugin
             include_once $dir . '/actions/' . strtolower(mb_substr($cls, 0, -6)) . '.php';
             return false;
         case 'Facebookclient':
-        case 'FacebookQueueHandler':
             include_once $dir . '/lib/' . strtolower($cls) . '.php';
             return false;
         case 'FacebookImport':
         case 'FacebookInQueueHandler':
+        case 'FacebookQueueHandler':
             include_once $dir . '/classes/' . $cls . '.php';
             return false;
         default:

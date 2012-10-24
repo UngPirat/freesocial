@@ -137,10 +137,10 @@ class Notice extends Managed_DataObject
         return $def;
     }
     
-    function multiGet($kc, $kvs, $skipNulls=true)
-    {
-        return Memcached_DataObject::multiGet('Notice', $kc, $kvs, $skipNulls);
-    }
+	function multiGet($keyCol, $keyVals, $skipNulls=true)
+	{
+	    return parent::multiGet('Notice', $keyCol, $keyVals, $skipNulls);
+	}
     
     /* Notice types */
     const LOCAL_PUBLIC    =  1;

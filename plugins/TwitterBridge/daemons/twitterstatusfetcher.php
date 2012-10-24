@@ -155,8 +155,9 @@ class TwitterStatusFetcher extends ParallelizingDaemon
 				}
         	}
 
-            $flink->last_noticesync = common_sql_now();
-            $flink->update();
+            $original = clone($flink);
+			$flink->last_noticesync = common_sql_now();
+            $flink->update($original);
         }
 
         $conn->disconnect();

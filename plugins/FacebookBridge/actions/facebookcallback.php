@@ -72,8 +72,12 @@ class FacebookcallbackAction extends Action
                 foreach((array)$data->entry as $entry) {
                     $flink = Foreign_link::getByForeignID($entry->uid, FACEBOOK_SERVICE);
                     if (!empty($flink) && ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV) {
-                        $importer = new FacebookImport($flink->foreign_id);
-                        common_debug("FBDBG User '{$entry->uid}' has a realtime update, handling it");
+                        try {
+							$importer = new FacebookImport($flink->foreign_id);
+	                        common_debug("FBDBG User '{$entry->uid}' has a realtime update, handling it");
+						} catch (Exception {
+							continue;
+						}
 
                         foreach ( $entry->changed_fields as $field ) {
                             $args = array('until'=>$entry->time+1);

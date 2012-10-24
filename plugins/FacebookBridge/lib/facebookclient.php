@@ -154,7 +154,7 @@ class Facebookclient
                 try {
                     // entry post will be overwritten on merge
                     $callbackArgs = array_merge($args['callback'], array('entry'=>$entry));
-                    $foundnew = call_user_func($callback, $callbackArgs);
+                    $foundnew = call_user_func($callback, $callbackArgs) || $foundnew;
                 } catch (Exception $e) {
                 }
             }

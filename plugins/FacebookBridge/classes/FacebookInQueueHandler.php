@@ -40,9 +40,9 @@ class FacebookInQueueHandler extends QueueHandler
 
     function handle($data)
     {
-        $receiver = $data['receiver'];
-        $scope    = $data['scope'];
-        $update   = $data['update'];
+        foreach(array('receiver', 'scope', 'update') as $key) {
+			$$key = $data[$key];
+		}
 
         $importer = new FacebookImport($receiver);
         try {

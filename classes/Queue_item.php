@@ -50,13 +50,13 @@ class Queue_item extends Managed_DataObject
             if (is_array($transports)) {
                 // @fixme use safer escaping
                 $list = implode("','", array_map(array($qi, 'escape'), $transports));
-                $qi->whereAdd("transport in ('$list')");
+                $qi->whereAdd("transport IN ('$list')");
             } else {
                 $qi->transport = $transports;
             }
         }
         $qi->orderBy('created');
-        $qi->whereAdd('claimed is null');
+        $qi->whereAdd('claimed IS NULL');
 
         $qi->limit(1);
 

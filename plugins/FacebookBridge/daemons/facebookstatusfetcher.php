@@ -21,7 +21,7 @@
 define('INSTALLDIR', realpath(dirname(__FILE__) . '/../../..'));
 
 define('MAXCHILDREN', 1);
-define('POLL_INTERVAL', 120); // in seconds
+define('POLL_INTERVAL', 300); // in seconds
 
 $shortoptions = 'di::';
 $longoptions = array('id::', 'debug');
@@ -107,8 +107,10 @@ class FacebookStatusFetcher extends ParallelizingDaemon
         $flinks = array();
 
         while ($flink->fetch()) {
-            if (($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV
-                    && !empty($flink->credentials)) {
+        	if (!empty($flink->credentials)
+					&& ($flink->noticesync & FOREIGN_NOTICE_RECV) == FOREIGN_NOTICE_RECV
+					&& time()-strtotime($flink->last_noticesync) > POLL_INTERVAL
+					) {
                 $flinks[] = clone($flink);
             }
         }
@@ -129,16 +131,13 @@ class FacebookStatusFetcher extends ParallelizingDaemon
         // a new connection if there isn't one already
         $conn = &$flink->getDatabaseConnection();
 
-        if (time()-strtotime($flink->last_noticesync) > 120) {
-		    $importer = new FacebookImport($flink->foreign_id);
-            // home has the user's news feed (i.e. including other users)
-            $importer->importUpdates('home');	// Fetching /home too often might be disliked by Facebook
+		$importer = new FacebookImport($flink->foreign_id);
+        // home has the user's news feed (i.e. including other users)
+        $importer->importUpdates('home');	// Fetching /home too often might be disliked by Facebook
 
-            $original = clone($flink);
-        	$flink->last_noticesync = common_sql_now();
-        	$flink->update($original);
-		}
-
+        $original = clone($flink);
+        $flink->last_noticesync = common_sql_now();
+        $flink->update($original);
 
         $conn->disconnect();
 

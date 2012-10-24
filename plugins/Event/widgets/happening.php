@@ -4,7 +4,7 @@ class HappeningWidget extends NoticeWidget {
     protected $itemClass = 'notice happening';
     protected $itemTag = 'article';
 
-    static function run($args=null) {
+    static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()
         $widget->show();
@@ -19,9 +19,8 @@ class HappeningWidget extends NoticeWidget {
         $happening = Happening::fromNotice($this->item);
 
         if (empty($happening)) {
-            common_log(LOG_ERR, 'No bookmark for notice '.$this->get_notice_id());
+            common_log(LOG_ERR, 'No happening for notice '.$this->get_notice_id());
 			parent::the_content();
-            throw new ServerException(_m('Bookmark not found'));
             return;
         }
 
@@ -51,6 +50,7 @@ class HappeningWidget extends NoticeWidget {
 
         $this->out->elementEnd('span');
     }
+
 	function show_property(Happening $happening, $property, $tag='li') {
 		$this->out->elementStart($tag, $property);
 		switch ($property) {

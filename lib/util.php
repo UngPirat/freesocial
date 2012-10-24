@@ -989,6 +989,7 @@ function common_linkify($url) {
     }
 
     if (!empty($f)) {
+		common_debug('facebook getEnclosure: '.print_r($f, true));
         if ($f->getEnclosure()) {
             $is_attachment = true;
             $attachment_id = $f->id;
