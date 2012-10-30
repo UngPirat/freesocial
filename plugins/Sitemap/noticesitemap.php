@@ -72,7 +72,7 @@ class NoticesitemapAction extends SitemapAction
         if ($this->j < count($this->notices)) {
             $n = $this->notices[$this->j];
             $this->j++;
-            return array(common_local_url('shownotice', array('notice' => $n[0])),
+            return array(common_local_url('notice', array('id' => $n[0])),
                          common_date_w3dtf($n[1]),
                          'never',
                          null);

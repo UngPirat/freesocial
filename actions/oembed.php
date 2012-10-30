@@ -70,9 +70,9 @@ class OembedAction extends Action
             $oembed['provider_name']=common_config('site', 'name');
             $oembed['provider_url']=common_root_url();
             switch($proxy_args['action']){
-                case 'shownotice':
+                case 'notice':
                     $oembed['type']='link';
-                    $id = $proxy_args['notice'];
+                    $id = $proxy_args['id'];
                     $notice = Notice::staticGet($id);
                     if(empty($notice)){
                         // TRANS: Server error displayed in oEmbed action when notice not found.

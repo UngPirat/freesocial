@@ -1941,8 +1941,8 @@ function common_user_uri(&$user)
 
 function common_notice_uri(&$notice)
 {
-    return common_local_url('shownotice',
-                            array('notice' => $notice->id),
+    return common_local_url('notice',
+                            array('id' => $notice->id),
                             null, null, false);
 }
 

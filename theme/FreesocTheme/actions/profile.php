@@ -2,22 +2,13 @@
 /*
  *  Name: Profile
  */
-    $this->box('header');
-
-    $this->out->elementStart($this->is_single()?'article':'div', array('id'=>'content','class'=>($this->is_single()?'single':'')));
+    $this->out->elementStart('article', array('id'=>'content'));
     $this->out->element('h2', 'content-title', $this->get_title());
 
-    if ($this->is_single()) :
-        if ($this->is_action('showstream')) {
-            $this->content('showstream');
-    	} elseif ($this->is_action('gallery')) {
-			$this->content('gallery');
-        } else {
-            $this->content('noticelist');
-        }
-	else :
-        $this->content('noticelist');
-    endif;
-    $this->out->elementEnd($this->is_single()?'article':'div');
+	$this->box('nav-profile');
 
-    $this->box('footer');
+	$this->box('aside-showstream');
+	
+    $this->content('noticelist');
+
+    $this->out->elementEnd('article');

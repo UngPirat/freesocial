@@ -139,4 +139,16 @@ class Conversation extends Managed_DataObject
     {
 		return Notice::conversationLength($id);
 	}
+
+	static function getNotices($id)
+	{
+		$conv = new Conversation;
+		$conv->id = $id;
+		$conv->orderBy('created ASC');
+		$ids = $conv->fetchAll('notice_id');
+		if (empty($ids)) {
+			throw new Exception('No notices found');
+		}
+		return Notice::multiGet('id', $ids);
+	}
 }

@@ -8,6 +8,7 @@ class Avatar extends Managed_DataObject
 {
     const PROFILE_SIZE = 128;
     const STREAM_SIZE  =  96;
+    const REPLY_SIZE   =  64;
     const MINI_SIZE    =  24;
 
 	private static $avatars = array();

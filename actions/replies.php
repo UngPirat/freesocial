@@ -44,7 +44,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class RepliesAction extends ShowstreamAction
+class RepliesAction extends TimelineAction
 {
 	protected $action = 'replies';
 

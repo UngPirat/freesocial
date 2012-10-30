@@ -466,7 +466,7 @@ class ApiAction extends Action
 
             $entry['content'] = common_xml_safe_str(trim($notice->rendered));
             $entry['title'] = $profile->nickname . ': ' . common_xml_safe_str(trim($notice->content));
-            $entry['link'] = common_local_url('shownotice', array('notice' => $notice->id));
+            $entry['link'] = common_local_url('notice', array('id' => $notice->id));
             $entry['published'] = common_date_iso8601($notice->created);
 
             $taguribase = TagURI::base();

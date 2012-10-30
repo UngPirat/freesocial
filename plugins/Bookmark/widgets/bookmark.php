@@ -1,8 +1,7 @@
 <?php
 
 class BookmarkWidget extends NoticeWidget {
-    protected $itemClass = 'notice bookmark';
-    protected $itemTag = 'article';
+    protected $widgetClass = 'notice bookmark';
 
     static function run(array $args=array()) {
         $class = get_class();

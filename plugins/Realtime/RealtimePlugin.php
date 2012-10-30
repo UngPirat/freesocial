@@ -54,8 +54,7 @@ class RealtimePlugin extends Plugin
     function onInitializePlugin()
     {
         // FIXME: need to find a better way to pass this pattern in
-        $this->showurl = common_local_url('shownotice',
-                                            array('notice' => '0000000000'));
+        $this->showurl = common_local_url('notice', array('id' => '0000000000'));
         return true;
     }
 
@@ -209,7 +208,7 @@ class RealtimePlugin extends Plugin
 
         foreach (array_keys($ni) as $user_id) {
             $user = User::staticGet('id', $user_id);
-            $paths[] = array('all', $user->nickname, null);
+            $paths[] = array('timeline', $user->nickname, null);
         }
 
         // Add to the mentions timeline
@@ -502,7 +501,7 @@ class RealtimePlugin extends Plugin
             }
             break;
          case 'showstream':
-         case 'all':
+         case 'timeline':
          case 'mentions':
             $nickname = common_canonical_nickname($action->trimmed('nickname'));
             if (!empty($nickname)) {

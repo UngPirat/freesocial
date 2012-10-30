@@ -43,22 +43,13 @@ require_once INSTALLDIR.'/lib/personalgroupnav.php';
 require_once INSTALLDIR.'/lib/noticelist.php';
 require_once INSTALLDIR.'/lib/feedlist.php';
 
-class AllAction extends ShowstreamAction
+class TimelineAction extends ShowstreamAction
 {
-    var $notice;
-
-    function isReadOnly($args)
-    {
-        return true;
-    }
-
     function prepare($args)
     {
         parent::prepare($args);
 
-        $user = common_current_user();
-
-        $stream = new ThreadingInboxNoticeStream($this->subject, Profile::current());
+        $stream = new ThreadingInboxNoticeStream($this->profile, Profile::current());
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
                                             NOTICES_PER_PAGE + 1);
@@ -74,14 +65,13 @@ class AllAction extends ShowstreamAction
     function title()
     {
         $user = common_current_user();
-        if (!empty($user) && $user->id == $this->subject->id) {
+        if (!empty($user) && $user->id == $this->profile->id) {
             // TRANS: Title of a user's own start page.
             return _('Home timeline');
         } else {
-            $profile = $this->subject->getProfile();
             // TRANS: Title of another user's start page.
             // TRANS: %s is the other user's name.
-            return sprintf(_("%s's home timeline"), $profile->getBestName());
+            return sprintf(_("%s's home timeline"), $this->profile->getBestName());
         }
     }
 
@@ -92,60 +82,60 @@ class AllAction extends ShowstreamAction
                 common_local_url(
                     'ApiTimelineFriends', array(
                         'format' => 'as',
-                        'id' => $this->subject->nickname
+                        'id' => $this->profile->nickname
                     )
                 ),
                 // TRANS: %s is user nickname.
-                sprintf(_('Feed for friends of %s (Activity Streams JSON)'), $this->subject->nickname)),
+                sprintf(_('Feed for friends of %s (Activity Streams JSON)'), $this->profile->nickname)),
             new Feed(Feed::RSS1,
                 common_local_url(
-                    'allrss', array(
+                    'timelinerss', array(
                         'nickname' =>
-                        $this->subject->nickname)
+                        $this->profile->nickname)
                 ),
                 // TRANS: %s is user nickname.
-                sprintf(_('Feed for friends of %s (RSS 1.0)'), $this->subject->nickname)),
+                sprintf(_('Feed for friends of %s (RSS 1.0)'), $this->profile->nickname)),
             new Feed(Feed::RSS2,
                 common_local_url(
                     'ApiTimelineFriends', array(
                         'format' => 'rss',
-                        'id' => $this->subject->nickname
+                        'id' => $this->profile->nickname
                     )
                 ),
                 // TRANS: %s is user nickname.
-                sprintf(_('Feed for friends of %s (RSS 2.0)'), $this->subject->nickname)),
+                sprintf(_('Feed for friends of %s (RSS 2.0)'), $this->profile->nickname)),
             new Feed(Feed::ATOM,
                 common_local_url(
                     'ApiTimelineFriends', array(
                         'format' => 'atom',
-                        'id' => $this->subject->nickname
+                        'id' => $this->profile->nickname
                     )
                 ),
                 // TRANS: %s is user nickname.
-                sprintf(_('Feed for friends of %s (Atom)'), $this->subject->nickname))
+                sprintf(_('Feed for friends of %s (Atom)'), $this->profile->nickname))
         );
     }
 
     function showEmptyListMessage()
     {
         // TRANS: Empty list message. %s is a user nickname.
-        $message = sprintf(_('This is the timeline for %s and friends but no one has posted anything yet.'), $this->subject->nickname) . ' ';
+        $message = sprintf(_('This is the timeline for %s and friends but no one has posted anything yet.'), $this->profile->nickname) . ' ';
 
         if (common_logged_in()) {
             $current_user = common_current_user();
-            if ($this->subject->id === $current_user->id) {
+            if ($this->profile->id === $current_user->id) {
                 // TRANS: Encouragement displayed on logged in user's empty timeline.
                 // TRANS: This message contains Markdown links. Keep "](" together.
                 $message .= _('Try subscribing to more people, [join a group](%%action.groups%%) or post something yourself.');
             } else {
                 // TRANS: %1$s is user nickname, %2$s is user nickname, %2$s is user nickname prefixed with "@".
                 // TRANS: This message contains Markdown links. Keep "](" together.
-                $message .= sprintf(_('You can try to [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->subject->nickname, $this->subject->nickname, '@' . $this->subject->nickname);
+                $message .= sprintf(_('You can try to [post something to them](%%%%action.newnotice%%%%?status_textarea=%3$s).'), $this->profile->nickname, $this->profile->nickname, '@' . $this->profile->nickname);
             }
         } else {
             // TRANS: Encouragement displayed on empty timeline user pages for anonymous users.
             // TRANS: %s is a user nickname. This message contains Markdown links. Keep "](" together.
-            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then post a notice to them.'), $this->subject->nickname);
+            $message .= sprintf(_('Why not [register an account](%%%%action.register%%%%) and then post a notice to them.'), $this->profile->nickname);
         }
 
         $this->elementStart('div', 'guide');
@@ -175,7 +165,7 @@ class AllAction extends ShowstreamAction
 
             $this->pagination(
                 $this->page > 1, $cnt > NOTICES_PER_PAGE,
-                $this->page, 'all', array('nickname' => $this->subject->nickname)
+                $this->page, 'timeline', array('nickname' => $this->profile->nickname)
             );
 
             Event::handle('EndShowAllContent', array($this));
@@ -204,7 +194,7 @@ class AllAction extends ShowstreamAction
         if (!common_config('performance', 'high')) {
             $pop = new PopularNoticeSection($this, Profile::current());
             $pop->show();
-            $pop = new InboxTagCloudSection($this, $this->subject);
+            $pop = new InboxTagCloudSection($this, $this->profile);
             $pop->show();
         }
     }

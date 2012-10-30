@@ -157,7 +157,7 @@ class TwitterOAuthClient extends OAuthClient
      */
     function verifyCredentials()
     {
-        $url          = 'https://api.twitter.com/1/account/verify_credentials.json';
+        $url          = 'https://api.twitter.com/1.1/account/verify_credentials.json';
         $response     = $this->oAuthGet($url);
         $twitter_user = json_decode($response);
         return $twitter_user;
@@ -175,7 +175,7 @@ class TwitterOAuthClient extends OAuthClient
      */
     function statusesUpdate($status, $params=array())
     {
-        $url      = 'https://api.twitter.com/1/statuses/update.json';
+        $url      = 'https://api.twitter.com/1.1/statuses/update.json';
         if (is_numeric($params)) {
             $params = array('in_reply_to_status_id' => intval($params));
         }
@@ -201,7 +201,7 @@ class TwitterOAuthClient extends OAuthClient
     function statusesTimeline($since_id = null, $timelineUri = 'home_timeline',
 	                          $max_id = null, $cnt = null, $page = null)
     {
-        $url    = 'https://api.twitter.com/1/statuses/'.$timelineUri.'.json';
+        $url    = 'https://api.twitter.com/1.1/statuses/'.$timelineUri.'.json';
 
         $params = array('include_entities' => 'true',
 						'include_rts' => 'true');
@@ -237,7 +237,7 @@ class TwitterOAuthClient extends OAuthClient
     function statusesFriends($id = null, $user_id = null, $screen_name = null,
                              $page = null)
     {
-        $url = "https://api.twitter.com/1/statuses/friends.json";
+        $url = "https://api.twitter.com/1.1/statuses/friends.json";
 
         $params = array();
 
@@ -273,7 +273,7 @@ class TwitterOAuthClient extends OAuthClient
      */
     function createFriendship($friend)
     {
-        $url = 'https://api.twitter.com/1/friendships/create.json';
+        $url = 'https://api.twitter.com/1.1/friendships/create.json';
 
         $params = array('follow'=>'true');
 
@@ -301,7 +301,7 @@ class TwitterOAuthClient extends OAuthClient
      */
     function destroyFriendship($friend)
     {
-        $url = 'https://api.twitter.com/1/friendships/destroy.json';
+        $url = 'https://api.twitter.com/1.1/friendships/destroy.json';
 
         $params = array();
 
@@ -331,7 +331,7 @@ class TwitterOAuthClient extends OAuthClient
     function friendsIds($id = null, $user_id = null, $screen_name = null,
                          $page = null)
     {
-        $url = "https://api.twitter.com/1/friends/ids.json";
+        $url = "https://api.twitter.com/1.1/friends/ids.json";
 
         $params = array();
 
@@ -366,7 +366,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function statusesRetweet($id)
     {
-        $url = "https://api.twitter.com/1/statuses/retweet/$id.json";
+        $url = "https://api.twitter.com/1.1/statuses/retweet/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -382,7 +382,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function favoritesCreate($id)
     {
-        $url = "https://api.twitter.com/1/favorites/create/$id.json";
+        $url = "https://api.twitter.com/1.1/favorites/create/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -398,7 +398,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function favoritesDestroy($id)
     {
-        $url = "https://api.twitter.com/1/favorites/destroy/$id.json";
+        $url = "https://api.twitter.com/1.1/favorites/destroy/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;
@@ -414,7 +414,7 @@ class TwitterOAuthClient extends OAuthClient
 
     function statusesDestroy($id)
     {
-        $url = "https://api.twitter.com/1/statuses/destroy/$id.json";
+        $url = "https://api.twitter.com/1.1/statuses/destroy/$id.json";
         $response = $this->oAuthPost($url);
         $status = json_decode($response);
         return $status;

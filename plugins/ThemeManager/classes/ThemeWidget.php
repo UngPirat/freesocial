@@ -2,6 +2,7 @@
 
 abstract class ThemeWidget extends ThemeExtension {
     protected $out;
+	protected $ajax = false;
 
     protected $widgetClass;
     protected $widgetTag = 'section';
@@ -18,7 +19,13 @@ abstract class ThemeWidget extends ThemeExtension {
     }
 
     protected function initialize() {
+		parent::initialize();
+
         $this->getOut();
+
+		if ($this->ajax) {
+			$this->widgetTag = null;
+		}
     }
 
 	function getOut() {

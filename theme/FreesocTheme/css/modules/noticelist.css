@@ -1,16 +1,18 @@
 .public-action .conversations {
-	column-count: 3;
-	column-gap: 2em;
-	-moz-column-count: 3;
-	-moz-column-gap: 2em;
+	column-count: 2;
+	column-gap: 3em;
+	-moz-column-count: 2;
+	-moz-column-gap: 3em;
+	-webkit-column-count: 2;
+	-webkit-column-gap: 3em;
 }
-.public-action .conversations .conversation {
+.conversations .conversation {
 	column-break-inside: avoid;
 	-moz-column-break-inside: avoid;
+	-webkit-column-break-inside: avoid;
 	display: inline-block;
-	font-size: 0.8em;
 	margin: 1em 0;
-	padding: 1em 1ex;
+	padding: 0 1ex 1ex;
 	position: relative;
 	border-radius: 1em;
 	border-right: 1px solid gray;
@@ -21,19 +23,16 @@
 }
 
 .conversation .notice {
+	margin-top: 1em;
 }
-.conversation,
-.conversation .notice:first-child,
+.conversations .conversation,
 .notice {
 	background-color: #f0f0f0;
 	background: -moz-linear-gradient(#ffffff, #f0f0f0);
 	background: -o-linear-gradient(#ffffff, #f0f0f0);
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#252525), to(#0a0a0a)); /* older webkit syntax */
-	background: -webkit-linear-gradient(#252525, #0a0a0a);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#f0f0f0)); /* older webkit syntax */
+	background: -webkit-linear-gradient(#ffffff, #f0f0f0);
 	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
-}
-.conversation .notice {
-	background-color: #fff;
 }
 /* WHY U NO MARGIN??? */
 .notice:after {
@@ -48,9 +47,8 @@
 	background: transparent;
 	border: none;
 	box-shadow: none;
-	font-size: 1em;
-	margin-left: 0;
-	margin-top: 1ex;
+	padding: 0;
+	margin: 0;
 }
 .conversation .notice.repeat .content:before {
 	position: absolute;
@@ -78,20 +76,16 @@
 	clear: both;
 }
 .notice {
-	padding: 1.5em 1ex 0;
+	padding: 1em 1ex 1ex;
 }
 .notice.spam {
 	border: 2px solid red;
 }
-.notice .metadata {
+.notice header {
 	display: block;
-	font-size: 0.75em;
-	position: absolute;
-	top: 1ex;
-	left: 1ex;
 }
-.conversation .notice {
-	margin-top: 1em;
+.notice .metadata {
+	font-size: 0.75em;
 }
 .notice > * {
 	text-align: left;
@@ -145,7 +139,7 @@
 
 .showstream-action #stream .notice {
 }
-.shownotice-action #stream .vcard.author {
+.notice-action #stream .vcard.author {
 	display: none;
 }
 /*.mentions-action #stream .notice .vcard.author,

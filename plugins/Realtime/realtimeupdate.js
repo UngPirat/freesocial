@@ -65,7 +65,7 @@ RealtimeUpdate = {
       * feed data into the RealtimeUpdate object!
       *
       * @param {int} userid: local profile ID of the currently logged-in user
-      * @param {String} showurl: URL for shownotice action, used when fetching formatting notices.
+      * @param {String} showurl: URL for [show]notice action, used when fetching formatting notices.
       *                            This URL contains a stub value of 0000000000 which will be replaced with the notice ID.
       *
       * @access public

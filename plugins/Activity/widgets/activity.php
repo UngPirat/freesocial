@@ -1,8 +1,7 @@
 <?php
 
 class ActivityWidget extends NoticeWidget {
-    protected $itemClass = 'notice activity';
-    protected $itemTag = 'article';
+    protected $widgetClass = 'notice activity';
 
     static function run(array $args=array()) {
         $class = get_class();
@@ -15,11 +14,10 @@ class ActivityWidget extends NoticeWidget {
 		return _m('done');
 	}
     function the_item() {
-        $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->itemClass));
+        $this->widgetTag && $this->out->elementStart($this->widgetTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->widgetClass));
+		$this->the_header();
 		$this->the_content();
-		$this->the_metadata();
-		$this->the_actions();
-        $this->itemTag && $this->out->elementEnd($this->itemTag);
+        $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 }
 

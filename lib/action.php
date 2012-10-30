@@ -523,7 +523,7 @@ class Action extends HTMLOutputter // lawsuit
                                         array('nickname' => $user->nickname));
             } else if (common_logged_in()) {
                 $cur = common_current_user();
-                $url = common_local_url('all', array('nickname' => $cur->nickname));
+                $url = common_local_url('timeline', array('nickname' => $cur->nickname));
             } else {
                 $url = common_local_url('public');
             }

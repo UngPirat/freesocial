@@ -68,14 +68,14 @@ class PersonalGroupNav extends Menu
         $this->out->elementStart('ul', array('class' => 'nav'));
 
         if (Event::handle('StartPersonalGroupNav', array($this))) {
-            $this->out->menuItem(common_local_url('all', array('nickname' =>
+            $this->out->menuItem(common_local_url('timeline', array('nickname' =>
                                                                $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.
                                  _m('MENU','Home'),
                                  // TRANS: Menu item title in personal group navigation menu.
                                  // TRANS: %s is a username.
                                  sprintf(_('%s and friends'), $name),
-                                 $mine && $action =='all', 'nav_timeline_personal');
+                                 $mine && $action =='timeline', 'nav_timeline_personal');
             $this->out->menuItem(common_local_url('showstream', array('nickname' =>
                                                                       $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.

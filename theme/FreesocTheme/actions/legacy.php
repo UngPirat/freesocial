@@ -2,9 +2,7 @@
 /*
  *  Name: Legacy
  */
-	$this->box('header');
-
-	$this->out->elementStart('article', array('id'=>'content', 'class'=>'legacy'.($this->is_single()?' single':'')));
+	$this->out->elementStart('article', array('id'=>'content', 'class'=>'legacy'));
     $this->out->element('h2', 'content-title', $this->get_title());
 
 	if (isset($this->action->notice) &&
@@ -13,7 +11,7 @@
 			$this->action->subject = $this->action->user->getProfile();
 		}
 		$this->content('gallery');
-	} elseif (isset($this->action->notice) || isset($this->action->notices)) {
+	} elseif (isset($this->action->notice) || isset($this->action->conversation)) {
 		$this->content('noticelist');
 	} elseif ($this->get_template() != 'legacy') {
 		$this->content($this->get_template());
@@ -22,6 +20,3 @@
 	}
 
 	$this->out->elementEnd('article');
-
-    $this->box('footer');
-?>

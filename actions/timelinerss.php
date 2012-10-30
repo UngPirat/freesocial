@@ -46,7 +46,7 @@ require_once INSTALLDIR.'/lib/rssaction.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl.html AGPLv3
  * @link     http://status.net/
  */
-class AllrssAction extends Rss10Action
+class TimelinerssAction extends Rss10Action
 {
     var $user = null;
 
@@ -103,12 +103,12 @@ class AllrssAction extends Rss10Action
     function getChannel()
     {
         $user = $this->user;
-        $c    = array('url' => common_local_url('allrss',
+        $c    = array('url' => common_local_url('timelinerss',
                                              array('nickname' =>
                                                    $user->nickname)),
                    // TRANS: Message is used as link title. %s is a user nickname.
                    'title' => sprintf(_('%s and friends'), $user->nickname),
-                   'link' => common_local_url('all',
+                   'link' => common_local_url('timeline',
                                              array('nickname' =>
                                                    $user->nickname)),
                    // TRANS: Message is used as link description. %1$s is a username, %2$s is a site name.

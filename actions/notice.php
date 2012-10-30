@@ -44,7 +44,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class ShownoticeAction extends Action
+class NoticeAction extends Action
 {
     /**
      * Notice object to show
@@ -54,7 +54,7 @@ class ShownoticeAction extends Action
     /**
      * Profile of the notice object
      */
-    var $subject = null;
+    var $profile = null;
 
     /**
      * Avatar of the profile of the notice object
@@ -92,15 +92,15 @@ class ShownoticeAction extends Action
             throw new ClientException(_('Not available.'), 403);
         }
 
-        $this->subject = $this->notice->getProfile();
+        $this->profile = $this->notice->getProfile();
 
-        if (empty($this->subject)) {
+        if (empty($this->profile)) {
             // TRANS: Server error displayed trying to show a notice without a connected profile.
             $this->serverError(_('Notice has no profile.'), 500);
             return false;
         }
 
-        $this->avatar = Avatar::getByProfile($this->subject);
+        $this->avatar = Avatar::getByProfile($this->profile);
 
         return true;
     }
@@ -113,7 +113,7 @@ class ShownoticeAction extends Action
      */
     function getNotice()
     {
-        $id = $this->arg('notice');
+        $id = $this->arg('id');
 
         $notice = Notice::staticGet('id', $id);
 
@@ -153,7 +153,7 @@ class ShownoticeAction extends Action
     function lastModified()
     {
         return max(strtotime($this->notice->modified),
-                   strtotime($this->subject->modified),
+                   strtotime($this->profile->modified),
                    ($this->avatar) ? strtotime($this->avatar->modified) : 0);
     }
 
@@ -176,7 +176,7 @@ class ShownoticeAction extends Action
                                           common_language(),
                                           $this->notice->id,
                                           strtotime($this->notice->created),
-                                          strtotime($this->subject->modified),
+                                          strtotime($this->profile->modified),
                                           $avtime)) . '"';
     }
 
@@ -187,7 +187,7 @@ class ShownoticeAction extends Action
      */
     function title()
     {
-        $base = $this->subject->getFancyName();
+        $base = $this->profile->getFancyName();
 
         // TRANS: Title of the page that shows a notice.
         // TRANS: %1$s is a user name, %2$s is the notice creation date/time.
@@ -209,10 +209,10 @@ class ShownoticeAction extends Action
     {
         parent::handle($args);
 
-        if ($this->boolean('ajax')) {
+/*        if ($this->boolean('ajax')) {
             $this->showAjax();
 			return;
-        }
+        }*/
 
         $this->showPage();
     }
@@ -274,7 +274,7 @@ class ShownoticeAction extends Action
      */
     function extraHead()
     {
-        $user = User::staticGet($this->subject->id);
+        $user = User::staticGet($this->profile->id);
 
         if (!$user) {
             return;
@@ -303,7 +303,7 @@ class ShownoticeAction extends Action
             'title'=>'oEmbed'),null);
 
         // Extras to aid in sharing notices to Facebook
-        $avatarUrl = Avatar::getUrlByProfile($this->subject);
+        $avatarUrl = Avatar::getUrlByProfile($this->profile);
         $this->element('meta', array('property' => 'og:image',
                                      'content' => $avatarUrl));
         $this->element('meta', array('property' => 'og:description',

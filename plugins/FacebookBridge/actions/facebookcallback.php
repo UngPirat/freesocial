@@ -75,7 +75,7 @@ class FacebookcallbackAction extends Action
                         try {
 							$importer = new FacebookImport($flink->foreign_id);
 	                        common_debug("FBDBG User '{$entry->uid}' has a realtime update, handling it");
-						} catch (Exception {
+						} catch (Exception $e) {
 							continue;
 						}
 

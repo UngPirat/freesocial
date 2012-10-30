@@ -144,13 +144,17 @@ class TwitterStatusFetcher extends ParallelizingDaemon
             common_debug('TWITTER ignoring timeline for silenced user '.$profile->id);
         } else {
 			try {
-	            $this->getTimeline($flink, 'home_timeline');
-            	$this->getTimeline($flink, 'mentions');
+				foreach(array('home_timeline', 'mentions_timeline') as $timelineUri) {
+		            $this->getTimeline($flink, $timelineUri);
+				}
 	        } catch (Exception $e) {
 	            common_log(LOG_ERR, $this->name() . ' - Unable to get ' . $timelineUri . ' timeline for user ' . $flink->user_id . ' - code: ' . $e->getCode() . 'msg: ' . $e->getMessage());
 				switch ($e->getCode()) {
 				case 32:
 					common_debug('Should we delete flink->user_id='.$flink->user_id.'?');
+					break;
+				case 417:
+					common_debug('Twitter API Expectation failed');
 					break;
 				}
         	}

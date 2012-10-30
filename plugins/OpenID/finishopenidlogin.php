@@ -488,9 +488,7 @@ class FinishopenidloginAction extends Action
             common_set_returnto(null);
 	    $url = common_inject_session($url);
         } else {
-            $url = common_local_url('all',
-                                    array('nickname' =>
-                                          $nickname));
+            $url = common_local_url('timeline', array('nickname' => $nickname));
         }
         common_redirect($url, 303);
     }

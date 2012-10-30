@@ -311,7 +311,7 @@ class EditpeopletagAction extends Action
             // This might take quite a bit of time.
             $this->peopletag->delete();
             // send home.
-            common_redirect(common_local_url('all',
+            common_redirect(common_local_url('timeline',
                                          array('nickname' => $this->tagger->nickname)),
                             303);
         }

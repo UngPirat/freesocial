@@ -130,7 +130,7 @@ class ConfirmfirstemailAction extends Action
      */
     function handle($argarray=null)
     {
-        $homepage = common_local_url('all',
+        $homepage = common_local_url('timeline',
                                      array('nickname' => $this->user->nickname));
 
         if ($this->isPost()) {

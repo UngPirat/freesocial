@@ -76,31 +76,12 @@ class RawConversationNoticeStream extends NoticeStream
         $this->id = $id;
     }
 
-    function getNotices($offset, $limit, $sinceId = null, $maxId = null)
-    {
-        $all = Memcached_DataObject::listGet('Notice', 'conversation', array($this->id));
-        $notices = $all[$this->id];
-        // Re-order in reverse-chron
-        usort($notices, array('RawConversationNoticeStream', '_reverseChron'));
-        // FIXME: handle since and max
-        $wanted = array_slice($notices, $offset, $limit);
-        return new ArrayWrapper($wanted);
-		// proposed
-		/*$ids = $this->getNoticeIds($offset, $limit, $sinceId, $maxId);
-		$notices = self::getStreamByIds($ids);
-		return $notices;*/
-    }
-
     function getNoticeIds($offset, $limit, $since_id, $max_id)
     {
-        $notice = $this->getNotices($offset, $limit, $since_id, $max_id);
-        $ids = $notice->fetchAll('id');
-        return $ids;
-		// proposed:
 		$conv = new Conversation();
 		$conv->id = $this->id;
-		$conv->orderBy('created ASC');
-		$ids = $conv->fetchAll('id');
+		$conv->orderBy('created DESC');
+		$ids = $conv->fetchAll('notice_id');
 		return array_slice($ids, $offset, $limit);
     }
 

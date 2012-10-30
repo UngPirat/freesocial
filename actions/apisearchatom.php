@@ -317,7 +317,7 @@ class ApiSearchAtomAction extends ApiPrivateAuthAction
     {
         $server  = common_config('site', 'server');
         $profile = $notice->getProfile();
-        $nurl    = common_local_url('shownotice', array('notice' => $notice->id));
+        $nurl    = common_local_url('notice', array('id' => $notice->id));
 
         $this->elementStart('entry');
 

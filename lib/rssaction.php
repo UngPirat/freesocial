@@ -239,7 +239,7 @@ class Rss10Action extends Action
     function showItem($notice)
     {
         $profile = $notice->getProfile();
-        $nurl = common_local_url('shownotice', array('notice' => $notice->id));
+        $nurl = common_local_url('notice', array('id' => $notice->id));
         $creator_uri = common_profile_uri($profile);
         $this->elementStart('item', array('rdf:about' => $notice->uri,
                             'rdf:type' => 'http://rdfs.org/sioc/types#MicroblogPost'));
@@ -267,7 +267,7 @@ class Rss10Action extends Action
         $this->element('statusnet:postIcon', array('rdf:resource' => $profile->avatarUrl()));
         $this->element('cc:licence', array('rdf:resource' => common_config('license', 'url')));
         if ($notice->reply_to) {
-            $replyurl = common_local_url('shownotice', array('notice' => $notice->reply_to));
+            $replyurl = common_local_url('notice', array('id' => $notice->reply_to));
             $this->element('sioc:reply_of', array('rdf:resource' => $replyurl));
         }
         if (!empty($notice->conversation)) {

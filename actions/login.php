@@ -95,7 +95,7 @@ class LoginAction extends Action
 
         if (common_is_real_login()) {
             $user = common_current_user();
-            common_redirect(common_local_url('all', array('nickname' => $user->nickname)), 307);
+            common_redirect(common_local_url('timeline', array('nickname' => $user->nickname)), 307);
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->checkLogin();
         } else {
@@ -148,7 +148,7 @@ class LoginAction extends Action
             common_set_returnto(null);
 	    $url = common_inject_session($url);
         } else {
-            $url = common_local_url('all',
+            $url = common_local_url('timeline',
                                     array('nickname' =>
                                           $user->nickname));
         }

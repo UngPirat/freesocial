@@ -100,8 +100,8 @@ nav.horizontal-menu, nav.vertical-menu {
 	background: #f0f0f0;
 	background: -moz-linear-gradient(#ffffff, #f0f0f0);
 	background: -o-linear-gradient(#ffffff, #f0f0f0);
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#252525), to(#0a0a0a)); /* older webkit syntax */
-	background: -webkit-linear-gradient(#252525, #0a0a0a);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#f0f0f0)); /* older webkit syntax */
+	background: -webkit-linear-gradient(#ffffff, #f0f0f0);
 	-webkit-box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
 	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
 	margin-bottom: 1em;

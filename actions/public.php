@@ -53,12 +53,6 @@ define('MAX_PUBLIC_PAGE', 100);
  */
 class PublicAction extends Action
 {
-    /**
-     * page of the stream we're on; default = 1
-     */
-
-    var $page = null;
-    var $notice;
     var $userProfile = null;
 
     function isReadOnly($args)
@@ -87,8 +81,6 @@ class PublicAction extends Action
         common_set_returnto($this->selfUrl());
 
         $this->userProfile = Profile::current();
-
-        $user = common_current_user();
 
         $stream = new ThreadingPublicNoticeStream($this->userProfile);
 

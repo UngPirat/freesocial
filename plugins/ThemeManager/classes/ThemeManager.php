@@ -64,10 +64,35 @@ class ThemeManager extends ThemeSite {
 
         $this->action->extraHeaders();    // http headers
 
-        include $this->get_template_file();    // we can do stuff like $this-> inside the template!
-        
+		$this->render();
+
         return true;
     }
+
+	function render() {
+		if ($this->action->boolean('ajax')) {
+			$this->ajax();
+		} else {
+			$this->box('header');
+            include $this->get_template_file();    // we can do stuff like $this-> inside the template!
+			$this->box('footer');
+		}
+		$this->out->flush();
+	}
+
+	function ajax() {
+        header('Content-Type: text/xml;charset=utf-8');
+        $this->out->xw->startDocument('1.0', 'UTF-8');
+/*        $this->out->elementStart('html');
+        $this->out->elementStart('head');
+        $this->out->element('title', null, $this->get_title());
+        $this->out->elementEnd('head');
+        $this->out->elementStart('body');
+		$this->out->flush();*/
+		$this->content($this->get_content_name());
+/*        $this->out->elementEnd('body');
+        $this->out->elementEnd('html');*/
+	}
 
     function head() {
         if (Event::handle('StartShowHeadElements', array($this->action))) {

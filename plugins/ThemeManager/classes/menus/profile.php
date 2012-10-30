@@ -26,7 +26,7 @@ class ProfileMenu extends ThemeMenu {
             // list($actionName, $args, $label, $description, $id)
             $list = array_merge($list, array(
                 array('url'=>'showstream', 'args'=>$args, 'label'=>_m('MENU','Posts'), 'description'=>_m('Your original posts')),
-                array('url'=>'all',        'args'=>$args, 'label'=>_m('MENU','Timeline'), 'description'=>_m('Home timeline')),
+                array('url'=>'timeline',   'args'=>$args, 'label'=>_m('MENU','Timeline'), 'description'=>_m('Subscription timeline')),
                 array('url'=>'mentions',   'args'=>$args, 'label'=>_m('MENU','Mentions'), 'description'=>_m('Who mentioned you?')),
                 array('url'=>'replies',    'args'=>$args, 'label'=>_m('MENU','Replies'), 'description'=>_m('Your replies to others')),
                 array('url'=>'favorites',  'args'=>$args, 'label'=>_m('MENU','Favorites'), 'description'=>_m('Your favorites')),

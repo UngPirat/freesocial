@@ -144,7 +144,7 @@ class OtpAction extends Action
             // We don't have to return to it again
             common_set_returnto(null);
         } else {
-            $url = common_local_url('all',
+            $url = common_local_url('timeline',
                                     array('nickname' =>
                                           $this->user->nickname));
         }

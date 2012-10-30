@@ -56,7 +56,7 @@ class User_group extends Managed_DataObject
                 'uri' => array('type' => 'varchar', 'length' => 255, 'description' => 'universal identifier'),
                 'join_policy' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=open; 1=requires admin approval'),      
                 'force_scope' => array('type' => 'int', 'size' => 'tiny', 'description' => '0=never,1=sometimes,-1=always'),
-				//remove the following
+                //remove the following
                 'profileurl' => array('type' => 'varchar', 'length' => 255, 'description' => 'page for group info to link to'),
                 'original_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'original size logo'),
                 'homepage_logo' => array('type' => 'varchar', 'length' => 255, 'description' => 'homepage (profile) size logo'),
@@ -71,9 +71,9 @@ class User_group extends Managed_DataObject
             'unique keys' => array(
                 'group_uri_key' => array('uri'),
             ),
-			'indexes' => array(
+            'indexes' => array(
                 'group_nickname_key' => array('nickname'),
-			),
+            ),
             'foreign keys' => array(
                 'group_id_idx' => array('profile', array('id' => 'id')),
             ),
@@ -90,14 +90,14 @@ class User_group extends Managed_DataObject
 
     function homeUrl()
     {
-		try {
-			$profile = $this->getProfile();
-		} catch (UserNoProfileException $e) {
-		}
-		if (!empty($profile) && $profile->isGroup()) {
-			return $profile->homeUrl();
-		}
-		return $this->profileurl;
+        try {
+            $profile = $this->getProfile();
+        } catch (UserNoProfileException $e) {
+        }
+        if (!empty($profile) && $profile->isGroup()) {
+            return $profile->homeUrl();
+        }
+        return $this->profileurl;
     }
 
     protected $_profile = -1;
@@ -164,8 +164,8 @@ class User_group extends Managed_DataObject
         $idstring = self::cacheGet($keypart);
 
         if ($idstring !== false) {
-			$ids = explode(',', $idstring);
-		} else {
+            $ids = explode(',', $idstring);
+        } else {
             $gm = new Group_member();
     
             $gm->selectAdd();
@@ -187,9 +187,9 @@ class User_group extends Managed_DataObject
             $ids = array_reverse($ids);
         }
 
-		if (!is_null($offset) && !is_null($limit)) {
-	        $ids = array_slice($ids, $offset, $limit);
-		}
+        if (!is_null($offset) && !is_null($limit)) {
+            $ids = array_slice($ids, $offset, $limit);
+        }
 
         return $ids;
     }
@@ -597,13 +597,13 @@ class User_group extends Managed_DataObject
         }
 
         $fields['nickname'] = common_canonical_nickname($fields['nickname']);
-		if (!User::allowed_nickname($fields['nickname'])) {
-			common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname), __FILE__);
-			throw new Exception(_m('Nickname not allowed'));
-		}
-		if (Nickname::exists($fields['nickname'])) {
-			throw new Exception(_m('Nickname already in use'));
-		}
+        if (!User::allowed_nickname($fields['nickname'])) {
+            common_log(LOG_WARNING, sprintf("Attempted to register a nickname that is not allowed: %s", $profile->nickname), __FILE__);
+            throw new Exception(_m('Nickname not allowed'));
+        }
+        if (Nickname::exists($fields['nickname'])) {
+            throw new Exception(_m('Nickname already in use'));
+        }
 
         $defaults = array('nickname' => null,
                           'fullname' => null,
@@ -619,7 +619,7 @@ class User_group extends Managed_DataObject
         $profile = new Profile();
 
         $profile->query('BEGIN');
-		$profile->type = Profile::GROUP;
+        $profile->type = Profile::GROUP;
 
         if (empty($fields['profileurl'])) {
             $fields['profileurl'] = common_local_url('showstream', array('nickname' => $fields['nickname']));
@@ -631,12 +631,12 @@ class User_group extends Managed_DataObject
         }
         $profile->created     = common_sql_now();
 
-		$result = $profile->insert();
-		if (!$result) {
+        $result = $profile->insert();
+        if (!$result) {
             common_log_db_error($group, 'INSERT', __FILE__);
             // TRANS: Server exception thrown when creating a group failed.
             throw new ServerException(_m('Could not create group.'));
-		}
+        }
 
             
         if ($fields['local']) {
@@ -655,21 +655,21 @@ class User_group extends Managed_DataObject
             }
         }
 
-		$group = new User_group();
-		$group->id = $profile->id;
-		$group->nickname = $profile->nickname;
-		$group->profileurl = $profile->profileurl;
+        $group = new User_group();
+        $group->id = $profile->id;
+        $group->nickname = $profile->nickname;
+        $group->profileurl = $profile->profileurl;
 
         if (empty($fields['uri'])) {
             $group->uri = common_local_url('groupbyid', array('id' => $profile->id));
         }
 
         $group->join_policy = isset($fields['join_policy'])
-							? intval($fields['join_policy'])
-							: 0;
+                            ? intval($fields['join_policy'])
+                            : 0;
         $group->force_scope = isset($fields['force_scope'])
-							? intval($fields['force_scope'])
-							: 0;
+                            ? intval($fields['force_scope'])
+                            : 0;
 
         if (Event::handle('StartGroupSave', array(&$group))) {
             $result = $group->insert();
@@ -704,7 +704,7 @@ class User_group extends Managed_DataObject
 
             self::blow('profile:groups:%d', $fields['userid']);
 
-            $profile->query('COMMIT');	// finalize everything and write to db
+            $profile->query('COMMIT');    // finalize everything and write to db
 
             Event::handle('EndGroupSave', array($group));
         }
@@ -751,7 +751,7 @@ class User_group extends Managed_DataObject
             $inst->related_group_id = $this->id;
             $inst->delete();
 
-			// and the group's profile
+            // and the group's profile
             $inst = new Profile();
             $inst->id = $this->id;
             $inst->delete();

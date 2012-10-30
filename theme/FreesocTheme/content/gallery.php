@@ -12,7 +12,7 @@
 			$this->widget(ucfirst(mb_substr($action, 0, -1)).'List', array('item'=>$profile));
 			break;
 		}
-	} elseif ($this->is_action('shownotice')) {
+	} elseif ($this->is_action('notice')) {
 		NoticeWidget::run(array('item'=>$this->action->notice));
 	} else {
 		$this->action->showContent();

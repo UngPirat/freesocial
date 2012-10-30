@@ -217,7 +217,7 @@ class ApiTimelineFriendsAction extends ApiBareAuthAction
         );
 
         $link = common_local_url(
-            'all',
+            'timeline',
              array('nickname' => $this->user->nickname)
         );
 

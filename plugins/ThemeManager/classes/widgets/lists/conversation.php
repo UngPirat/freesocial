@@ -16,7 +16,7 @@ class ConversationListWidget extends NoticeListWidget {
 	
     function the_item($item) {
 		// $item here is an array of all the Notice objects in the conversation
-        ConversationWidget::run(array('list'=>$item, 'loopArgs'=>$this->convArgs, 'pagination'=>$this->pagination));
+        ConversationWidget::run(array('list'=>$item, 'loopArgs'=>$this->convArgs, 'pagination'=>false));
     }
 }
 

@@ -233,11 +233,9 @@ class NewnoticeAction extends Action
             $returnto = $this->trimmed('returnto');
 
             if ($returnto) {
-                $url = common_local_url($returnto,
-                                        array('nickname' => $user->nickname));
+                $url = common_local_url($returnto, array('nickname' => $user->nickname));
             } else {
-                $url = common_local_url('shownotice',
-                                        array('notice' => $notice->id));
+                $url = common_local_url('notice', array('id' => $notice->id));
             }
             common_redirect($url, 303);
         }

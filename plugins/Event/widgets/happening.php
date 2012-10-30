@@ -1,8 +1,7 @@
 <?php
 
 class HappeningWidget extends NoticeWidget {
-    protected $itemClass = 'notice happening';
-    protected $itemTag = 'article';
+    protected $widgetClass = 'notice happening';
 
     static function run(array $args=array()) {
         $class = get_class();

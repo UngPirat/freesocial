@@ -1758,8 +1758,7 @@ class Notice extends Managed_DataObject
         } else if (!empty($this->uri) && preg_match('/^https?:/', $this->uri)) {
             return $this->uri;
         } else {
-            return common_local_url('shownotice',
-                                    array('notice' => $this->id));
+            return common_local_url('notice', array('id' => $this->id));
         }
     }
 

@@ -72,6 +72,9 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
     function get_template_file() {
         return $this->template_file;
     }
+	function get_content_name() {
+		return basename($this->template_file, '.php');
+	}
 
     function get_siteinfo($param='') {
         switch ($param) {
@@ -100,11 +103,6 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
         endwhile;
         return $class;
     }
-    function is_single() {
-        return (isset($this->action->user) || isset($this->action->subject))
-            || $this->is_action('showstream');
-    }
-
 
     function the_feeds()
     {

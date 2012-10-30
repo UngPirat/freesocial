@@ -190,7 +190,7 @@ class EmailregisterAction extends Action
         $cur = common_current_user();
 
         if (!empty($cur)) {
-            common_redirect(common_local_url('all', array('nickname' => $cur->nickname)));
+            common_redirect(common_local_url('timeline', array('nickname' => $cur->nickname)));
             return;
         }
 

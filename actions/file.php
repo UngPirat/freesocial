@@ -19,7 +19,7 @@
 
 if (!defined('STATUSNET') && !defined('LACONICA')) { exit(1); }
 
-require_once(INSTALLDIR.'/actions/shownotice.php');
+require_once(INSTALLDIR.'/actions/notice.php');
 
 // @todo FIXME: Add documentation.
 class FileAction extends Action

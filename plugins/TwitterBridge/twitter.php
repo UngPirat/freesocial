@@ -289,11 +289,14 @@ function broadcast_oauth($notice, $flink) {
     $status = null;
 
     try {
+		common_debug('oauth broadcasting '.$notice->id);
         $status = $client->statusesUpdate($statustxt, $params);
+		common_debug('oauth broadcasting '.$notice->id.' returned '.print_r($status));
         if (!empty($status)) {
             Foreign_notice_map::saveNew($notice->id, twitter_id($status), TWITTER_SERVICE);
         }
     } catch (OAuthClientException $e) {
+		common_debug('oauth broadcasting '.$notice->id.' returned error '.print_r($e));
         return process_error($e, $flink, $notice);
     }
 
@@ -383,24 +386,30 @@ function format_status($notice)
     // Start with the plaintext source of this notice...
     $statustxt = $notice->content;
 
-	if (empty($notice->repeat_of) && $replyto = $notice->getParent()) {
-		// the reply has a notice and we want to profile of its author
-		$replyto = $replyto->getProfile();
-		if ($flink = Foreign_link::getByUserId($replyto->profile_id, TWITTER_SERVICE)) {
-			// let's store the profile author's local nickname for later
-			$localnick = $replyto->nickname;
-			// and get the foreign user which has the remote nickname
-			$replyto = Foreign_user::getForeignUser($flink->foreign_id, TWITTER_SERVICE);
-			// and replace the possible local nickname with the remote nickname
-			$statustxt = preg_replace('/(.+\s+|^)\@'.$localnick.'(\s+.+|$)/i',
-										'\\1@'.$replyto->nickname.'\\2',
-										$statustxt);
+	if (empty($notice->repeat_of)) :
+		try {
+			// try if notice has a parent notice (reply_to)
+			$replyto = $notice->getParent();
+			// the reply has a notice and we want to profile of its author
+			$replyto = $replyto->getProfile();
+			if ($flink = Foreign_link::getByUserId($replyto->profile_id, TWITTER_SERVICE)) {
+				// let's store the profile author's local nickname for later
+				$localnick = $replyto->nickname;
+				// and get the foreign user which has the remote nickname
+				$replyto = Foreign_user::getForeignUser($flink->foreign_id, TWITTER_SERVICE);
+				// and replace the possible local nickname with the remote nickname
+				$statustxt = preg_replace('/(.+\s+|^)\@'.$localnick.'(\s+.+|$)/i',
+											'\\1@'.$replyto->nickname.'\\2',
+											$statustxt);
+			}
+	    	if (!empty($replyto) && !preg_match('/(.+\s+|^)\@'.$replyto->nickname.'(\s+.+|$)/i', $statustxt)) {
+				// the profile was not a local user with a foreign link, add remote nick if necessary
+				$statustxt = "@{$replyto->nickname} " . $statustxt;
+			}
+		} catch (Exception $e) {
+			// no parent
 		}
-    	if (!empty($replyto) && !preg_match('/(.+\s+|^)\@'.$replyto->nickname.'(\s+.+|$)/i', $statustxt)) {
-			// the profile was not a local user with a foreign link, add remote nick if necessary
-			$statustxt = "@{$replyto->nickname} " . $statustxt;
-		}
-	}
+	endif;
 
     // Convert !groups to #hashes
     // XXX: Make this an optional setting?

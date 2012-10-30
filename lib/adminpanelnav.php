@@ -65,14 +65,14 @@ class AdminPanelNav extends Menu
         // TRANS: Header in administrator navigation panel.
         $this->action->element('h3', null, _m('HEADER','Home'));
         $this->action->elementStart('ul', 'nav');
-        $this->out->menuItem(common_local_url('all', array('nickname' =>
+        $this->out->menuItem(common_local_url('timeline', array('nickname' =>
                                                            $nickname)),
                              // TRANS: Menu item in administrator navigation panel.
                              _m('MENU','Home'),
                              // TRANS: Menu item title in administrator navigation panel.
                              // TRANS: %s is a username.
                              sprintf(_('%s and friends'), $name),
-                             $this->action == 'all', 'nav_timeline_personal');
+                             $this->action == 'timeline', 'nav_timeline_personal');
 
         $this->action->elementEnd('ul');
         $this->action->elementEnd('li');

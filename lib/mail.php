@@ -469,8 +469,7 @@ function mail_notify_fave($other, $user, $notice)
                       "%5\$s"),
                     $bestname,
                     common_exact_date($notice->created),
-                    common_local_url('shownotice',
-                                     array('notice' => $notice->id)),
+                    common_local_url('notice', array('id' => $notice->id)),
                     $notice->content,
                     common_local_url('favorites',
                                      array('nickname' => $user->nickname)),
@@ -548,8 +547,7 @@ function mail_notify_attn($user, $notice)
                       "%7\$s"),
                     $sender->getFancyName(),//%1
                     common_config('site', 'name'),//%2
-                    common_local_url('shownotice',
-                                     array('notice' => $notice->id)),//%3
+                    common_local_url('notice', array('id' => $notice->id)),//%3
                     $notice->content,//%4
                     $conversationEmailText,//%5
                     common_local_url('newnotice',

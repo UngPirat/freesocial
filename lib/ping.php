@@ -44,8 +44,8 @@ function ping_broadcast_notice($notice) {
                                          array($profile->nickname, # site name
                                                common_local_url('showstream',
                                                                 array('nickname' => $profile->nickname)),
-                                               common_local_url('shownotice',
-                                                                array('notice' => $notice->id)),
+                                               common_local_url('notice',
+                                                                array('id' => $notice->id)),
                                                common_local_url('userrss',
                                                                 array('nickname' => $profile->nickname)),
                                                $tags));

@@ -5,8 +5,8 @@ class NoticeWidget extends ThemeWidget {
     protected $item;
     protected $avatarSize = Avatar::STREAM_SIZE;
 
-    protected $itemClass = 'notice';
-    protected $itemTag = 'article';
+    protected $widgetClass = 'notice';
+    protected $widgetTag = 'article';
 
     static function run(array $args=array()) {
         if (Event::handle('StartRunNoticeWidget', array($args))) {
@@ -44,25 +44,24 @@ class NoticeWidget extends ThemeWidget {
             return false;	// shouldn't this throw an exception?
         }
         if (!empty($this->item->repeat_of)) {
-            $this->itemClass .= ' repeat';
+            $this->widgetClass .= ' repeat';
         }
         if (class_exists('Spam_score') && $score = Spam_score::staticGet('notice_id', $this->item->id)) {
-            $this->itemClass .= $score->is_spam ? ' spam' : '';
+            $this->widgetClass .= $score->is_spam ? ' spam' : '';
         }
         $this->the_item();
         return true;
     }
 
     function the_item() {
-        $this->itemTag && $this->out->elementStart($this->itemTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->itemClass));
+        $this->widgetTag && $this->out->elementStart($this->widgetTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->widgetClass));
+		$this->the_header();
         $this->the_vcard();
         $this->the_content();
         if (common_config('attachments', 'show_thumbs')) {
             $this->the_attachments();
         }
-        $this->the_metadata();
-        $this->the_actions();
-        $this->itemTag && $this->out->elementEnd($this->itemTag);
+        $this->widgetTag && $this->out->elementEnd($this->widgetTag);
     }
 
     function get_notice() {
@@ -94,7 +93,7 @@ class NoticeWidget extends ThemeWidget {
                 : $profile->profileurl;
     }
     function get_permalink() {
-        return common_local_url('shownotice', array('notice'=>$this->get_notice()->id));
+        return common_local_url('notice', array('id'=>$this->get_notice()->id));
     }
     function get_verb() {
         if (!empty($this->repeated)) {
@@ -128,6 +127,13 @@ class NoticeWidget extends ThemeWidget {
         $this->out->raw($this->get_rendered_content());
         $this->out->elementEnd('span');
     }
+	function the_header() {
+		$this->out->flush();
+        $this->out->elementStart('header');
+        $this->the_metadata();
+        $this->the_actions();
+        $this->out->elementEnd('header');
+	}
     function the_actions() {
         try {
             NoticeactionsWidget::run(array('item'=>$this->get_notice(), 'scoped'=>$this->scoped));
@@ -135,14 +141,14 @@ class NoticeWidget extends ThemeWidget {
         }
     }
     function the_metadata() {
-        $this->out->elementStart('footer', 'metadata');
+        $this->out->elementStart('aside', 'metadata');
 //        $this->the_author();
         $this->the_verb();
         $this->the_timestamp();
         $this->the_context();
         $this->the_related();
         $this->the_source();
-        $this->out->elementEnd('footer');
+        $this->out->elementEnd('aside');
     }
     function the_related() {
         if (!empty($this->repeated)) {

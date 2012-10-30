@@ -299,7 +299,7 @@ class NoticeTitlePlugin extends Plugin
     {
         $actionName = $action->trimmed('action');
 
-        if ($actionName == 'shownotice') {
+        if ($actionName == 'notice') {
             $title = Notice_title::fromNotice($action->notice);
             if (!empty($title)) {
                 $action->element('title', null,
@@ -324,7 +324,7 @@ class NoticeTitlePlugin extends Plugin
     {
         $actionName = $action->trimmed('action');
 
-        if ($actionName == 'shownotice') {
+        if ($actionName == 'notice') {
             $title = Notice_title::fromNotice($action->notice);
             if (!empty($title)) {
                 $action->element('h1', null, $title);

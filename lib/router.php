@@ -247,9 +247,9 @@ class Router
                         array('action' => 'file'),
                         array('notice' => '[0-9]+'));
 
-            $m->connect('notice/:notice',
-                        array('action' => 'shownotice'),
-                        array('notice' => '[0-9]+'));
+            $m->connect('notice/:id',
+                        array('action' => 'notice'),
+                        array('id' => '[0-9]+'));
 
             $m->connect('notice/delete/:notice',
                         array('action' => 'deletenotice'),
@@ -823,7 +823,7 @@ class Router
                 $nickname = User::singleUserNickname();
 
                 foreach (array('subscriptions', 'subscribers',
-                               'all', 'foaf', 'mentions',
+                               'timeline', 'foaf', 'mentions',
                                'favorites', 'repeated', 'repeats', 'replies') as $a) {
                     $m->connect($a,
                                 array('action' => $a,
@@ -847,7 +847,7 @@ class Router
                                       'nickname' => $nickname));
                 }
 
-                foreach (array('all', 'mentions', 'favorites') as $a) {
+                foreach (array('timeline', 'mentions', 'favorites') as $a) {
                     $m->connect($a.'/rss',
                                 array('action' => $a.'rss',
                                       'nickname' => $nickname));
@@ -938,7 +938,7 @@ class Router
                 $m->connect('rsd.xml', array('action' => 'rsd'));
 
                 foreach (array('subscriptions', 'subscribers',
-                               'all', 'foaf', 'mentions',
+                               'timeline', 'foaf', 'mentions',
 							   'favorites', 'repeated', 'repeats', 'replies') as $a) {
                     $m->connect(':nickname/'.$a,
                                 array('action' => $a),
@@ -1015,7 +1015,7 @@ class Router
                                 array('nickname' => Nickname::DISPLAY_FMT));
                 }
 
-                foreach (array('all', 'mentions', 'favorites') as $a) {
+                foreach (array('timeline', 'mentions', 'favorites') as $a) {
                     $m->connect(':nickname/'.$a.'/rss',
                                 array('action' => $a.'rss'),
                                 array('nickname' => Nickname::DISPLAY_FMT));

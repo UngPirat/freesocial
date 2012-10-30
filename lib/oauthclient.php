@@ -243,7 +243,7 @@ class OAuthClient
         ));
 
         // Twitter is strict about accepting invalid "Expect" headers
-        $request->setHeader('Expect', '');
+        //$request->setHeader('Expect', '');
 
         if (isset($params)) {
             $request->setMethod(HTTP_Request2::METHOD_POST);

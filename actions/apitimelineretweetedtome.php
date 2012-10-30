@@ -105,7 +105,7 @@ class ApiTimelineRetweetedToMeAction extends ApiAuthAction
         $id         = "tag:$taguribase:RepeatedToMe:" . $this->auth_user->id;
 
         $link = common_local_url(
-            'all',
+            'timeline',
              array('nickname' => $this->auth_user->nickname)
         );
 

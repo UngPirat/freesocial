@@ -47,10 +47,10 @@ require_once INSTALLDIR.'/lib/noticelist.php';
  */
 class ConversationAction extends Action
 {
-    var $id          = null;
-    var $page        = null;
-    var $notices     = null;
-    var $userProfile = null;
+    var $id           = null;
+    var $page         = null;
+    var $conversation = null;
+    var $userProfile  = null;
 
     const MAX_NOTICES = 500;
 
@@ -82,9 +82,11 @@ class ConversationAction extends Action
             $this->userProfile = $cur->getProfile();
         }
 
-        $stream = new ConversationNoticeStream($this->id, $this->userProfile);
-
-        $this->notices = $stream->getNotices(0, self::MAX_NOTICES);
+		$this->conversation = $this->id;
+        if (!defined('THEME_MANAGER') || THEME_MANAGER==false) {
+        	$stream = new ConversationNoticeStream($this->id, $this->userProfile);
+			$this->notices = $stream->getNotices(0, self::MAX_NOTICES);
+		}
 
         return true;
     }

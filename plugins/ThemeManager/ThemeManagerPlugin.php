@@ -42,9 +42,9 @@ class ThemeManagerPlugin extends Plugin {
     function onGetTmSupported(&$supported) {
         $supported = array_merge($supported, array(
                 'newnotice' => 'newnotice',
-                'public' => 'public',
+                'public' => 'noticelist',
                 'settings' => 'settings',
-                'shownotice' => 'legacy',
+                'notice' => 'noticelist',
                 'showstream' => 'profile',
                 ));
     }
@@ -66,7 +66,7 @@ class ThemeManagerPlugin extends Plugin {
     }
     function onStartShowNoticeItem($noticeitem) {
         if (defined('THEME_MANAGER') && THEME_MANAGER===true) {
-            NoticeWidget::run(array('item'=>$noticeitem->notice, 'itemTag'=>'li'));
+            NoticeWidget::run(array('item'=>$noticeitem->notice, 'widgetTag'=>'li'));
             return false;
         }
         return true;

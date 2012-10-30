@@ -91,7 +91,7 @@ class FreeSocialPlugin extends Plugin {
                                     array('nickname' => $user->nickname));
         } else if (common_logged_in()) {
             $user = common_current_user();
-            $url = common_local_url('all', array('nickname' => $user->nickname));
+            $url = common_local_url('timeline', array('nickname' => $user->nickname));
         } else {
 			$acct = null;
             $url = common_local_url('public');

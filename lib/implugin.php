@@ -552,7 +552,7 @@ abstract class ImPlugin extends Plugin
     {
         $aname = $action->trimmed('action');
 
-        if ($aname == 'shownotice') {
+        if ($aname == 'notice') {
 
             $user_im_prefs = new User_im_prefs();
             $user_im_prefs->user_id = $action->profile->id;

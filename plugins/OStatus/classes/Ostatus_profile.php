@@ -1272,7 +1272,7 @@ class Ostatus_profile extends Managed_DataObject
      */
     public static function getActivityObjectAvatar($object, $hints=array())
     {
-        if (class_exists('Avatar') && $object->avatarLinks) {	//TODO: do this with Event
+        if (class_exists('Avatar') && $object->avatarLinks) {    //TODO: do this with Event
             $best = false;
             // Take the exact-size avatar, or the largest avatar, or the first avatar if all sizeless
             foreach ($object->avatarLinks as $avatar) {
@@ -1528,17 +1528,17 @@ class Ostatus_profile extends Managed_DataObject
             $group->created = common_sql_now();
             self::updateGroup($group, $object, $hints);
 
-			// TODO: All this gpro stuff have to be normalized together with other activityobject types
-			$gpro = new Profile();
-			$gpro->query('BEGIN');
-			foreach(array('nickname', 'fullname', 'homepage', 'description', 'profileurl', 'location') as $key) {
-				$gpro->$key = $group->$key;
-			}
-			$group->id = $gpro->insert();
-			$group->insert();
+            // TODO: All this gpro stuff have to be normalized together with other activityobject types
+            $gpro = new Profile();
+            $gpro->query('BEGIN');
+            foreach(array('nickname', 'fullname', 'homepage', 'description', 'profileurl', 'location') as $key) {
+                $gpro->$key = $group->$key;
+            }
+            $group->id = $gpro->insert();
+            $group->insert();
 
             $oprofile->group_id = $group->id;
-			$gpro->query('COMMIT');
+            $gpro->query('COMMIT');
 
             if (!$oprofile->group_id) {
                 // TRANS: Server exception.
@@ -1586,6 +1586,7 @@ class Ostatus_profile extends Managed_DataObject
      */
     public function updateFromActivityObject($object, $hints=array())
     {
+        $this->updateOstatusFeeds($hints);
         if ($this->isGroup()) {
             $group = $this->localGroup();
             self::updateGroup($group, $object, $hints);
@@ -1605,6 +1606,43 @@ class Ostatus_profile extends Managed_DataObject
                 common_log(LOG_WARNING, "Exception saving OStatus profile avatar: " . $ex->getMessage());
             }
         }
+    }
+
+    private function updateOstatusFeeds($hints) {
+		$this->query('BEGIN');
+        if (array_key_exists('feedurl', $hints) && $hints['feedurl']!=$this->feeduri) {
+			// see if the new one already exists (might collide)
+            $feedsub = FeedSub::staticGet('uri', $hints['feedurl']);
+            if (empty($feedsub)) {	// change the old one if it doesn't collide
+                $feedsub = FeedSub::staticGet('uri', $this->feeduri);
+                if (!empty($feedsub)) {
+                    $orig = clone($feedsub);
+                    $feedsub->uri = $hints['feedurl'];
+                    if (isset($hints['hub'])) {
+                        $feedsub->huburi = $hints['hub'];
+                    }
+                    $feedsub->update($orig);
+                }
+            }
+        }
+        $orig = clone($this);
+        $hintmap = array('feedurl'=>'feeduri', 'salmon'=>'salmonuri');
+        foreach($hintmap as $hint=>$field) {
+            if (array_key_exists($hint, $hints)) {
+				// because DB will only update non-key fields
+				if (in_array($field, $this->keys())) {
+					$sql = 'UPDATE %1$s SET %2$s="%3$s" WHERE %2$s="%4$s";';
+					$this->query(sprintf($sql, /* 1 */ $this->__table, /* 2 */ $field,
+										/* 3 */ $this->escape($hints[$hint]),
+										/* 4 */ $this->escape($this->$field)
+										));
+				}
+				// this is how it gets done otherwise (will affect salmonuri)
+                $this->$field = $hints[$hint];
+            }
+        }
+        $this->update($orig);
+		$this->query('COMMIT');
     }
 
     public static function updateProfile($profile, $object, $hints=array())
