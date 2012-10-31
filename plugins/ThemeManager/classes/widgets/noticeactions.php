@@ -25,7 +25,7 @@ class NoticeactionsWidget extends ThemeWidget {
 
     function get_actions() {
         $items = array();
-		 
+         
         if (Event::handle('StartShowNoticeActions', array(&$items, $this->item, $this))) {
             $items['favor'] = ($this->scoped->hasFave($this->item)
                         ? new DisfavorForm($this->out, $this->item)
@@ -50,9 +50,9 @@ class NoticeactionsWidget extends ThemeWidget {
                 $inreplyto = $this->item->id;
             }
             $items['reply']  = array('element'=>'a',
-                                        'args'=>array('href' => common_local_url('newnotice', array(
-                                                                    'replyto' => $replyto,
-                                                                    'inreplyto' => $inreplyto)),
+                                        'args'=>array('href'   => common_local_url('reply', array(
+                                                                    'id' => $inreplyto)),
+                                                       'id'    => 'reply-'.$this->item->id,
                                                        'class' => 'action reply',
                                                     // TRANS: Link title in notice list item to reply to a notice.
                                                     'title' => _('Reply to this notice.')),
@@ -61,9 +61,9 @@ class NoticeactionsWidget extends ThemeWidget {
             if (!empty($this->scoped) &&
                 ($this->item->profile_id == $this->scoped->id || $this->scoped->hasRight(Right::DELETEOTHERSNOTICE))) {
                 $items['delete'] = array('element'=>'a',
-                                           'args'=>array('href' => common_local_url('deletenotice',
-                                                                                    array('notice' => $this->item->id)),
-                                                         'class' => 'action delete',
+                                        'args'=>array('href'  => common_local_url('delete', array('id' => $this->item->id)),
+                                                      'id'    => 'delete-'.$this->item->id,
+                                                      'class' => 'action delete',
                                                // TRANS: Link title in notice list item to delete a notice.
                                                'title'  => _('Delete this notice from the timeline.')),
                                            'content'=> _m(' Delete'),

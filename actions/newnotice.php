@@ -304,12 +304,8 @@ class NewnoticeAction extends Action
      */
     function showForm($msg=null)
     {
-        if ($this->boolean('ajax')) {
-            if ($msg) {
-                $this->ajaxErrorMsg($msg);
-            } else {
-                $this->ajaxShowForm();
-            }
+        if ($this->boolean('ajax') && $msg) {
+            $this->ajaxErrorMsg($msg);
             return;
         }
 

@@ -1,2 +1,2 @@
 <?php
-	$this->box('aside-newnotice');
+		NewnoticeForm::run($this->action->args);

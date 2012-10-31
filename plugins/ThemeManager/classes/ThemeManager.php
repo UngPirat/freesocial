@@ -81,8 +81,8 @@ class ThemeManager extends ThemeSite {
 	}
 
 	function ajax() {
-        header('Content-Type: text/xml;charset=utf-8');
-        $this->out->xw->startDocument('1.0', 'UTF-8');
+        header('Content-Type: text/html;charset=utf-8');
+        //$this->out->xw->startDocument('1.0', 'UTF-8');
 /*        $this->out->elementStart('html');
         $this->out->elementStart('head');
         $this->out->element('title', null, $this->get_title());
@@ -205,6 +205,7 @@ class ThemeManager extends ThemeSite {
         if (!is_subclass_of($name, 'ThemeWidget')) {
             throw new Exception('Not a widget');
         }
+		$args['ajax'] = StatusNet::isAjax();
         $name::run($args);
         $this->out->flush();
     }

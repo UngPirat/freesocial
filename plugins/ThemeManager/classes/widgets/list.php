@@ -43,6 +43,10 @@ abstract class ListWidget extends ThemeWidget {
 			}
 		endforeach;
         $this->loop = $this->get_loop($this->loopArgs);
+
+		if ($this->ajax) {
+			$this->pagination = false;
+		}
     }
 
     function count() {

@@ -41,11 +41,13 @@ class ThemeManagerPlugin extends Plugin {
 
     function onGetTmSupported(&$supported) {
         $supported = array_merge($supported, array(
-                'newnotice' => 'newnotice',
-                'public' => 'noticelist',
-                'settings' => 'settings',
-                'notice' => 'noticelist',
-                'showstream' => 'profile',
+                'conversation' => 'noticelist',
+                'delete'       => 'delete',
+                'newnotice'    => 'newnotice',
+                'public'       => 'noticelist',
+                'settings'     => 'settings',
+                'notice'       => 'noticelist',
+                'showstream'   => 'profile',
                 ));
     }
 

@@ -23,9 +23,9 @@ abstract class ThemeWidget extends ThemeExtension {
 
         $this->getOut();
 
-		if ($this->ajax) {
+/*		if ($this->ajax) {
 			$this->widgetTag = null;
-		}
+		}*/
     }
 
 	function getOut() {

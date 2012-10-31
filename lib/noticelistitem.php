@@ -657,8 +657,7 @@ class NoticeListItem extends Widget
         if (!empty($user) &&
             ($todel->profile_id == $user->id || $user->hasRight(Right::DELETEOTHERSNOTICE))) {
             $this->out->text(' ');
-            $deleteurl = common_local_url('deletenotice',
-                                          array('notice' => $todel->id));
+            $deleteurl = common_local_url('delete', array('id' => $todel->id));
             $this->out->element('a', array('href' => $deleteurl,
                                            'class' => 'notice_delete',
                                            // TRANS: Link title in notice list item to delete a notice.

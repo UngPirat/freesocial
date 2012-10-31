@@ -237,6 +237,10 @@ class Router
                         array('replyto' => Nickname::DISPLAY_FMT),
                         array('inreplyto' => '[0-9]+'));
 
+			$m->connect('notice/:id/reply',
+                        array('action' => 'reply'),
+                        array('id' => '[0-9]+'));
+
             $m->connect('notice/new?replyto=:replyto',
                         array('action' => 'newnotice'),
                         array('replyto' => Nickname::DISPLAY_FMT));
@@ -251,11 +255,11 @@ class Router
                         array('action' => 'notice'),
                         array('id' => '[0-9]+'));
 
-            $m->connect('notice/delete/:notice',
-                        array('action' => 'deletenotice'),
-                        array('notice' => '[0-9]+'));
+            $m->connect('notice/:id/delete',
+                        array('action' => 'delete'),
+                        array('id' => '[0-9]+'));
 
-            $m->connect('notice/delete', array('action' => 'deletenotice'));
+            $m->connect('notice/delete', array('action' => 'delete'));
 
             $m->connect('bookmarklet/new', array('action' => 'bookmarklet'));
 

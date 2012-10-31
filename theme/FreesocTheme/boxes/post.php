@@ -3,7 +3,7 @@
 
 	if (common_logged_in()) :
 		$this->out->element('header', array('accesskey'=>'n', 'class'=>'slidecontrol'), _m("Post »"));
-		NewnoticeForm::run($this->action->args);
+		NewnoticeForm::run();
     else :
 		WelcomeWidget::run(array('image'=>$this->url('img/catfish-welcome.png')));
     endif;
