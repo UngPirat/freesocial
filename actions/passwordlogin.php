@@ -42,44 +42,8 @@ if (!defined('STATUSNET') && !defined('LACONICA')) {
  * @license  http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
  * @link     http://status.net/
  */
-class LoginAction extends Action
+class PasswordloginAction extends LoginAction
 {
-    /**
-     * Has there been an error?
-     */
-    var $error = null;
-
-    /**
-     * Is this a read-only action?
-     *
-     * @return boolean false
-     */
-    function isReadOnly($args)
-    {
-        return false;
-    }
-
-    /**
-     * Prepare page to run
-     *
-     *
-     * @param $args
-     * @return string title
-     */
-    function prepare($args)
-    {
-        parent::prepare($args);
-
-        // @todo this check should really be in index.php for all sensitive actions
-        $ssl = common_config('site', 'ssl');
-        if (empty($_SERVER['HTTPS']) && ($ssl == 'always' || $ssl == 'sometimes')) {
-            common_redirect(common_local_url('login'));
-            // exit
-        }
-
-        return true;
-    }
-
     /**
      * Handle input, produce output
      *
@@ -102,6 +66,22 @@ class LoginAction extends Action
             common_ensure_session();
             $this->showForm();
         }
+    }
+
+    /**
+     * Store an error and show the page
+     *
+     * This used to show the whole page; now, it's just a wrapper
+     * that stores the error in an attribute.
+     *
+     * @param string $error error, if any.
+     *
+     * @return void
+     */
+    function showForm($error=null)
+    {
+        $this->error = $error;
+        $this->showPage();
     }
 
     /**
@@ -156,22 +136,6 @@ class LoginAction extends Action
         common_redirect($url, 303);
     }
 
-    /**
-     * Store an error and show the page
-     *
-     * This used to show the whole page; now, it's just a wrapper
-     * that stores the error in an attribute.
-     *
-     * @param string $error error, if any.
-     *
-     * @return void
-     */
-    function showForm($error=null)
-    {
-        $this->error = $error;
-        $this->showPage();
-    }
-
     function showScripts()
     {
         parent::showScripts();
@@ -186,27 +150,7 @@ class LoginAction extends Action
     function title()
     {
         // TRANS: Page title for login page.
-        return _('Login');
-    }
-
-    /**
-     * Show page notice
-     *
-     * Display a notice for how to use the page, or the
-     * error if it exists.
-     *
-     * @return void
-     */
-    function showPageNotice()
-    {
-        if ($this->error) {
-            $this->element('p', 'error', $this->error);
-        } else {
-            $instr  = $this->getInstructions();
-            $output = common_markup_to_html($instr);
-
-            $this->raw($output);
-        }
+        return _('Password login');
     }
 
     /**
@@ -221,7 +165,7 @@ class LoginAction extends Action
         $this->elementStart('form', array('method' => 'post',
                                           'id' => 'form_login',
                                           'class' => 'form_settings',
-                                          'action' => common_local_url('login')));
+                                          'action' => common_local_url('passwordlogin')));
         $this->elementStart('fieldset');
         // TRANS: Form legend on login page.
         $this->element('legend', null, _('Login to site'));
@@ -283,26 +227,5 @@ class LoginAction extends Action
             }
             return $prompt;
         }
-    }
-
-    /**
-     * A local menu
-     *
-     * Shows different login/register actions.
-     *
-     * @return void
-     */
-    function showLocalNav()
-    {
-        $nav = new LoginGroupNav($this);
-        $nav->show();
-    }
-
-    function showNoticeForm()
-    {
-    }
-
-    function showProfileBlock()
-    {
     }
 }

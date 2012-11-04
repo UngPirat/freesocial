@@ -3,6 +3,7 @@
 class ProfileWidget extends ThemeWidget {
     // these values will be set by default or $args-supplied values
     protected $item;
+	protected $itemTag = 'span';
 
     protected $avatarSize = Avatar::PROFILE_SIZE;
     protected $mini       = false;
@@ -38,6 +39,9 @@ class ProfileWidget extends ThemeWidget {
     function get_name() {
         return $this->item->getBestName();
     }
+	function get_description() {
+		return $this->item->description;
+	}
     function get_profile_url(Profile $profile=null) {
         $profile = (is_null($profile) ? $this->item : $profile);
         return class_exists('RemoteProfileAction')
@@ -51,31 +55,34 @@ class ProfileWidget extends ThemeWidget {
         $this->out->elementEnd('dl');
     }
     function the_tags() {
-        $this->out->element('dt', null, _m('Tags'));
+        //$this->out->element('dt', null, _m('Tags'));
         // a bunch of dd with the user's tags
     }
 	function the_userinfo() {
 		$this->out->element('dt', null, _m('Full name'));
 		$this->out->element('dd', 'fn', $this->get_name());
-        $this->out->element('dt', null, _m('Webfinger ID'));
-		$this->out->elementStart('dd', 'webfinger');
-		$this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), $this->item->getWebfinger());
-		$this->out->elementEnd('dd');
+		if ($this->item->isUser() && $wf = $this->item->getWebfinger()) {
+	        $this->out->element('dt', null, _m('Webfinger ID'));
+			$this->out->elementStart('dd', 'webfinger');
+			$this->out->element('a', array('href'=>$this->item->profileurl, 'class' => 'url'), $wf);
+			$this->out->elementEnd('dd');
+		}
 		$this->out->element('dt', null, _m('Homepage'));
 		$this->out->elementStart('dd');
 		$this->out->element('a', array('href'=>$this->item->homepage, 'rel'=>'nofollow external', 'class' => 'url'), $this->item->homepage);
 		$this->out->elementEnd('dd');
+		$this->out->element('dt', null, _m('Description'));
+		$this->out->element('dd', 'fn', $this->get_description());
 	}
     function the_actions() {
         ProfileactionsWidget::run(array('item'=>$this->item, 'scoped'=>$this->scoped));
     }
     function the_vcard() {
 		$class = 'vcard author' . ($this->mini ? ' mini' : '');
-        $this->out->elementStart('span', $class);
+	    $this->itemTag && $this->out->elementStart($this->itemTag, $class);
+		
         $this->out->elementStart('a', array('href'=>$this->get_profile_url()));
-        if (!Event::handle('GetAvatarElement', array(
-								&$element, $this->item, $this->avatarSize
-							))) {
+        if (!Event::handle('GetAvatarElement', array(&$element, $this->item, $this->avatarSize))) {
 			$this->out->element($element['tag'], $element['args']);
 		}
         $this->mini && $this->out->element('span', 'fn', $this->get_name());
@@ -84,7 +91,7 @@ class ProfileWidget extends ThemeWidget {
 		if (!$this->mini) {
 			$this->the_metadata();
 		}
-        $this->out->elementEnd('span');
+        $this->itemTag && $this->out->elementEnd($this->itemTag);
     }
 }
 

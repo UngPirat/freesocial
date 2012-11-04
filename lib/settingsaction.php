@@ -79,7 +79,7 @@ class SettingsAction extends Action
             common_set_returnto($this->selfUrl());
             $user = common_current_user();
             if (Event::handle('RedirectToLogin', array($this, $user))) {
-                common_redirect(common_local_url('login'), 303);
+                common_redirect(common_local_url('passwordlogin'), 303);
             }
         } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $this->handlePost();

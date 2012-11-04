@@ -135,7 +135,7 @@ class Router
 
             // main stuff is repetitive
 
-            $main = array('login', 'logout', 'register', 'subscribe',
+            $main = array('logout', 'register', 'subscribe',
                           'unsubscribe', 'cancelsubscription', 'approvesub',
                           'confirmaddress', 'recoverpassword',
                           'invite', 'favor', 'disfavor', 'sup',
@@ -157,6 +157,9 @@ class Router
             foreach ($main as $a) {
                 $m->connect('main/'.$a, array('action' => $a));
             }
+
+            $m->connect('main/login',
+                        array('action' => 'passwordlogin'));
 
             $m->connect('main/tagprofile/:id', array('action' => 'tagprofile'),
                                                array('id' => '[0-9]+'));

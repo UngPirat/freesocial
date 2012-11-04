@@ -20,12 +20,19 @@
 .form input, .form textarea {
 }
 
+section.widget {
+	margin-bottom: 1em;
+	position: relative;
+}
 
+
+form.reply .notice_data-text,
 #post textarea {
 	margin: 1ex 1em 1ex 0;
 	width: 75%;
 	clear: both;
 }
+form.reply .attachments,
 #post .attachments {
 	clear: left;
 	display: block;
@@ -35,6 +42,7 @@ textarea + .count {
 	float: right;
 	margin-right: 25%;
 }
+form.reply input.submit,
 #post input.submit {
 	font-size:2em;
 	position:absolute;
@@ -42,6 +50,9 @@ textarea + .count {
 	top:0;
 	bottom:0;
 	width:20%;
+}
+form.reply input.submit {
+	font-size: 1.5em;
 }
 #post legend {
 	display: none;

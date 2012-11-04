@@ -319,7 +319,7 @@ class OStatusSubAction extends Action
             // XXX: selfURL() didn't work. :<
             common_set_returnto($_SERVER['REQUEST_URI']);
             if (Event::handle('RedirectToLogin', array($this, null))) {
-                common_redirect(common_local_url('login'), 303);
+                common_redirect(common_local_url('passwordlogin'), 303);
             }
             return false;
         }

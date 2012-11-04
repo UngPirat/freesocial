@@ -1,8 +1,7 @@
 .notice .actions {
 	opacity: 0.4;
-	position: absolute;
-	top: 0;
-	right: 1ex;
+	clear: both;
+	text-align: right;
 }
 .notice:hover .actions {
 	opacity: 1.0;

@@ -1,38 +1,44 @@
 .public-action .conversations {
-	column-count: 2;
+/*	column-count: 2;
 	column-gap: 3em;
 	-moz-column-count: 2;
 	-moz-column-gap: 3em;
 	-webkit-column-count: 2;
-	-webkit-column-gap: 3em;
+	-webkit-column-gap: 3em;*/
+	font-size: 0.8em;
 }
 .conversations .conversation {
 	column-break-inside: avoid;
 	-moz-column-break-inside: avoid;
 	-webkit-column-break-inside: avoid;
-	display: inline-block;
 	margin: 1em 0;
-	padding: 0 1ex 1ex;
-	position: relative;
-	border-radius: 1em;
-	border-right: 1px solid gray;
-	width: 100%;
 }
 .notices {
 	display: block;
 }
 
 .conversation .notice {
-	margin-top: 1em;
+	margin: 1em 1ex;
 }
-.conversations .conversation,
-.notice {
+.conversation, .notice {
 	background-color: #f0f0f0;
 	background: -moz-linear-gradient(#ffffff, #f0f0f0);
 	background: -o-linear-gradient(#ffffff, #f0f0f0);
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ffffff), to(#f0f0f0)); /* older webkit syntax */
 	background: -webkit-linear-gradient(#ffffff, #f0f0f0);
 	box-shadow: rgba(0, 0, 0, 0.4) 0px 1px 2px;
+}
+
+.conversation, .notice {
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	border-radius: 1em;
+	position: relative;
+	padding: 1ex 1ex;
+	clear: both;
+}
+.conversation {
+	padding-top: 0;
 }
 /* WHY U NO MARGIN??? */
 .notice:after {
@@ -47,7 +53,6 @@
 	background: transparent;
 	border: none;
 	box-shadow: none;
-	padding: 0;
 	margin: 0;
 }
 .conversation .notice.repeat .content:before {
@@ -65,19 +70,6 @@
 	white-space: pre-wrap;
 }
 
-
-.notice, .profiles.list .list-item {
-	border-left: 1px solid gray;
-	border-right: 1px solid gray;
-	border-radius: 1em;
-	position: relative;
-	margin: 1em 0;
-	padding: 1ex 1ex 1em;
-	clear: both;
-}
-.notice {
-	padding: 1em 1ex 1ex;
-}
 .notice.spam {
 	border: 2px solid red;
 }
@@ -86,6 +78,7 @@
 }
 .notice .metadata {
 	font-size: 0.75em;
+	line-height: 1.1em;
 }
 .notice > * {
 	text-align: left;
@@ -100,6 +93,12 @@
 	border-radius: 1ex;
 	margin: 1ex auto;
 	max-width: 100%;
+}
+.conversation .notice .vcard .photo {
+	width: 64px;
+}
+.conversation .notice:first-child .vcard .photo {
+	width: auto;
 }
 .mini-list .vcard .photo {
 	border-radius: 0;
@@ -137,8 +136,6 @@
 }
 
 
-.showstream-action #stream .notice {
-}
 .notice-action #stream .vcard.author {
 	display: none;
 }

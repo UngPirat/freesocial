@@ -4,6 +4,8 @@ class SubscriberListWidget extends ProfileListWidget {
     protected $itemClass = 'subscriber';
 	protected $itemTag   = null;
 
+	protected $action = 'subscribers';
+
     static function run(array $args=array()) {
         $class = get_class();
         $widget = new $class($args);    // runs validate()

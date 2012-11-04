@@ -12,7 +12,7 @@
 .widget.mini-list .list-item {
 	padding: 0;
 }
-.profiles.mini-list > .vcard {
+.profiles.mini-list .vcard {
 	display: inline-block;
 	position: relative;
 }

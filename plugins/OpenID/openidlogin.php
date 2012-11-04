@@ -23,7 +23,7 @@ if (!defined('STATUSNET')) {
 
 require_once INSTALLDIR.'/plugins/OpenID/openid.php';
 
-class OpenidloginAction extends Action
+class OpenidloginAction extends LoginAction
 {
     function handle($args)
     {

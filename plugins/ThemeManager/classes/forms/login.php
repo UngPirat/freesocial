@@ -16,7 +16,7 @@ class LoginForm extends ThemeForm {
     function initialize() {
         parent::initialize();
 
-        $this->attributes['action'] = common_local_url('login');
+        $this->attributes['action'] = common_local_url('passwordlogin');
 
         if (empty($this->charlimit)) {
             $this->charlimit = Notice::maxContent();

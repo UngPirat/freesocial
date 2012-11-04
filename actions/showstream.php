@@ -28,7 +28,7 @@
  * @link      http://status.net/
  */
 
-if (!defined('STATUSNET') && !defined('LACONICA')) {
+if (!defined('STATUSNET')) {
     exit(1);
 }
 
@@ -74,7 +74,7 @@ class ShowstreamAction extends ProfileAction
         	$stream = new ThreadingGroupNoticeStream($this->subject, $this->userProfile);
 		}
 
-        $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE, NOTICES_PER_PAGE + 1);
+        $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE, NOTICES_PER_PAGE);
 
         return true;
     }

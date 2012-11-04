@@ -77,7 +77,7 @@ class PrimaryNav extends Menu
                                 false,
                                 'nav_logout');
             } else {
-                $this->action->menuItem(common_local_url('login'),
+                $this->action->menuItem(common_local_url('passwordlogin'),
                                 // TRANS: Menu item in primary navigation panel.
                                 _m('MENU','Login'),
                                 // TRANS: Menu item title in primary navigation panel.

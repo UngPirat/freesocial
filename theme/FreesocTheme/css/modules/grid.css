@@ -25,7 +25,8 @@
 	float: left;
 	width: 30%;
 }
-#content #profile + section {
+#content #profile + section,
+#content #profile + #stream {
 	float: right;
 	width: 60%;
 }

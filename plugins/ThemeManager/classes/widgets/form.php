@@ -56,6 +56,7 @@ abstract class FormWidget extends ThemeForm {
 		}
 
         $args = array('class'=>"form widget {$this->widgetClass}");
+		echo 'widgetClass: '.$this->widgetClass;
         if (!empty($this->widgetId)) {
             $args['id'] = $this->widgetId;
         }

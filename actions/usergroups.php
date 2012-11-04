@@ -60,12 +60,12 @@ class UsergroupsAction extends ProfileAction
         if ($this->page == 1) {
             // TRANS: Page title for first page of groups for a user.
             // TRANS: %s is a nickname.
-            return sprintf(_('%s groups'), $this->user->nickname);
+            return sprintf(_('%s groups'), $this->profile->getBestName());
         } else {
             // TRANS: Page title for all but the first page of groups for a user.
             // TRANS: %1$s is a nickname, %2$d is a page number.
             return sprintf(_('%1$s groups, page %2$d'),
-                           $this->user->nickname,
+                           $this->profile->getBestName(),
                            $this->page);
         }
     }
@@ -88,15 +88,15 @@ class UsergroupsAction extends ProfileAction
             return false;
         }
 
-        $this->user = User::staticGet('nickname', $nickname);
+        $this->subject = User::staticGet('nickname', $nickname);
 
-        if (!$this->user) {
+        if (!$this->subject) {
             // TRANS: Client error displayed requesting groups for a non-existing user.
             $this->clientError(_('No such user.'), 404);
             return false;
         }
 
-        $this->profile = $this->user->getProfile();
+        $this->profile = $this->subject->getProfile();
 
         if (!$this->profile) {
             // TRANS: Error message displayed when referring to a user without a profile.
@@ -105,6 +105,12 @@ class UsergroupsAction extends ProfileAction
         }
 
         $this->page = $this->trimmed('page', 1);
+
+        $this->offset = ($this->page-1) * GROUPS_PER_PAGE;
+		$this->limit  = GROUPS_PER_PAGE + 1;
+
+
+        $this->profiles = $this->profile->getGroupProfiles($this->offset, $this->limit);
 
         return true;
     }
@@ -132,13 +138,10 @@ class UsergroupsAction extends ProfileAction
         $this->elementEnd('p');
 
         if (Event::handle('StartShowUserGroupsContent', array($this))) {
-            $offset = ($this->page-1) * GROUPS_PER_PAGE;
-            $limit =  GROUPS_PER_PAGE + 1;
-
-            $groups = $this->user->getGroups($offset, $limit);
+            $groups = $this->subject->getGroups($this->offset, $this->limit);
 
             if ($groups) {
-                $gl = new GroupList($groups, $this->user, $this);
+                $gl = new GroupList($groups, $this->subject, $this);
                 $cnt = $gl->show();
                 if (0 == $cnt) {
                     $this->showEmptyListMessage();
@@ -147,7 +150,7 @@ class UsergroupsAction extends ProfileAction
 
             $this->pagination($this->page > 1, $cnt > GROUPS_PER_PAGE,
                               $this->page, 'usergroups',
-                              array('nickname' => $this->user->nickname));
+                              array('nickname' => $this->profile->nickname));
 
             Event::handle('EndShowUserGroupsContent', array($this));
         }
@@ -157,11 +160,11 @@ class UsergroupsAction extends ProfileAction
     {
         // TRANS: Text on group page for a user that is not a member of any group.
         // TRANS: %s is a user nickname.
-        $message = sprintf(_('%s is not a member of any group.'), $this->user->nickname) . ' ';
+        $message = sprintf(_('%s is not a member of any group.'), $this->profile->nickname) . ' ';
 
         if (common_logged_in()) {
-            $current_user = common_current_user();
-            if ($this->user->id === $current_user->id) {
+            $cur = common_current_user();
+            if ($this->profile->id === $cur->id) {
                 // TRANS: Text on group page for a user that is not a member of any group. This message contains
                 // TRANS: a Markdown link in the form [link text](link) and a variable that should not be changed.
                 $message .= _('Try [searching for groups](%%action.groupsearch%%) and joining them.');

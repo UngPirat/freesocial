@@ -59,7 +59,7 @@ class OpenidtrustAction extends Action
         if(empty($this->user)){
             /* Go log in, and then come back. */
             common_set_returnto($_SERVER['REQUEST_URI']);
-            common_redirect(common_local_url('login'));
+            common_redirect(common_local_url('passwordlogin'));
             return;
         }
         $this->trust_root = $_SESSION['openid_trust_root'];

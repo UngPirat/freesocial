@@ -1,11 +1,13 @@
 <?php
 
-class ProfileListWidget extends ListWidget {
+abstract class ProfileListWidget extends ListWidget {
     protected $num = 15;
     protected $itemClass   = 'profile';
 	protected $itemTag     = 'li';
     protected $widgetClass = 'profiles';
-	protected $widgetTag   = 'ul';
+
+	// must be set
+	protected $action = null;
 
     protected $avatarSize  = Avatar::PROFILE_SIZE;
     protected $pagination  = true;
@@ -21,6 +23,10 @@ class ProfileListWidget extends ListWidget {
     }
 
     protected function validate() {
+		if ($this->action == null) {
+			return false;
+		}
+
         if (!is_a($this->item, 'Profile')) {
             return false;
         }
@@ -36,6 +42,7 @@ class ProfileListWidget extends ListWidget {
 		parent::initialize();
 
 		$this->widgetClass .= ($this->mini ? ' mini-list' : ' list');
+		$this->itemClass   .= ($this->mini ? ' vcard mini' : '');
 	}
 	
     function get_list() {
@@ -43,23 +50,28 @@ class ProfileListWidget extends ListWidget {
     }
 
     function the_item($item) {
-        $this->itemTag && $this->out->elementStart($this->itemTag, $this->itemClass);
-		VcardWidget::run(array('item'=>$item, 'avatarSize'=>$this->avatarSize, 'mini'=>$this->mini));
-        $this->itemTag && $this->out->elementEnd($this->itemTag);
+		VcardWidget::run(array('item'=>$item, 'itemTag'=>$this->itemTag, 'avatarSize'=>$this->avatarSize, 'mini'=>$this->mini));
     }
 
+	function get_page_action() {
+		return $this->action;
+	}
+
+	function get_page_link() {
+		return common_local_url($this->action, array('nickname'=>$this->item->nickname));
+	}
 	function get_count() {
 		return false;
 	}
 	function the_title() {
         if (!empty($this->title)) {
             $this->out->elementStart($this->titleTag, 'widget-title');
-			$this->titleLink && $this->out->elementStart('a', array('href'=>$this->titleLink));
+			$this->out->elementStart('a', array('href'=>$this->get_page_link()));
 			$this->out->text($this->title);
-			$this->titleLink && $this->out->elementEnd('a');
 			if ($this->showCount && $this->get_count()!==false) {
 				$this->out->element('span', 'count', sprintf('(%d)', $this->get_count()));
 			}
+			$this->out->elementEnd('a');
 			$this->out->elementEnd($this->titleTag);
         }
 	}

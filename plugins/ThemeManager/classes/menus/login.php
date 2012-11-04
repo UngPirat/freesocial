@@ -11,7 +11,7 @@ class LoginMenu extends ThemeMenu {
         parent::initialize();
 
 		$this->title = _m('Log in');
-		$this->titleLink = common_local_url('login');
+		$this->titleLink = common_local_url('passwordlogin');
     }
 
     function get_list() {
@@ -21,7 +21,7 @@ class LoginMenu extends ThemeMenu {
 
 	    if (Event::handle('StartLoginGroupNav', array($adapter))) :
 	        $list = array_merge($list, array(
-            	array('url'=>'login', 'label'=>_m('MENU','Password'), 'description'=>_m('Login with your password')),
+            	array('url'=>'passwordlogin', 'label'=>_m('MENU','Password'), 'description'=>_m('Login with your password')),
 	            ));
 	        Event::handle('EndLoginGroupNav', array($adapter));
 	    endif;

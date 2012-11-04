@@ -217,28 +217,18 @@ class NewnoticeAction extends Action
         }
         Event::handle('EndSaveNewNoticeWeb', array($this, $user, &$content_shortened, &$options));
 
+		$params = array();
         if ($this->boolean('ajax')) {
-            header('Content-Type: text/xml;charset=utf-8');
-            $this->xw->startDocument('1.0', 'UTF-8');
-            $this->elementStart('html');
-            $this->elementStart('head');
-            // TRANS: Page title after sending a notice.
-            $this->element('title', null, _('Notice posted'));
-            $this->elementEnd('head');
-            $this->elementStart('body');
-            $this->showNotice($notice);
-            $this->elementEnd('body');
-            $this->elementEnd('html');
-        } else {
-            $returnto = $this->trimmed('returnto');
+			$params['ajax'] = 'true';
+		}
+        $returnto = $this->trimmed('returnto');
 
-            if ($returnto) {
-                $url = common_local_url($returnto, array('nickname' => $user->nickname));
-            } else {
-                $url = common_local_url('notice', array('id' => $notice->id));
-            }
-            common_redirect($url, 303);
+        if ($returnto) {
+            $url = common_local_url($returnto, array('nickname' => $user->nickname), $params);
+        } else {
+            $url = common_local_url('notice', array('id' => $notice->id), $params);
         }
+        common_redirect($url, 303);
     }
 
     /**

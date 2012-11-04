@@ -65,7 +65,7 @@ class ConfirmaddressAction extends Action
         parent::handle($args);
         if (!common_logged_in()) {
             common_set_returnto($this->selfUrl());
-            common_redirect(common_local_url('login'));
+            common_redirect(common_local_url('passwordlogin'));
             return;
         }
         $code = $this->trimmed('code');

@@ -40,7 +40,7 @@ class NoticeWidget extends ThemeWidget {
     }
 
     function show() {
-        if (!$this->item->inScope($this->scoped)) {
+        if (!$this->can_show()) {
             return false;	// shouldn't this throw an exception?
         }
         if (!empty($this->item->repeat_of)) {
@@ -53,11 +53,22 @@ class NoticeWidget extends ThemeWidget {
         return true;
     }
 
+	function can_show() {
+        if (!$this->item->inScope($this->getScoped())) {
+            return false;	// shouldn't this throw an exception?
+        }
+		if ($this->profile->isSilenced() && (is_null($this->scoped) || !$this->scoped->hasRole(Profile_role::MODERATOR))) {
+			return false;
+		}
+		return true;
+	}
+
     function the_item() {
         $this->widgetTag && $this->out->elementStart($this->widgetTag, array('id'=>'notice-'.$this->get_notice_id(), 'class'=>$this->widgetClass));
 		$this->the_header();
         $this->the_vcard();
         $this->the_content();
+		$this->the_footer();
         if (common_config('attachments', 'show_thumbs')) {
             $this->the_attachments();
         }
@@ -131,8 +142,13 @@ class NoticeWidget extends ThemeWidget {
 		$this->out->flush();
         $this->out->elementStart('header');
         $this->the_metadata();
-        $this->the_actions();
         $this->out->elementEnd('header');
+	}
+	function the_footer() {
+		$this->out->flush();
+        $this->out->elementStart('footer');
+        $this->the_actions();
+        $this->out->elementEnd('footer');
 	}
     function the_actions() {
         try {

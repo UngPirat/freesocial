@@ -128,7 +128,7 @@ class OpenIDPlugin extends Plugin
         if (common_config('site', 'openidonly')) {
             if (array_key_exists('action', $args)) {
                 $action = trim($args['action']);
-                if (in_array($action, array('login', 'register'))) {
+                if (in_array($action, array('passwordlogin', 'register'))) {
                     common_redirect(common_local_url('openidlogin'));
                     exit(0);
                 } else if ($action == 'passwordsettings') {
@@ -490,7 +490,7 @@ class OpenIDPlugin extends Plugin
                   '(%%action.openidlogin%%)!)');
             }
             break;
-        case 'login':
+        case 'passwordlogin':
             // TRANS: Page notice on the login page to try and get them to log on with an OpenID account.
             // TRANS: This message contains Markdown links in the form (description)[link].
             $instr = _m('(Have an [OpenID](http://openid.net/)? ' .

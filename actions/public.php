@@ -84,8 +84,7 @@ class PublicAction extends Action
 
         $stream = new ThreadingPublicNoticeStream($this->userProfile);
 
-        $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE,
-                                            NOTICES_PER_PAGE + 1);
+        $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE, NOTICES_PER_PAGE);
 
         if (!$this->notice) {
             // TRANS: Server error displayed when a public timeline cannot be retrieved.

@@ -59,12 +59,12 @@ class LoginGroupNav extends Menu
 
         if (Event::handle('StartLoginGroupNav', array($this->action))) {
 
-            $this->action->menuItem(common_local_url('login'),
+            $this->action->menuItem(common_local_url('passwordlogin'),
                                     // TRANS: Menu item for logging in to the StatusNet site.
                                     _m('MENU','Login'),
                                     // TRANS: Title for menu item for logging in to the StatusNet site.
                                     _('Login with a username and password'),
-                                    $action_name === 'login');
+                                    $action_name === 'passwordlogin');
 
             if (!common_logged_in() &&
                 !(common_config('site','closed') || common_config('site','inviteonly'))) {

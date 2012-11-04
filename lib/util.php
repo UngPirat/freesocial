@@ -1256,7 +1256,7 @@ function common_local_url($action, $args=null, $params=null, $fragment=null, $ad
 function common_is_sensitive($action)
 {
     static $sensitive = array(
-        'login',
+        'passwordlogin',
         'register',
         'passwordsettings',
         'api',

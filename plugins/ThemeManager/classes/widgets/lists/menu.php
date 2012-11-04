@@ -59,7 +59,7 @@ class MenuListWidget extends ListWidget {
             list($actionName, $args, $label, $description) = $item;
             $actionUrl = common_local_url($actionName, $args);
             $this->out->elementStart('li', array('class'=>'menu-item' .
-                                                          ($actionName == $this->action->trimmed('action') ? ' current-menu-item' : '')
+                                                	($actionName == $this->action->trimmed('action') ? ' current-menu-item' : '')
                                                 ));
             $this->out->element('a', array('href'=>$actionUrl, 'title'=>$description), $label);
             $this->out->elementEnd('li');

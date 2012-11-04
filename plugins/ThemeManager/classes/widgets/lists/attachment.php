@@ -5,7 +5,6 @@ class AttachmentListWidget extends ListWidget {
     protected $num    = 10;
 
     protected $notice = null;
-	protected $widgetTag = 'ul';
 	protected $widgetClass = 'list attachments';
 
     static function run(array $args=array()) {

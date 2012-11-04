@@ -44,7 +44,7 @@ nav.paging {
 	text-align: center;
 }
 /* self-clearing bug */
-nav.paging .notice:after {
+#stream > ul > li:after {
     content: ".";
     display: block;
     height: 0;

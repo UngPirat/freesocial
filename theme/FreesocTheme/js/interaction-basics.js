@@ -1,8 +1,8 @@
 $(document).ready(function() {
-	$(".notice_data-text").bind('input', function(e) {
+	$(".notice_data-text").live('input', function(e) {
 		$(this).next(".count").html($(this).val().length);
 	});
-	$(".notice_data-text").bind('keyup', function(e) {
+	$(".notice_data-text").live('keyup', function(e) {
 		$(this).next(".count").html($(this).val().length);
 	});
 //	$("#newnotice").focus();
@@ -14,9 +14,26 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#newnotice').bind('keydown', function (e) {
+	$('form.newnotice').live('submit', function(e) {
+// ajaxform necessary to send files?
+/*		var form = $(this).parent();
+		var data = $(this).serializeArray();
+		data.push({"name":"ajax","value":"true"});
+		$.ajax({type: 'POST',
+				url: $(this).attr('action'),
+				data: data,
+				type: 'post'
+			})
+			.done(function(data) {
+				$(form).replaceWith(data);
+			});
+
+		return false;*/
+	});
+
+	$('.notice_data-text').live('keydown', function (e) {
 		if (e.ctrlKey && e.keyCode == 13) {
-			$("#newnotice-submit").click();
+			$('#' + $(this).attr('id') + '-submit').click();
 		}
 	});
 	$('.notice .action').live('click', function (e) {

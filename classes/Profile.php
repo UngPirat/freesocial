@@ -343,6 +343,11 @@ class Profile extends Managed_DataObject
 		return $ids;
 	}
 
+	function getGroupProfiles($offset=0, $limit=PROFILES_PER_PAGE, $desc=false) {
+		$ids = $this->getGroupIDs($offset, $limit, $desc);
+        return Profile::multiGet('id', $ids);
+    }
+
 	function getGroups($offset=0, $limit=PROFILES_PER_PAGE, $desc=false) {
 		$ids = $this->getGroupIDs($offset, $limit, $desc);
         return User_group::multiGet('id', $ids);
@@ -586,6 +591,7 @@ class Profile extends Managed_DataObject
             if (Event::handle('StartJoinGroup', array($group, $this))) {
                 $join = Group_member::join($group->id, $this->id);
                 self::blow('profile:groups:%d', $this->id);
+                self::blow('profile:group_count:%d', $this->id);
                 self::blow('group:member_ids:%d', $group->id);
                 self::blow('group:member_count:%d', $group->id);
                 Event::handle('EndJoinGroup', array($group, $this));
@@ -608,6 +614,7 @@ class Profile extends Managed_DataObject
         if (Event::handle('StartLeaveGroup', array($group, $this))) {
             Group_member::leave($group->id, $this->id);
             self::blow('profile:groups:%d', $this->id);
+            self::blow('profile:group_count:%d', $this->id);
             self::blow('group:member_ids:%d', $group->id);
             self::blow('group:member_count:%d', $group->id);
             Event::handle('EndLeaveGroup', array($group, $this));
@@ -738,6 +745,31 @@ class Profile extends Managed_DataObject
         return $members;
     }
 
+    function groupCount()
+    {
+        $c = Cache::instance();
+
+        if (!empty($c)) {
+            $cnt = $c->get(Cache::key('profile:group_count:'.$this->id));
+            if (is_integer($cnt)) {
+                return (int) $cnt;
+            }
+        }
+
+        $sub = new Group_member();
+        $sub->profile_id = $this->id;
+
+        $cnt = (int) $sub->count('DISTINCT group_id');
+
+        $cnt = ($cnt > 0) ? $cnt - 1 : $cnt;
+
+        if (!empty($c)) {
+            $c->set(Cache::key('profile:group_count:'.$this->id), $cnt);
+        }
+
+        return $cnt;
+    }
+
     function subscriptionCount()
     {
         $c = Cache::instance();
@@ -752,7 +784,7 @@ class Profile extends Managed_DataObject
         $sub = new Subscription();
         $sub->subscriber = $this->id;
 
-        $cnt = (int) $sub->count('distinct subscribed');
+        $cnt = (int) $sub->count('DISTINCT subscribed');
 
         $cnt = ($cnt > 0) ? $cnt - 1 : $cnt;
 
@@ -776,7 +808,7 @@ class Profile extends Managed_DataObject
         $sub = new Subscription();
         $sub->subscribed = $this->id;
         $sub->whereAdd('subscriber != subscribed');
-        $cnt = (int) $sub->count('distinct subscriber');
+        $cnt = (int) $sub->count('DISTINCT subscriber');
 
         if (!empty($c)) {
             $c->set(Cache::key('profile:subscriber_count:'.$this->id), $cnt);

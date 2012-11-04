@@ -12,10 +12,11 @@ abstract class ListWidget extends ThemeWidget {
     protected $pagination = false;
     protected $hideEmpty  = false;
 
-    protected $itemClass = 'list-item';
-    protected $itemTag;
+    protected $itemClass;
+    protected $itemTag  = 'li';
     protected $loopClass;
-    protected $loopTag;
+    protected $loopId   = null;
+    protected $loopTag  = 'ul';
 	protected $loopArgs = array();
 	protected $loopType = 'Object';
 
@@ -78,11 +79,15 @@ abstract class ListWidget extends ThemeWidget {
     }
 
     function the_loop() {
-        $this->loopTag && $this->out->elementStart($this->loopTag, $this->loopClass);
+		$this->out->flush();	// PHP crashes (memory limit?) if we don't flush once in a while
+		$args = array();
+		if (!empty($this->loopClass)) $args['class'] = $this->loopClass;
+		if (!empty($this->loopId)) $args['id'] = $this->loopId;
+        $this->loopTag && $this->out->elementStart($this->loopTag, $args);
         do {
-            $this->itemTag && $this->out->elementStart($this->itemTag, $this->itemClass);
+//            $this->itemTag && $this->out->elementStart($this->itemTag, $this->itemClass);
             $this->the_item($this->loop->current());
-            $this->itemTag && $this->out->elementEnd($this->itemTag);
+//            $this->itemTag && $this->out->elementEnd($this->itemTag);
         } while ($this->loop->next());
         $this->loopTag && $this->out->elementEnd($this->loopTag);
     }

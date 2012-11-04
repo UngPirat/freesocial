@@ -33,6 +33,6 @@ class NoticeListWidget extends ListWidget {
         } else {
             NoticeWidget::run(array('item'=>$item));
     	}*/
-        NoticeWidget::run(array('item'=>$item));
+        NoticeWidget::run(array('item'=>$item, 'widgetTag'=>$this->itemTag));
     }
 }
