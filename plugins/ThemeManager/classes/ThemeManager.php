@@ -263,4 +263,19 @@ class ThemeManagerAdapter {
     function getOut() {
         return $this->action;
     }
+
+    function __get($name)
+    {
+        return $this->action->$name;
+    }
+
+    function __isset($name)
+    {
+        return isset($this->action->$name);
+    }
+
+    function __call($name, $args)
+    {
+        return call_user_func_array(array($this->action, $name), $args);
+    }
 }

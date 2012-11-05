@@ -102,15 +102,14 @@ class BookmarkListPlugin extends Plugin
 
     function onEndPersonalNav($action)
     {
-        $this->user = common_current_user();
-
-        if (!$this->user) {
+		$profile = Profile::current();
+        if (!$profile) {
             // TRANS: Client error displayed when trying to display bookmarks for a non-existing user.
-            $this->clientError(_('No such user.'));
+            $this->clientError(_('No current profile.'));
             return false;
         }
 
-        $action->menuItem(common_local_url('bookmarks', array('nickname' => $this->user->nickname)),
+        $action->menuItem(common_local_url('bookmarks', array('nickname' => $profile->nickname)),
                           // TRANS: Menu item in sample plugin.
                           _m('Bookmarks'),
                           // TRANS: Menu item title in sample plugin.

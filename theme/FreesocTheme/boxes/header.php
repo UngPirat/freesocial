@@ -23,9 +23,9 @@ $this->out->elementStart('div', array('id'=>'wrapper'));
     $this->out->elementStart('div', array('id'=>'login'));
 
 	$this->menu('Session', array('widgetClass'=>'horizontal-menu session'));
-		if ($this->loggedIn()) {
-	        $this->widget('Vcard', array('item'=>$this->profile, 'avatarSize'=>Avatar::STREAM_SIZE, 'mini'=>true, 'webfinger'=>true));
-    	}
+	if ($this->loggedIn()) {
+	    $this->widget('Vcard', array('item'=>$this->profile, 'avatarSize'=>Avatar::STREAM_SIZE, 'mini'=>true, 'webfinger'=>true));
+    }
     $this->out->elementEnd('div');
     $this->box('topmenu');
 $this->out->elementEnd('header');

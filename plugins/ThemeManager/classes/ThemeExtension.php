@@ -19,13 +19,11 @@ abstract class ThemeExtension {
     }
 
     protected function prepare() {
-        if (is_null($this->scoped)) {
-            $this->getScoped();
-        }
+        $this->scoped = $this->getScoped();
     }
 
     protected function validate() {
-        if (is_null($this->scoped) || !is_a($this->scoped, 'Profile')) {
+        if (!is_null($this->scoped) && !is_a($this->scoped, 'Profile')) {
             return false;
         }
 
@@ -37,7 +35,7 @@ abstract class ThemeExtension {
     }
 
     function getScoped() {
-        if (empty($this->scoped)) {
+        if (is_null($this->scoped)) {
             $this->scoped = Profile::current();
         }
         return $this->scoped;
