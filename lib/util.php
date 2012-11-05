@@ -612,7 +612,9 @@ function common_linkify_mentions($text, $notice)
 
     foreach ($mentions as $mention)
     {
-        $points[$mention['position']] = $mention;
+		if (!is_null($mention['position'])) {
+	        $points[$mention['position']] = $mention;
+		}
     }
 
     krsort($points);
@@ -683,27 +685,36 @@ function common_find_mentions($text, $notice)
 
     if (Event::handle('StartFindMentions', array($sender, $text, &$mentions))) {
         // Get the context of the original notice, if any
-        $originalAuthor   = null;
-        $originalNotice   = null;
-        $originalMentions = array();
+        $parent          = null;
+        $parent_author   = null;
+        $parent_mentions = array();
 
-        // Is it a reply?
+		try {
+			$parent          = $notice->getParent();
+            $parent_author   = $parent->getProfile();
 
-        if (!empty($notice) && !empty($notice->reply_to)) {
-            $originalNotice = Notice::staticGet('id', $notice->reply_to);
-            if (!empty($originalNotice)) {
-                $originalAuthor = Profile::staticGet('id', $originalNotice->profile_id);
 
-                $ids = $originalNotice->getMentions();
+			// Implied mentions from parent notice
+			$implied = array('mentioned'=>$parent->getMentionProfiles(),
+							'text'=>null, 'position'=>null, 'url'=>null);
 
-                foreach ($ids as $id) {
-                    $repliedTo = Profile::staticGet('id', $id);
-                    if (!empty($repliedTo)) {
-                        $originalMentions[$repliedTo->nickname] = $repliedTo;
-                    }
-                }
-            }
-        }
+			// add these to nickname key-lookup for context-based mentions below
+			foreach($implied['mentioned'] as $profile) {
+				$parent_mentions[$profile->nickname] = $profile;
+			}
+
+			// We don't want to notify the user of a self-mention, right?
+            if ($notice->profile_id != $parent->profile_id) {
+				// And if we're replying to someone else's notice, reset
+				// the list and only mention the parent notice's author.
+				$implied['mentioned'] = array($parent_author);
+			}
+			// But let's maintain the context when double-replying
+			$mentions[] = $implied;
+			
+		} catch (Exception $e) {
+			// I guess it wasn't a reply_to
+		}
 
         $matches = common_find_mentions_raw($text);
 
@@ -719,11 +730,11 @@ function common_find_mentions($text, $notice)
             // Start with conversation context, then go to
             // sender context.
 
-            if (!empty($originalAuthor) && $originalAuthor->nickname == $nickname) {
-                $mentioned = $originalAuthor;
-            } else if (!empty($originalMentions) &&
-                       array_key_exists($nickname, $originalMentions)) {
-                $mentioned = $originalMentions[$nickname];
+            if (!empty($parent_author) && $parent_author->nickname == $nickname) {
+                $mentioned = $parent_author;
+            } else if (!empty($parent_mentions) &&
+                       array_key_exists($nickname, $parent_mentions)) {
+                $mentioned = $parent_mentions[$nickname];
             } else {
                 $mentioned = common_relative_profile($sender, $nickname);
             }

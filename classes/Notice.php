@@ -1328,55 +1328,31 @@ class Notice extends Managed_DataObject
             return array();
         }
 
-        $sender = Profile::staticGet($this->profile_id);
-
-        $mentioned = array();
-
-        // If it's a reply, save for the replied-to author
-
-        try {
-            $parent = $this->getParent();
-            do {
-                if ($this->profile_id != $parent->profile_id) {
-                    $author = $parent->getProfile();
-                    $this->saveMention($author->id);
-                    $mentioned[$author->id] = 1;
-                    self::blow('mention:stream:%d', $author->id);
-                    break;
-                }
-            } while ($parent = $parent->getParent());
-        } catch (Exception $e) {
-            // clear out the bad reply_to or profile_id?
-        }
-
         // @todo ideally this parser information would only
         // be calculated once.
 
         $mentions = common_find_mentions($this->content, $this);
 
-        // store mentioned only for first @ (what user/notice what the mention directed,
-        // we assume first @ is it)
-
         foreach ($mentions as $mention) {
 
-            foreach ($mention['mentioned'] as $user) {
+            foreach ($mention['mentioned'] as $profile) {
 
                 // skip if they're already covered
 
-                if (!empty($mentioned[$user->id])) {
+                if (!empty($mentioned[$profile->id])) {
                     continue;
                 }
 
                 // Don't save mentions from blocked profile to local user
 
-                $mentioned_user = User::staticGet('id', $user->id);
-                if (!empty($mentioned_user) && $mentioned_user->hasBlocked($sender)) {
+                $rcpt = User::staticGet('id', $profile->id);
+                if (!empty($rcpt) && $rcpt->hasBlocked($sender)) {
                     continue;
                 }
 
-                $this->saveMention($user->id);
-                $mentioned[$user->id] = 1;
-                self::blow('mention:stream:%d', $user->id);
+                $this->saveMention($profile->id);
+                $mentioned[$profile->id] = 1;
+                self::blow('mention:stream:%d', $profile->id);
             }
         }
 
