@@ -128,9 +128,7 @@ class UserFlagPlugin extends Plugin
      */
     function onEndProfilePageActionsElements($action, $profile)
     {
-        $this->showFlagButton($action, $profile,
-                              array('action' => 'showstream',
-                                    'nickname' => $profile->nickname));
+        $this->showFlagButton($action, $profile, array('action' => 'profile', 'nickname' => $profile->nickname));
 
         return true;
     }

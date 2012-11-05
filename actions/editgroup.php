@@ -250,7 +250,7 @@ class EditgroupAction extends GroupAction
             $this->group->homepage    = $homepage;
             $this->group->description = $description;
             $this->group->location    = $location;
-            $this->group->profileurl  = common_local_url('showstream', array('nickname' => $nickname));
+            $this->group->profileurl  = common_local_url('profile', array('nickname' => $nickname));
             $this->group->join_policy = $join_policy;
             $this->group->force_scope = $force_scope;
 

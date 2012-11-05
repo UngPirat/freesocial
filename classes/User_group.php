@@ -622,7 +622,7 @@ class User_group extends Managed_DataObject
         $profile->type = Profile::GROUP;
 
         if (empty($fields['profileurl'])) {
-            $fields['profileurl'] = common_local_url('showstream', array('nickname' => $fields['nickname']));
+            $fields['profileurl'] = common_local_url('profile', array('nickname' => $fields['nickname']));
         }
 
         // $default contains the Profile keys-to-be-set, $fields has the submitted values

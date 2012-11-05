@@ -71,12 +71,12 @@ class SubGroupNav extends Menu
 
         if (Event::handle('StartSubGroupNav', array($this))) {
 
-            $this->out->menuItem(common_local_url('showstream', array('nickname' =>
+            $this->out->menuItem(common_local_url('profile', array('nickname' =>
                                                                       $this->user->nickname)),
                                  // TRANS: Menu item in local navigation menu.
                                  _m('MENU','Profile'),
                                  (empty($profile)) ? $this->user->nickname : $profile->getBestName(),
-                                 $action == 'showstream',
+                                 $action == 'profile',
                                  'nav_profile');
             $this->out->menuItem(common_local_url('subscriptions',
                                                   array('nickname' =>

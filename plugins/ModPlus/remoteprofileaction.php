@@ -35,7 +35,7 @@ class RemoteProfileAction extends ShowstreamAction
         $user = User::staticGet('id', $this->profile->id);
         if ($user) {
             // This is a local user -- send to their regular profile.
-            $url = common_local_url('showstream', array('nickname' => $user->nickname));
+            $url = common_local_url('profile', array('nickname' => $user->nickname));
             common_redirect($url);
             return false;
         }

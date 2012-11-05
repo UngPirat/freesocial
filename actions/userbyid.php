@@ -84,7 +84,7 @@ class UserbyidAction extends Action
                       ? $_SERVER['HTTP_ACCEPT'] : null;
         $type       = common_negotiate_type(common_accept_to_prefs($httpaccept),
                       common_accept_to_prefs($page_prefs));
-        $page       = $type == 'application/rdf+xml' ? 'foaf' : 'showstream';
+        $page       = $type == 'application/rdf+xml' ? 'foaf' : 'profile';
         $url        = common_local_url($page, array('nickname' => $user->nickname));
         common_redirect($url, 303);
     }

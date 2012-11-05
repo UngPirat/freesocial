@@ -373,8 +373,7 @@ class FlaggedProfileListItem extends ProfileListItem
 
         foreach ($flaggers as $flagger) {
 
-            $url = common_local_url('showstream',
-                                    array('nickname' => $flagger->nickname));
+            $url = common_local_url('profile', array('nickname' => $flagger->nickname));
 
             $lnks[] = XMLStringer::estring('a', array('href' => $url,
                                                       'class' => 'flagger'),

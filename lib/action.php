@@ -519,8 +519,7 @@ class Action extends HTMLOutputter // lawsuit
         if (Event::handle('StartAddressData', array($this))) {
             if (common_config('singleuser', 'enabled')) {
                 $user = User::singleUser();
-                $url = common_local_url('showstream',
-                                        array('nickname' => $user->nickname));
+                $url = common_local_url('profile', array('nickname' => $user->nickname));
             } else if (common_logged_in()) {
                 $cur = common_current_user();
                 $url = common_local_url('timeline', array('nickname' => $cur->nickname));

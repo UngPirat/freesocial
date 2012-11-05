@@ -120,11 +120,9 @@ function updateGroupUrls()
                     $group->mini_logo = Avatar::url(basename($group->mini_logo));
                 }
                 // XXX: this is a hack to see if a group is local or not
-                $localUri = common_local_url('groupbyid',
-                                             array('id' => $group->id));
+                $localUri = common_local_url('groupbyid', array('id' => $group->id));
                 if ($group->getUri() != $localUri) {
-                    $group->profileurl = common_local_url('showstream',
-                                                        array('nickname' => $group->nickname));
+                    $group->profileurl = common_local_url('profile', array('nickname' => $group->nickname));
                 }
                 $group->update($orig);
                 printfv("DONE.");

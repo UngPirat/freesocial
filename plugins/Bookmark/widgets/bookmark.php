@@ -35,7 +35,7 @@ class BookmarkWidget extends NoticeWidget {
 
         // Whether to nofollow
         $nf = common_config('nofollow', 'external');
-        if ($nf == 'never' || ($nf == 'sometimes' and $this->out instanceof ShowstreamAction)) {
+        if ($nf == 'never' || ($nf == 'sometimes' and $this->out instanceof ProfileAction)) {
             $attrs['rel'] = 'external';
         } else {
             $attrs['rel'] = 'nofollow external';

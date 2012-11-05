@@ -9,6 +9,10 @@
     $this->title .= ' | ';
     $this->title .= $this->get_siteinfo('name');
     $this->out->element('title', null, $this->title);
+	foreach (array('jquery-1.8.1.min', 'fancybox/jquery.fancybox.pack',
+					'jquery-form/jquery.form', 'init', 'interaction-basics') as $script) {
+    	$this->out->script($this->url("js/$script.js"));
+	}
     $this->head();
 $this->out->elementEnd('head');
 $this->out->elementStart('body', $this->is_action());

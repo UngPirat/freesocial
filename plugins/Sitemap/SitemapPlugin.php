@@ -146,7 +146,7 @@ class SitemapPlugin extends Plugin
 
         // Different "top" pages if it's single user or not
 
-        if (($singleUser && $actionName == 'showstream') ||
+        if (($singleUser && $actionName == 'profile') ||
             (!$singleUser && $actionName == 'public')) {
 
             $keys = array('googlekey' => 'google-site-verification',

@@ -80,7 +80,7 @@ class groupRssAction extends Rss10Action
 
         if ($nickname_arg != $nickname) {
             $args = array('nickname' => $nickname);
-            common_redirect(common_local_url('showstream', $args), 301);
+            common_redirect(common_local_url('grouprss', $args), 301);
             return false;
         }
 

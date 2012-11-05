@@ -23,7 +23,7 @@ class HappeningWidget extends NoticeWidget {
             return;
         }
 
-        $this->out->elementStart('span', array('class' => 'entry-content'));
+        $this->out->elementStart('span', array('class' => 'content'));
 
         $attrs = array('href' => $happening->url,
                        'class' => 'happening-title',

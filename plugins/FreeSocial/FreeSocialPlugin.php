@@ -87,7 +87,7 @@ class FreeSocialPlugin extends Plugin {
 	function onStartAddressData($out) {
         if (common_config('singleuser', 'enabled')) {
             $user = User::singleUser();
-            $url = common_local_url('showstream',
+            $url = common_local_url('timeline',
                                     array('nickname' => $user->nickname));
         } else if (common_logged_in()) {
             $user = common_current_user();

@@ -565,7 +565,7 @@ abstract class ImPlugin extends Plugin
                                              'content' => $id->toString()));
             }
 
-        } else if ($aname == 'showstream') {
+        } else if ($aname == 'profile') {
 
             $user_im_prefs = new User_im_prefs();
             $user_im_prefs->user_id = $action->subject->id;

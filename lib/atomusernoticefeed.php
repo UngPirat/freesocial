@@ -87,12 +87,7 @@ class AtomUserNoticeFeed extends AtomNoticeFeed
 
         $this->setUpdated('now');
 
-        $this->addLink(
-            common_local_url(
-                'showstream',
-                array('nickname' => $user->nickname)
-            )
-        );
+        $this->addLink(common_local_url('profile', array('nickname' => $user->nickname)));
 
         $self = common_local_url('ApiTimelineUser',
                                  array('id' => $user->id,

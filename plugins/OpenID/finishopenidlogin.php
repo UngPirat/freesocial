@@ -430,8 +430,7 @@ class FinishopenidloginAction extends Action
 
         Event::handle('EndRegistrationTry', array($this));
 
-        common_redirect(common_local_url('showstream', array('nickname' => $user->nickname)),
-                        303);
+        common_redirect(common_local_url('profile', array('nickname' => $user->nickname)), 303);
     }
 
     function connectUser()

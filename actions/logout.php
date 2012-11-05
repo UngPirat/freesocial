@@ -75,8 +75,7 @@ class LogoutAction extends Action
 
             if (common_config('singleuser', 'enabled')) {
                 $user = User::singleUser();
-                common_redirect(common_local_url('showstream',
-                                                 array('nickname' => $user->nickname)));
+                common_redirect(common_local_url('profile', array('nickname' => $user->nickname)));
             } else {
                 common_redirect(common_local_url('public'), 303);
             }

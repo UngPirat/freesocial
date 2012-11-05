@@ -35,20 +35,6 @@ class GalleryAction extends ProfileAction
         return true;
     }
 
-    function handle($args)
-    {
-        parent::handle($args);
-
-		// Post from the tag dropdown; redirect to a GET
-
-		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		    common_redirect($this->selfUrl(), 303);
-            return;
-		}
-
-        $this->showPage();
-    }
-
     function showContent()
     {
         $this->showTagsDropdown();

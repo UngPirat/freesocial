@@ -115,12 +115,6 @@ class UsergroupsAction extends ProfileAction
         return true;
     }
 
-    function handle($args)
-    {
-        parent::handle($args);
-        $this->showPage();
-    }
-
     function showContent()
     {
         $this->elementStart('p', array('id' => 'new_group'));

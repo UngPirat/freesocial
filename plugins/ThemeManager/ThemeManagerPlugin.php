@@ -47,7 +47,8 @@ class ThemeManagerPlugin extends Plugin {
                 'public'       => 'noticelist',
                 'settings'     => 'settings',
                 'notice'       => 'noticelist',
-                'showstream'   => 'profile',
+                'profile'      => 'profile',
+//                'showstream'   => 'profile',
                 'usergroups'   => 'profile',
                 ));
     }

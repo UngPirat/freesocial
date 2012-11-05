@@ -48,6 +48,8 @@ class SettingsMenu extends ThemeMenu {
             if ($haveImPlugin) {
                 $list[] = array('url'=>'imsettings', 'label'=>_m('MENU','Messaging'), 'description'=>'Instant messengers');
             }
+
+			$list[] = array('menu'=>'ConnectionsMenu');
         }
 
         unset($adapter);

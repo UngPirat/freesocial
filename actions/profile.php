@@ -51,7 +51,6 @@ class ProfileAction extends Action
     var $subject = null;
     var $page    = null;
     var $profile = null;
-    var $tag     = null;
 
     function prepare($args)
     {
@@ -114,10 +113,21 @@ class ProfileAction extends Action
             throw new ClientException(_('This profile has been silenced by site moderators'), 403);
         }
 
-        $this->tag = $this->trimmed('tag');
         $this->page = ($this->arg('page')) ? ($this->arg('page')+0) : 1;
         common_set_returnto($this->selfUrl());
         return true;
+    }
+
+    function handle($args)
+    {
+		parent::handle();
+
+        $this->showPage();
+    }
+
+    function title()
+    {
+		return sprintf('%s profile', $this->profile->getFancyName());
     }
 
     function showSections()

@@ -26,20 +26,17 @@ nav > .menu > li {
 	float: left;
 	position: relative;
 }
-header .menu-container > .menu > li:hover > .menu-title {
+header .menu-container > .menu > li:hover .menu-title {
 	color: #373737;
 }
-header .menu-container .menu > li > .menu-title {
+header .menu-container .menu > li .menu-title {
 	color: #eee;
 	font-size: 1em;
-	padding: 0 2em;
-	line-height: 3.333em;
 }
-header .menu-container nav a,
-header .menu-container nav h3 {
+header .menu-container .menu > li > h3,
+header .menu-container .menu > li > a {
 	line-height: 3.333em;
-	padding: 0 1.2125em;
-	text-decoration: none;
+	padding: 0 2em;
 }
 nav .sub-menu {
 	-moz-box-shadow: 0 3px 3px rgba(0,0,0,0.2);
@@ -61,12 +58,12 @@ nav .sub-menu ul {
 nav .sub-menu a, nav .sub-menu h3 {
 	font-size: 13px;
 	font-weight: normal;
-	height: auto;
 	line-height: 1.4em;
-	width: 148px;
 }
-nav li a {
+nav a {
 	display: block;
+}
+nav .sub-menu li a {
 	background: #f9f9f9;
 	color: #444;
 	border-bottom: 1px dotted #ddd;
@@ -75,9 +72,8 @@ nav li a {
 nav li h3 {
 	padding: 0;
 }
-header nav li:hover > h3 > a,
-header nav li:hover > h3,
 nav h3:focus,
+nav li:hover > h3,
 nav li:hover > a,
 nav a:focus {
 	background: -moz-linear-gradient(#f9f9f9, #e5e5e5);
@@ -108,13 +104,13 @@ nav.horizontal-menu, nav.vertical-menu {
 }
 #content .horizontal-menu {
 	float: right;
-	width: 60%;
+	width: 70%;
 }
 nav.horizontal-menu .sub-menu {
 	top: 2.333em;
 }
-nav.horizontal-menu li a,
-nav.vertical-menu li a {
+nav.horizontal-menu li > a,
+nav.vertical-menu li > a {
 	color: #222;
 	font-size: 1em;
 	padding: 0 1em;

@@ -2,9 +2,11 @@
 
 class ThemeMenu extends ListWidget {
     protected $list  = array();
-	protected $action = null;
+    protected $action = null;
     protected $offset = 0;
     protected $num    = -1;
+
+    protected $submenus    = true;
 
     protected $menuClass   = 'sub-menu';
     protected $itemClass   = null;
@@ -34,14 +36,18 @@ class ThemeMenu extends ListWidget {
     function the_item($item) {
         $menu = null;
         if (isset($item['menu']) && is_subclass_of($item['menu'], 'ThemeMenu')) {
+			if (!$this->submenus) {
+				/* skipping submenu */
+				return null;
+			}
             try {
-				$class = $item['menu'];
-				$args = isset($item['args']) ? $item['args'] : array();
-				foreach(array('action', 'loopClass', 'widgetTag') as $key) {
-					if (!isset($args[$key])) {
-						$args[$key] = $this->$key;
-					}
-				}
+                $class = $item['menu'];
+                $args = isset($item['args']) ? $item['args'] : array();
+                foreach(array('action', 'loopClass', 'widgetTag') as $key) {
+                    if (!isset($args[$key])) {
+                        $args[$key] = $this->$key;
+                    }
+                }
                 $menu = new $class($args);
             } catch (Exception $e) {
                 return false;
@@ -49,11 +55,11 @@ class ThemeMenu extends ListWidget {
             if (!$menu->count()) {
                 return false;
             }
-        }
 
-        if (!is_null($menu)) {
-            return $menu->show();
-        }
+            if (!is_null($menu)) {
+                return $menu->show();
+            }
+		}
 
         $this->menu_item($item, $this->out, $this->action);
     }
@@ -76,18 +82,18 @@ class ThemeMenu extends ListWidget {
     
     function the_content() {
         $args = !empty($this->widgetClass)
-				? array('class'=>$this->widgetClass)
-				: array();
+                ? array('class'=>$this->widgetClass)
+                : array();
         if (!empty($this->widgetId)) {
             $args['id'] = $this->widgetId;
         }
 
         if ($this->loop->count()) {
             $this->widgetTag && $this->out->elementStart($this->widgetTag, $args);
-			$this->the_title();
+            $this->the_title();
             $this->the_loop();
             $this->the_more();
-        	$this->widgetTag && $this->out->elementEnd($this->widgetTag);
+            $this->widgetTag && $this->out->elementEnd($this->widgetTag);
         } else {
             $this->the_empty();
         }

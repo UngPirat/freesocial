@@ -431,17 +431,12 @@ ENDOFSCRIPT;
                 if (common_config('singleuser', 'enabled')) {
                     $user = User::singleUser();
 
-                    $destination = common_local_url(
-                        'showstream',
-                        array('nickname' => $user->nickname)
-                    );
+                    $destination = common_local_url('profile', array('nickname' => $user->nickname));
                 } else {
                     $destination = common_local_url('public');
                 }
 
-                $logoutUrl = $this->facebook->getLogoutUrl(
-                    array('next' => $destination)
-                );
+                $logoutUrl = $this->facebook->getLogoutUrl(array('next' => $destination));
 
                 common_log(LOG_INFO, "Logging user out of Facebook ({$cur->id}) with $logoutUrl");
 

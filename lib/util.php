@@ -989,7 +989,6 @@ function common_linkify($url) {
     }
 
     if (!empty($f)) {
-		common_debug('facebook getEnclosure: '.print_r($f, true));
         if ($f->getEnclosure()) {
             $is_attachment = true;
             $attachment_id = $f->id;
@@ -1521,7 +1520,7 @@ function common_broadcast_profile(Profile $profile)
 
 function common_profile_url($nickname)
 {
-    return common_local_url('showstream', array('nickname' => $nickname),
+    return common_local_url('profile', array('nickname' => $nickname),
                             null, null, false);
 }
 

@@ -98,7 +98,7 @@ class GroupsNav extends MoreMenu
         }
 
         if (empty($id)) {
-            $id = $this->menuItemID('showstream', array('nickname' => $args['nickname']));
+            $id = $this->menuItemID('profile', array('nickname' => $args['nickname']));
         }
 
         $url = $args['profileurl'];

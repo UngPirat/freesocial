@@ -56,6 +56,7 @@ require_once INSTALLDIR.'/lib/feedlist.php';
 class ShowstreamAction extends ProfileAction
 {
     var $notice;
+    var $tag     = null;
 	protected $action = 'showstream';
 
     function prepare($args)
@@ -75,6 +76,7 @@ class ShowstreamAction extends ProfileAction
 		}
 
         $this->notice = $stream->getNotices(($this->page-1)*NOTICES_PER_PAGE, NOTICES_PER_PAGE);
+        $this->tag = $this->trimmed('tag');
 
         return true;
     }
@@ -108,15 +110,6 @@ class ShowstreamAction extends ProfileAction
                                $this->page);
             }
         }
-    }
-
-    function handle($args)
-    {
-        // Looks like we're good; start output
-
-        // For YADIS discovery, we also have a <meta> tag
-
-        $this->showPage();
     }
 
     /**

@@ -880,6 +880,10 @@ class Router
                                   'nickname' => $nickname));
 
                 $m->connect('',
+                            array('action' => 'profile',
+                                  'nickname' => $nickname));
+
+                $m->connect('posts',
                             array('action' => 'showstream',
                                   'nickname' => $nickname));
 
@@ -1048,14 +1052,14 @@ class Router
                             array('nickname' => Nickname::DISPLAY_FMT));
 
                 $m->connect(':nickname',
-                            array('action' => 'showstream'),
+                            array('action' => 'profile'),
                             array('nickname' => Nickname::DISPLAY_FMT));
 
                 $m->connect(':nickname/',
-                            array('action' => 'showstream'),
+                            array('action' => 'profile'),
                             array('nickname' => Nickname::DISPLAY_FMT));
 
-                $m->connect(':nickname/stream',
+                $m->connect(':nickname/posts',
                             array('action' => 'showstream'),
                             array('nickname' => Nickname::DISPLAY_FMT));
             }

@@ -142,7 +142,7 @@ class OStatusPlugin extends Plugin
      */
     function onStartShowHTML($action)
     {
-        if ($action instanceof ShowstreamAction) {
+        if ($action instanceof ProfileAction) {
             $acct = 'acct:'. $action->subject->nickname .'@'. common_config('site', 'server');
             $url = common_local_url('userxrd');
             $url.= '?uri='. $acct;

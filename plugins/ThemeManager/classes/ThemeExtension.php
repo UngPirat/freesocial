@@ -9,6 +9,8 @@ abstract class ThemeExtension {
             $this->$key = isset($args[$key]) ? $args[$key] : $val;
         }
 
+        $this->prepare();
+
         if (!$this->validate()) {
             throw new Exception('Could not validate args');
         }
@@ -16,10 +18,14 @@ abstract class ThemeExtension {
         $this->initialize();
     }
 
-    protected function validate() {
+    protected function prepare() {
         if (is_null($this->scoped)) {
-			$this->getScoped();
-        } elseif (!is_a($this->scoped, 'Profile')) {
+            $this->getScoped();
+        }
+    }
+
+    protected function validate() {
+        if (is_null($this->scoped) || !is_a($this->scoped, 'Profile')) {
             return false;
         }
 
@@ -30,10 +36,10 @@ abstract class ThemeExtension {
         return true;
     }
 
-	function getScoped() {
-		if (empty($this->scoped)) {
+    function getScoped() {
+        if (empty($this->scoped)) {
             $this->scoped = Profile::current();
-		}
-		return $this->scoped;
-	}
+        }
+        return $this->scoped;
+    }
 }

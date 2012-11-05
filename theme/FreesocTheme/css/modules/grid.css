@@ -28,7 +28,8 @@
 #content #profile + section,
 #content #profile + #stream {
 	float: right;
-	width: 60%;
+	margin-right: 3%;
+	width: 64%;
 }
 
 .favorited-action #content .notice,

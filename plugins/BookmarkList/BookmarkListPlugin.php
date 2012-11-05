@@ -100,7 +100,7 @@ class BookmarkListPlugin extends Plugin
         return true;
     }
 
-    function onEndPersonalGroupNav($action)
+    function onEndPersonalNav($action)
     {
         $this->user = common_current_user();
 

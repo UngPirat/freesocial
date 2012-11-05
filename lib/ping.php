@@ -42,7 +42,7 @@ function ping_broadcast_notice($notice) {
          case 'extended':
             $req = xmlrpc_encode_request('weblogUpdates.ping',
                                          array($profile->nickname, # site name
-                                               common_local_url('showstream',
+                                               common_local_url('profile',
                                                                 array('nickname' => $profile->nickname)),
                                                common_local_url('notice',
                                                                 array('id' => $notice->id)),
@@ -81,7 +81,7 @@ function ping_broadcast_notice($notice) {
          case 'get':
          case 'post':
             $args = array('name' => $profile->nickname,
-                          'url' => common_local_url('showstream',
+                          'url' => common_local_url('profile',
                                                     array('nickname' => $profile->nickname)),
                           'changesURL' => common_local_url('userrss',
                                                            array('nickname' => $profile->nickname)));

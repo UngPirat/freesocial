@@ -306,7 +306,7 @@ class RealtimePlugin extends Plugin
 
         if (common_config('singleuser', 'enabled')) {
             $user = User::singleUser();
-            $url = common_local_url('showstream', array('nickname' => $user->nickname));
+            $url = common_local_url('profile', array('nickname' => $user->nickname));
         } else {
             $url = common_local_url('public');
         }

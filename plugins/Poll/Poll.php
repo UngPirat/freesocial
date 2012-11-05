@@ -191,6 +191,16 @@ class Poll extends Managed_DataObject
         return $counts;
     }
 
+	function totalVotes() {
+		$pr = new Poll_response();
+		$pr->poll_id = $this->id;
+		$pr->selectAdd('COUNT(profile_id) AS votes');
+		if (!$pr->find()) {
+			return false;
+		}
+		return $pr->votes;
+	}
+
     /**
      * Save a new poll notice
      *

@@ -5,6 +5,7 @@ class GlobalMenu extends ThemeMenu {
         parent::initialize();
 
         $this->title = _m('Global');
+        $this->titleLink = common_local_url('public');
     }
 
     function get_list() {

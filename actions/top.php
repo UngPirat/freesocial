@@ -72,7 +72,7 @@ class TopAction extends Action
     function handle($argarray=null)
     {
         if (common_config('singleuser', 'enabled')) {
-            $url = common_local_url('showstream', array('nickname' => User::singleUserNickname()));
+            $url = common_local_url('profile', array('nickname' => User::singleUserNickname()));
         } else {
             $url = common_local_url('public');
         }

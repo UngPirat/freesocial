@@ -111,19 +111,6 @@ class ShowgroupAction extends ShowstreamAction
     }
 
     /**
-     * Handle the request
-     *
-     * Shows a profile for the group, some controls, and a list of
-     * group notices.
-     *
-     * @return void
-     */
-    function handle($args)
-    {
-        $this->showPage();
-    }
-
-    /**
      * Show the page content
      *
      * Shows a group profile and a list of group notices
@@ -149,7 +136,7 @@ class ShowgroupAction extends ShowstreamAction
         $this->pagination($this->page > 1,
                           $cnt > NOTICES_PER_PAGE,
                           $this->page,
-                          'showstream',
+                          'showgroup',
                           array('nickname' => $this->group->nickname));
     }
 

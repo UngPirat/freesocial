@@ -83,7 +83,7 @@ class BookmarkListItem extends NoticeListItemAdapter
 
         $nf = common_config('nofollow', 'external');
 
-        if ($nf == 'never' || ($nf == 'sometimes' and $out instanceof ShowstreamAction)) {
+        if ($nf == 'never' || ($nf == 'sometimes' and $out instanceof ProfileAction)) {
             $attrs['rel'] = 'external';
         } else {
             $attrs['rel'] = 'nofollow external';

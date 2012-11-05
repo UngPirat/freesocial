@@ -1,4 +1,4 @@
 <?php
 
-    $this->menu('Profile', array('action'=>$this->action, 'profile'=>$this->action->profile, 'widgetClass'=>'horizontal-menu'));
+    $this->menu('Personal', array('action'=>$this->action, 'scoped'=>$this->action->profile, 'widgetClass'=>'horizontal-menu'));
 

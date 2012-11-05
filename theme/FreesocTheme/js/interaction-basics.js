@@ -15,6 +15,15 @@ $(document).ready(function() {
 	});
 
 	$('form.newnotice').live('submit', function(e) {
+		var newnotice = $(this).parent();
+		e.preventDefault();
+		$(this).ajaxSubmit({
+			data: { ajax: 'true' },
+			replaceTarget: true,
+			target: newnotice,
+		});
+	});
+
 // ajaxform necessary to send files?
 /*		var form = $(this).parent();
 		var data = $(this).serializeArray();
@@ -28,8 +37,9 @@ $(document).ready(function() {
 				$(form).replaceWith(data);
 			});
 
-		return false;*/
+		return false;
 	});
+*/
 
 	$('.notice_data-text').live('keydown', function (e) {
 		if (e.ctrlKey && e.keyCode == 13) {
@@ -37,6 +47,8 @@ $(document).ready(function() {
 		}
 	});
 	$('.notice .action').live('click', function (e) {
+		e.preventDefault();
+
 		var element = $(this);
 // fuck you webkit		[action, id] = $(element).attr('id').split('-');
 		var action = $(element).attr('id').split('-')[0];
@@ -57,10 +69,11 @@ $(document).ready(function() {
 				});
 			actionsection.remove();
 		}
-		return false;
 	});
 
-	$(".show-more").bind('click', function(e) {
+	$(".show-more").live('click', function(e) {
+		e.preventDefault();
+
 		var conv = $(this).parent();
 		var r = $.ajax('/ajax/' + $(this).parent().attr('id'))
 			.done(function(html) {
@@ -68,7 +81,6 @@ $(document).ready(function() {
 			});
 		$(this).html(loadingIcon());
 //		$(this).parent().load('/ajax/' + $(this).parent().attr('id') +  ' article');
-		return false;
 	});
 
 	function loadingIcon() {

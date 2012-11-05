@@ -593,7 +593,7 @@ class RegisterAction extends Action
         if (Event::handle('StartRegisterSuccess', array($this))) {
             $nickname = $this->arg('nickname');
 
-            $profileurl = common_local_url('showstream',
+            $profileurl = common_local_url('profile',
                                            array('nickname' => $nickname));
 
             $this->elementStart('div', 'success');

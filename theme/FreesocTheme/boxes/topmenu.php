@@ -1,4 +1,3 @@
 <?php
 
-    $this->menus(array('GlobalMenu', 'PersonalMenu', 'SettingsMenu', 'ConnectionsMenu'), array('action'=>$this->action));
-
+    $this->menus(array('GlobalMenu', 'PersonalMenu', 'FederationMenu', 'SettingsMenu'), array('action'=>$this->action));

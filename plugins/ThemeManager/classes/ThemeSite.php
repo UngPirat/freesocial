@@ -114,10 +114,6 @@ if ( isset($this->action->args['notm']))        self::$supported = array();
         }
     }
     function the_scripts() {
-        $this->out->script($this->url('js/jquery-1.8.1.min.js'));
-        $this->out->script($this->url('js/fancybox/jquery.fancybox.pack.js'));
-        $this->out->script($this->url('js/init.js'));
-        $this->out->script($this->url('js/interaction-basics.js'));
     }
     function the_styles() {
         $this->out->element('link', array('rel' => 'stylesheet',

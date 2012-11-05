@@ -188,7 +188,7 @@ class Profile extends Managed_DataObject
             if (!empty($this->profileurl)) {
                 $url = $this->profileurl;
             } else {
-                $url = common_local_url('showstream',
+                $url = common_local_url('profile',
                                         array('nickname' => $this->nickname));
             }
         }

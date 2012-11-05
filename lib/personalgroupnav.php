@@ -76,13 +76,13 @@ class PersonalGroupNav extends Menu
                                  // TRANS: %s is a username.
                                  sprintf(_('%s and friends'), $name),
                                  $mine && $action =='timeline', 'nav_timeline_personal');
-            $this->out->menuItem(common_local_url('showstream', array('nickname' =>
+            $this->out->menuItem(common_local_url('profile', array('nickname' =>
                                                                       $nickname)),
                                  // TRANS: Menu item in personal group navigation menu.
                                  _m('MENU','Profile'),
                                  // TRANS: Menu item title in personal group navigation menu.
                                  _('Your profile'),
-                                 $mine && $action =='showstream',
+                                 $mine && $action =='profile',
                                  'nav_profile');
             $this->out->menuItem(common_local_url('mentions', array('nickname' =>
                                                                    $nickname)),
