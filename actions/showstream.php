@@ -206,34 +206,6 @@ class ShowstreamAction extends ProfileAction
                               sprintf(_('FOAF for %s'), $this->subject->nickname)));
     }
 
-    function extraHead()
-    {
-        if ($this->profile->description) {
-            $this->element('meta', array('name' => 'description',
-                                         'content' => $this->profile->description));
-        }
-
-        if ($this->subject->emailmicroid && $this->subject->email && $this->profile->profileurl) {
-            $id = new Microid('mailto:'.$this->subject->email,
-                              $this->selfUrl());
-            $this->element('meta', array('name' => 'microid',
-                                         'content' => $id->toString()));
-        }
-
-        $rsd = common_local_url('rsd',
-                                array('nickname' => $this->subject->nickname));
-
-        // RSD, http://tales.phrasewise.com/rfc/rsd
-        $this->element('link', array('rel' => 'EditURI',
-                                     'type' => 'application/rsd+xml',
-                                     'href' => $rsd));
-
-        if ($this->page != 1) {
-            $this->element('link', array('rel' => 'canonical',
-                                         'href' => $this->subject->profileurl));
-        }
-    }
-
     function showEmptyListMessage()
     {
         // TRANS: First sentence of empty list message for a timeline. $1%s is a user nickname.
